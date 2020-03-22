@@ -1,0 +1,38 @@
+local stringUtils = {}
+stringUtils.arrayHasValue = function(tab, val)
+    for i, v in ipairs(tab) do if v == val then return true end end
+
+    return false
+end
+stringUtils.stringSplit = function(testString, separatorString)
+    local results = {}
+    if testString == nil then return results end
+    if separatorString == nil then separatorString = "%s" end
+
+    -- for w in string.gmatch(testString, "([^" .. separatorString .. "]*)" .. separatorString) do
+    for w in string.gmatch(testString, "([^" .. separatorString .. "]+)") do
+        -- print(w)
+        table.insert(results, w)
+    end
+    return results
+    -- consume it so:
+    -- for k, v in pairs(stringSplit(str0, "/")) do
+    -- for k, v in ipairs(stringSplit(str0, "/")) do
+    --     print(k, v)
+    -- end
+end
+stringUtils.stringStartsWith = function(testString, startString)
+    if not (startString) then return true end
+    if not (testString) then return false end
+    return string.sub(testString, 0, #startString) == startString
+end
+stringUtils.stringEndsWith = function(testString, endString)
+    if not (endString) then return true end
+    if not (testString) then return false end
+    return string.sub(testString, -#endString) == endString
+end
+stringUtils.stringContains = function(testString, containedString)
+    return not (not (string.find(testString, containedString)))
+end
+
+return stringUtils

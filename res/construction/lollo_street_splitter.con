@@ -1,0 +1,112 @@
+-- local dump = require 'luadump'
+local vec3 = require 'vec3'
+local transf = require 'transf'
+
+function data()
+    return {
+        type = 'STREET_CONSTRUCTION',
+        description = {
+            name = _('Street Splitter'),
+            description = _(
+                'Splits a street in two sections. Place it and then remove it to create a lane switching point. Place different types of streets or roads between and outside switching points to route road vehicles on different lanes.'
+            )
+        },
+        availability = {
+            yearFrom = 0,
+            yearTo = 0
+        },
+        order = 1,
+        collider = {
+            type = 'NONE'
+        },
+        autoRemovable = true,
+        skipCollision = true,
+        skipCollisionCheck = true,
+        updateFn = function(params)
+            -- print('lollo street splitter updateFn')
+            -- dump(true)(params)
+
+            local result = {}
+            result.colliders = {} -- LOLLO TODO check this
+            result.cost = 0
+            result.edgeLists = {}
+            result.models = {}
+            --		result.groundFaces = {}
+            --		result.h0 = {}
+            --		result.h1 = {}
+            result.collider = {
+                type = 'NONE'
+            }
+            result.autoRemovable = true
+            result.skipCollision = true
+            result.skipCollisionCheck = true
+            --		result.stations = {}
+            --		result.terminalGroups = {}
+            --		result.terrainAlignmentLists = {}
+
+            table.insert(
+                result.models,
+                {
+                    --id = "asset/icon/marker_exclamation.mdl",
+                    --id = "asset/icon/mark.mdl",
+                    --id = "station/street/mark.mdl",
+                    id = 'lollo_assets/mark.mdl',
+                    collider = {
+                        type = 'NONE'
+                    },
+                    autoRemovable = true,
+                    skipCollision = true,
+                    skipCollisionCheck = true,
+                    transf = transf.transl(vec3.new(0.0, 0.0, .0))
+                }
+            )
+
+            table.insert(
+                result.edgeLists,
+                {
+                    type = 'STREET',
+                    params = {
+                        collider = {
+                            type = 'NONE'
+                        },
+                        autoRemovable = true,
+                        skipCollision = true,
+                        skipCollisionCheck = true,
+                        type = 'lollo_ultrathin_street.lua', -- from res/config/street/
+                        tramTrackType = 'NO'
+                    },
+                    edges = {
+                        -- one entry refers to a position and a tangent
+                        --						{ { -45, .0, .0 }, { -1.0, .0, .0 } },  -- node 0
+                        --						{ { -60, .0, .0 }, { -1.0, .0, .0 } },  -- node 1 (snap node)
+                        --						{ { -5, .0, .0 }, { -1.0, .0, .0 } },  -- node 0
+                        --						{ { -6, .0, .0 }, { -1.0, .0, .0 } },  -- node 1 (snap node)
+                        -- {{-3, .0, .0}, {-1.0, .0, .0}}, -- node 0
+                        -- {{-6, .0, .0}, {-1.0, .0, .0}} -- node 1 (snap node)
+                        {{-5, .0, .0}, {-1.0, .0, .0}}, -- node 0
+                        {{-6, .0, .0}, {-1.0, .0, .0}} -- node 1 (snap node)
+                    },
+                    --					edgeType = "BRIDGE",
+                    --					edgeTypeName = "cement.lua",
+                    -- freeNodes = { 0, 1 },
+                    collider = {
+                        type = 'NONE'
+                    },
+                    autoRemovable = true,
+                    skipCollision = true, --useless
+                    skipCollisionCheck = true, --useless
+                    --					snapNodes = { 0 },  -- node 0 is allowed to snap to other edges of the same type --crashes
+                    snapNodes = {1} -- node 1 is allowed to snap to other edges of the same type
+                    --					snapNodes = { 0, 1 },  -- node 0 and 1 are allowed to snap to other edges of the same type --crashes
+                    --					tag2nodes = { },
+                }
+            )
+
+            return result
+        end,
+        upgradeFn = function(params)
+            -- print('lollo street splitter upgradeFn')
+            -- dump(true)(params)
+        end
+    }
+end
