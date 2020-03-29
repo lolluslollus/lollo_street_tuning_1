@@ -33,19 +33,20 @@ function data()
                 transportModes = {'BUS', 'ELECTRIC_TRAM', 'PERSON', 'TRAM'}
             }
         },
+        transportModesStreet = {'CAR', 'BUS', 'ELECTRIC_TRAM', 'TRAM'}, -- with this, tram tracks appear on all lanes, not only on the right one
         skipCollision = true,
         skipCollisionCheck = true,
-        streetWidth = 12.0,
-        sidewalkWidth = 2.0, -- was 4.0; 2 * sidewalkWidth + streetWidth must be 16
-        sidewalkHeight = .00,
+        streetWidth = 16.0,
+        sidewalkWidth = 4.0, -- 2 * sidewalkWidth + streetWidth must be 24
+        sidewalkHeight = .02,
         yearFrom = 1925,
         yearTo = 0,
         upgrade = false,
         country = true,
-        speed = 80.0,
-        type = 'lollo_medium_4_lane_country_road',
-        name = _('Medium country road with 4 lanes'),
-        desc = _('Medium country road with 4 lanes crammed in. Speed limit is %2%.'),
+        speed = 100.0,
+        type = 'lollo_large_4_lane_4_tram_tracks_country_road',
+        name = _('Large country road with 4 lanes and 4 tram tracks'),
+        desc = _('Large country road with 4 lanes, each with a tram track. Speed limit is %2%.'),
         categories = {'country'},
         materials = {
             streetPaving = {
@@ -106,13 +107,17 @@ function data()
                 name = ''
             },
             sidewalkLane = {},
-            sidewalkBorderInner = {},
+            sidewalkBorderInner = {
+                name = "street/country_new_large_sidewalk_border_inner.mtl",
+                size = { 9, 3.6 }
+            },
             sidewalkBorderOuter = {},
             sidewalkCurb = {},
             sidewalkWall = {}
         },
+        assets = { },
         borderGroundTex = 'street_border.lua',
         sidewalkFillGroundTex = 'country_sidewalk.lua',
-        cost = 70.0
+        cost = 75.0
     }
 end

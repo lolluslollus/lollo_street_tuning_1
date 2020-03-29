@@ -65,10 +65,13 @@ function data()
                 name = 'street/new_medium_lane.mtl',
                 size = {3.0, 3.0}
             },
-            streetStripe = {},
+            streetStripe = {
+                name = "street/country_new_medium_stripes.mtl",
+                size = { 32.0, .5 }
+            },
             streetStripeMedian = {
-                name = 'street/country_new_medium_stripes.mtl',
-                size = {32.0, .5}
+                name = "street/country_new_large_median.mtl",
+                size = { 4.0, .5 }
             },
             streetTram = {
                 name = 'street/new_medium_tram_paving.mtl',

@@ -1,17 +1,9 @@
 ﻿function data()
     return {
-        -- numLanes = 4,
+        --numLanes = 4,
         laneConfig = {
-            {
-                forward = false,
-                transportModesLane = {'BUS', 'ELECTRIC_TRAM', 'PERSON', 'TRAM'},
-                transportModes = {'BUS', 'ELECTRIC_TRAM', 'PERSON', 'TRAM'}
-            },
-            {
-                forward = false,
-                transportModesLane = {'BUS', 'CAR', 'ELECTRIC_TRAM', 'TRAM'},
-                transportModes = {'BUS', 'CAR', 'ELECTRIC_TRAM', 'TRAM'}
-            },
+            {forward = false, transportModesLane = {'PERSON', 'TRUCK'}, transportModes = {'PERSON', 'TRUCK'}},
+            {forward = false, transportModesLane = {'CAR', 'TRUCK'}, transportModes = {'CAR', 'TRUCK'}},
             {
                 forward = false,
                 transportModesLane = {'BUS', 'CAR', 'ELECTRIC_TRAM', 'TRAM', 'TRUCK'},
@@ -22,33 +14,25 @@
                 transportModesLane = {'BUS', 'CAR', 'ELECTRIC_TRAM', 'TRAM', 'TRUCK'},
                 transportModes = {'BUS', 'CAR', 'ELECTRIC_TRAM', 'TRAM', 'TRUCK'}
             },
-            {
-                forward = true,
-                transportModesLane = {'BUS', 'CAR', 'ELECTRIC_TRAM', 'TRAM'},
-                transportModes = {'BUS', 'CAR', 'ELECTRIC_TRAM', 'TRAM'}
-            },
-            {
-                forward = true,
-                transportModesLane = {'BUS', 'ELECTRIC_TRAM', 'PERSON', 'TRAM'},
-                transportModes = {'BUS', 'ELECTRIC_TRAM', 'PERSON', 'TRAM'}
-            }
+            {forward = true, transportModesLane = {'CAR', 'TRUCK'}, transportModes = {'CAR', 'TRUCK'}},
+            {forward = true, transportModesLane = {'PERSON', 'TRUCK'}, transportModes = {'PERSON', 'TRUCK'}}
         },
-        --transportModesStreet = {"CAR", "TRUCK"},
-        --transportModesSidewalk = {"BUS", "ELECTRIC_TRAM", "PERSON", "TRAM"}, --crashes
-        --transportModesSidewalk = {"PERSON"}, --crashes
+        transportModesStreet = {'CAR', 'BUS', 'ELECTRIC_TRAM', 'TRAM'}, -- with this, tram tracks appear on all lanes, not only on the right one
+        --transportModesSidewalk = { "PERSON", "TRUCK" }, --crashes
+        --transportModesSidewalk = { "PERSON" }, --crashes
         skipCollision = true,
         skipCollisionCheck = true,
-        streetWidth = 12.0,
-        sidewalkWidth = 2.0, -- was 4.0; 2 * sidewalkWidth + streetWidth must be 16
+        streetWidth = 16.0,
+        sidewalkWidth = 4.0, -- 2 * sidewalkWidth + streetWidth must be 24
         sidewalkHeight = .3,
         yearFrom = 1925,
         yearTo = 0,
         upgrade = false,
         country = false,
-        speed = 50.0,
-        type = 'lollo_medium_4_lane_street',
-        name = _('Medium street with 4 lanes'),
-        desc = _('Medium street with 4 lanes crammed in. Speed limit is %2%.'),
+        speed = 60.0,
+        type = 'lollo_large_4_lane_4_tram_tracks_street.lua',
+        name = _('Large street with 4 lanes and 4 tram tracks'),
+        desc = _('Large street with 4 lanes, each with a tram track. Speed limit is %2%.'),
         categories = {'urban'},
         borderGroundTex = 'street_border.lua',
         materials = {
@@ -57,21 +41,21 @@
                 size = {8.0, 8.0}
             },
             streetBorder = {
-                name = 'street/new_medium_border.mtl',
-                size = {2.0, .3}
+                name = "street/new_large_border.mtl",
+                size = { 6.0, .5 }
             },
             streetLane = {
                 name = 'street/new_medium_lane.mtl',
                 size = {4.0, 4.0}
             },
-            streetStripe = {
-                name = 'street/new_medium_stripes.mtl',
-                size = {8.0, .5}
+            streetArrow = {
+                name = "street/default_arrows.mtl",
+                size = { 9.0, 3.0 }
             },
-            -- streetStripeMedian = {
-            --     name = 'street/new_medium_stripes.mtl',
-            --     size = {8.0, .5}
-            -- },
+            streetStripe = {
+                name = "street/new_medium_stripes.mtl",
+                size = { 8.0, .5 }
+            },
             streetStripeMedian = {
                 name = "street/new_large_median.mtl",
                 size = { 4.0, 1 }
@@ -106,12 +90,7 @@
             crossingCrosswalk = {
                 name = 'street/new_medium_crosswalk.mtl',
                 size = {3.0, 2.5}
-                -- size = { 2.5, 2.5 }
             },
-            -- crossingStopline = {
-            -- 	name = "street/new_medium_stopline.mtl",
-            --	size = { 6.0, .5 }
-            -- },
             sidewalkPaving = {
                 name = 'street/new_medium_sidewalk.mtl',
                 size = {4.0, 4.0}
@@ -136,7 +115,7 @@
         },
         assets = {
             {
-                name = 'street/street_light_eu_c.mdl',
+                name = "street/street_light_eu_c.mdl",
                 offset = 8.0,
                 distance = 16.0,
                 prob = 1.0,
@@ -145,53 +124,63 @@
                 oneSideOnly = false,
                 alignToElevation = false,
                 avoidFaceEdges = false,
-                placeOnBridge = true
+                placeOnBridge = true,
             },
             {
-                name = 'street/street_asset_mix/fireplug_eu_c.mdl',
-                offset = 9.0,
+                name = "street/street_asset_mix/fireplug_eu_c.mdl",
+                offset = 10.0,
                 distance = 49.0,
                 prob = 0.5,
                 offsetOrth = 0.5,
                 randRot = false,
                 oneSideOnly = false,
                 alignToElevation = true,
-                avoidFaceEdges = false
+                avoidFaceEdges = false,
             },
             {
-                name = 'street/street_asset_mix/mailbox_eu_c.mdl',
-                offset = 8,
-                distance = 40.0,
+                name = "street/street_asset_mix/mailbox_eu_c.mdl",
+                offset = 9,
+                distance = 39.0,
                 prob = 0.3,
                 offsetOrth = 0.4,
                 randRot = false,
                 oneSideOnly = false,
                 alignToElevation = false,
-                avoidFaceEdges = false
+                avoidFaceEdges = false,
             },
             {
-                name = 'street/street_asset_mix/trash_standing_c.mdl',
+                name = "street/street_asset_mix/trash_standing_c.mdl",
                 offset = 20,
                 distance = 50.0,
                 prob = 0.5,
-                offsetOrth = 0.5, -- was 3.0,
+                offsetOrth = 3.0,
                 randRot = false,
                 oneSideOnly = false,
                 alignToElevation = true,
-                avoidFaceEdges = false
-            }
-            -- {
-            --	name = "asset/lamp_new.mdl",
-            --	offset = 5.0,
-            --	distance = 12.0,
-            --	prob = 1.0,
-            --	offsetOrth = 2.4,
-            --	randRot = false,
-            --	oneSideOnly = false,
-            --	alignToElevation = false,
-            --	avoidFaceEdges = true,
-            --	placeOnBridge = true,
-            --},
+                avoidFaceEdges = false,
+            },
+            {
+                name = "asset/tree_bed_new.mdl",
+                offset = 13.0,
+                distance = 23.0,
+                prob = 1.0,
+                offsetOrth = 2.89,
+                randRot = false,
+                oneSideOnly = false,
+                alignToElevation = true,
+                avoidFaceEdges = true,
+            },
+            {
+                name = "tree/lombardy_poplar.mdl",
+                offset = 13.0,
+                distance = 23.0,
+                prob = 1.0,
+                offsetOrth = 2.8,
+                randRot = true,
+                oneSideOnly = false,
+                alignToElevation = false,
+                avoidFaceEdges = true,
+            },
         },
         signalAssetName = 'asset/ampel.mdl',
         cost = 60.0
