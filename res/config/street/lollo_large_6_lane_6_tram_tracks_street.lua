@@ -1,8 +1,9 @@
 ﻿function data()
     return {
-        --numLanes = 4,
+        --numLanes = 6,
         laneConfig = {
             {forward = false, transportModesLane = {'PERSON', 'TRUCK'}, transportModes = {'PERSON', 'TRUCK'}},
+            {forward = false, transportModesLane = {'CAR', 'TRUCK'}, transportModes = {'CAR', 'TRUCK'}},
             {forward = false, transportModesLane = {'CAR', 'TRUCK'}, transportModes = {'CAR', 'TRUCK'}},
             {
                 forward = false,
@@ -15,6 +16,7 @@
                 transportModes = {'BUS', 'CAR', 'ELECTRIC_TRAM', 'TRAM', 'TRUCK'}
             },
             {forward = true, transportModesLane = {'CAR', 'TRUCK'}, transportModes = {'CAR', 'TRUCK'}},
+            {forward = true, transportModesLane = {'CAR', 'TRUCK'}, transportModes = {'CAR', 'TRUCK'}},
             {forward = true, transportModesLane = {'PERSON', 'TRUCK'}, transportModes = {'PERSON', 'TRUCK'}}
         },
         transportModesStreet = {'CAR', 'BUS', 'ELECTRIC_TRAM', 'TRAM'}, -- with this, tram tracks appear on all lanes, not only on the right one
@@ -22,8 +24,8 @@
         --transportModesSidewalk = { "PERSON" }, --crashes
         skipCollision = true,
         skipCollisionCheck = true,
-        streetWidth = 16.0,
-        sidewalkWidth = 4.0, -- 2 * sidewalkWidth + streetWidth must be 24
+        streetWidth = 20.0,
+        sidewalkWidth = 2.0, -- 2 * sidewalkWidth + streetWidth must be 24
         sidewalkHeight = .3,
         yearFrom = 1925,
         yearTo = 0,
@@ -31,9 +33,9 @@
         country = false,
         speed = 60.0,
         priority = 1, -- LOLLO NOTE this is copied from airports, it should give priority to this street
-        type = 'lollo_large_4_lane_4_tram_tracks_street.lua',
-        name = _('Large street with 4 lanes and 4 tram tracks'),
-        desc = _('Large street with 4 lanes, each with a tram track. Speed limit is %2%.'),
+        type = 'lollo_large_6_lane_6_tram_tracks_street.lua',
+        name = _('Large street with 6 lanes and 6 tram tracks'),
+        desc = _('Large street with 6 lanes crammed in, each with a tram track. Speed limit is %2%.'),
         categories = {'urban'},
         borderGroundTex = 'street_border.lua',
         materials = {
