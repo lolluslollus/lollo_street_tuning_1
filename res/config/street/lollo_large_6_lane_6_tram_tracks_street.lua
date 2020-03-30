@@ -156,7 +156,7 @@
                 offset = 20,
                 distance = 50.0,
                 prob = 0.5,
-                offsetOrth = 3.0,
+                offsetOrth = 0.5, -- was 3.0,
                 randRot = false,
                 oneSideOnly = false,
                 alignToElevation = true,
