@@ -34,8 +34,6 @@ function data()
             }
         },
         transportModesStreet = {'CAR', 'BUS', 'ELECTRIC_TRAM', 'TRAM'}, -- with this, tram tracks appear on all lanes, not only on the right one
-        skipCollision = true,
-        skipCollisionCheck = true,
         streetWidth = 12.0,
         sidewalkWidth = 2.0, -- was 4.0; 2 * sidewalkWidth + streetWidth must be 16
         sidewalkHeight = .00,
@@ -44,7 +42,7 @@ function data()
         upgrade = false,
         country = true,
         speed = 80.0,
-        priority = 5, -- LOLLO NOTE this is copied from airports, it should give priority to this street
+        -- priority = this crashes 5, -- LOLLO NOTE this is copied from airports, it should give priority to this street
         type = 'lollo_medium_4_lane_4_tram_tracks_country_road',
         name = _('Medium country road with 4 lanes and 4 tram tracks'),
         desc = _('Medium country road with 4 lanes crammed in, each with a tram track. Speed limit is %2%.'),

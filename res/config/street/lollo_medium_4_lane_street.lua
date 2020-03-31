@@ -36,8 +36,6 @@
         --transportModesStreet = {"CAR", "TRUCK"},
         --transportModesSidewalk = {"BUS", "ELECTRIC_TRAM", "PERSON", "TRAM"}, --crashes
         --transportModesSidewalk = {"PERSON"}, --crashes
-        skipCollision = true,
-        skipCollisionCheck = true,
         streetWidth = 12.0,
         sidewalkWidth = 2.0, -- was 4.0; 2 * sidewalkWidth + streetWidth must be 16
         sidewalkHeight = .3,
@@ -46,7 +44,7 @@
         upgrade = false,
         country = false,
         speed = 50.0,
-        priority = 5, -- LOLLO NOTE this is copied from airports, it should give priority to this street
+        -- priority = this crashes 5, -- LOLLO NOTE this is copied from airports, it should give priority to this street
         type = 'lollo_medium_4_lane_street',
         name = _('Medium street with 4 lanes'),
         desc = _('Medium street with 4 lanes crammed in. Speed limit is %2%.'),

@@ -12,8 +12,6 @@ return {
 	--transportModesStreet = { "CAR", "BUS", "ELECTRIC_TRAM", "TRAM" }, -- with this, tram tracks appear on all lanes, not only on the right one
 	--transportModesSidewalk = { "PERSON", "TRUCK" }, --crashes
 	--transportModesSidewalk = { "PERSON" }, --crashes
-	skipCollision = true,
-	skipCollisionCheck = true,
 	streetWidth = 12.0,
 	sidewalkWidth = 2.0, -- was 4.0; 2 * sidewalkWidth + streetWidth must be 16
 	sidewalkHeight = .3,
@@ -44,10 +42,10 @@ return {
 			name = 'street/new_medium_stripes.mtl',
 			size = {8.0, .5}
 		},
-		streetStripeMedian = {
-			name = 'street/new_medium_stripes.mtl',
-			size = {8.0, .5}
-		},
+            streetStripeMedian = {
+                name = 'street/new_large_median.mtl',
+                size = {4.0, 1}
+            },
 		streetTram = {
 			name = "street/new_medium_tram_paving.mtl",
 			size = { 2.0, 2.0 }

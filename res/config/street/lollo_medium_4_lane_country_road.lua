@@ -33,8 +33,6 @@ function data()
                 transportModes = {'BUS', 'ELECTRIC_TRAM', 'PERSON', 'TRAM'}
             }
         },
-        skipCollision = true,
-        skipCollisionCheck = true,
         streetWidth = 12.0,
         sidewalkWidth = 2.0, -- was 4.0; 2 * sidewalkWidth + streetWidth must be 16
         sidewalkHeight = .00,
@@ -43,7 +41,7 @@ function data()
         upgrade = false,
         country = true,
         speed = 80.0,
-        priority = 5, -- LOLLO NOTE this is copied from airports, it should give priority to this street
+        -- priority = this crashes 5, -- LOLLO NOTE this is copied from airports, it should give priority to this street
         type = 'lollo_medium_4_lane_country_road',
         name = _('Medium country road with 4 lanes'),
         desc = _('Medium country road with 4 lanes crammed in. Speed limit is %2%.'),

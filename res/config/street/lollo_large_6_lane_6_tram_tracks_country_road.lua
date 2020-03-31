@@ -44,8 +44,6 @@ function data()
             }
         },
         transportModesStreet = {'CAR', 'BUS', 'ELECTRIC_TRAM', 'TRAM'}, -- with this, tram tracks appear on all lanes, not only on the right one
-        skipCollision = true,
-        skipCollisionCheck = true,
         streetWidth = 20.0,
         sidewalkWidth = 2.0, -- 2 * sidewalkWidth + streetWidth must be 24
         sidewalkHeight = .02,
@@ -54,7 +52,7 @@ function data()
         upgrade = false,
         country = true,
         speed = 100.0,
-        priority = 7, -- LOLLO NOTE this is copied from airports, it should give priority to this street
+        -- priority = this crashes 7, -- LOLLO NOTE this is copied from airports, it should give priority to this street
         type = 'lollo_large_6_lane_6_tram_tracks_country_road',
         name = _('Large country road with 6 lanes and 6 tram tracks'),
         desc = _('Large country road with 6 lanes crammed in, each with a tram track. Speed limit is %2%.'),
@@ -65,10 +63,6 @@ function data()
                 size = {8.0, 8.0}
             },
             streetBorder = {
-                name = 'street/country_new_large_border.mtl',
-                size = {24, 0.459}
-            },
-            junctionBorder = {
                 name = 'street/country_new_large_border.mtl',
                 size = {24, 0.459}
             },
@@ -103,9 +97,6 @@ function data()
             crossingLane = {
                 name = 'street/new_medium_lane.mtl',
                 size = {3.33, 3.33}
-            },
-            crossingBus = {
-                name = ''
             },
             crossingTram = {
                 name = 'street/new_medium_tram_paving.mtl',

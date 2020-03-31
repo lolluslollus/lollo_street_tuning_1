@@ -22,8 +22,6 @@
         transportModesStreet = {'CAR', 'BUS', 'ELECTRIC_TRAM', 'TRAM'}, -- with this, tram tracks appear on all lanes, not only on the right one
         --transportModesSidewalk = { "PERSON", "TRUCK" }, --crashes
         --transportModesSidewalk = { "PERSON" }, --crashes
-        skipCollision = true,
-        skipCollisionCheck = true,
         streetWidth = 20.0,
         sidewalkWidth = 2.0, -- 2 * sidewalkWidth + streetWidth must be 24
         sidewalkHeight = .3,
@@ -32,7 +30,7 @@
         upgrade = false,
         country = false,
         speed = 60.0,
-        priority = 7, -- LOLLO NOTE this is copied from airports, it should give priority to this street
+        -- priority = this crashes 7, -- LOLLO NOTE this is copied from airports, it should give priority to this street
         type = 'lollo_large_6_lane_6_tram_tracks_street.lua',
         name = _('Large street with 6 lanes and 6 tram tracks'),
         desc = _('Large street with 6 lanes crammed in, each with a tram track. Speed limit is %2%.'),
