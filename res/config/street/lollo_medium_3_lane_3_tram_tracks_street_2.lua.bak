@@ -25,7 +25,7 @@ return {
 	type = "lollo_medium_3_lane_3_tram_tracks_street_2.lua",
 	name = _("Medium street with 3 lanes and 3 tram tracks 2"),
 	desc = _("Medium street with 3 lanes crammed in, each with a tram track, direction 2. Speed limit is %2%."),
-	categories = { "one-way", "urban" },
+	categories = {'one-way'},
 	borderGroundTex = "street_border.lua",
 	materials = {
 		streetPaving = {
