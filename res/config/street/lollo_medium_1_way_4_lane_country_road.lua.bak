@@ -1,0 +1,88 @@
+﻿function data()
+    return {
+        --numLanes = 4,
+        laneConfig = {
+            {forward = true},
+            {forward = true},
+            {forward = true},
+            {forward = true},
+            {forward = true},
+            {forward = false}
+        },
+        --transportModesStreet = { "CAR", "BUS", "ELECTRIC_TRAM", "TRAM" }, -- with this, tram tracks appear on all lanes, not only on the right one
+        --transportModesSidewalk = { "PERSON", "TRUCK" }, --crashes
+        --transportModesSidewalk = { "PERSON" }, --crashes
+        skipCollision = true,
+        skipCollisionCheck = true,
+        streetWidth = 12.0,
+        sidewalkWidth = 2.0, -- was 4.0; 2 * sidewalkWidth + streetWidth must be 16
+        sidewalkHeight = .00,
+        yearFrom = 1925,
+        yearTo = 0,
+        upgrade = false,
+        country = true,
+        speed = 80.0,
+        type = 'lollo_medium_1_way_4_lane_country_road.lua',
+        name = _('Medium 1-way country road with 4 lanes'),
+        desc = _('Medium 1-way country road with 4 lanes crammed in. Speed limit is %2%.'),
+        categories = {'one-way'},
+        borderGroundTex = 'street_border.lua',
+        materials = {
+            streetPaving = {
+                name = 'street/country_new_medium_paving.mtl',
+                size = {8.0, 8.0}
+            },
+            streetBorder = {
+                name = 'street/country_new_large_border.mtl',
+                size = {24, 0.459}
+            },
+            junctionBorder = {
+                name = 'street/country_new_large_border.mtl',
+                size = {24, 0.459}
+            },
+            streetLane = {
+                name = 'street/new_medium_lane.mtl',
+                size = {3.0, 3.0}
+            },
+            streetArrow = {
+                name = 'street/default_arrows.mtl',
+                size = {6.0, 3.0}
+            },
+            streetStripe = {
+                name = 'street/country_new_medium_stripes.mtl',
+                size = {32.0, .5}
+            },
+            streetTram = {
+                name = 'street/new_medium_tram_paving.mtl',
+                size = {2.0, 2.0}
+            },
+            streetTramTrack = {
+                name = 'street/new_medium_tram_track.mtl',
+                size = {2.0, 2.0}
+            },
+            streetBus = {
+                name = 'street/new_medium_bus.mtl',
+                size = {12, 2.7}
+            },
+            crossingLane = {
+                name = 'street/new_medium_lane.mtl',
+                size = {3.0, 3.0}
+            },
+            crossingBus = {
+                name = ''
+            },
+            crossingTram = {
+                name = 'street/new_medium_tram_paving.mtl',
+                size = {2.0, 2.0}
+            },
+            crossingTramTrack = {
+                name = 'street/new_medium_tram_track.mtl',
+                size = {2.0, 2.0}
+            },
+            sidewalkLane = {},
+            sidewalkBorderInner = {}
+        },
+        assets = {},
+        cost = 50.0
+    }
+end
