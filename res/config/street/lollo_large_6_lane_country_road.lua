@@ -74,15 +74,19 @@ function data()
             },
             streetLane = {
                 name = 'street/new_medium_lane.mtl',
-                size = {3.0, 3.0}
+                size = {3.33, 3.33}
+            },
+            streetArrow = {
+                name = 'street/default_arrows.mtl',
+                size = {9.0, 3.0}
             },
             streetStripe = {
-                name = "street/country_new_medium_stripes.mtl",
-                size = { 32.0, .5 }
+                name = 'street/country_new_medium_stripes.mtl',
+                size = {32.0, .5}
             },
             streetStripeMedian = {
-                name = "street/country_new_large_median.mtl",
-                size = { 4.0, .5 }
+                name = 'street/country_new_large_median.mtl',
+                size = {4.0, .5}
             },
             streetTram = {
                 name = 'street/new_medium_tram_paving.mtl',
@@ -98,7 +102,7 @@ function data()
             },
             crossingLane = {
                 name = 'street/new_medium_lane.mtl',
-                size = {3.0, 3.0}
+                size = {3.33, 3.33}
             },
             crossingBus = {
                 name = ''
@@ -111,22 +115,13 @@ function data()
                 name = 'street/new_medium_tram_track.mtl',
                 size = {2.0, 2.0}
             },
-            crossingCrosswalk = {
-                name = ''
-            },
-            sidewalkPaving = {
-                name = ''
-            },
             sidewalkLane = {},
             sidewalkBorderInner = {
-                name = "street/country_new_large_sidewalk_border_inner.mtl",
-                size = { 9, 3.6 }
+                name = 'street/country_new_large_sidewalk_border_inner.mtl',
+                size = {9, 3.6}
             },
-            sidewalkBorderOuter = {},
-            sidewalkCurb = {},
-            sidewalkWall = {}
         },
-        assets = { },
+        assets = {},
         borderGroundTex = 'street_border.lua',
         sidewalkFillGroundTex = 'country_sidewalk.lua',
         cost = 75.0

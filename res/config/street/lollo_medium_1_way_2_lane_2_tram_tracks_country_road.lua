@@ -1,54 +1,32 @@
-function data()
+﻿function data()
     return {
-        --numLanes = 2,
+        --numLanes = 4,
         laneConfig = {
-            {
-                forward = false,
-                transportModesLane = {'BUS', 'ELECTRIC_TRAM', 'PERSON', 'TRAM'},
-                transportModes = {'BUS', 'ELECTRIC_TRAM', 'PERSON', 'TRAM'}
-            },
-            {
-                forward = false,
-                transportModesLane = {'BUS', 'CAR', 'ELECTRIC_TRAM', 'TRAM'},
-                transportModes = {'BUS', 'CAR', 'ELECTRIC_TRAM', 'TRAM'}
-            },
-            {
-                forward = false,
-                transportModesLane = {'BUS', 'CAR', 'ELECTRIC_TRAM', 'TRAM', 'TRUCK'},
-                transportModes = {'BUS', 'CAR', 'ELECTRIC_TRAM', 'TRAM', 'TRUCK'}
-            },
-            {
-                forward = true,
-                transportModesLane = {'BUS', 'CAR', 'ELECTRIC_TRAM', 'TRAM', 'TRUCK'},
-                transportModes = {'BUS', 'CAR', 'ELECTRIC_TRAM', 'TRAM', 'TRUCK'}
-            },
-            {
-                forward = true,
-                transportModesLane = {'BUS', 'CAR', 'ELECTRIC_TRAM', 'TRAM'},
-                transportModes = {'BUS', 'CAR', 'ELECTRIC_TRAM', 'TRAM'}
-            },
-            {
-                forward = true,
-                transportModesLane = {'BUS', 'ELECTRIC_TRAM', 'PERSON', 'TRAM'},
-                transportModes = {'BUS', 'ELECTRIC_TRAM', 'PERSON', 'TRAM'}
-            }
+            {forward = true},
+            {forward = true},
+            --		{forward = true },
+            --		{forward = true, },
+            {forward = true},
+            {forward = false}
         },
         transportModesStreet = {'CAR', 'BUS', 'ELECTRIC_TRAM', 'TRAM'}, -- with this, tram tracks appear on all lanes, not only on the right one
+        --transportModesSidewalk = { "PERSON", "TRUCK" }, --crashes
+        --transportModesSidewalk = { "PERSON" }, --crashes
         skipCollision = true,
         skipCollisionCheck = true,
-        streetWidth = 16.0,
-        sidewalkWidth = 4.0, -- 2 * sidewalkWidth + streetWidth must be 24
-        sidewalkHeight = .02,
+        streetWidth = 8.0,
+        sidewalkWidth = 4.0, -- was 4.0; 2 * sidewalkWidth + streetWidth must be 16
+        sidewalkHeight = .00,
         yearFrom = 1925,
         yearTo = 0,
         upgrade = false,
         country = true,
-        speed = 100.0,
-        priority = 1, -- LOLLO NOTE this is copied from airports, it should give priority to this street
-        type = 'lollo_large_4_lane_4_tram_tracks_country_road',
-        name = _('Large country road with 4 lanes and 4 tram tracks'),
-        desc = _('Large country road with 4 lanes, each with a tram track. Speed limit is %2%.'),
-        categories = {'country'},
+        speed = 80.0,
+        type = 'lollo_medium_1_way_2_lane_2_tram_tracks_country_road.lua',
+        name = _('Medium 1-way country road with 2 lanes and 2 tram tracks'),
+        desc = _('Medium 1-way country road with 2 lanes, each with a tram track. Speed limit is %2%.'),
+        categories = {'one-way', 'country'},
+        borderGroundTex = 'street_border.lua',
         materials = {
             streetPaving = {
                 name = 'street/country_new_medium_paving.mtl',
@@ -68,7 +46,7 @@ function data()
             },
             streetArrow = {
                 name = 'street/default_arrows.mtl',
-                size = {9.0, 3.0}
+                size = {6.0, 3.0}
             },
             streetStripe = {
                 name = 'street/country_new_medium_stripes.mtl',
@@ -106,17 +84,10 @@ function data()
                 size = {2.0, 2.0}
             },
             sidewalkLane = {},
-            sidewalkBorderInner = {
-                name = 'street/country_new_large_sidewalk_border_inner.mtl',
-                size = {9, 3.6}
-            },
-            sidewalkBorderOuter = {},
-            sidewalkCurb = {},
-            sidewalkWall = {}
+            sidewalkBorderInner = {}
         },
         assets = {},
-        borderGroundTex = 'street_border.lua',
         sidewalkFillGroundTex = 'country_sidewalk.lua',
-        cost = 75.0
+        cost = 50.0
     }
 end

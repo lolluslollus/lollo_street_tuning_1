@@ -44,24 +44,24 @@
                 size = {8.0, 8.0}
             },
             streetBorder = {
-                name = "street/new_large_border.mtl",
-                size = { 6.0, .5 }
+                name = 'street/new_large_border.mtl',
+                size = {6.0, .5}
             },
             streetLane = {
                 name = 'street/new_medium_lane.mtl',
-                size = {4.0, 4.0}
+                size = {3.33, 3.33}
             },
             streetArrow = {
-                name = "street/default_arrows.mtl",
-                size = { 9.0, 3.0 }
+                name = 'street/default_arrows.mtl',
+                size = {9.0, 3.0}
             },
             streetStripe = {
-                name = "street/new_medium_stripes.mtl",
-                size = { 8.0, .5 }
+                name = 'street/new_medium_stripes.mtl',
+                size = {8.0, .5}
             },
             streetStripeMedian = {
-                name = "street/new_large_median.mtl",
-                size = { 4.0, 1 }
+                name = 'street/new_large_median.mtl',
+                size = {4.0, 1}
             },
             streetTram = {
                 name = 'street/new_medium_tram_paving.mtl',
@@ -77,7 +77,7 @@
             },
             crossingLane = {
                 name = 'street/new_medium_lane.mtl',
-                size = {4.0, 4.0}
+                size = {3.33, 3.33}
             },
             crossingBus = {
                 name = ''
@@ -118,7 +118,7 @@
         },
         assets = {
             {
-                name = "street/street_light_eu_c.mdl",
+                name = 'street/street_light_eu_c.mdl',
                 offset = 8.0,
                 distance = 16.0,
                 prob = 1.0,
@@ -127,10 +127,10 @@
                 oneSideOnly = false,
                 alignToElevation = false,
                 avoidFaceEdges = false,
-                placeOnBridge = true,
+                placeOnBridge = true
             },
             {
-                name = "street/street_asset_mix/fireplug_eu_c.mdl",
+                name = 'street/street_asset_mix/fireplug_eu_c.mdl',
                 offset = 10.0,
                 distance = 49.0,
                 prob = 0.5,
@@ -138,10 +138,10 @@
                 randRot = false,
                 oneSideOnly = false,
                 alignToElevation = true,
-                avoidFaceEdges = false,
+                avoidFaceEdges = false
             },
             {
-                name = "street/street_asset_mix/mailbox_eu_c.mdl",
+                name = 'street/street_asset_mix/mailbox_eu_c.mdl',
                 offset = 9,
                 distance = 39.0,
                 prob = 0.3,
@@ -149,10 +149,10 @@
                 randRot = false,
                 oneSideOnly = false,
                 alignToElevation = false,
-                avoidFaceEdges = false,
+                avoidFaceEdges = false
             },
             {
-                name = "street/street_asset_mix/trash_standing_c.mdl",
+                name = 'street/street_asset_mix/trash_standing_c.mdl',
                 offset = 20,
                 distance = 50.0,
                 prob = 0.5,
@@ -160,10 +160,10 @@
                 randRot = false,
                 oneSideOnly = false,
                 alignToElevation = true,
-                avoidFaceEdges = false,
+                avoidFaceEdges = false
             },
             {
-                name = "asset/tree_bed_new.mdl",
+                name = 'asset/tree_bed_new.mdl',
                 offset = 13.0,
                 distance = 23.0,
                 prob = 1.0,
@@ -171,10 +171,10 @@
                 randRot = false,
                 oneSideOnly = false,
                 alignToElevation = true,
-                avoidFaceEdges = true,
+                avoidFaceEdges = true
             },
             {
-                name = "tree/lombardy_poplar.mdl",
+                name = 'tree/lombardy_poplar.mdl',
                 offset = 13.0,
                 distance = 23.0,
                 prob = 1.0,
@@ -182,8 +182,8 @@
                 randRot = true,
                 oneSideOnly = false,
                 alignToElevation = false,
-                avoidFaceEdges = true,
-            },
+                avoidFaceEdges = true
+            }
         },
         signalAssetName = 'asset/ampel.mdl',
         cost = 60.0

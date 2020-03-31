@@ -1,39 +1,17 @@
-function data()
+﻿function data()
     return {
-        --numLanes = 2,
+        --numLanes = 4,
         laneConfig = {
-            {
-                forward = false,
-                transportModesLane = {'BUS', 'ELECTRIC_TRAM', 'PERSON', 'TRAM'},
-                transportModes = {'BUS', 'ELECTRIC_TRAM', 'PERSON', 'TRAM'}
-            },
-            {
-                forward = false,
-                transportModesLane = {'BUS', 'CAR', 'ELECTRIC_TRAM', 'TRAM'},
-                transportModes = {'BUS', 'CAR', 'ELECTRIC_TRAM', 'TRAM'}
-            },
-            {
-                forward = false,
-                transportModesLane = {'BUS', 'CAR', 'ELECTRIC_TRAM', 'TRAM', 'TRUCK'},
-                transportModes = {'BUS', 'CAR', 'ELECTRIC_TRAM', 'TRAM', 'TRUCK'}
-            },
-            {
-                forward = true,
-                transportModesLane = {'BUS', 'CAR', 'ELECTRIC_TRAM', 'TRAM', 'TRUCK'},
-                transportModes = {'BUS', 'CAR', 'ELECTRIC_TRAM', 'TRAM', 'TRUCK'}
-            },
-            {
-                forward = true,
-                transportModesLane = {'BUS', 'CAR', 'ELECTRIC_TRAM', 'TRAM'},
-                transportModes = {'BUS', 'CAR', 'ELECTRIC_TRAM', 'TRAM'}
-            },
-            {
-                forward = true,
-                transportModesLane = {'BUS', 'ELECTRIC_TRAM', 'PERSON', 'TRAM'},
-                transportModes = {'BUS', 'ELECTRIC_TRAM', 'PERSON', 'TRAM'}
-            }
+            {forward = true},
+            {forward = true},
+            --		{forward = true },
+            {forward = true},
+            {forward = true},
+            {forward = false}
         },
         transportModesStreet = {'CAR', 'BUS', 'ELECTRIC_TRAM', 'TRAM'}, -- with this, tram tracks appear on all lanes, not only on the right one
+        --transportModesSidewalk = { "PERSON", "TRUCK" }, --crashes
+        --transportModesSidewalk = { "PERSON" }, --crashes
         skipCollision = true,
         skipCollisionCheck = true,
         streetWidth = 12.0,
@@ -44,10 +22,11 @@ function data()
         upgrade = false,
         country = true,
         speed = 80.0,
-        type = 'lollo_medium_4_lane_4_tram_tracks_country_road',
-        name = _('Medium country road with 4 lanes and 4 tram tracks'),
-        desc = _('Medium country road with 4 lanes crammed in, each with a tram track. Speed limit is %2%.'),
-        categories = {'country'},
+        type = 'lollo_medium_1_way_3_lane_3_tram_tracks_country_road.lua',
+        name = _('Medium 1-way country road with 3 lanes and 3 tram tracks'),
+        desc = _('Medium 1-way country road with 3 lanes crammed in, each with a tram track. Speed limit is %2%.'),
+        categories = {'one-way', 'country'},
+        borderGroundTex = 'street_border.lua',
         materials = {
             streetPaving = {
                 name = 'street/country_new_medium_paving.mtl',
@@ -63,7 +42,11 @@ function data()
             },
             streetLane = {
                 name = 'street/new_medium_lane.mtl',
-                size = {3.0, 3.0}
+                size = {4.0, 4.0}
+            },
+            streetArrow = {
+                name = 'street/default_arrows.mtl',
+                size = {6.0, 3.0}
             },
             streetStripe = {
                 name = 'street/country_new_medium_stripes.mtl',
@@ -87,7 +70,7 @@ function data()
             },
             crossingLane = {
                 name = 'street/new_medium_lane.mtl',
-                size = {3.0, 3.0}
+                size = {4.0, 4.0}
             },
             crossingBus = {
                 name = ''
@@ -103,8 +86,7 @@ function data()
             sidewalkLane = {},
             sidewalkBorderInner = {}
         },
-        borderGroundTex = 'street_border.lua',
-        sidewalkFillGroundTex = 'country_sidewalk.lua',
+        assets = {},
         cost = 50.0
     }
 end

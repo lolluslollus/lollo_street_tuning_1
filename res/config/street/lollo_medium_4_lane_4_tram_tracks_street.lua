@@ -46,19 +46,15 @@
             },
             streetLane = {
                 name = 'street/new_medium_lane.mtl',
-                size = {4.0, 4.0}
+                size = {3.0, 3.0}
             },
             streetStripe = {
                 name = 'street/new_medium_stripes.mtl',
                 size = {8.0, .5}
             },
-            -- streetStripeMedian = {
-            --     name = 'street/new_medium_stripes.mtl',
-            --     size = {8.0, .5}
-            -- },
             streetStripeMedian = {
-                name = "street/new_large_median.mtl",
-                size = { 4.0, 1 }
+                name = 'street/new_large_median.mtl',
+                size = {4.0, 1}
             },
             streetTram = {
                 name = 'street/new_medium_tram_paving.mtl',
@@ -74,7 +70,7 @@
             },
             crossingLane = {
                 name = 'street/new_medium_lane.mtl',
-                size = {4.0, 4.0}
+                size = {3.0, 3.0}
             },
             crossingBus = {
                 name = ''
@@ -90,12 +86,11 @@
             crossingCrosswalk = {
                 name = 'street/new_medium_crosswalk.mtl',
                 size = {3.0, 2.5}
-                -- size = { 2.5, 2.5 }
             },
-            -- crossingStopline = {
-            -- 	name = "street/new_medium_stopline.mtl",
-            --	size = { 6.0, .5 }
-            -- },
+            crossingStopline = {
+                name = 'street/new_medium_stopline.mtl',
+                size = {6.0, .5}
+            },
             sidewalkPaving = {
                 name = 'street/new_medium_sidewalk.mtl',
                 size = {4.0, 4.0}
@@ -178,6 +173,6 @@
             --},
         },
         signalAssetName = 'asset/ampel.mdl',
-        cost = 60.0
+        cost = 40.0
     }
 end

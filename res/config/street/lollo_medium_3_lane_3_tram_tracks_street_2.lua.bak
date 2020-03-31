@@ -41,20 +41,17 @@ return {
 			size = { 4.0, 4.0 }
 		},
 		streetStripe = {
-
+			name = 'street/new_medium_stripes.mtl',
+			size = {8.0, .5}
 		},
 		streetStripeMedian = {
-			name = "street/new_medium_stripes.mtl",
-			size = { 8.0, .5 }
+			name = 'street/new_medium_stripes.mtl',
+			size = {8.0, .5}
 		},
 		streetTram = {
 			name = "street/new_medium_tram_paving.mtl",
 			size = { 2.0, 2.0 }
 		},
---		streetTramTrack = {
---			name = "street/new_medium_tram_track.mtl",
---			size = { 2.0, 2.0 }
---		},
 		streetTramTrack = {
 			name = "street/new_medium_tram_track.mtl",
 			size = { 2.0, 2.0 }
@@ -86,20 +83,18 @@ return {
 			size = { 3.0, 2.5 }
 			-- size = { 2.5, 2.5 }
 		},
-		-- crossingStopline = {
-		-- 	name = "street/new_medium_stopline.mtl",
-		--	size = { 6.0, .5 }
-		-- },
+		crossingStopline = {
+			name = "street/new_medium_stopline.mtl",
+			size = { 6.0, .5 }
+		},
 		sidewalkPaving = {
 			name = "street/new_medium_sidewalk.mtl",
 			size = { 4.0, 4.0 }
 		},
-		sidewalkLane = {
-
-		},
+		sidewalkLane = {},
 		sidewalkBorderInner = {
-			name = "street/new_medium_sidewalk_border_inner.mtl",
-			size = { 3, 0.6 }
+			name = 'street/new_medium_sidewalk_border_inner.mtl',
+			size = {3, 0.6}
 		},
 		sidewalkBorderOuter = {
 			name = "street/new_medium_sidewalk_border_outer.mtl",
@@ -174,6 +169,6 @@ return {
 		--},
 	},
 	signalAssetName = "asset/ampel.mdl",
-	cost = 60.0,
+	cost = 40.0,
 }
 end
