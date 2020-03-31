@@ -47,10 +47,10 @@
                 name = 'street/new_medium_stripes.mtl',
                 size = {8.0, .5}
             },
-            streetStripeMedian = {
-                name = 'street/new_large_median.mtl',
-                size = {4.0, 1}
-            },
+            -- streetStripeMedian = {
+            --     name = 'street/new_large_median.mtl',
+            --     size = {4.0, 1}
+            -- },
             streetTram = {
                 name = 'street/new_medium_tram_paving.mtl',
                 size = {2.0, 2.0}
