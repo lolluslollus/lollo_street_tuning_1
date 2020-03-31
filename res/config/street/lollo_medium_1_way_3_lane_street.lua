@@ -22,6 +22,7 @@
         upgrade = false,
         country = false,
         speed = 50.0,
+        priority = 5, -- LOLLO NOTE this is copied from airports, it should give priority to this street
         type = 'lollo_medium_1_way_3_lane_street.lua',
         name = _('Medium 1-way street with 3 lanes'),
         desc = _('Medium 1-way street with 3 lanes crammed in. Speed limit is %2%.'),

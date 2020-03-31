@@ -54,7 +54,7 @@ function data()
         upgrade = false,
         country = true,
         speed = 100.0,
-        priority = 1, -- LOLLO NOTE this is copied from airports, it should give priority to this street
+        priority = 7, -- LOLLO NOTE this is copied from airports, it should give priority to this street
         type = 'lollo_large_6_lane_country_road',
         name = _('Large country road with 6 lanes'),
         desc = _('Large country road with 6 lanes crammed in. Speed limit is %2%.'),

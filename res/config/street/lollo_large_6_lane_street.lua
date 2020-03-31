@@ -32,7 +32,7 @@
         upgrade = false,
         country = false,
         speed = 60.0,
-        priority = 1, -- LOLLO NOTE this is copied from airports, it should give priority to this street
+        priority = 7, -- LOLLO NOTE this is copied from airports, it should give priority to this street
         type = 'lollo_large_6_lane_street.lua',
         name = _('Large street with 6 lanes'),
         desc = _('Large street with 6 lanes crammed in. Speed limit is %2%.'),
