@@ -11,6 +11,9 @@ To keep the carnage down, this mod adds a very thin street slicer into the stree
 Once you have a few lane switchers, you can change the road segments between them. This mod adds a selection of streets with multiple lanes, to allow overtaking, but with the same width, so you can try different road types without destroying your buildings.
 The game does not offer lane-bound waypoints, so routing the vehicles can involve a fair amount of trial and error.
 
+[h2] This mod also contains a very thin footpath[/h2]
+You can use it to perform various tricks. Give it a bus lane to pedestrianise it.
+
 [h2]Some handy tips:[/h2]
 To better visualise the lanes, start the game in debug mode and press <AltGr> + <L>.
 Press and hold <shift> to place a short road segment between two joints.
