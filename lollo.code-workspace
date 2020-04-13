@@ -1,0 +1,14 @@
+{
+	"folders": [
+		{
+			"path": "."
+		}
+	],
+	"settings": {
+		"files.associations": {
+			"*.con": "lua",
+			"*.mdl": "lua",
+			"*.mtl": "lua"
+		}
+	}
+}

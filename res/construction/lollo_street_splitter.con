@@ -27,7 +27,7 @@ function data()
             -- dump(true)(params)
 
             local result = {}
-            result.colliders = {} -- LOLLO TODO check this
+            result.colliders = {}
             result.cost = 0
             result.edgeLists = {}
             result.models = {}
@@ -77,17 +77,17 @@ function data()
                     },
                     edges = {
                         -- one entry refers to a position and a tangent
-                        --						{ { -45, .0, .0 }, { -1.0, .0, .0 } },  -- node 0
-                        --						{ { -60, .0, .0 }, { -1.0, .0, .0 } },  -- node 1 (snap node)
-                        --						{ { -5, .0, .0 }, { -1.0, .0, .0 } },  -- node 0
-                        --						{ { -6, .0, .0 }, { -1.0, .0, .0 } },  -- node 1 (snap node)
+                        -- { { -45, .0, .0 }, { -1.0, .0, .0 } },  -- node 0
+                        -- { { -60, .0, .0 }, { -1.0, .0, .0 } },  -- node 1 (snap node)
+                        -- { { -5, .0, .0 }, { -1.0, .0, .0 } },  -- node 0
+                        -- { { -6, .0, .0 }, { -1.0, .0, .0 } },  -- node 1 (snap node)
                         -- {{-3, .0, .0}, {-1.0, .0, .0}}, -- node 0
                         -- {{-6, .0, .0}, {-1.0, .0, .0}} -- node 1 (snap node)
                         {{-5, .0, .0}, {-1.0, .0, .0}}, -- node 0
                         {{-6, .0, .0}, {-1.0, .0, .0}} -- node 1 (snap node)
                     },
-                    --					edgeType = "BRIDGE",
-                    --					edgeTypeName = "cement.lua",
+                    -- edgeType = "BRIDGE",
+                    -- edgeTypeName = "cement.lua",
                     -- freeNodes = { 0, 1 },
                     collider = {
                         type = 'NONE'
