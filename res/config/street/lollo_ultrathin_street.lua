@@ -1,7 +1,7 @@
 function data()
     return {
         numLanes = 2,
-        sidewalkWidth = 0.11,
+        sidewalkWidth = 0, --0.11,
         sidewalkHeight = .0,
         streetWidth = 0.1,
         yearFrom = 65535, -- LOLLO NOTE this bars the street from the street menu

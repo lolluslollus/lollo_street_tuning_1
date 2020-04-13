@@ -1,7 +1,7 @@
 [b]This is a collection of tools to fine-tune the road vehicle routing.[/b]
 
 [h2]The trouble: vehicles queue up[/h2]
-When you build a long enough piece of road, the game splits it into seamless chunks. The joints between these chunks allow vehicles to change lanes. The trouble is, these chunks are fairly long and crossings do not allow switching lanes. As a result, vehicles will queue up more than required. 
+When you build a long enough piece of road, the game splits it into seamless chunks. The joints between these chunks allow vehicles to change lanes. The trouble is, these chunks are fairly long, and crossings do not allow switching lanes. As a result, vehicles will queue up more than required. 
 
 [h2]Solution part 1: add lane switchers[/h2]
 You can create an extra lane switcher by adding an intersecting street and deleting it, but this often involves destroying several buildings.
@@ -10,6 +10,10 @@ To keep the carnage down, this mod adds a very thin street slicer into the stree
 [h2]Solution part 2: add lanes[/h2]
 Once you have a few lane switchers, you can change the road segments between them. This mod adds a selection of streets with multiple lanes, to allow overtaking, but with the same width, so you can try different road types without destroying your buildings.
 The game does not offer lane-bound waypoints, so routing the vehicles can involve a fair amount of trial and error.
+
+[h2]The easiest way to have lorries overtake stopping trams, or viceversa[/h2]
+- Add two lane switchers before and after your roadside stop, with no crossings in between.
+- Replace the road between them with one of the same width, but an extra lane and maybe extra tram lanes.
 
 [h2] This mod also contains a very thin footpath[/h2]
 You can use it to perform various tricks. Give it a bus lane to pedestrianise it.
