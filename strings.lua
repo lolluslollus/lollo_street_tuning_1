@@ -18,8 +18,8 @@ function data()
 			.."- Add two lane switchers before and after your roadside stop, with no crossings in between.\n"
 			.."- Replace the road between them with one of the same width, but an extra lane and maybe extra tram lanes.\n"
 
-			.."[h2] This mod also contains a very thin footpath[/h2]\n"
-			.."You can use it to perform various tricks, eg connecting stations to roads or having people walk across a park. Give it a bus lane to pedestrianise it.\n"
+			.."[h2]This mod also contains some thin footpaths[/h2]\n"
+			.."You can use them to perform various tricks, eg connecting stations to roads or having people walk across a park. Give them a bus lane to pedestrianise them.\n"
 
 			.."[h2]Some handy tips:[/h2]\n"
 			.."- To better visualise the lanes, start the game in debug mode and press <AltGr> + <L>.\n"

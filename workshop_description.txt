@@ -15,8 +15,8 @@ The game does not offer lane-bound waypoints, so routing the vehicles can involv
 - Add two lane switchers before and after your roadside stop, with no crossings in between.
 - Replace the road between them with one of the same width, but an extra lane and maybe extra tram lanes.
 
-[h2] This mod also contains a very thin footpath[/h2]
-You can use it to perform various tricks. Give it a bus lane to pedestrianise it.
+[h2]This mod also contains some thin footpaths[/h2]
+You can use them to perform various tricks, eg connecting stations to roads or having people walk across a park. Give them a bus lane to pedestrianise them.
 
 [h2]Some handy tips:[/h2]
 To better visualise the lanes, start the game in debug mode and press <AltGr> + <L>.
