@@ -10,12 +10,12 @@ function data()
         country = false,
         speed = 20.0,
         type = 'lollo_ultrathin_path',
-        name = _("Ultrathin path"),
+        name = _("Ultrathin path with steep enbankment"),
         desc = _("Ultrathin path with a speed limit of %2%, give it a bus lane to pedestrianise it."),
         categories = { 'paths' },
-        order = 1,
-        embankmentSlopeLow  = .75,
-        embankmentSlopeHigh  = 2.5,
+        order = 3,
+        embankmentSlopeLow  = 0.0,
+        embankmentSlopeHigh  = 9.9,
         materials = {
             streetPaving = {
                 name = 'street/country_new_medium_paving.mtl',
