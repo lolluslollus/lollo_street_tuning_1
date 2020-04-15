@@ -19,7 +19,7 @@ function data()
 			.."- Replace the road between them with one of the same width, but an extra lane and maybe extra tram lanes.\n"
 
 			.."[h2] This mod also contains a very thin footpath[/h2]\n"
-			.."You can use it to perform various tricks. Give it a bus lane to pedestrianise it.\n"
+			.."You can use it to perform various tricks, eg connecting stations to roads or having people walk across a park. Give it a bus lane to pedestrianise it.\n"
 
 			.."[h2]Some handy tips:[/h2]\n"
 			.."- To better visualise the lanes, start the game in debug mode and press <AltGr> + <L>.\n"

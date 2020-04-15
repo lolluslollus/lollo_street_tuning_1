@@ -14,8 +14,8 @@ function data()
         desc = _("Ultrathin path with a speed limit of %2%, give it a bus lane to pedestrianise it."),
         categories = { 'paths' },
         order = 2,
-        embankmentSlopeLow  = .85,
-        embankmentSlopeHigh  = 1.25,
+        embankmentSlopeLow  = .5,
+        embankmentSlopeHigh  = 2.5,
         materials = {
             streetPaving = {
                 name = 'street/country_new_medium_paving.mtl',
