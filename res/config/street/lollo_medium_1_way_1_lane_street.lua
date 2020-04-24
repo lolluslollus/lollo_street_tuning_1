@@ -13,7 +13,7 @@
         --transportModesSidewalk = { "PERSON", "TRUCK" }, --crashes
         --transportModesSidewalk = { "PERSON" }, --crashes
         streetWidth = 3.0,
-        sidewalkWidth = 2.0, -- was 4.0; 2 * sidewalkWidth + streetWidth must be 7
+        sidewalkWidth = 2.5, -- was 4.0; 2 * sidewalkWidth + streetWidth must be 8
         sidewalkHeight = .3,
         yearFrom = 1925,
         yearTo = 0,
@@ -117,7 +117,7 @@
                 prob = 1.0,
                 offsetOrth = 3.4,
                 randRot = false,
-                oneSideOnly = false,
+                oneSideOnly = true, -- was false,
                 alignToElevation = false,
                 avoidFaceEdges = false,
                 placeOnBridge = true
@@ -135,8 +135,8 @@
             },
             {
                 name = 'street/street_asset_mix/mailbox_eu_c.mdl',
-                offset = 8,
-                distance = 40.0,
+                offset = 5, -- was 8,
+                distance = 43, -- was 40.0,
                 prob = 0.3,
                 offsetOrth = 0.4,
                 randRot = false,
