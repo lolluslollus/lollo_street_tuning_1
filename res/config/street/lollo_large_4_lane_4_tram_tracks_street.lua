@@ -17,7 +17,7 @@
             {forward = true, transportModesLane = {'CAR', 'TRUCK'}, transportModes = {'CAR', 'TRUCK'}},
             {forward = true, transportModesLane = {'PERSON', 'TRUCK'}, transportModes = {'PERSON', 'TRUCK'}}
         },
-        transportModesStreet = {'CAR', 'BUS', 'ELECTRIC_TRAM', 'TRAM'}, -- with this, tram tracks appear on all lanes, not only on the right one
+        transportModesStreet = {'CAR', 'BUS', 'ELECTRIC_TRAM', 'TRAM', 'TRUCK'}, -- with this, tram tracks appear on all lanes, not only on the right one
         --transportModesSidewalk = { "PERSON", "TRUCK" }, --crashes
         --transportModesSidewalk = { "PERSON" }, --crashes
         streetWidth = 16.0,

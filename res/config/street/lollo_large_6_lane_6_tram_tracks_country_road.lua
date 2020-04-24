@@ -43,7 +43,7 @@ function data()
                 transportModes = {'BUS', 'ELECTRIC_TRAM', 'PERSON', 'TRAM'}
             }
         },
-        transportModesStreet = {'CAR', 'BUS', 'ELECTRIC_TRAM', 'TRAM'}, -- with this, tram tracks appear on all lanes, not only on the right one
+        transportModesStreet = {'CAR', 'BUS', 'ELECTRIC_TRAM', 'TRAM', 'TRUCK'}, -- with this, tram tracks appear on all lanes, not only on the right one
         streetWidth = 20.0,
         sidewalkWidth = 2.0, -- 2 * sidewalkWidth + streetWidth must be 24
         sidewalkHeight = .02,
