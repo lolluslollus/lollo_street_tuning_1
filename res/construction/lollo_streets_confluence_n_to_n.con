@@ -444,12 +444,169 @@ local function updateFn_3_to_3_narrow_sidewalk(params)
 
     return result
 end
+
+local function updateFn_3_to_3_medium_sidewalk(params)
+    local result = {}
+    result.cost = 0
+
+    local connectorFace = {
+        {2, -12.0, 0.0, 1.0},
+        {2, 12.0, 0.0, 1.0},
+        {-10, 12.0, 0.0, 1.0},
+        {-10, -12.0, 0.0, 1.0}
+    }
+    result.groundFaces = {
+        {
+            face = connectorFace,
+            modes = {
+                {
+                    type = 'FILL',
+                    key = 'shared/asphalt_01.gtex.lua' --'shared/gravel_03.gtex.lua'
+                }
+            }
+        }
+    }
+
+    result.colliders = {
+        {
+            type = 'BOX',
+            params = {
+                halfExtents = {4.0, 12.0, 0.15}
+            }
+        }
+    }
+
+    result.models = {
+        {
+            id = 'lollo_assets/lollo_street_confluence_3_lanes_medium_sidewalk.mdl',
+            transf = {1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1}
+        }
+    }
+
+    result.edgeLists = {
+        {
+            type = 'STREET',
+            params = {
+                skipCollision = true,
+                skipCollisionCheck = true,
+                type = 'lollo_medium_1_way_1_lane_street.lua', -- from res/config/street/
+                tramTrackType = 'ELECTRIC'
+            },
+            edges = {
+                -- one entry refers to a position and a tangent
+                {{-10, -8, .0}, {1, .0, .0}}, -- node 0
+                {{-6, -8, .0}, {1, .0, .0}} -- node 1
+            },
+            freeNodes = {0},
+            snapNodes = {}
+        },
+        {
+            type = 'STREET',
+            params = {
+                skipCollision = true,
+                skipCollisionCheck = true,
+                type = 'lollo_medium_1_way_1_lane_street.lua', -- from res/config/street/
+                tramTrackType = 'ELECTRIC'
+            },
+            edges = {
+                -- one entry refers to a position and a tangent
+                {{-10, 0, .0}, {1, .0, .0}}, -- node 0
+                {{-6, 0, .0}, {1, .0, .0}} -- node 1
+            },
+            freeNodes = {0},
+            snapNodes = {}
+        },
+        {
+            type = 'STREET',
+            params = {
+                skipCollision = true,
+                skipCollisionCheck = true,
+                type = 'lollo_medium_1_way_1_lane_street.lua', -- from res/config/street/
+                tramTrackType = 'ELECTRIC'
+            },
+            edges = {
+                -- one entry refers to a position and a tangent
+                {{-10, 8, .0}, {1, .0, .0}}, -- node 0
+                {{-6, 8, .0}, {1, .0, .0}} -- node 1
+            },
+            freeNodes = {0},
+            snapNodes = {}
+        },
+        {
+            type = 'STREET',
+            params = {
+                skipCollision = true,
+                skipCollisionCheck = true,
+                type = 'lollo_1_way_1_lane_street_no_sidewalk.lua', -- from res/config/street/
+                tramTrackType = 'ELECTRIC'
+            },
+            edges = {
+                -- one entry refers to a position and a tangent
+                {{-5.9, 8, 0}, {8, -0.1, 0}}, -- node 0
+                {{1.9, 4, 0}, {8, -0.1, 0}} -- node 1
+            },
+            freeNodes = {},
+            snapNodes = {}
+        },
+        {
+            type = 'STREET',
+            params = {
+                skipCollision = true,
+                skipCollisionCheck = true,
+                type = 'lollo_1_way_1_lane_street_no_sidewalk.lua', -- from res/config/street/
+                tramTrackType = 'ELECTRIC'
+            },
+            edges = {
+                -- one entry refers to a position and a tangent
+                {{-5.9, 0, 0}, {1, 0, 0}}, -- node 0
+                {{1.9, 0, 0}, {1, 0, 0}} -- node 1
+            },
+            freeNodes = {},
+            snapNodes = {}
+        },
+        {
+            type = 'STREET',
+            params = {
+                skipCollision = true,
+                skipCollisionCheck = true,
+                type = 'lollo_1_way_1_lane_street_no_sidewalk.lua', -- from res/config/street/
+                tramTrackType = 'ELECTRIC'
+            },
+            edges = {
+                -- one entry refers to a position and a tangent
+                {{-5.9, -8, 0}, {8, 0.1, 0}}, -- node 0
+                {{1.9, -4, 0}, {8, 0.1, 0}} -- node 1
+            },
+            freeNodes = {},
+            snapNodes = {}
+        },
+        {
+            type = 'STREET',
+            params = {
+                skipCollision = true,
+                skipCollisionCheck = true,
+                type = 'lollo_medium_1_way_3_lane_3_tram_tracks_street.lua', -- from res/config/street/
+                tramTrackType = 'ELECTRIC'
+            },
+            edges = {
+                -- one entry refers to a position and a tangent
+                {{2, 0, .0}, {1, .0, .0}}, -- node 0
+                {{10, 0, .0}, {1, .0, .0}} -- node 1
+            },
+            freeNodes = {1},
+            snapNodes = {}
+        }
+    }
+
+    return result
+end
+
 function data()
     return {
         type = 'STREET_CONSTRUCTION',
         description = {
-            name = _('Street confluence 1 and 1 to 2'),
-            description = _('Lays two parallel streets and a single broader street.')
+            name = _('Street confluence'),
+            description = _('Lays a confluence of multiple streets into a single broader street.')
         },
         availability = {
             yearFrom = 1925,
@@ -478,19 +635,15 @@ function data()
             {
                 key = 'confluenceType',
                 name = _('Confluence type'),
-                values = {_('2 streets into a 2-lane street'), _('3 streets into a 3-lane street'), _('4 streets into a 4-lane street')},
+                values = {
+                    _('2 narrow-pavement streets into a medium 2-lane street'), 
+                    _('2 medium-pavement streets into a medium 2-lane street'), 
+                    _('3 narrow-pavement streets into a medium 3-lane street'), 
+                    _('3 medium-pavement streets into a medium 3-lane street')
+                },
                 defaultIndex = 0
             },
-            {
-                key = 'sidewalkWidth',
-                name = _('Pavement width'),
-                values = {_('0.5 m'), _('2 m')},
-                defaultIndex = 0
-            }
         },
-        -- collider = {
-        --     type = 'NONE'
-        -- },
         -- autoRemovable = true,
         --skipCollision = true,
         --skipCollisionCheck = true,
@@ -548,24 +701,14 @@ function data()
             )
             dump(true)(lanes)
 
-            if params.confluenceType == 2 then
-                if params.sidewalkWidth == 0 then
-                    return updateFn_4_to_4_narrow_sidewalk(params)
-                else
-                    return updateFn_4_to_4_medium_sidewalk(params)
-                end
+            if params.confluenceType == 0 then
+                return updateFn_2_to_2_narrow_sidewalk(params)
             elseif params.confluenceType == 1 then
-                if params.sidewalkWidth == 0 then
-                    return updateFn_3_to_3_narrow_sidewalk(params)
-                else
-                    return updateFn_3_to_3_medium_sidewalk(params)
-                end
+                return updateFn_2_to_2_medium_sidewalk(params)
+            elseif params.confluenceType == 2 then
+                return updateFn_3_to_3_narrow_sidewalk(params)
             else
-                if params.sidewalkWidth == 0 then
-                    return updateFn_2_to_2_narrow_sidewalk(params)
-                else
-                    return updateFn_2_to_2_medium_sidewalk(params)
-                end
+                return updateFn_3_to_3_medium_sidewalk(params)
             end
         end
         -- upgradeFn = function(params) -- LOLLO TODO this may be important
