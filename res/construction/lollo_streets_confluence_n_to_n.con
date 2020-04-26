@@ -62,7 +62,7 @@ local function updateFn_2_to_2_narrow_sidewalk(params)
         }
     }
 
-     -- does not pull, neither do hasBusLane and busLane, with true or false
+    -- does not pull, neither do hasBusLane and busLane, with true or false
     -- local busLaneType = params.busLane and (({'NO', 'YES'})[params.busLane + 1]) or 'NO'
     local tramTrackType = params.tramTrack and (({'NO', 'YES', 'ELECTRIC'})[params.tramTrack + 1]) or 'NO'
     result.edgeLists = {
@@ -75,17 +75,23 @@ local function updateFn_2_to_2_narrow_sidewalk(params)
                 type = 'lollo_medium_1_way_1_lane_street_narrow_sidewalk.lua', -- from res/config/street/
                 tramTrackType = tramTrackType
             },
-            edges = {
-                -- one entry refers to a position and a tangent
-                {{-6, -3, .0}, {1, .0, .0}}, -- node 0
-                {{-2, -3, .0}, {1, .0, .0}} -- node 1
-            },
+            edges = params.direction == 0 and
+                {
+                    -- one entry refers to a position and a tangent
+                    {{-6, -3, .0}, {1, .0, .0}}, -- node 0
+                    {{-2, -3, .0}, {1, .0, .0}} -- node 1
+                } or
+                {
+                    -- one entry refers to a position and a tangent
+                    {{-2, -3, .0}, {-1, .0, .0}}, -- node 0
+                    {{-6, -3, .0}, {-1, .0, .0}} -- node 1
+                },
             -- edgeType = "BRIDGE",
             -- edgeTypeName = "cement.lua",
             --freeNodes = { 0, 1 },
             --freeNodes = { 1 },
             -- freeNodes = {},
-            freeNodes = {0},
+            freeNodes = params.direction == 0 and {0} or {1},
             --skipCollision = true, --useless
             --skipCollisionCheck = true, --useless
             --snapNodes = {0, 1}, -- node 1 is allowed to snap to other edges of the same type
@@ -101,14 +107,20 @@ local function updateFn_2_to_2_narrow_sidewalk(params)
                 skipCollision = true,
                 skipCollisionCheck = true,
                 type = 'lollo_medium_1_way_1_lane_street_narrow_sidewalk.lua', -- from res/config/street/
-                tramTrackType = tramTrackType,
+                tramTrackType = tramTrackType
             },
-            edges = {
-                -- one entry refers to a position and a tangent
-                {{-6, 3, .0}, {1, .0, .0}}, -- node 0
-                {{-2, 3, .0}, {1, .0, .0}} -- node 1
-            },
-            freeNodes = {0},
+            edges = params.direction == 0 and
+                {
+                    -- one entry refers to a position and a tangent
+                    {{-6, 3, .0}, {1, .0, .0}}, -- node 0
+                    {{-2, 3, .0}, {1, .0, .0}} -- node 1
+                } or
+                {
+                    -- one entry refers to a position and a tangent
+                    {{-2, 3, .0}, {-1, .0, .0}}, -- node 0
+                    {{-6, 3, .0}, {-1, .0, .0}} -- node 1
+                },
+            freeNodes = params.direction == 0 and {0} or {1},
             snapNodes = {}
         },
         {
@@ -118,13 +130,19 @@ local function updateFn_2_to_2_narrow_sidewalk(params)
                 skipCollision = true,
                 skipCollisionCheck = true,
                 type = 'lollo_1_way_1_lane_street_no_sidewalk.lua', -- from res/config/street/
-                tramTrackType = tramTrackType,
+                tramTrackType = tramTrackType
             },
-            edges = {
-                -- one entry refers to a position and a tangent
-                {{-1.9, 3, 0}, {1, 0, 0}}, -- node 0
-                {{1.9, 3, 0}, {4, 0, 0}} -- node 1
-            },
+            edges = params.direction == 0 and
+                {
+                    -- one entry refers to a position and a tangent
+                    {{-1.9, 3, 0}, {1, 0, 0}}, -- node 0
+                    {{1.9, 3, 0}, {1, 0, 0}} -- node 1
+                } or
+                {
+                    -- one entry refers to a position and a tangent
+                    {{1.9, 3, 0}, {-1, 0, 0}}, -- node 0
+                    {{-1.9, 3, 0}, {-1, 0, 0}} -- node 1
+                },
             freeNodes = {},
             snapNodes = {}
         },
@@ -135,13 +153,19 @@ local function updateFn_2_to_2_narrow_sidewalk(params)
                 skipCollision = true,
                 skipCollisionCheck = true,
                 type = 'lollo_1_way_1_lane_street_no_sidewalk.lua', -- from res/config/street/
-                tramTrackType = tramTrackType,
+                tramTrackType = tramTrackType
             },
-            edges = {
-                -- one entry refers to a position and a tangent
-                {{-1.9, -3, 0}, {1, 0, 0}}, -- node 0
-                {{1.9, -3, 0}, {1, 0, 0}} -- node 1
-            },
+            edges = params.direction == 0 and
+                {
+                    -- one entry refers to a position and a tangent
+                    {{-1.9, -3, 0}, {1, 0, 0}}, -- node 0
+                    {{1.9, -3, 0}, {1, 0, 0}} -- node 1
+                } or
+                {
+                    -- one entry refers to a position and a tangent
+                    {{1.9, -3, 0}, {-1, 0, 0}}, -- node 0
+                    {{-1.9, -3, 0}, {-1, 0, 0}} -- node 1
+                },
             freeNodes = {},
             snapNodes = {}
         },
@@ -152,14 +176,20 @@ local function updateFn_2_to_2_narrow_sidewalk(params)
                 skipCollision = true,
                 skipCollisionCheck = true,
                 type = tramTrackType == 'NO' and 'lollo_medium_1_way_2_lane_medium_sidewalk_street.lua' or 'lollo_medium_1_way_2_lane_2_tram_tracks_narrow_sidewalk_street.lua',
-                tramTrackType = tramTrackType,
+                tramTrackType = tramTrackType
             },
-            edges = {
-                -- one entry refers to a position and a tangent
-                {{2, 0, .0}, {1, .0, .0}}, -- node 0
-                {{10, 0, .0}, {1, .0, .0}} -- node 1
-            },
-            freeNodes = {1},
+            edges = params.direction == 0 and
+                {
+                    -- one entry refers to a position and a tangent
+                    {{2, 0, .0}, {1, .0, .0}}, -- node 0
+                    {{10, 0, .0}, {1, .0, .0}} -- node 1
+                } or
+                {
+                    -- one entry refers to a position and a tangent
+                    {{10, 0, .0}, {-1, .0, .0}}, -- node 0
+                    {{2, 0, .0}, {-1, .0, .0}} -- node 1
+                },
+            freeNodes = params.direction == 0 and {1} or {0},
             snapNodes = {}
         }
     }
@@ -218,12 +248,18 @@ local function updateFn_2_to_2_medium_sidewalk(params)
                 type = 'lollo_medium_1_way_1_lane_street.lua', -- from res/config/street/
                 tramTrackType = tramTrackType
             },
-            edges = {
-                -- one entry refers to a position and a tangent
-                {{-6, -4, .0}, {1, .0, .0}}, -- node 0
-                {{-2, -4, .0}, {1, .0, .0}} -- node 1
-            },
-            freeNodes = {0},
+            edges = params.direction == 0 and
+                {
+                    -- one entry refers to a position and a tangent
+                    {{-6, -4, .0}, {1, .0, .0}}, -- node 0
+                    {{-2, -4, .0}, {1, .0, .0}} -- node 1
+                } or
+                {
+                    -- one entry refers to a position and a tangent
+                    {{-2, -4, .0}, {-1, .0, .0}}, -- node 0
+                    {{-6, -4, .0}, {-1, .0, .0}} -- node 1
+                },
+            freeNodes = params.direction == 0 and {0} or {1},
             snapNodes = {}
         },
         {
@@ -234,12 +270,18 @@ local function updateFn_2_to_2_medium_sidewalk(params)
                 type = 'lollo_medium_1_way_1_lane_street.lua', -- from res/config/street/
                 tramTrackType = tramTrackType
             },
-            edges = {
-                -- one entry refers to a position and a tangent
-                {{-6, 4, .0}, {1, .0, .0}}, -- node 0
-                {{-2, 4, .0}, {1, .0, .0}} -- node 1
-            },
-            freeNodes = {0},
+            edges = params.direction == 0 and
+                {
+                    -- one entry refers to a position and a tangent
+                    {{-6, 4, .0}, {1, .0, .0}}, -- node 0
+                    {{-2, 4, .0}, {1, .0, .0}} -- node 1
+                } or
+                {
+                    -- one entry refers to a position and a tangent
+                    {{-2, 4, .0}, {-1, .0, .0}}, -- node 0
+                    {{-6, 4, .0}, {-1, .0, .0}} -- node 1
+                },
+            freeNodes = params.direction == 0 and {0} or {1},
             snapNodes = {}
         },
         {
@@ -250,11 +292,17 @@ local function updateFn_2_to_2_medium_sidewalk(params)
                 type = 'lollo_1_way_1_lane_street_no_sidewalk.lua', -- from res/config/street/
                 tramTrackType = tramTrackType
             },
-            edges = {
-                -- one entry refers to a position and a tangent
-                {{-1.9, 4, 0}, {4, -0.1, 0}}, -- node 0
-                {{1.9, 3, 0}, {4, -0.1, 0}} -- node 1
-            },
+            edges = params.direction == 0 and
+                {
+                    -- one entry refers to a position and a tangent
+                    {{-1.9, 4, 0}, {4, -0.1, 0}}, -- node 0
+                    {{1.9, 3, 0}, {4, -0.1, 0}} -- node 1
+                } or
+                {
+                    -- one entry refers to a position and a tangent
+                    {{1.9, 3, 0}, {-4, 0.1, 0}}, -- node 0
+                    {{-1.9, 4, 0}, {-4, 0.1, 0}} -- node 1
+                },
             freeNodes = {},
             snapNodes = {}
         },
@@ -266,11 +314,17 @@ local function updateFn_2_to_2_medium_sidewalk(params)
                 type = 'lollo_1_way_1_lane_street_no_sidewalk.lua', -- from res/config/street/
                 tramTrackType = tramTrackType
             },
-            edges = {
-                -- one entry refers to a position and a tangent
-                {{-1.9, -4, 0}, {4, 0.1, 0}}, -- node 0
-                {{1.9, -3, 0}, {4, 0.1, 0}} -- node 1
-            },
+            edges = params.direction == 0 and
+                {
+                    -- one entry refers to a position and a tangent
+                    {{-1.9, -4, 0}, {4, 0.1, 0}}, -- node 0
+                    {{1.9, -3, 0}, {4, 0.1, 0}} -- node 1
+                } or
+                {
+                    -- one entry refers to a position and a tangent
+                    {{1.9, -3, 0}, {-4, -0.1, 0}}, -- node 0
+                    {{-1.9, -4, 0}, {-4, -0.1, 0}} -- node 1
+                },
             freeNodes = {},
             snapNodes = {}
         },
@@ -282,12 +336,18 @@ local function updateFn_2_to_2_medium_sidewalk(params)
                 type = tramTrackType == 'NO' and 'lollo_medium_1_way_2_lane_medium_sidewalk_street.lua' or 'lollo_medium_1_way_2_lane_2_tram_tracks_narrow_sidewalk_street.lua',
                 tramTrackType = tramTrackType
             },
-            edges = {
-                -- one entry refers to a position and a tangent
-                {{2, 0, .0}, {1, .0, .0}}, -- node 0
-                {{10, 0, .0}, {1, .0, .0}} -- node 1
-            },
-            freeNodes = {1},
+            edges = params.direction == 0 and
+                {
+                    -- one entry refers to a position and a tangent
+                    {{2, 0, .0}, {1, .0, .0}}, -- node 0
+                    {{10, 0, .0}, {1, .0, .0}} -- node 1
+                } or
+                {
+                    -- one entry refers to a position and a tangent
+                    {{10, 0, .0}, {-1, .0, .0}}, -- node 0
+                    {{2, 0, .0}, {-1, .0, .0}} -- node 1
+                },
+            freeNodes = params.direction == 0 and {1} or {0},
             snapNodes = {}
         }
     }
@@ -343,12 +403,16 @@ local function updateFn_3_to_3_narrow_sidewalk(params)
                 type = 'lollo_medium_1_way_1_lane_street_narrow_sidewalk.lua', -- from res/config/street/
                 tramTrackType = tramTrackType
             },
-            edges = {
-                -- one entry refers to a position and a tangent
-                {{-6, -4, .0}, {1, .0, .0}}, -- node 0
-                {{-2, -4, .0}, {1, .0, .0}} -- node 1
-            },
-            freeNodes = {0},
+            edges = params.direction == 0 and
+                {
+                    {{-6, -4, .0}, {1, .0, .0}}, -- node 0
+                    {{-2, -4, .0}, {1, .0, .0}} -- node 1
+                } or
+                {
+                    {{-2, -4, .0}, {-1, .0, .0}}, -- node 0
+                    {{-6, -4, .0}, {-1, .0, .0}} -- node 0
+                },
+            freeNodes = params.direction == 0 and {0} or {1},
             snapNodes = {}
         },
         {
@@ -359,12 +423,16 @@ local function updateFn_3_to_3_narrow_sidewalk(params)
                 type = 'lollo_medium_1_way_1_lane_street_narrow_sidewalk.lua', -- from res/config/street/
                 tramTrackType = tramTrackType
             },
-            edges = {
-                -- one entry refers to a position and a tangent
-                {{-6, 0, .0}, {1, .0, .0}}, -- node 0
-                {{-2, 0, .0}, {1, .0, .0}} -- node 1
-            },
-            freeNodes = {0},
+            edges = params.direction == 0 and
+                {
+                    {{-6, 0, .0}, {1, .0, .0}}, -- node 0
+                    {{-2, 0, .0}, {1, .0, .0}} -- node 1
+                } or
+                {
+                    {{-2, 0, .0}, {-1, .0, .0}}, -- node 0
+                    {{-6, 0, .0}, {-1, .0, .0}} -- node 1
+                },
+            freeNodes = params.direction == 0 and {0} or {1},
             snapNodes = {}
         },
         {
@@ -375,12 +443,16 @@ local function updateFn_3_to_3_narrow_sidewalk(params)
                 type = 'lollo_medium_1_way_1_lane_street_narrow_sidewalk.lua', -- from res/config/street/
                 tramTrackType = tramTrackType
             },
-            edges = {
-                -- one entry refers to a position and a tangent
-                {{-6, 4, .0}, {1, .0, .0}}, -- node 0
-                {{-2, 4, .0}, {1, .0, .0}} -- node 1
-            },
-            freeNodes = {0},
+            edges = params.direction == 0 and
+                {
+                    {{-6, 4, .0}, {1, .0, .0}}, -- node 0
+                    {{-2, 4, .0}, {1, .0, .0}} -- node 1
+                } or
+                {
+                    {{-2, 4, .0}, {-1, .0, .0}}, -- node 0
+                    {{-6, 4, .0}, {-1, .0, .0}} -- node 0
+                },
+            freeNodes = params.direction == 0 and {0} or {1},
             snapNodes = {}
         },
         {
@@ -391,11 +463,15 @@ local function updateFn_3_to_3_narrow_sidewalk(params)
                 type = 'lollo_1_way_1_lane_street_no_sidewalk.lua', -- from res/config/street/
                 tramTrackType = tramTrackType
             },
-            edges = {
-                -- one entry refers to a position and a tangent
-                {{-1.9, 4, 0}, {1, 0, 0}}, -- node 0
-                {{1.9, 4, 0}, {1, 0, 0}} -- node 1
-            },
+            edges = params.direction == 0 and
+                {
+                    {{-1.9, 4, 0}, {1, 0, 0}}, -- node 0
+                    {{1.9, 4, 0}, {1, 0, 0}} -- node 1
+                } or
+                {
+                    {{1.9, 4, 0}, {-1, 0, 0}}, -- node 0
+                    {{-1.9, 4, 0}, {-1, 0, 0}} -- node 1
+                },
             freeNodes = {},
             snapNodes = {}
         },
@@ -407,11 +483,15 @@ local function updateFn_3_to_3_narrow_sidewalk(params)
                 type = 'lollo_1_way_1_lane_street_no_sidewalk.lua', -- from res/config/street/
                 tramTrackType = tramTrackType
             },
-            edges = {
-                -- one entry refers to a position and a tangent
-                {{-1.9, 0, 0}, {1, 0, 0}}, -- node 0
-                {{1.9, 0, 0}, {1, 0, 0}} -- node 1
-            },
+            edges = params.direction == 0 and
+                {
+                    {{-1.9, 0, 0}, {1, 0, 0}}, -- node 0
+                    {{1.9, 0, 0}, {1, 0, 0}} -- node 1
+                } or
+                {
+                    {{1.9, 0, 0}, {-1, 0, 0}}, -- node 0
+                    {{-1.9, 0, 0}, {-1, 0, 0}} -- node 1
+                },
             freeNodes = {},
             snapNodes = {}
         },
@@ -423,11 +503,15 @@ local function updateFn_3_to_3_narrow_sidewalk(params)
                 type = 'lollo_1_way_1_lane_street_no_sidewalk.lua', -- from res/config/street/
                 tramTrackType = tramTrackType
             },
-            edges = {
-                -- one entry refers to a position and a tangent
-                {{-1.9, -4, 0}, {1, 0, 0}}, -- node 0
-                {{1.9, -4, 0}, {1, 0, 0}} -- node 1
-            },
+            edges = params.direction == 0 and
+                {
+                    {{-1.9, -4, 0}, {1, 0, 0}}, -- node 0
+                    {{1.9, -4, 0}, {1, 0, 0}} -- node 1
+                } or
+                {
+                    {{1.9, -4, 0}, {-1, 0, 0}}, -- node 0
+                    {{-1.9, -4, 0}, {-1, 0, 0}} -- node 1
+                },
             freeNodes = {},
             snapNodes = {}
         },
@@ -439,12 +523,16 @@ local function updateFn_3_to_3_narrow_sidewalk(params)
                 type = tramTrackType == 'NO' and 'lollo_medium_1_way_3_lane_street.lua' or 'lollo_medium_1_way_3_lane_3_tram_tracks_street.lua',
                 tramTrackType = tramTrackType
             },
-            edges = {
-                -- one entry refers to a position and a tangent
-                {{2, 0, .0}, {1, .0, .0}}, -- node 0
-                {{10, 0, .0}, {1, .0, .0}} -- node 1
-            },
-            freeNodes = {1},
+            edges = params.direction == 0 and
+                {
+                    {{2, 0, .0}, {1, .0, .0}}, -- node 0
+                    {{10, 0, .0}, {1, .0, .0}} -- node 1
+                } or
+                {
+                    {{10, 0, .0}, {-1, .0, .0}}, -- node 0
+                    {{2, 0, .0}, {-1, .0, .0}} -- node 1
+                },
+            freeNodes = params.direction == 0 and {1} or {0},
             snapNodes = {}
         }
     }
@@ -500,12 +588,16 @@ local function updateFn_3_to_3_medium_sidewalk(params)
                 type = 'lollo_medium_1_way_1_lane_street.lua', -- from res/config/street/
                 tramTrackType = tramTrackType
             },
-            edges = {
-                -- one entry refers to a position and a tangent
-                {{-10, -8, .0}, {1, .0, .0}}, -- node 0
-                {{-6, -8, .0}, {1, .0, .0}} -- node 1
-            },
-            freeNodes = {0},
+            edges = params.direction == 0 and
+                {
+                    {{-10, -8, .0}, {1, .0, .0}}, -- node 0
+                    {{-6, -8, .0}, {1, .0, .0}} -- node 1
+                } or
+                {
+                    {{-6, -8, .0}, {-1, .0, .0}}, -- node 0
+                    {{-10, -8, .0}, {-1, .0, .0}} -- node 1
+                },
+            freeNodes = params.direction == 0 and {0} or {1},
             snapNodes = {}
         },
         {
@@ -516,12 +608,16 @@ local function updateFn_3_to_3_medium_sidewalk(params)
                 type = 'lollo_medium_1_way_1_lane_street.lua', -- from res/config/street/
                 tramTrackType = tramTrackType
             },
-            edges = {
-                -- one entry refers to a position and a tangent
-                {{-10, 0, .0}, {1, .0, .0}}, -- node 0
-                {{-6, 0, .0}, {1, .0, .0}} -- node 1
-            },
-            freeNodes = {0},
+            edges = params.direction == 0 and
+                {
+                    {{-10, 0, .0}, {1, .0, .0}}, -- node 0
+                    {{-6, 0, .0}, {1, .0, .0}} -- node 1
+                } or
+                {
+                    {{-6, 0, .0}, {-1, .0, .0}}, -- node 0
+                    {{-10, 0, .0}, {-1, .0, .0}} -- node 1
+                },
+            freeNodes = params.direction == 0 and {0} or {1},
             snapNodes = {}
         },
         {
@@ -532,12 +628,16 @@ local function updateFn_3_to_3_medium_sidewalk(params)
                 type = 'lollo_medium_1_way_1_lane_street.lua', -- from res/config/street/
                 tramTrackType = tramTrackType
             },
-            edges = {
-                -- one entry refers to a position and a tangent
-                {{-10, 8, .0}, {1, .0, .0}}, -- node 0
-                {{-6, 8, .0}, {1, .0, .0}} -- node 1
-            },
-            freeNodes = {0},
+            edges = params.direction == 0 and
+                {
+                    {{-10, 8, .0}, {1, .0, .0}}, -- node 0
+                    {{-6, 8, .0}, {1, .0, .0}} -- node 1
+                } or
+                {
+                    {{-6, 8, .0}, {-1, .0, .0}}, -- node 0
+                    {{-10, 8, .0}, {-1, .0, .0}} -- node 1
+                },
+            freeNodes = params.direction == 0 and {0} or {1},
             snapNodes = {}
         },
         {
@@ -548,11 +648,15 @@ local function updateFn_3_to_3_medium_sidewalk(params)
                 type = 'lollo_1_way_1_lane_street_no_sidewalk.lua', -- from res/config/street/
                 tramTrackType = tramTrackType
             },
-            edges = {
-                -- one entry refers to a position and a tangent
-                {{-5.9, 8, 0}, {8, -0.1, 0}}, -- node 0
-                {{1.9, 4, 0}, {8, -0.1, 0}} -- node 1
-            },
+            edges = params.direction == 0 and
+                {
+                    {{-5.9, 8, 0}, {8, -0.1, 0}}, -- node 0
+                    {{1.9, 4, 0}, {8, -0.1, 0}} -- node 1
+                } or
+                {
+                    {{1.9, 4, 0}, {-8, 0.1, 0}}, -- node 0
+                    {{-5.9, 8, 0}, {-8, 0.1, 0}} -- node 1
+                },
             freeNodes = {},
             snapNodes = {}
         },
@@ -564,11 +668,15 @@ local function updateFn_3_to_3_medium_sidewalk(params)
                 type = 'lollo_1_way_1_lane_street_no_sidewalk.lua', -- from res/config/street/
                 tramTrackType = tramTrackType
             },
-            edges = {
-                -- one entry refers to a position and a tangent
-                {{-5.9, 0, 0}, {1, 0, 0}}, -- node 0
-                {{1.9, 0, 0}, {1, 0, 0}} -- node 1
-            },
+            edges = params.direction == 0 and
+                {
+                    {{-5.9, 0, 0}, {1, 0, 0}}, -- node 0
+                    {{1.9, 0, 0}, {1, 0, 0}} -- node 1
+                } or
+                {
+                    {{1.9, 0, 0}, {-1, 0, 0}}, -- node 0
+                    {{-5.9, 0, 0}, {-1, 0, 0}} -- node 1
+                },
             freeNodes = {},
             snapNodes = {}
         },
@@ -580,11 +688,15 @@ local function updateFn_3_to_3_medium_sidewalk(params)
                 type = 'lollo_1_way_1_lane_street_no_sidewalk.lua', -- from res/config/street/
                 tramTrackType = tramTrackType
             },
-            edges = {
-                -- one entry refers to a position and a tangent
-                {{-5.9, -8, 0}, {8, 0.1, 0}}, -- node 0
-                {{1.9, -4, 0}, {8, 0.1, 0}} -- node 1
-            },
+            edges = params.direction == 0 and
+                {
+                    {{-5.9, -8, 0}, {8, 0.1, 0}}, -- node 0
+                    {{1.9, -4, 0}, {8, 0.1, 0}} -- node 1
+                } or
+                {
+                    {{1.9, -4, 0}, {-8, -0.1, 0}}, -- node 0
+                    {{-5.9, -8, 0}, {-8, -0.1, 0}} -- node 1
+                },
             freeNodes = {},
             snapNodes = {}
         },
@@ -596,12 +708,16 @@ local function updateFn_3_to_3_medium_sidewalk(params)
                 type = tramTrackType == 'NO' and 'lollo_medium_1_way_3_lane_street.lua' or 'lollo_medium_1_way_3_lane_3_tram_tracks_street.lua',
                 tramTrackType = tramTrackType
             },
-            edges = {
-                -- one entry refers to a position and a tangent
-                {{2, 0, .0}, {1, .0, .0}}, -- node 0
-                {{10, 0, .0}, {1, .0, .0}} -- node 1
-            },
-            freeNodes = {1},
+            edges = params.direction == 0 and
+                {
+                    {{2, 0, .0}, {1, .0, .0}}, -- node 0
+                    {{10, 0, .0}, {1, .0, .0}} -- node 1
+                } or
+                {
+                    {{10, 0, .0}, {-1, .0, .0}}, -- node 0
+                    {{2, 0, .0}, {-1, .0, .0}} -- node 1
+                },
+            freeNodes = params.direction == 0 and {1} or {0},
             snapNodes = {}
         }
     }
@@ -657,12 +773,16 @@ local function updateFn_4_to_4_narrow_sidewalk(params)
                 type = 'lollo_medium_1_way_1_lane_street_narrow_sidewalk.lua', -- from res/config/street/
                 tramTrackType = tramTrackType
             },
-            edges = {
-                -- one entry refers to a position and a tangent
-                {{-6, -6, .0}, {1, .0, .0}}, -- node 0
-                {{-2, -6, .0}, {1, .0, .0}} -- node 1
-            },
-            freeNodes = {0},
+            edges = params.direction == 0 and
+                {
+                    {{-6, -6, .0}, {1, .0, .0}}, -- node 0
+                    {{-2, -6, .0}, {1, .0, .0}} -- node 1
+                } or
+                {
+                    {{-2, -6, .0}, {-1, .0, .0}}, -- node 0
+                    {{-6, -6, .0}, {-1, .0, .0}} -- node 1
+                },
+            freeNodes = params.direction == 0 and {0} or {1},
             snapNodes = {}
         },
         {
@@ -673,12 +793,16 @@ local function updateFn_4_to_4_narrow_sidewalk(params)
                 type = 'lollo_medium_1_way_1_lane_street_narrow_sidewalk.lua', -- from res/config/street/
                 tramTrackType = tramTrackType
             },
-            edges = {
-                -- one entry refers to a position and a tangent
-                {{-6, -2, .0}, {1, .0, .0}}, -- node 0
-                {{-2, -2, .0}, {1, .0, .0}} -- node 1
-            },
-            freeNodes = {0},
+            edges = params.direction == 0 and
+                {
+                    {{-6, -2, .0}, {1, .0, .0}}, -- node 0
+                    {{-2, -2, .0}, {1, .0, .0}} -- node 1
+                } or
+                {
+                    {{-2, -2, .0}, {-1, .0, .0}}, -- node 0
+                    {{-6, -2, .0}, {-1, .0, .0}} -- node 1
+                },
+            freeNodes = params.direction == 0 and {0} or {1},
             snapNodes = {}
         },
         {
@@ -689,12 +813,16 @@ local function updateFn_4_to_4_narrow_sidewalk(params)
                 type = 'lollo_medium_1_way_1_lane_street_narrow_sidewalk.lua', -- from res/config/street/
                 tramTrackType = tramTrackType
             },
-            edges = {
-                -- one entry refers to a position and a tangent
-                {{-6, 2, .0}, {1, .0, .0}}, -- node 0
-                {{-2, 2, .0}, {1, .0, .0}} -- node 1
-            },
-            freeNodes = {0},
+            edges = params.direction == 0 and
+                {
+                    {{-6, 2, .0}, {1, .0, .0}}, -- node 0
+                    {{-2, 2, .0}, {1, .0, .0}} -- node 1
+                } or
+                {
+                    {{-2, 2, .0}, {-1, .0, .0}}, -- node 0
+                    {{-6, 2, .0}, {-1, .0, .0}} -- node 1
+                },
+            freeNodes = params.direction == 0 and {0} or {1},
             snapNodes = {}
         },
         {
@@ -705,12 +833,16 @@ local function updateFn_4_to_4_narrow_sidewalk(params)
                 type = 'lollo_medium_1_way_1_lane_street_narrow_sidewalk.lua', -- from res/config/street/
                 tramTrackType = tramTrackType
             },
-            edges = {
-                -- one entry refers to a position and a tangent
-                {{-6, 6, .0}, {1, .0, .0}}, -- node 0
-                {{-2, 6, .0}, {1, .0, .0}} -- node 1
-            },
-            freeNodes = {0},
+            edges = params.direction == 0 and
+                {
+                    {{-6, 6, .0}, {1, .0, .0}}, -- node 0
+                    {{-2, 6, .0}, {1, .0, .0}} -- node 1
+                } or
+                {
+                    {{-2, 6, .0}, {-1, .0, .0}}, -- node 0
+                    {{-6, 6, .0}, {-1, .0, .0}} -- node 1
+                },
+            freeNodes = params.direction == 0 and {0} or {1},
             snapNodes = {}
         },
         {
@@ -721,11 +853,15 @@ local function updateFn_4_to_4_narrow_sidewalk(params)
                 type = 'lollo_1_way_1_lane_street_no_sidewalk.lua', -- from res/config/street/
                 tramTrackType = tramTrackType
             },
-            edges = {
-                -- one entry refers to a position and a tangent
-                {{-1.9, 6, 0}, {4, -0.1, 0}}, -- node 0
-                {{1.9, 4.5, 0}, {4, -0.1, 0}} -- node 1
-            },
+            edges = params.direction == 0 and
+                {
+                    {{-1.9, 6, 0}, {4, -0.1, 0}}, -- node 0
+                    {{1.9, 4.5, 0}, {4, -0.1, 0}} -- node 1
+                } or
+                {
+                    {{1.9, 4.5, 0}, {-4, 0.1, 0}}, -- node 0
+                    {{-1.9, 6, 0}, {-4, 0.1, 0}} -- node 1
+                },
             freeNodes = {},
             snapNodes = {}
         },
@@ -737,11 +873,15 @@ local function updateFn_4_to_4_narrow_sidewalk(params)
                 type = 'lollo_1_way_1_lane_street_no_sidewalk.lua', -- from res/config/street/
                 tramTrackType = tramTrackType
             },
-            edges = {
-                -- one entry refers to a position and a tangent
-                {{-1.9, 2, 0}, {4, -0.1, 0}}, -- node 0
-                {{1.9, 1.5, 0}, {4, -0.1, 0}} -- node 1
-            },
+            edges = params.direction == 0 and
+                {
+                    {{-1.9, 2, 0}, {4, -0.1, 0}}, -- node 0
+                    {{1.9, 1.5, 0}, {4, -0.1, 0}} -- node 1
+                } or
+                {
+                    {{1.9, 1.5, 0}, {-4, 0.1, 0}}, -- node 0
+                    {{-1.9, 2, 0}, {-4, 0.1, 0}} -- node 1
+                },
             freeNodes = {},
             snapNodes = {}
         },
@@ -753,11 +893,15 @@ local function updateFn_4_to_4_narrow_sidewalk(params)
                 type = 'lollo_1_way_1_lane_street_no_sidewalk.lua', -- from res/config/street/
                 tramTrackType = tramTrackType
             },
-            edges = {
-                -- one entry refers to a position and a tangent
-                {{-1.9, -2, 0}, {4, 0.1, 0}}, -- node 0
-                {{1.9, -1.5, 0}, {4, 0.1, 0}} -- node 1
-            },
+            edges = params.direction == 0 and
+                {
+                    {{-1.9, -2, 0}, {4, 0.1, 0}}, -- node 0
+                    {{1.9, -1.5, 0}, {4, 0.1, 0}} -- node 1
+                } or
+                {
+                    {{1.9, -1.5, 0}, {-4, -0.1, 0}}, -- node 0
+                    {{-1.9, -2, 0}, {-4, -0.1, 0}} -- node 1
+                },
             freeNodes = {},
             snapNodes = {}
         },
@@ -769,11 +913,15 @@ local function updateFn_4_to_4_narrow_sidewalk(params)
                 type = 'lollo_1_way_1_lane_street_no_sidewalk.lua', -- from res/config/street/
                 tramTrackType = tramTrackType
             },
-            edges = {
-                -- one entry refers to a position and a tangent
-                {{-1.9, -6, 0}, {4, 0.1, 0}}, -- node 0
-                {{1.9, -4.5, 0}, {4, 0.1, 0}} -- node 1
-            },
+            edges = params.direction == 0 and
+                {
+                    {{-1.9, -6, 0}, {4, 0.1, 0}}, -- node 0
+                    {{1.9, -4.5, 0}, {4, 0.1, 0}} -- node 1
+                } or
+                {
+                    {{1.9, -4.5, 0}, {-4, -0.1, 0}}, -- node 0
+                    {{-1.9, -6, 0}, {-4, -0.1, 0}} -- node 1
+                },
             freeNodes = {},
             snapNodes = {}
         },
@@ -785,12 +933,16 @@ local function updateFn_4_to_4_narrow_sidewalk(params)
                 type = tramTrackType == 'NO' and 'lollo_medium_1_way_4_lane_street.lua' or 'lollo_medium_1_way_4_lane_4_tram_tracks_street.lua',
                 tramTrackType = tramTrackType
             },
-            edges = {
-                -- one entry refers to a position and a tangent
-                {{2, 0, .0}, {1, .0, .0}}, -- node 0
-                {{10, 0, .0}, {1, .0, .0}} -- node 1
-            },
-            freeNodes = {1},
+            edges = params.direction == 0 and
+                {
+                    {{2, 0, .0}, {1, .0, .0}}, -- node 0
+                    {{10, 0, .0}, {1, .0, .0}} -- node 1
+                } or
+                {
+                    {{10, 0, .0}, {-1, .0, .0}}, -- node 0
+                    {{2, 0, .0}, {-1, .0, .0}} -- node 1
+                },
+            freeNodes = params.direction == 0 and {1} or {0},
             snapNodes = {}
         }
     }
@@ -809,6 +961,7 @@ function data()
             yearFrom = 1925,
             yearTo = 0
         },
+        -- categories = {'one-way'}, -- no way to get the arrows reversed with right - click
         -- params = { -- LOLLO here, you can add some parameters, such as the street type
         --     {
         --         key = "streetType2",
@@ -833,13 +986,22 @@ function data()
                 key = 'confluenceType',
                 name = _('Confluence type'),
                 values = {
-                    _('2 narrow-pavement streets into a medium 2-lane street'),
-                    _('2 medium-pavement streets into a medium 2-lane street'),
-                    _('3 narrow-pavement streets into a medium 3-lane street'),
-                    _('3 medium-pavement streets into a medium 3-lane street'),
-                    _('4 narrow-pavement streets into a medium 4-lane street')
+                    _('2 narrow-pavement streets and a medium 2-lane street'),
+                    _('2 medium-pavement streets and a medium 2-lane street'),
+                    _('3 narrow-pavement streets and a medium 3-lane street'),
+                    _('3 medium-pavement streets and a medium 3-lane street'),
+                    _('4 narrow-pavement streets and a medium 4-lane street')
                 },
                 defaultIndex = 0
+            },
+            {
+                key = 'direction',
+                name = _('Direction'),
+                values = {
+                    _('Narrow streets into a wider street'),
+                    _('A wider street into narrow streets')
+                },
+                defaultIndex = 1
             }
         },
         --autoRemovable = false, -- Used to allow the construction to be removed, if it collides with something else.
@@ -893,13 +1055,13 @@ function data()
             else
                 return updateFn_4_to_4_narrow_sidewalk(params)
             end
-        end,
-        upgradeFn = function(params) -- LOLLO TODO this may be important
-            print('LOLLO streets confluence upgradeFn')
-            dump(true)(params)
-            print('lollo PARAMS.MODULES = ')
-            dump(true)(params.modules)
-            return {}
         end
+        -- upgradeFn = function(params) -- LOLLO TODO this may be important
+        --     print('LOLLO streets confluence upgradeFn')
+        --     dump(true)(params)
+        --     print('lollo PARAMS.MODULES = ')
+        --     dump(true)(params.modules)
+        --     return {}
+        -- end
     }
 end
