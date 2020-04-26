@@ -1008,8 +1008,8 @@ function data()
         --skipCollision = true,
         --skipCollisionCheck = true,
         updateFn = function(params)
-            --print('LOLLO street merging n 2 n updateFn')
-            --dump(true)(params)
+            print('LOLLO street merging n 2 n updateFn')
+            dump(true)(params)
             -- local lanes =
             --     laneutil.createLanes(
             --     {
@@ -1055,13 +1055,14 @@ function data()
             else
                 return updateFn_4_to_4_narrow_sidewalk(params)
             end
+        end,
+        upgradeFn = function(params)
+            -- LOLLO NOTE the game wants this function to be defined, even if it returns an empty table.
+            -- If you leave it out, adding and removing tram tracks won't work.
+            -- (Bus lanes don't work anyway.)
+            -- print('LOLLO streets merging upgradeFn')
+            -- dump(true)(params)
+            return {}
         end
-        -- upgradeFn = function(params)
-        --     print('LOLLO streets merging upgradeFn')
-        --     dump(true)(params)
-        --     print('lollo PARAMS.MODULES = ')
-        --     dump(true)(params.modules)
-        --     return {}
-        -- end
     }
 end
