@@ -6,15 +6,14 @@
             {forward = true},
             --		{forward = true },
             --		{forward = true, },
-            -- {forward = true},
+            {forward = true},
             {forward = false}
         },
-        --transportModesStreet = {'CAR', 'BUS', 'ELECTRIC_TRAM', 'TRAM', 'TRUCK'}, -- with this, tram tracks appear on all lanes, not only on the right one
+        transportModesStreet = {'CAR', 'BUS', 'ELECTRIC_TRAM', 'TRAM', 'TRUCK'}, -- with this, tram tracks appear on all lanes, not only on the right one
         --transportModesSidewalk = { "PERSON", "TRUCK" }, --crashes
         --transportModesSidewalk = { "PERSON" }, --crashes
-        streetWidth = 4.0,
-        sidewalkWidth = 2.0, -- was 2.5, which causes incompatibilities. To fix them, restore it to 2.5, destroy the road, save the game, then back to 2.0, restart the game and rebuild the road
-        -- 2 * sidewalkWidth + streetWidth must be 8
+        streetWidth = 12.0,
+        sidewalkWidth = 2.0, -- was 4.0; 2 * sidewalkWidth + streetWidth must be 16
         sidewalkHeight = .3,
         yearFrom = 1925,
         yearTo = 0,
@@ -22,9 +21,9 @@
         country = false,
         speed = 50.0,
         -- priority = this crashes 4, -- LOLLO NOTE this is copied from airports, it should give priority to this street
-        type = 'lollo_medium_1_way_1_lane_street.lua',
-        name = _('Medium 1-way street with 1 lane'),
-        desc = _('Medium 1-way street with 1 lane. Speed limit is %2%.'),
+        type = 'lollo_medium_1_way_2_lane_2_tram_tracks_street.lua',
+        name = _('Medium 1-way street with 2 lanes and 2 tram tracks'),
+        desc = _('Medium 1-way street with 2 lanes, each with a tram track. Speed limit is %2%.'),
         categories = {'one-way'},
         borderGroundTex = 'street_border.lua',
         materials = {
@@ -44,10 +43,10 @@
                 name = 'street/default_arrows.mtl',
                 size = {9.0, 3.0}
             },
-            -- streetStripe = {
-            --     name = 'street/new_medium_stripes.mtl',
-            --     size = {8.0, .5}
-            -- },
+            streetStripe = {
+                name = 'street/new_medium_stripes.mtl',
+                size = {8.0, .5}
+            },
             -- streetStripeMedian = {
             --     name = 'street/new_large_median.mtl',
             --     size = {4.0, 1}
@@ -118,7 +117,7 @@
                 prob = 1.0,
                 offsetOrth = 3.4,
                 randRot = false,
-                oneSideOnly = true, -- was false,
+                oneSideOnly = false,
                 alignToElevation = false,
                 avoidFaceEdges = false,
                 placeOnBridge = true
@@ -136,8 +135,8 @@
             },
             {
                 name = 'street/street_asset_mix/mailbox_eu_c.mdl',
-                offset = 5, -- was 8,
-                distance = 43, -- was 40.0,
+                offset = 8,
+                distance = 40.0,
                 prob = 0.3,
                 offsetOrth = 0.4,
                 randRot = false,

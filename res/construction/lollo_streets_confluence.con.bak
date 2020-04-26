@@ -11,7 +11,7 @@ function data()
             description = _('Lays two parallel streets and a single broader street.')
         },
         availability = {
-            yearFrom = 0,
+            yearFrom = 1925,
             yearTo = 0
         },
         -- params = { -- LOLLO here, you can add some parameters, such as the street type
