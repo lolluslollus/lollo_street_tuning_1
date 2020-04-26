@@ -63,15 +63,18 @@ local function updateFn_2_to_2_narrow_sidewalk(params)
             transf = {1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1}
         }
     }
+
+    local tramTrackType = params.tramTrack and (({'NO', 'YES', 'ELECTRIC'})[params.tramTrack + 1]) or 'NO'
     result.edgeLists = {
         {
             type = 'STREET',
             params = {
                 -- autoRemovable = true,
+                busLane = params.busLane,
                 skipCollision = true,
                 skipCollisionCheck = true,
                 type = 'lollo_medium_1_way_1_lane_street_narrow_sidewalk.lua', -- from res/config/street/
-                tramTrackType = 'ELECTRIC'
+                tramTrackType = tramTrackType
             },
             edges = {
                 -- one entry refers to a position and a tangent
@@ -96,10 +99,11 @@ local function updateFn_2_to_2_narrow_sidewalk(params)
         {
             type = 'STREET',
             params = {
+                busLane = params.busLane,
                 skipCollision = true,
                 skipCollisionCheck = true,
                 type = 'lollo_medium_1_way_1_lane_street_narrow_sidewalk.lua', -- from res/config/street/
-                tramTrackType = 'ELECTRIC'
+                tramTrackType = tramTrackType,
             },
             edges = {
                 -- one entry refers to a position and a tangent
@@ -112,10 +116,11 @@ local function updateFn_2_to_2_narrow_sidewalk(params)
         {
             type = 'STREET',
             params = {
+                busLane = params.busLane,
                 skipCollision = true,
                 skipCollisionCheck = true,
                 type = 'lollo_1_way_1_lane_street_no_sidewalk.lua', -- from res/config/street/
-                tramTrackType = 'ELECTRIC'
+                tramTrackType = tramTrackType,
             },
             edges = {
                 -- one entry refers to a position and a tangent
@@ -128,10 +133,11 @@ local function updateFn_2_to_2_narrow_sidewalk(params)
         {
             type = 'STREET',
             params = {
+                busLane = params.busLane,
                 skipCollision = true,
                 skipCollisionCheck = true,
                 type = 'lollo_1_way_1_lane_street_no_sidewalk.lua', -- from res/config/street/
-                tramTrackType = 'ELECTRIC'
+                tramTrackType = tramTrackType,
             },
             edges = {
                 -- one entry refers to a position and a tangent
@@ -144,10 +150,11 @@ local function updateFn_2_to_2_narrow_sidewalk(params)
         {
             type = 'STREET',
             params = {
+                busLane = params.busLane,
                 skipCollision = true,
                 skipCollisionCheck = true,
-                type = 'lollo_medium_1_way_2_lane_2_tram_tracks_narrow_sidewalk_street.lua', -- from res/config/street/
-                tramTrackType = 'ELECTRIC'
+                type = tramTrackType == 'NO' and 'lollo_medium_1_way_2_lane_narrow_sidewalk_street.lua' or 'lollo_medium_1_way_2_lane_2_tram_tracks_narrow_sidewalk_street.lua',
+                tramTrackType = tramTrackType,
             },
             edges = {
                 -- one entry refers to a position and a tangent
@@ -204,6 +211,7 @@ local function updateFn_2_to_2_medium_sidewalk(params)
         }
     }
 
+    local tramTrackType = params.tramTrack and (({'NO', 'YES', 'ELECTRIC'})[params.tramTrack + 1]) or 'NO'
     result.edgeLists = {
         {
             type = 'STREET',
@@ -211,7 +219,7 @@ local function updateFn_2_to_2_medium_sidewalk(params)
                 skipCollision = true,
                 skipCollisionCheck = true,
                 type = 'lollo_medium_1_way_1_lane_street.lua', -- from res/config/street/
-                tramTrackType = 'ELECTRIC'
+                tramTrackType = tramTrackType
             },
             edges = {
                 -- one entry refers to a position and a tangent
@@ -227,7 +235,7 @@ local function updateFn_2_to_2_medium_sidewalk(params)
                 skipCollision = true,
                 skipCollisionCheck = true,
                 type = 'lollo_medium_1_way_1_lane_street.lua', -- from res/config/street/
-                tramTrackType = 'ELECTRIC'
+                tramTrackType = tramTrackType
             },
             edges = {
                 -- one entry refers to a position and a tangent
@@ -243,7 +251,7 @@ local function updateFn_2_to_2_medium_sidewalk(params)
                 skipCollision = true,
                 skipCollisionCheck = true,
                 type = 'lollo_1_way_1_lane_street_no_sidewalk.lua', -- from res/config/street/
-                tramTrackType = 'ELECTRIC'
+                tramTrackType = tramTrackType
             },
             edges = {
                 -- one entry refers to a position and a tangent
@@ -259,7 +267,7 @@ local function updateFn_2_to_2_medium_sidewalk(params)
                 skipCollision = true,
                 skipCollisionCheck = true,
                 type = 'lollo_1_way_1_lane_street_no_sidewalk.lua', -- from res/config/street/
-                tramTrackType = 'ELECTRIC'
+                tramTrackType = tramTrackType
             },
             edges = {
                 -- one entry refers to a position and a tangent
@@ -274,8 +282,8 @@ local function updateFn_2_to_2_medium_sidewalk(params)
             params = {
                 skipCollision = true,
                 skipCollisionCheck = true,
-                type = 'lollo_medium_1_way_2_lane_2_tram_tracks_narrow_sidewalk_street.lua', -- from res/config/street/
-                tramTrackType = 'ELECTRIC'
+                type = tramTrackType == 'NO' and 'lollo_medium_1_way_2_lane_narrow_sidewalk_street.lua' or 'lollo_medium_1_way_2_lane_2_tram_tracks_narrow_sidewalk_street.lua',
+                tramTrackType = tramTrackType
             },
             edges = {
                 -- one entry refers to a position and a tangent
@@ -327,6 +335,8 @@ local function updateFn_3_to_3_narrow_sidewalk(params)
             transf = {1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1}
         }
     }
+
+    local tramTrackType = params.tramTrack and (({'NO', 'YES', 'ELECTRIC'})[params.tramTrack + 1]) or 'NO'
     result.edgeLists = {
         {
             type = 'STREET',
@@ -334,7 +344,7 @@ local function updateFn_3_to_3_narrow_sidewalk(params)
                 skipCollision = true,
                 skipCollisionCheck = true,
                 type = 'lollo_medium_1_way_1_lane_street_narrow_sidewalk.lua', -- from res/config/street/
-                tramTrackType = 'ELECTRIC'
+                tramTrackType = tramTrackType
             },
             edges = {
                 -- one entry refers to a position and a tangent
@@ -350,7 +360,7 @@ local function updateFn_3_to_3_narrow_sidewalk(params)
                 skipCollision = true,
                 skipCollisionCheck = true,
                 type = 'lollo_medium_1_way_1_lane_street_narrow_sidewalk.lua', -- from res/config/street/
-                tramTrackType = 'ELECTRIC'
+                tramTrackType = tramTrackType
             },
             edges = {
                 -- one entry refers to a position and a tangent
@@ -366,7 +376,7 @@ local function updateFn_3_to_3_narrow_sidewalk(params)
                 skipCollision = true,
                 skipCollisionCheck = true,
                 type = 'lollo_medium_1_way_1_lane_street_narrow_sidewalk.lua', -- from res/config/street/
-                tramTrackType = 'ELECTRIC'
+                tramTrackType = tramTrackType
             },
             edges = {
                 -- one entry refers to a position and a tangent
@@ -382,7 +392,7 @@ local function updateFn_3_to_3_narrow_sidewalk(params)
                 skipCollision = true,
                 skipCollisionCheck = true,
                 type = 'lollo_1_way_1_lane_street_no_sidewalk.lua', -- from res/config/street/
-                tramTrackType = 'ELECTRIC'
+                tramTrackType = tramTrackType
             },
             edges = {
                 -- one entry refers to a position and a tangent
@@ -398,7 +408,7 @@ local function updateFn_3_to_3_narrow_sidewalk(params)
                 skipCollision = true,
                 skipCollisionCheck = true,
                 type = 'lollo_1_way_1_lane_street_no_sidewalk.lua', -- from res/config/street/
-                tramTrackType = 'ELECTRIC'
+                tramTrackType = tramTrackType
             },
             edges = {
                 -- one entry refers to a position and a tangent
@@ -414,7 +424,7 @@ local function updateFn_3_to_3_narrow_sidewalk(params)
                 skipCollision = true,
                 skipCollisionCheck = true,
                 type = 'lollo_1_way_1_lane_street_no_sidewalk.lua', -- from res/config/street/
-                tramTrackType = 'ELECTRIC'
+                tramTrackType = tramTrackType
             },
             edges = {
                 -- one entry refers to a position and a tangent
@@ -429,8 +439,8 @@ local function updateFn_3_to_3_narrow_sidewalk(params)
             params = {
                 skipCollision = true,
                 skipCollisionCheck = true,
-                type = 'lollo_medium_1_way_3_lane_3_tram_tracks_street.lua', -- from res/config/street/
-                tramTrackType = 'ELECTRIC'
+                type = tramTrackType == 'NO' and 'lollo_medium_1_way_3_lane_street.lua' or 'lollo_medium_1_way_3_lane_3_tram_tracks_street.lua',
+                tramTrackType = tramTrackType
             },
             edges = {
                 -- one entry refers to a position and a tangent
@@ -483,6 +493,7 @@ local function updateFn_3_to_3_medium_sidewalk(params)
         }
     }
 
+    local tramTrackType = params.tramTrack and (({'NO', 'YES', 'ELECTRIC'})[params.tramTrack + 1]) or 'NO'
     result.edgeLists = {
         {
             type = 'STREET',
@@ -490,7 +501,7 @@ local function updateFn_3_to_3_medium_sidewalk(params)
                 skipCollision = true,
                 skipCollisionCheck = true,
                 type = 'lollo_medium_1_way_1_lane_street.lua', -- from res/config/street/
-                tramTrackType = 'ELECTRIC'
+                tramTrackType = tramTrackType
             },
             edges = {
                 -- one entry refers to a position and a tangent
@@ -506,7 +517,7 @@ local function updateFn_3_to_3_medium_sidewalk(params)
                 skipCollision = true,
                 skipCollisionCheck = true,
                 type = 'lollo_medium_1_way_1_lane_street.lua', -- from res/config/street/
-                tramTrackType = 'ELECTRIC'
+                tramTrackType = tramTrackType
             },
             edges = {
                 -- one entry refers to a position and a tangent
@@ -522,7 +533,7 @@ local function updateFn_3_to_3_medium_sidewalk(params)
                 skipCollision = true,
                 skipCollisionCheck = true,
                 type = 'lollo_medium_1_way_1_lane_street.lua', -- from res/config/street/
-                tramTrackType = 'ELECTRIC'
+                tramTrackType = tramTrackType
             },
             edges = {
                 -- one entry refers to a position and a tangent
@@ -538,7 +549,7 @@ local function updateFn_3_to_3_medium_sidewalk(params)
                 skipCollision = true,
                 skipCollisionCheck = true,
                 type = 'lollo_1_way_1_lane_street_no_sidewalk.lua', -- from res/config/street/
-                tramTrackType = 'ELECTRIC'
+                tramTrackType = tramTrackType
             },
             edges = {
                 -- one entry refers to a position and a tangent
@@ -554,7 +565,7 @@ local function updateFn_3_to_3_medium_sidewalk(params)
                 skipCollision = true,
                 skipCollisionCheck = true,
                 type = 'lollo_1_way_1_lane_street_no_sidewalk.lua', -- from res/config/street/
-                tramTrackType = 'ELECTRIC'
+                tramTrackType = tramTrackType
             },
             edges = {
                 -- one entry refers to a position and a tangent
@@ -570,7 +581,7 @@ local function updateFn_3_to_3_medium_sidewalk(params)
                 skipCollision = true,
                 skipCollisionCheck = true,
                 type = 'lollo_1_way_1_lane_street_no_sidewalk.lua', -- from res/config/street/
-                tramTrackType = 'ELECTRIC'
+                tramTrackType = tramTrackType
             },
             edges = {
                 -- one entry refers to a position and a tangent
@@ -585,8 +596,8 @@ local function updateFn_3_to_3_medium_sidewalk(params)
             params = {
                 skipCollision = true,
                 skipCollisionCheck = true,
-                type = 'lollo_medium_1_way_3_lane_3_tram_tracks_street.lua', -- from res/config/street/
-                tramTrackType = 'ELECTRIC'
+                type = tramTrackType == 'NO' and 'lollo_medium_1_way_3_lane_street.lua' or 'lollo_medium_1_way_3_lane_3_tram_tracks_street.lua',
+                tramTrackType = tramTrackType
             },
             edges = {
                 -- one entry refers to a position and a tangent
@@ -638,6 +649,8 @@ local function updateFn_4_to_4_narrow_sidewalk(params)
             transf = {1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1}
         }
     }
+
+    local tramTrackType = params.tramTrack and (({'NO', 'YES', 'ELECTRIC'})[params.tramTrack + 1]) or 'NO'
     result.edgeLists = {
         {
             type = 'STREET',
@@ -645,7 +658,7 @@ local function updateFn_4_to_4_narrow_sidewalk(params)
                 skipCollision = true,
                 skipCollisionCheck = true,
                 type = 'lollo_medium_1_way_1_lane_street_narrow_sidewalk.lua', -- from res/config/street/
-                tramTrackType = 'ELECTRIC'
+                tramTrackType = tramTrackType
             },
             edges = {
                 -- one entry refers to a position and a tangent
@@ -661,7 +674,7 @@ local function updateFn_4_to_4_narrow_sidewalk(params)
                 skipCollision = true,
                 skipCollisionCheck = true,
                 type = 'lollo_medium_1_way_1_lane_street_narrow_sidewalk.lua', -- from res/config/street/
-                tramTrackType = 'ELECTRIC'
+                tramTrackType = tramTrackType
             },
             edges = {
                 -- one entry refers to a position and a tangent
@@ -677,7 +690,7 @@ local function updateFn_4_to_4_narrow_sidewalk(params)
                 skipCollision = true,
                 skipCollisionCheck = true,
                 type = 'lollo_medium_1_way_1_lane_street_narrow_sidewalk.lua', -- from res/config/street/
-                tramTrackType = 'ELECTRIC'
+                tramTrackType = tramTrackType
             },
             edges = {
                 -- one entry refers to a position and a tangent
@@ -693,7 +706,7 @@ local function updateFn_4_to_4_narrow_sidewalk(params)
                 skipCollision = true,
                 skipCollisionCheck = true,
                 type = 'lollo_medium_1_way_1_lane_street_narrow_sidewalk.lua', -- from res/config/street/
-                tramTrackType = 'ELECTRIC'
+                tramTrackType = tramTrackType
             },
             edges = {
                 -- one entry refers to a position and a tangent
@@ -709,7 +722,7 @@ local function updateFn_4_to_4_narrow_sidewalk(params)
                 skipCollision = true,
                 skipCollisionCheck = true,
                 type = 'lollo_1_way_1_lane_street_no_sidewalk.lua', -- from res/config/street/
-                tramTrackType = 'ELECTRIC'
+                tramTrackType = tramTrackType
             },
             edges = {
                 -- one entry refers to a position and a tangent
@@ -725,7 +738,7 @@ local function updateFn_4_to_4_narrow_sidewalk(params)
                 skipCollision = true,
                 skipCollisionCheck = true,
                 type = 'lollo_1_way_1_lane_street_no_sidewalk.lua', -- from res/config/street/
-                tramTrackType = 'ELECTRIC'
+                tramTrackType = tramTrackType
             },
             edges = {
                 -- one entry refers to a position and a tangent
@@ -741,7 +754,7 @@ local function updateFn_4_to_4_narrow_sidewalk(params)
                 skipCollision = true,
                 skipCollisionCheck = true,
                 type = 'lollo_1_way_1_lane_street_no_sidewalk.lua', -- from res/config/street/
-                tramTrackType = 'ELECTRIC'
+                tramTrackType = tramTrackType
             },
             edges = {
                 -- one entry refers to a position and a tangent
@@ -757,7 +770,7 @@ local function updateFn_4_to_4_narrow_sidewalk(params)
                 skipCollision = true,
                 skipCollisionCheck = true,
                 type = 'lollo_1_way_1_lane_street_no_sidewalk.lua', -- from res/config/street/
-                tramTrackType = 'ELECTRIC'
+                tramTrackType = tramTrackType
             },
             edges = {
                 -- one entry refers to a position and a tangent
@@ -772,8 +785,8 @@ local function updateFn_4_to_4_narrow_sidewalk(params)
             params = {
                 skipCollision = true,
                 skipCollisionCheck = true,
-                type = 'lollo_medium_1_way_4_lane_4_tram_tracks_street.lua', -- from res/config/street/
-                tramTrackType = 'ELECTRIC'
+                type = tramTrackType == 'NO' and 'lollo_medium_1_way_4_lane_street.lua' or 'lollo_medium_1_way_4_lane_4_tram_tracks_street.lua',
+                tramTrackType = tramTrackType
             },
             edges = {
                 -- one entry refers to a position and a tangent
@@ -823,21 +836,21 @@ function data()
                 key = 'confluenceType',
                 name = _('Confluence type'),
                 values = {
-                    _('2 narrow-pavement streets into a medium 2-lane street'), 
-                    _('2 medium-pavement streets into a medium 2-lane street'), 
-                    _('3 narrow-pavement streets into a medium 3-lane street'), 
+                    _('2 narrow-pavement streets into a medium 2-lane street'),
+                    _('2 medium-pavement streets into a medium 2-lane street'),
+                    _('3 narrow-pavement streets into a medium 3-lane street'),
                     _('3 medium-pavement streets into a medium 3-lane street'),
-                    _('4 narrow-pavement streets into a medium 4-lane street'),
+                    _('4 narrow-pavement streets into a medium 4-lane street')
                 },
                 defaultIndex = 0
-            },
+            }
         },
         -- autoRemovable = true,
         --skipCollision = true,
         --skipCollisionCheck = true,
         updateFn = function(params)
             print('LOLLO streets confluence n 2 n updateFn')
-            -- dump(true)(params)
+            dump(true)(params)
             -- local lanes =
             --     laneutil.createLanes(
             --     {
@@ -872,23 +885,6 @@ function data()
             -- )
             -- dump(true)(lanes)
 
-            local lanes =
-                laneutil.createLanes(
-                {
-                    curves = {
-                        ['right_lane'] = {
-                            -- right with | | below and || above
-                            {{-2, 4.0, .0}, {-1.9, 4, .0}, {1.9, 2, .0}, {2, 2, .0}}
-                        }
-                    }
-                },
-                {'BUS', 'CAR', 'ELECTRIC_TRAM', 'TRAM', 'TRUCK'},
-                100,
-                3,
-                false --linkable
-            )
-            dump(true)(lanes)
-
             if params.confluenceType == 0 then
                 return updateFn_2_to_2_narrow_sidewalk(params)
             elseif params.confluenceType == 1 then
@@ -900,10 +896,13 @@ function data()
             else
                 return updateFn_4_to_4_narrow_sidewalk(params)
             end
+        end,
+        upgradeFn = function(params) -- LOLLO TODO this may be important
+            print('LOLLO streets confluence upgradeFn')
+            dump(true)(params)
+            print('lollo PARAMS.MODULES = ')
+            dump(true)(params.modules)
+            return {}
         end
-        -- upgradeFn = function(params) -- LOLLO TODO this may be important
-        --     print('LOLLO streets confluence upgradeFn')
-        --     dump(true)(params)
-        -- end
     }
 end
