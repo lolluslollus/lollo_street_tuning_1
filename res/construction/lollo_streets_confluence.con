@@ -117,7 +117,6 @@ function data()
             result.colliders = {
                 {
                     type = 'BOX',
-                    --transf = transf.mul(transform, transf.transl(vec3.new(0, 0, zed * .5 + 5))), --transform,
                     params = {
                         halfExtents = {2, 8.0, 0.15}
                     }
@@ -186,7 +185,6 @@ function data()
                 {
                     type = 'STREET',
                     params = {
-                        -- autoRemovable = true,
                         skipCollision = true,
                         skipCollisionCheck = true,
                         type = 'lollo_medium_1_way_1_lane_street.lua', -- from res/config/street/
@@ -197,23 +195,8 @@ function data()
                         {{-6, 4, .0}, {1, .0, .0}}, -- node 0
                         {{-2, 4, .0}, {1, .0, .0}} -- node 1
                     },
-                    -- edgeType = "BRIDGE",
-                    -- edgeTypeName = "cement.lua",
-                    --freeNodes = { 0, 1 },
-                    --freeNodes = { 1 },
-                    --freeNodes = { },
                     freeNodes = {0},
-                    -- collider = {
-                    --     type = 'NONE'
-                    -- },
-                    -- autoRemovable = true,
-                    --skipCollision = true, --useless
-                    --skipCollisionCheck = true, --useless
-                    --snapNodes = {0, 1}, -- node 1 is allowed to snap to other edges of the same type
-                    --snapNodes = {0},
                     snapNodes = {}
-                    --snapNodes = {1},
-                    --					tag2nodes = {},
                 },
                 {
                     type = 'STREET',
