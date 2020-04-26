@@ -12,8 +12,8 @@
         --transportModesStreet = {'CAR', 'BUS', 'ELECTRIC_TRAM', 'TRAM', 'TRUCK'}, -- with this, tram tracks appear on all lanes, not only on the right one
         --transportModesSidewalk = { "PERSON", "TRUCK" }, --crashes
         --transportModesSidewalk = { "PERSON" }, --crashes
-        streetWidth = 3.0,
-        sidewalkWidth = 2.5, -- was 4.0; 2 * sidewalkWidth + streetWidth must be 8
+        streetWidth = 4.0,
+        sidewalkWidth = 2.0, -- was 4.0; 2 * sidewalkWidth + streetWidth must be 8
         sidewalkHeight = .3,
         yearFrom = 1925,
         yearTo = 0,
