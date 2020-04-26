@@ -20,38 +20,18 @@ function data()
             {
                 node = {
                     children = {
-                        -- close the incoming thinner roads
-                        -- {
-                        --     --materials = {'station/road/streetstation/streetstation_perron_border.mtl', 'station/road/streetstation/streetstation_perron_base_new.mtl'},
-                        --     materials = {'street/new_medium_sidewalk_border_inner.mtl', 'street/new_medium_sidewalk.mtl'},
-                        --     mesh = 'station/road/streetstation/pedestrian_era_c/straight_spcl2_r_lod0.msh',
-                        --     name = 'straight_spcl2_l',
-                        --     transf = {0, 1, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0, 0, -2.5, 0, 1}
-                        -- },
-                        -- {
-                        --     materials = {'street/new_medium_sidewalk_border_inner.mtl', 'street/new_medium_sidewalk.mtl'},
-                        --     mesh = 'station/road/streetstation/pedestrian_era_c/straight_spcl2_r_lod0.msh',
-                        --     name = 'straight_spcl2_r',
-                        --     transf = {0, -1, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0, 0, 2.5, 0, 1}
-                        -- },
-                        -- {
-                        --     materials = { "street/new_medium_sidewalk_border_inner.mtl", "street/new_medium_sidewalk.mtl", },
-                        --     mesh = "station/road/streetstation/era_c/pltfrm_r_top_lod0.msh",
-                        --     name = "pltfrm_r_top",
-                        --     transf = { 0, 1, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0, -7.5, 2, 0, 1, },
-                        -- },
                         -- straight bits
                         -- right
                         {
                             --materials = {'street/new_medium_sidewalk_border_inner.mtl', 'street/new_medium_sidewalk.mtl'},
-                            materials = {'street/new_medium_sidewalk_border_inner.mtl', 'street/new_medium_sidewalk_border_inner.mtl'},
+                            materials = {'street/new_medium_sidewalk_border_inner.mtl', 'street/new_medium_sidewalk.mtl'},
                             mesh = 'station/road/streetstation/pedestrian_era_c/straight_lod0.msh',
                             transf = {.54, 0, 0, 0, 0, 0.25, 0, 0, 0, 0, 1, 0, -1.2, -9.37, 0, 1}
                         },
                         -- left
                         {
                             --materials = {'street/new_medium_sidewalk_border_inner.mtl', 'street/new_medium_sidewalk.mtl'},
-                            materials = {'street/new_medium_sidewalk_border_inner.mtl', 'street/new_medium_sidewalk_border_inner.mtl',},
+                            materials = {'street/new_medium_sidewalk_border_inner.mtl', 'street/new_medium_sidewalk.mtl'},
                             mesh = 'station/road/streetstation/pedestrian_era_c/straight_lod0.msh',
                             transf = {.54, 0, 0, 0, 0, -0.25, 0, 0, 0, 0, 1, 0, -1.2, 9.37, 0, 1}
                         },
