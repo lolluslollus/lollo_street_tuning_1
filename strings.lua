@@ -27,8 +27,8 @@ function data()
 			.."- Select street - upgrade and right-click a one-way road to reverse its direction.\n"
 			.."\n"
 			.."[b]This mod may break your game if you use it and then remove it.[/b]\n"
-			.."[b]Thanks to Enzojz for luadump![/b]",
-			.."n"
+			.."[b]Thanks to Enzojz for luadump![/b]"
+
 			.."[h2]Word of warning[/h2]\n"
 			.."The game won't allow changing or removing a piece of road, whose parameters have changed in a mod update.\n"
 			.."This affects the \"Medium 1-way street with 1 lane and extra narrow pavement\" and the \"Medium 1-way street with 1 lane\".\n"
@@ -43,7 +43,7 @@ function data()
 			.."- save the game\n"
 			.."- restore the files to their previous state (ie from the latest update)\n"
 			.."- reload the game and rebuild the roads you destroyed\n"
-			.."Chances are, the new street merger will help you make them nicer anyway.\n"
+			.."Chances are, the new street merger will help you make them nicer anyway.\n",
 			["_NAME"] = "Street fine tuning"
 		},
 	}
