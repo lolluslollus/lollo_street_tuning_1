@@ -40,13 +40,13 @@ function data()
                         {
                             materials = {'street/new_medium_sidewalk_border_inner.mtl', 'street/new_medium_sidewalk.mtl'},
                             mesh = 'station/road/streetstation/pedestrian_era_c/straight_lod0.msh',
-                            transf = {1.6, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, -3.7, -12.5, 0, 1}
+                            transf = {1.6, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, -4, -12.5, 0, 1}
                         },
                         -- left
                         {
                             materials = {'street/new_medium_sidewalk_border_inner.mtl', 'street/new_medium_sidewalk.mtl'},
                             mesh = 'station/road/streetstation/pedestrian_era_c/straight_lod0.msh',
-                            transf = {1.6, 0, 0, 0, 0, -1, 0, 0, 0, 0, 1, 0, -3.7, 12.5, 0, 1}
+                            transf = {1.6, 0, 0, 0, 0, -1, 0, 0, 0, 0, 1, 0, -4, 12.5, 0, 1}
                         },
                         -- bevel the pavement outside
                         -- right
