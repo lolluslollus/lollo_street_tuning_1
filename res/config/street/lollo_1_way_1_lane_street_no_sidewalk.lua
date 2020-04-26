@@ -15,11 +15,11 @@
         streetWidth = 0.2,
         sidewalkWidth = 0.1, -- was 4.0; 2 * sidewalkWidth + streetWidth must be 8
         sidewalkHeight = 0,
-        yearFrom = 1925,
+        yearFrom = 65535, -- LOLLO NOTE this bars the street from the street menu
         yearTo = 0,
         upgrade = false,
         country = false,
-        speed = 50.0,
+        speed = 100.0, -- was 50.0,
         -- priority = this crashes 4, -- LOLLO NOTE this is copied from airports, it should give priority to this street
         type = 'lollo_1_way_1_lane_street_no_sidewalk.lua',
         name = _('Medium 1-way street with 1 lane'),
