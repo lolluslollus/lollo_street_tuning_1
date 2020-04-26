@@ -36,7 +36,6 @@ local function updateFn_2_to_2_narrow_sidewalk(params)
 
     --		result.h0 = {}
     --		result.h1 = {}
-    -- result.autoRemovable = true
     -- result.skipCollision = true
     -- result.skipCollisionCheck = true
     --		result.stations = {}
@@ -56,7 +55,6 @@ local function updateFn_2_to_2_narrow_sidewalk(params)
     result.models = {
         {
             id = 'lollo_assets/lollo_street_confluence_2_lanes_narrow_sidewalk.mdl',
-            --autoRemovable = true,
             -- skipCollision = true,
             -- skipCollisionCheck = true,
             --transf = transf.transl(vec3.new(0.0, 0.0, 0.0))
@@ -64,13 +62,14 @@ local function updateFn_2_to_2_narrow_sidewalk(params)
         }
     }
 
+     -- does not pull, neither do hasBusLane and busLane, with true or false
+    -- local busLaneType = params.busLane and (({'NO', 'YES'})[params.busLane + 1]) or 'NO'
     local tramTrackType = params.tramTrack and (({'NO', 'YES', 'ELECTRIC'})[params.tramTrack + 1]) or 'NO'
     result.edgeLists = {
         {
             type = 'STREET',
             params = {
-                -- autoRemovable = true,
-                busLane = params.busLane,
+                -- busLaneType = busLaneType, -- does not pull, neither do hasBusLane and busLane, with true or false
                 skipCollision = true,
                 skipCollisionCheck = true,
                 type = 'lollo_medium_1_way_1_lane_street_narrow_sidewalk.lua', -- from res/config/street/
@@ -87,7 +86,6 @@ local function updateFn_2_to_2_narrow_sidewalk(params)
             --freeNodes = { 1 },
             -- freeNodes = {},
             freeNodes = {0},
-            -- autoRemovable = true,
             --skipCollision = true, --useless
             --skipCollisionCheck = true, --useless
             --snapNodes = {0, 1}, -- node 1 is allowed to snap to other edges of the same type
@@ -99,7 +97,7 @@ local function updateFn_2_to_2_narrow_sidewalk(params)
         {
             type = 'STREET',
             params = {
-                busLane = params.busLane,
+                -- busLaneType = busLaneType, -- does not pull, neither do hasBusLane and busLane, with true or false
                 skipCollision = true,
                 skipCollisionCheck = true,
                 type = 'lollo_medium_1_way_1_lane_street_narrow_sidewalk.lua', -- from res/config/street/
@@ -116,7 +114,7 @@ local function updateFn_2_to_2_narrow_sidewalk(params)
         {
             type = 'STREET',
             params = {
-                busLane = params.busLane,
+                -- busLaneType = busLaneType, -- does not pull, neither do hasBusLane and busLane, with true or false
                 skipCollision = true,
                 skipCollisionCheck = true,
                 type = 'lollo_1_way_1_lane_street_no_sidewalk.lua', -- from res/config/street/
@@ -133,7 +131,7 @@ local function updateFn_2_to_2_narrow_sidewalk(params)
         {
             type = 'STREET',
             params = {
-                busLane = params.busLane,
+                -- busLaneType = busLaneType, -- does not pull, neither do hasBusLane and busLane, with true or false
                 skipCollision = true,
                 skipCollisionCheck = true,
                 type = 'lollo_1_way_1_lane_street_no_sidewalk.lua', -- from res/config/street/
@@ -150,7 +148,7 @@ local function updateFn_2_to_2_narrow_sidewalk(params)
         {
             type = 'STREET',
             params = {
-                busLane = params.busLane,
+                -- busLaneType = busLaneType, -- does not pull, neither do hasBusLane and busLane, with true or false
                 skipCollision = true,
                 skipCollisionCheck = true,
                 type = tramTrackType == 'NO' and 'lollo_medium_1_way_2_lane_narrow_sidewalk_street.lua' or 'lollo_medium_1_way_2_lane_2_tram_tracks_narrow_sidewalk_street.lua',
@@ -203,7 +201,6 @@ local function updateFn_2_to_2_medium_sidewalk(params)
     result.models = {
         {
             id = 'lollo_assets/lollo_street_confluence_2_lanes_medium_sidewalk.mdl',
-            --autoRemovable = true,
             -- skipCollision = true,
             -- skipCollisionCheck = true,
             --transf = transf.transl(vec3.new(0.0, 0.0, 0.0))
@@ -845,7 +842,7 @@ function data()
                 defaultIndex = 0
             }
         },
-        -- autoRemovable = true,
+        --autoRemovable = false, -- Used to allow the construction to be removed, if it collides with something else.
         --skipCollision = true,
         --skipCollisionCheck = true,
         updateFn = function(params)
