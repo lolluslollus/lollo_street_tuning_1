@@ -151,7 +151,7 @@ local function updateFn_2_to_2_narrow_sidewalk(params)
                 -- busLaneType = busLaneType, -- does not pull, neither do hasBusLane and busLane, with true or false
                 skipCollision = true,
                 skipCollisionCheck = true,
-                type = tramTrackType == 'NO' and 'lollo_medium_1_way_2_lane_narrow_sidewalk_street.lua' or 'lollo_medium_1_way_2_lane_2_tram_tracks_narrow_sidewalk_street.lua',
+                type = tramTrackType == 'NO' and 'lollo_medium_1_way_2_lane_medium_sidewalk_street.lua' or 'lollo_medium_1_way_2_lane_2_tram_tracks_narrow_sidewalk_street.lua',
                 tramTrackType = tramTrackType,
             },
             edges = {
@@ -279,7 +279,7 @@ local function updateFn_2_to_2_medium_sidewalk(params)
             params = {
                 skipCollision = true,
                 skipCollisionCheck = true,
-                type = tramTrackType == 'NO' and 'lollo_medium_1_way_2_lane_narrow_sidewalk_street.lua' or 'lollo_medium_1_way_2_lane_2_tram_tracks_narrow_sidewalk_street.lua',
+                type = tramTrackType == 'NO' and 'lollo_medium_1_way_2_lane_medium_sidewalk_street.lua' or 'lollo_medium_1_way_2_lane_2_tram_tracks_narrow_sidewalk_street.lua',
                 tramTrackType = tramTrackType
             },
             edges = {
