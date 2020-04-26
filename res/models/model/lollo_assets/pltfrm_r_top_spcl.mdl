@@ -1,0 +1,56 @@
+local laneutil = require "laneutil"
+
+--Begin Generated
+local generatedData = {
+	["lanes_person"] = {
+		curves = {
+			["pltfrm"] = {
+				{ { -1.00000, 5, 0.3 }, { -1.25, 10, 0.30000 }, },
+			},
+		},
+	},
+}
+--End Generated
+function data()
+return {
+	boundingInfo = {
+		bbMax = { 2.5000028610229, 5.7999997138977, 0.30000007152557, },
+		bbMin = { -2.4999961853027, 5, -2.2053718566895e-05, },
+	},
+	collider = {
+		params = {
+			halfExtents = { 2.4999995231628, 0.39999985694885, 0.15001106262207, },
+		},
+		transf = { 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, },
+		type = "BOX",
+	},
+	lods = {
+		{
+			node = {
+				children = {
+					{
+						materials = { "station/road/streetstation/streetstation_perron_border.mtl", "station/road/streetstation/streetstation_perron_base_new.mtl", },
+						mesh = "station/road/streetstation/era_c/pltfrm_r_top_spcl_lod0.msh",
+						name = "pltfrm_r_top_spcl",
+						transf = { 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 9.1848504679465e-16, 1, },
+					},
+				},
+				name = "RootNode",
+				transf = { 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, },
+			},
+			static = false,
+			visibleFrom = 0,
+			visibleTo = 1730.3282470703,
+		},
+	},
+	metadata = {
+		transportNetworkProvider = {
+			laneLists = {
+				laneutil.createLanes(generatedData["lanes_person"], { "PERSON" }, 20, 3, false),
+				
+			}
+		}
+	},
+	version = 1,
+}
+end

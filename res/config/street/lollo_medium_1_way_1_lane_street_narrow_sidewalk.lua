@@ -110,18 +110,18 @@
             }
         },
         assets = {
-            {
-                name = 'street/street_light_eu_c.mdl',
-                offset = 8.0,
-                distance = 16.0,
-                prob = 1.0,
-                offsetOrth = 2.9, -- was 3.4,
-                randRot = false,
-                oneSideOnly = true, -- was false,
-                alignToElevation = false,
-                avoidFaceEdges = false,
-                placeOnBridge = true
-            },
+            -- {
+            --     name = 'street/street_light_eu_c.mdl',
+            --     offset = 8.0,
+            --     distance = 16.0,
+            --     prob = 1.0,
+            --     offsetOrth = 2.9, -- was 3.4,
+            --     randRot = false,
+            --     oneSideOnly = true, -- was false,
+            --     alignToElevation = false,
+            --     avoidFaceEdges = false,
+            --     placeOnBridge = true
+            -- },
             -- {
             --     name = 'street/street_asset_mix/fireplug_eu_c.mdl',
             --     offset = 9.0,

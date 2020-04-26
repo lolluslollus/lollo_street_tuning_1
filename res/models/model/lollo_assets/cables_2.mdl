@@ -1,0 +1,77 @@
+function data()
+return {
+	boundingInfo = {
+		bbMax = { 52.152500152588, 9.6315841674805, 6.375, },
+		bbMin = { 0, -34.671585083008, 0, },
+	},
+	collider = {
+		params = { },
+		transf = { 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, },
+		type = "MESH",
+	},
+	lods = {
+		{
+			node = {
+				children = {
+					{
+						materials = { "asset/tram_pole.mtl", },
+						mesh = "station/road/streetstation/lod_0_tram_pole_cable_extend_left.msh",
+						transf = { 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, },
+					},
+					{
+						materials = { "asset/tram_pole.mtl", },
+						mesh = "station/road/streetstation/lod_0_tram_pole_cable_start_left.msh",
+						transf = { 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, },
+					},
+					{
+						materials = { "asset/tram_pole.mtl", },
+						mesh = "station/road/streetstation/lod_0_tram_poles_cable_extend_right.msh",
+						transf = { 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, },
+					},
+					{
+						materials = { "asset/tram_pole.mtl", },
+						mesh = "station/road/streetstation/lod_0_tram_poles_curve.msh",
+						transf = { 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, },
+					},
+					{
+						materials = { "asset/tram_pole.mtl", },
+						mesh = "station/road/streetstation/lod_0_tram_poles_lane.msh",
+						transf = { 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, },
+					},
+					{
+						materials = { "station/station_tram_small_new_track_1.mtl", },
+						mesh = "station/road/streetstation/lod_0_tram_rail_curve.msh",
+						transf = { 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, },
+					},
+					{
+						materials = { "station/station_tram_small_new_track_1.mtl", },
+						mesh = "station/road/streetstation/lod_0_tram_rail_extend_left.msh",
+						transf = { 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, },
+					},
+					{
+						materials = { "station/station_tram_small_new_track_1.mtl", },
+						mesh = "station/road/streetstation/lod_0_tram_rail_extend_right.msh",
+						transf = { 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, },
+					},
+					{
+						materials = { "station/station_tram_small_new_track_1.mtl", },
+						mesh = "station/road/streetstation/lod_0_tram_rail_lane.msh",
+						transf = { 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, },
+					},
+					{
+						materials = { "station/station_tram_small_new_track_1.mtl", },
+						mesh = "station/road/streetstation/lod_0_tram_rail_start_left.msh",
+						transf = { 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, },
+					},
+				},
+				transf = { 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, },
+			},
+			static = false,
+			visibleFrom = 0,
+			visibleTo = 10520,
+		},
+	},
+	metadata = { },
+	version = 1,
+}
+end

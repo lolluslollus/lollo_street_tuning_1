@@ -1,0 +1,162 @@
+local dump = require 'luadump'
+local vec3 = require 'vec3'
+local transf = require 'transf'
+
+function data()
+    return {
+        type = 'STREET_CONSTRUCTION',
+        description = {
+            name = _('Parallel streets'),
+            description = _('Lays two parallel streets.')
+        },
+        availability = {
+            yearFrom = 0,
+            yearTo = 0
+        },
+        -- params = { -- LOLLO here, you can add some parameters, such as the street type
+        --     {
+        --         key = "streetType2",
+        --         name = _("Number of lanes"),
+        --         values = { _("2"), _("3") },
+        --         defaultIndex = 0,
+        --         yearFrom = 1960,
+        --         yearTo = 0
+        --     },
+        --     {
+        --         key = "scale",
+        --         name = _("Scale"),
+        --         values = { _("Small"), _("Medium"), _("Large") },
+        --         defaultIndex = 0,
+        --         yearFrom = 1960,
+        --         yearTo = 0
+        --     },
+        -- },
+        order = 1,
+        -- collider = {
+        --     type = 'NONE'
+        -- },
+        -- autoRemovable = true,
+        --skipCollision = true,
+        --skipCollisionCheck = true,
+        updateFn = function(params)
+            print('LOLLO parallel streets updateFn')
+            -- dump(true)(params)
+
+            local result = {}
+            --result.colliders = {}
+            result.cost = 0
+            --result.edgeLists = {}
+            result.models = {}
+            result.groundFaces = {}
+            --		result.h0 = {}
+            --		result.h1 = {}
+            -- result.collider = {
+            --     type = 'NONE'
+            -- }
+            -- result.autoRemovable = true
+            -- result.skipCollision = true
+            -- result.skipCollisionCheck = true
+            --		result.stations = {}
+            --		result.terminalGroups = {}
+            --		result.terrainAlignmentLists = {}
+            -- result.terrainAlignmentLists = {
+            --     {
+            --         type = 'EQUAL',
+            --         faces = {}
+            --     }
+            -- }
+            -- result.models = {
+            --     {
+            --         --id = "asset/icon/marker_exclamation.mdl",
+            --         --id = "asset/icon/mark.mdl",
+            --         --id = "station/street/mark.mdl",
+            --         id = 'lollo_assets/mark.mdl',
+            --         collider = {
+            --             type = 'NONE'
+            --         },
+            --         autoRemovable = true,
+            --         skipCollision = true,
+            --         skipCollisionCheck = true,
+            --         transf = transf.transl(vec3.new(0.0, 0.0, .0))
+            --     }
+            -- }
+
+            result.edgeLists = {
+                {
+                    type = 'STREET',
+                    params = {
+                        -- collider = {
+                        --     type = 'NONE'
+                        -- },
+                        -- autoRemovable = true,
+                        -- skipCollision = true,
+                        -- skipCollisionCheck = true,
+                        type = 'lollo_medium_1_way_1_lane_street.lua', -- from res/config/street/
+                        -- tramTrackType = 'NO'
+                    },
+                    edges = {
+                        -- one entry refers to a position and a tangent
+                        {{-4, -4, .0}, {1, .0, .0}}, -- node 0
+                        {{4, -4, .0}, {1, .0, .0}} -- node 1
+                    },
+                    -- edgeType = "BRIDGE",
+                    -- edgeTypeName = "cement.lua",
+                    freeNodes = { 0, 1 },
+                    --freeNodes = { 1 },
+                    -- freeNodes = {},
+                    -- collider = {
+                    --     type = 'NONE'
+                    -- },
+                    -- autoRemovable = true,
+                    --skipCollision = true, --useless
+                    --skipCollisionCheck = true, --useless
+                    --					snapNodes = { 0 },  -- node 0 is allowed to snap to other edges of the same type --crashes
+                    snapNodes = {0, 1}, -- node 1 is allowed to snap to other edges of the same type
+                    snapNodes = {0},
+                    snapNodes = {}
+                    --					snapNodes = { 0, 1 },  -- node 0 and 1 are allowed to snap to other edges of the same type --crashes
+                    --					tag2nodes = {},
+                },
+                {
+                    type = 'STREET',
+                    params = {
+                        -- collider = {
+                        --     type = 'NONE'
+                        -- },
+                        -- autoRemovable = true,
+                        -- skipCollision = true,
+                        -- skipCollisionCheck = true,
+                        type = 'lollo_medium_1_way_1_lane_street.lua', -- from res/config/street/
+                        -- tramTrackType = 'NO'
+                    },
+                    edges = {
+                        -- one entry refers to a position and a tangent
+                        {{-4, 4, .0}, {1, .0, .0}}, -- node 0
+                        {{4, 4, .0}, {1, .0, .0}} -- node 1
+                    },
+                    -- edgeType = "BRIDGE",
+                    -- edgeTypeName = "cement.lua",
+                    freeNodes = { 0, 1 },
+                    --freeNodes = { 1 },
+                    --freeNodes = { },
+                    -- collider = {
+                    --     type = 'NONE'
+                    -- },
+                    -- autoRemovable = true,
+                    --skipCollision = true, --useless
+                    --skipCollisionCheck = true, --useless
+                    snapNodes = {0, 1}, -- node 1 is allowed to snap to other edges of the same type
+                    snapNodes = {0},
+                    snapNodes = {}
+                    --					tag2nodes = {},
+                }
+            }
+
+            return result
+        end,
+        upgradeFn = function(params)
+            print('LOLLO parallel streets upgradeFn')
+            dump(true)(params)
+        end
+    }
+end

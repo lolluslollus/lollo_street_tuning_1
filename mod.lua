@@ -1,13 +1,14 @@
 function data()
     return {
         info = {
-            minorVersion = 10,
+            minorVersion = 11,
             severityAdd = 'NONE',
             severityRemove = 'WARNING',
             name = _('_NAME'),
             description = _('_DESC'),
             tags = {
-                'Street'
+                'Street',
+                'Street Construction'
             },
             authors = {
                 {

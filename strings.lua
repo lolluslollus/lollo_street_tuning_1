@@ -28,6 +28,22 @@ function data()
 			.."\n"
 			.."[b]This mod may break your game if you use it and then remove it.[/b]\n"
 			.."[b]Thanks to Enzojz for luadump![/b]",
+			.."n"
+			.."[h2]Word of warning[/h2]\n"
+			.."The game won't allow changing or removing a piece of road, whose parameters have changed in a mod update.\n"
+			.."This affects the \"Medium 1-way street with 1 lane and extra narrow pavement\" and the \"Medium 1-way street with 1 lane\".\n"
+			.."To fix this:\n"
+			.."- locate the mod in your folder \"C:\\Program Files (x86)\\Steam\\steamapps\\workshop\\content\\1066780\"\n"
+			.."- locate the file \"lollo_medium_1_way_1_lane_street.lua\"\n"
+			.."- set [code]streetWidth = 3.0, \n sidewalkWidth = 2.0,[/code]\n"
+			.."- locate the file \"lollo_medium_1_way_1_lane_street_narrow_sidewalk.lua\"\n"
+			.."- set [code]streetWidth = 3.0, \n sidewalkWidth = 1.0,[/code]\n"
+			.."- start the game\n"
+			.."- remove all the instances of these roads\n"
+			.."- save the game\n"
+			.."- restore the files to their previous state (ie from the latest update)\n"
+			.."- reload the game and rebuild the roads you destroyed\n"
+			.."Chances are, the new street merger will help you make them nicer anyway.\n"
 			["_NAME"] = "Street fine tuning"
 		},
 	}
