@@ -109,9 +109,9 @@ function data()
             cost = {
                 price = 0
             },
-            autoRemovable = true,
+            --autoRemovable = true,
             skipCollision = true,
-            skipCollisionCheck = true,
+            --skipCollisionCheck = true,
             transportNetworkProvider = {
                 laneLists = {
                     -- vehicles

@@ -55,7 +55,7 @@ local function updateFn_2_to_2_narrow_sidewalk(params)
     result.models = {
         {
             id = 'lollo_assets/lollo_street_confluence_2_lanes_narrow_sidewalk.mdl',
-            -- skipCollision = true,
+            skipCollision = true,
             -- skipCollisionCheck = true,
             transf = {1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1}
         }
@@ -226,7 +226,7 @@ local function updateFn_2_to_2_medium_sidewalk(params)
     result.models = {
         {
             id = 'lollo_assets/lollo_street_confluence_2_lanes_medium_sidewalk.mdl',
-            -- skipCollision = true,
+            skipCollision = true,
             -- skipCollisionCheck = true,
             transf = {1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1}
         }
@@ -998,6 +998,17 @@ function data()
                 defaultIndex = 0
             },
             {
+-- local tramTrackType = params.tramTrack and (({'NO', 'YES', 'ELECTRIC'})[params.tramTrack + 1]) or 'NO'
+                key = 'tramTrack',
+                name = _('Tram track type'),
+                values = {
+                    _('NO'),
+                    _('YES'),
+                    _('ELECTRIC'),
+                },
+                defaultIndex = 0
+            },
+            {
                 key = 'snapNodes',
                 name = _('Snap to neighbours'),
                 values = {
@@ -1008,7 +1019,7 @@ function data()
             }
         },
         --autoRemovable = false, -- Used to allow the construction to be removed, if it collides with something else.
-        skipCollision = true,
+        -- skipCollision = true,
         --skipCollisionCheck = true,
         updateFn = function(params)
             -- print('LOLLO street merging n 2 n updateFn')

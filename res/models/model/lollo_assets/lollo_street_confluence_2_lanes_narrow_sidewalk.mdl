@@ -125,7 +125,7 @@ function data()
                 price = 0
             },
             --autoRemovable = true,
-            --skipCollision = true,
+            skipCollision = true,
             --skipCollisionCheck = true,
             transportNetworkProvider = {
                 laneLists = {
