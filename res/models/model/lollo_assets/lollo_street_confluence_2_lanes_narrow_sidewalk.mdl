@@ -124,46 +124,114 @@ function data()
             cost = {
                 price = 0
             },
-            autoRemovable = true,
-            skipCollision = true,
-            skipCollisionCheck = true,
+            --autoRemovable = true,
+            --skipCollision = true,
+            --skipCollisionCheck = true,
             transportNetworkProvider = {
                 laneLists = {
                     -- vehicles
-                    laneutil.createLanes(
-                        {
-                            curves = {
-                                -- ['right_lane'] = {
-                                --     -- right with | | below and || above
-                                --     {{-2.00000, -4.00000, 0.00000}, {-1.00000, -3.900000, 0.00000}, {1.00000, -2.10000, 0.00000}, {2.00000, -2.00000, 0.00000}}
-                                -- },
-                                -- ['left_lane'] = {
-                                --     -- left with | | below and || above
-                                --     {{-2.00000, 4.00000, 0.00000}, {-1.00000, 3.900000, 0.00000}, {1.00000, 2.10000, 0.00000}, {2.00000, 2.00000, 0.00000}}
-                                -- }
-                                ['right_lane_one'] = {
-                                    -- right with | | below and || above
-                                    {{-2, -3, 0.00000}, {-1.9, -3, 0.00000}}
-                                },
-                                ['right_lane_two'] = {
-                                    -- right with | | below and || above
-                                    {{1.9, -3, 0.00000}, {2, -3, 0.00000}}
-                                },
-                                ['left_lane_one'] = {
-                                    -- left with | | below and || above
-                                    {{-2, 3, 0.00000}, {-1.9, 3.00000, 0.00000}}
-                                },
-                                ['left_lane_two'] = {
-                                    -- left with | | below and || above
-                                    {{1.9, 3, 0.00000}, {2, 3.00000, 0.00000}}
-                                }
-                            }
+                    {
+                        linkable = false,
+                        nodes = {
+                            {
+                                {-2, -3, 0.00000},
+                                {1, 0, 0},
+                                2.4
+                            },
+                            {
+                                {-1.8, -3, 0.00000},
+                                {1, 0, 0},
+                                2.4
+                            },
                         },
-                        {'BUS', 'CAR', 'ELECTRIC_TRAM', 'TRAM', 'TRUCK'},
-                        100,
-                        3,
-                        false --linkable
-                    ),
+                        speedLimit = 100,
+                        transportModes = {'BUS', 'CAR', 'ELECTRIC_TRAM', 'TRAM', 'TRUCK'}
+                    },
+                    {
+                        linkable = false,
+                        nodes = {
+                            {
+                                {1.8, -3, 0.00000},
+                                {1, 0, 0},
+                                2.4
+                            },
+                            {
+                                {2, -3, 0.00000},
+                                {1, 0, 0},
+                                2.4
+                            },
+                        },
+                        speedLimit = 100,
+                        transportModes = {'BUS', 'CAR', 'ELECTRIC_TRAM', 'TRAM', 'TRUCK'}
+                    },
+                    {
+                        linkable = false,
+                        nodes = {
+                            {
+                                {-2, 3, 0.00000},
+                                {1, 0, 0},
+                                2.4
+                            },
+                            {
+                                {-1.8, 3, 0.00000},
+                                {1, 0, 0},
+                                2.4
+                            },
+                        },
+                        speedLimit = 100,
+                        transportModes = {'BUS', 'CAR', 'ELECTRIC_TRAM', 'TRAM', 'TRUCK'}
+                    },
+                    {
+                        linkable = false,
+                        nodes = {
+                            {
+                                {1.8, 3, 0.00000},
+                                {1, 0, 0},
+                                2.4
+                            },
+                            {
+                                {2, 3, 0.00000},
+                                {1, 0, 0},
+                                2.4
+                            },
+                        },
+                        speedLimit = 100,
+                        transportModes = {'BUS', 'CAR', 'ELECTRIC_TRAM', 'TRAM', 'TRUCK'}
+                    },
+                    -- laneutil.createLanes(
+                    --     {
+                    --         curves = {
+                    --             -- ['right_lane'] = {
+                    --             --     -- right with | | below and || above
+                    --             --     {{-2.00000, -4.00000, 0.00000}, {-1.00000, -3.900000, 0.00000}, {1.00000, -2.10000, 0.00000}, {2.00000, -2.00000, 0.00000}}
+                    --             -- },
+                    --             -- ['left_lane'] = {
+                    --             --     -- left with | | below and || above
+                    --             --     {{-2.00000, 4.00000, 0.00000}, {-1.00000, 3.900000, 0.00000}, {1.00000, 2.10000, 0.00000}, {2.00000, 2.00000, 0.00000}}
+                    --             -- }
+                    --             ['right_lane_one'] = {
+                    --                 -- right with | | below and || above
+                    --                 {{-2, -3, 0.00000}, {-1.9, -3, 0.00000}}
+                    --             },
+                    --             ['right_lane_two'] = {
+                    --                 -- right with | | below and || above
+                    --                 {{1.9, -3, 0.00000}, {2, -3, 0.00000}}
+                    --             },
+                    --             ['left_lane_one'] = {
+                    --                 -- left with | | below and || above
+                    --                 {{-2, 3, 0.00000}, {-1.9, 3.00000, 0.00000}}
+                    --             },
+                    --             ['left_lane_two'] = {
+                    --                 -- left with | | below and || above
+                    --                 {{1.9, 3, 0.00000}, {2, 3.00000, 0.00000}}
+                    --             }
+                    --         }
+                    --     },
+                    --     {'BUS', 'CAR', 'ELECTRIC_TRAM', 'TRAM', 'TRUCK'},
+                    --     100,
+                    --     2.4,
+                    --     false --linkable
+                    -- ),
                     -- pedestrians
                     laneutil.createLanes(
                         {
