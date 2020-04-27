@@ -980,11 +980,11 @@ function data()
                 key = 'mergingType',
                 name = _('Street merging type'),
                 values = {
-                    _('¦ + ¦   <->   ||'),
-                    _('| + |   <->   ||'),
-                    _('¦ + ¦ + ¦   <->   |||'),
-                    _('| + | + |   <->   |||'),
-                    _('¦ + ¦ + ¦ + ¦   <->   ||||')
+                    _('¦ and ¦   <->   ||'),
+                    _('| and |   <->   ||'),
+                    _('¦ and ¦ and ¦   <->   |||'),
+                    _('| and | and |   <->   |||'),
+                    _('¦ and ¦ and ¦ and ¦   <->   ||||')
                 },
                 defaultIndex = 0
             },
@@ -998,15 +998,14 @@ function data()
                 defaultIndex = 0
             },
             {
--- local tramTrackType = params.tramTrack and (({'NO', 'YES', 'ELECTRIC'})[params.tramTrack + 1]) or 'NO'
                 key = 'tramTrack',
                 name = _('Tram track type'),
-                values = {
+                values = { -- must be in this sequence
                     _('NO'),
                     _('YES'),
                     _('ELECTRIC'),
                 },
-                defaultIndex = 0
+                defaultIndex = 2
             },
             {
                 key = 'snapNodes',
@@ -1019,7 +1018,7 @@ function data()
             }
         },
         --autoRemovable = false, -- Used to allow the construction to be removed, if it collides with something else.
-        -- skipCollision = true,
+        skipCollision = true,
         --skipCollisionCheck = true,
         updateFn = function(params)
             -- print('LOLLO street merging n 2 n updateFn')
