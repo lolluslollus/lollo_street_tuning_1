@@ -37,7 +37,7 @@ function data()
 			.."- locate the file \"lollo_medium_1_way_1_lane_street.lua\"\n"
 			.."- set [code]sidewalkWidth = 2.0,[/code]\n"
 			.."- locate the file \"lollo_medium_1_way_1_lane_street_narrow_sidewalk.lua\"\n"
-			.."- set [code]streetWidth = 3.0,[/code]\n"
+			.."- set [code]sidewalkWidth = 1.0,[/code]\n"
 			.."- start the game\n"
 			.."- remove all the instances of these roads\n"
 			.."- save the game\n"
