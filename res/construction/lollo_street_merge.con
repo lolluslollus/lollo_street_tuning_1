@@ -190,7 +190,7 @@ local function updateFn_2_to_2_narrow_sidewalk(params)
                     {{2, 0, .0}, {-1, .0, .0}} -- node 1
                 },
             freeNodes = params.direction == 0 and {1} or {0},
-            snapNodes = {}
+            snapNodes = {},
         }
     }
 
@@ -348,7 +348,7 @@ local function updateFn_2_to_2_medium_sidewalk(params)
                     {{2, 0, .0}, {-1, .0, .0}} -- node 1
                 },
             freeNodes = params.direction == 0 and {1} or {0},
-            snapNodes = {}
+            snapNodes = {},
         }
     }
 
@@ -533,7 +533,7 @@ local function updateFn_3_to_3_narrow_sidewalk(params)
                     {{2, 0, .0}, {-1, .0, .0}} -- node 1
                 },
             freeNodes = params.direction == 0 and {1} or {0},
-            snapNodes = {}
+            snapNodes = {},
         }
     }
 
@@ -718,7 +718,7 @@ local function updateFn_3_to_3_medium_sidewalk(params)
                     {{2, 0, .0}, {-1, .0, .0}} -- node 1
                 },
             freeNodes = params.direction == 0 and {1} or {0},
-            snapNodes = {}
+            snapNodes = {},
         }
     }
 
@@ -943,7 +943,7 @@ local function updateFn_4_to_4_narrow_sidewalk(params)
                     {{2, 0, .0}, {-1, .0, .0}} -- node 1
                 },
             freeNodes = params.direction == 0 and {1} or {0},
-            snapNodes = {}
+            snapNodes = {},
         }
     }
 
