@@ -724,7 +724,7 @@ function data()
             },
             {
                 key = 'pitch',
-                name = _('Pitch'),
+                name = _('Pitch (use arrows to adjust it while placing)'),
                 values = pitchUtil.getPitchValues(),
                 defaultIndex = pitchUtil.getDefaultPitch(),
                 uiType = 'SLIDER'

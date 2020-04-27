@@ -1,6 +1,6 @@
 local pitchUtil = {}
 local _maxAngleAbs = 0.36
-local _paramXFactor = 0.05
+local _paramXFactor = 0.004
 
 local _getParamsXAdjusted = function(paramX)
     return math.max(math.min(paramX * _paramXFactor, _maxAngleAbs), -_maxAngleAbs)
@@ -41,16 +41,16 @@ pitchUtil.getIdTransfPitched = function(paramX)
     return result
 end
 
-local _maxPitch = 10
+local _maxPitch4Slider = 100
 pitchUtil.getPitchValues = function()
     local result = {}
-    for i = -_maxPitch, _maxPitch do
+    for i = -_maxPitch4Slider, _maxPitch4Slider do
         table.insert(result, #result + 1, tostring(i))
     end
     return result
 end
 pitchUtil.getMiddlePitch = function()
-    return _maxPitch
+    return _maxPitch4Slider
 end
 pitchUtil.getDefaultPitch = function()
     return pitchUtil.getMiddlePitch()
