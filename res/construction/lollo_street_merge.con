@@ -724,9 +724,9 @@ function data()
             },
             {
                 key = 'pitch',
-                name = _('Pitch (use arrows to adjust it while placing)'),
-                values = pitchUtil.getPitchValues(),
-                defaultIndex = pitchUtil.getDefaultPitch(),
+                name = _('Pitch (you can adjust it with arrow keys)'),
+                values = pitchUtil.getPitchParamValues(),
+                defaultIndex = pitchUtil.getDefaultPitchParamValue(),
                 uiType = 'SLIDER'
             }
         },
@@ -768,7 +768,7 @@ function data()
             -- )
             -- dump(true)(lanes)
 
-            params.pitch = params.pitch - pitchUtil.getMiddlePitch()
+            params.pitch = params.pitch - pitchUtil.getMiddlePitchParamValue()
             if params.mergingType == 0 then
                 return updateFn_2_to_2_narrow_sidewalk(params)
             elseif params.mergingType == 1 then
