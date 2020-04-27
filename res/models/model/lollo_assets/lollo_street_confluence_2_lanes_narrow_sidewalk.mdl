@@ -25,7 +25,7 @@ function data()
                             materials = { "street/new_medium_sidewalk_border_inner.mtl", "street/new_medium_sidewalk.mtl", },
                             mesh = "station/road/streetstation/era_c/pltfrm_r_top_lod0.msh",
                             name = "pltfrm_r_top",
-                            transf = { 0, .75, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0, -7.5, 0, 0, 1, },
+                            transf = { 0, .93, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0, -7.5, 0, 0, 1, },
                         },
                         {
                             materials = {'street/new_medium_sidewalk_border_inner.mtl', 'street/new_medium_sidewalk.mtl'},
