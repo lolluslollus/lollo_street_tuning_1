@@ -12,7 +12,7 @@
         --transportModesStreet = {'CAR', 'BUS', 'ELECTRIC_TRAM', 'TRAM', 'TRUCK'}, -- with this, tram tracks appear on all lanes, not only on the right one
         --transportModesSidewalk = { "PERSON", "TRUCK" }, --crashes
         --transportModesSidewalk = { "PERSON" }, --crashes
-        streetWidth = 4.0,
+        streetWidth = 4.0, -- was 3.0
         sidewalkWidth = 2.0, -- was 2.5, which causes incompatibilities. To fix them, restore it to 2.5, destroy the road, save the game, then back to 2.0, restart the game and rebuild the road
         -- 2 * sidewalkWidth + streetWidth must be 8
         sidewalkHeight = .3,
