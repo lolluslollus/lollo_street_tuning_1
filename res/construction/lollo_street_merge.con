@@ -980,11 +980,11 @@ function data()
                 key = 'mergingType',
                 name = _('Street merging type'),
                 values = {
-                    _('¦ and ¦   <->   ||'),
-                    _('| and |   <->   ||'),
-                    _('¦ and ¦ and ¦   <->   |||'),
-                    _('| and | and |   <->   |||'),
-                    _('¦ and ¦ and ¦ and ¦   <->   ||||')
+                    _('¦   ¦   <->   ||'),
+                    _('|   |   <->   ||'),
+                    _('¦   ¦   ¦   <->   |||'),
+                    _('|   |   |   <->   |||'),
+                    _('¦   ¦   ¦   ¦   <->   ||||')
                 },
                 defaultIndex = 0
             },
