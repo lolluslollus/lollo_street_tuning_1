@@ -3,8 +3,8 @@
 local stringUtils = require('stringUtils')
 
 local fileUtils = {}
-fileUtils.fileExists = function(fileName)
-    local file = io.open(fileName, 'r')
+fileUtils.fileExists = function(filePath)
+    local file = io.open(filePath, 'r')
     if file then
         file:close()
         return true
@@ -12,12 +12,18 @@ fileUtils.fileExists = function(fileName)
     return false
 end
 
-fileUtils.readGameDataFile = function(fileName)
-    local file = io.open(fileName, 'r')
+fileUtils.readGameDataFile = function(filePath)
+    local file = io.open(filePath, 'r')
     if file == nil then
         print('LOLLO file not found')
         return false
     end
+
+    -- this works, but it returns a file that returns nothing, coz street files are structured this way
+    -- local file, err = loadfile('C:/Program Files (x86)/Steam/userdata/71590188/1066780/local/staging_area/lollo_street_tuning_1/res/config/street/lollo_medium_1_way_1_lane_street.lua')
+    -- print('LOLLO err = ', err)
+    -- print(inspect(file)) -- a function
+    -- print(inspect(file())) -- nil. Note that street files do not return anything.
 
     -- file has type userdata
     print('LOLLO start reading the file')
@@ -75,7 +81,7 @@ end
 fileUtils.getCurrentPath = function()
     local currPath = string.sub(debug.getinfo(1, 'S').source, 2)
     return string.gsub(currPath, '\\', '/')
---    return string.sub(debug.getinfo(1, 'S').source, 2)
+    --    return string.sub(debug.getinfo(1, 'S').source, 2)
 
     -- returns something like
     -- "@C:/Program Files (x86)/Steam/userdata/71590188/1066780/local/staging_area/lollo_street_tuning_1/res/scripts/fileUtils.lua"
@@ -127,28 +133,29 @@ fileUtils.getCurrentPath = function()
     -- }
 end
 
-fileUtils.getDirFromFile = function(fileName)
+fileUtils.getParentDirFromPath = function(path)
     local searchString = '[^/]*/'
-    return string.reverse(string.gsub(string.reverse(fileName), searchString, '', 1))
+    return string.reverse(string.gsub(string.reverse(path), searchString, '', 1))
 end
 
-fileUtils.getResDirFromPath = function(dirName)
+fileUtils.getResDirFromPath = function(path)
     local searchString = '.*/ser/'
-    return string.reverse(string.gsub(string.reverse(dirName), searchString, 'ser/'))
+    return string.reverse(string.gsub(string.reverse(path), searchString, 'ser/'))
 end
 
-fileUtils.getFilesInDir = function(dir, filterFn)
-    filterFn = filterFn or function(fileName)
+fileUtils.getFilesInDir = function(dirPath, filterFn)
+    local dirPathWithEndingSlash = stringUtils.stringEndsWith(dirPath, '/') and dirPath or (dirPath .. '/')
+    filterFn = type(filterFn) == 'function' and filterFn or function(fileName)
             return true
         end
     local result = {}
-    local f = io.popen(string.format([[dir "%s" /b /a-d]], dir))
-    --local f = io.popen(string.format([[dir "%s" /b /ad]], dir))
+    local f = io.popen(string.format([[dir "%s" /b /a-d]], dirPathWithEndingSlash))
+    --local f = io.popen(string.format([[dir "%s" /b /ad]], dirPathWithEndingSlash))
     if f then
         for s in f:lines() do
             if ((string.len(s) > 0) and filterFn(s)) then
-                result[#result + 1] = string.format([[%s%s]], dir, s)
-            --result[#result + 1] = string.format([[%s%s/]], dir, s)
+                result[#result + 1] = string.format([[%s%s]], dirPathWithEndingSlash, s)
+            --result[#result + 1] = string.format([[%s%s/]], dirPathWithEndingSlash, s)
             end
         end
         f:close()
@@ -157,19 +164,30 @@ fileUtils.getFilesInDir = function(dir, filterFn)
     return result
 end
 
-fileUtils.getFilesInDirWithExtension = function(dir, ext)
+fileUtils.getFilesInDirWithExtension = function(dirPath, ext)
+    if ext == nil then
+        return {}
+    end
+
+    local extWithoutDot = string.sub(ext, 1, 1) == '.' and string.sub(ext, 2, 1) or ext
     return fileUtils.getFilesInDir(
-        dir,
-        function(fname)
-            if ext == nil then
-                return true
-            else
-                return stringUtils.stringEndsWith(fname, '.' .. ext)
-            end
+        dirPath,
+        function(fileName)
+            return stringUtils.stringEndsWith(fileName, '.' .. extWithoutDot)
         end
     )
 end
 
+fileUtils.getPackageCpaths = function()
+    -- returns something like
+    -- {
+    --     "C:\Program Files (x86)\Steam\steamapps\common\Transport Fever 2\?.dll",
+    --     "C:\Program Files (x86)\Steam\steamapps\common\Transport Fever 2\loadall.dll",
+    --     ".\?.dll"
+    -- }
+
+    return stringUtils.stringSplit(package.cpath, ';')
+end
 fileUtils.getPackagePaths = function()
     -- returns something like
     -- {

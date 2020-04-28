@@ -34,5 +34,8 @@ end
 stringUtils.stringContains = function(testString, containedString)
     return not (not (string.find(testString, containedString)))
 end
+stringUtils.isNullOrEmptyString = function(str)
+    return str == nil or (type(str) == 'string' and string.len(str) == 0)
+end
 
 return stringUtils

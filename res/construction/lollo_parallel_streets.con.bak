@@ -3,45 +3,80 @@ local inspect = require('inspect')
 local vec3 = require 'vec3'
 local transf = require 'transf'
 local fileUtils = require('fileUtils')
+local stringUtils = require('stringUtils')
 
 function data()
     --local test = require('lollo_medium_1_way_1_lane_street.lua')
     local function readFiles(files)
+
         print('LOLLO current path = ')
         dump(true)(fileUtils.getCurrentPath())
-        -- this works, but it returns a file that returns nothing, coz street files are structured this way
-        local file, err = loadfile('C:/Program Files (x86)/Steam/userdata/71590188/1066780/local/staging_area/lollo_street_tuning_1/res/config/street/lollo_medium_1_way_1_lane_street.lua')
-        print('LOLLO err = ', err)
-        print(inspect(file)) -- a function
-        print(inspect(file())) -- nil. Note that street files do not return anything.
-
-        local readFileResultSuccess, readFileResult =
-            fileUtils.readGameDataFile('C:/Program Files (x86)/Steam/userdata/71590188/1066780/local/staging_area/lollo_street_tuning_1/res/config/street/lollo_medium_1_way_1_lane_street.lua')
-        print('LOLLO readFileResultSuccess = ')
-        dump(true)(readFileResultSuccess) -- this fails coz readFileResult is boolean
-        print('LOLLO readFileResult = ')
-        dump(true)(readFileResult)
         print('LOLLO package paths = ')
         dump(true)(fileUtils.getPackagePaths())
-        --print('LOLLO package.loaded = ')
+        print('LOLLO package cpaths = ')
+        dump(true)(fileUtils.getPackageCpaths())
+        print('LOLLO package.loaded = ')
         --dump(true)(package.loaded) huge
-        local a, b, c = package.loaders
-        print('LOLLO package.loaders = ')
-        dump(true)(a) -- returns true
-        dump(true)(b) -- returns true
-        dump(true)(c) -- returns true
-
-        local a, b, c = package.preload
-        print('LOLLO package.preload = ')
-        dump(true)(a) -- returns true
-        dump(true)(b) -- returns true
-        dump(true)(c) -- returns true
-
-        print('LOLLO _G = ')
-        for key, value in pairs(_G) do
+        for key, value in pairs(package.loaded) do
             print(key, value)
         end
 
+        -- this works
+        local fileDatas = {}
+        local currPath = fileUtils.getCurrentPath()
+        print('LOLLO currPath is')
+        dump(true)(currPath)
+        if not stringUtils.isNullOrEmptyString(currPath) then
+            local resDir = fileUtils.getResDirFromPath(currPath)
+            print('LOLLO resDir is')
+            dump(true)(resDir)
+            if not stringUtils.isNullOrEmptyString(resDir) then
+                local streetDir = resDir .. '/config/street'
+                print('LOLLO streetDir is')
+                dump(true)(streetDir)
+
+                if not stringUtils.isNullOrEmptyString(streetDir) then
+                    local streetFiles = fileUtils.getFilesInDirWithExtension(streetDir, 'lua')
+                    --streetFiles = "C:/Program Files (x86)/Steam/userdata/71590188/1066780/local/staging_area/lollo_street_tuning_1/res/config/street"
+                    print('LOLLO streetfiles are')
+                    dump(true)(streetFiles)
+                    if type(streetFiles) == 'table' then
+                        for i = 1, #streetFiles do
+                            local isOk, fileData = fileUtils.readGameDataFile(streetFiles[i])
+                            if isOk then
+                                table.insert(
+                                    fileDatas,
+                                    #fileDatas + 1,
+                                    {
+                                        type = fileData.type,
+                                        streetWidth = fileData.streetWidth,
+                                        sidewalkWidth = fileData.sidewalkWidth
+                                    }
+                                )
+                            end
+                        end
+                        for i = 1, #fileDatas do
+                            dump(true)(fileDatas[i])
+                        end
+                    end
+                end
+            end
+        end
+
+        -- LOLLO NOTE very useful to see what is going on
+        -- print('LOLLO debug.getregistry() = ')
+        -- print(inspect(debug.getregistry()))
+
+        -- LOLLO NOTE you can save the global var in game or in _G
+        -- print('LOLLO game.config = ')
+        -- -- dump(true)(game)
+        -- for key, value in pairs(game.config) do
+        --     print(key, value)
+        -- end
+        -- print('LOLLO game.res = ')
+        -- for key, value in pairs(game.res) do
+        --     print(key, value)
+        -- end
         -- this fails coz game.interface is not on this thread
         -- local func = function()
         --     return game.interface.findPath('lollo_medium_4_lane_street')
