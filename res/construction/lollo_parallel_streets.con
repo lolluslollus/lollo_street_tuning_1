@@ -30,36 +30,31 @@ function data()
         --     print(key, value)
         -- end
 
-        -- this works
         local results = {}
         local currPath = fileUtils.getCurrentPath()
-        print('LOLLO currPath is')
-        dump(true)(currPath)
-        print('LOLLO isNullOrEmptyString = ')
-        print(inspect(stringUtils))
-        print(inspect(stringUtils.isNullOrEmptyString))
+        -- print('LOLLO currPath is')
+        -- dump(true)(currPath)
         if stringUtils.isNullOrEmptyString(currPath) then
             return results
         end
 
         local resDir = fileUtils.getResDirFromPath(currPath)
-        print('LOLLO resDir is')
-        dump(true)(resDir)
+        -- print('LOLLO resDir is')
+        -- dump(true)(resDir)
         if stringUtils.isNullOrEmptyString(resDir) then
             return results
         end
 
         local streetDir = resDir .. '/config/street'
-        print('LOLLO streetDir is')
-        dump(true)(streetDir)
-        --streetDir = "C:/Program Files (x86)/Steam/userdata/71590188/1066780/local/staging_area/lollo_street_tuning_1/res/config/street"
+        -- print('LOLLO streetDir is')
+        -- dump(true)(streetDir)
         if stringUtils.isNullOrEmptyString(streetDir) then
             return results
         end
 
         local streetFiles = fileUtils.getFilesInDirWithExtension(streetDir, 'lua')
-        print('LOLLO streetfiles are')
-        dump(true)(streetFiles)
+        -- print('LOLLO streetfiles are')
+        -- dump(true)(streetFiles)
         if type(streetFiles) ~= 'table' then
             return results
         end
@@ -79,9 +74,9 @@ function data()
                 )
             end
         end
-        for i = 1, #results do
-            dump(true)(results[i])
-        end
+        -- for i = 1, #results do
+        --     dump(true)(results[i])
+        -- end
 
         return results
 
@@ -129,10 +124,6 @@ function data()
         local results = {}
         for _, val1 in pairs(streetData) do
             for _, val2 in pairs(_parallelisedStreetTypes) do
-                print('val1 = ')
-                dump(true)(val1)
-                print('val2 = ')
-                dump(true)(val2)
                 if val1.type == val2 then
                     table.insert(results, #results + 1, val1)
                 end
@@ -184,10 +175,10 @@ function data()
     end
 
     if game._lolloStreetData == nil then
-        print('LOLLO reading street data')
+        print('LOLLO parallel streets reading street data')
         game._lolloStreetData = _getStreetData(_getStreetFilesContents())
-        print('LOLLO street data = ')
-        dump(true)(game._lolloStreetData)
+        -- print('LOLLO street data = ')
+        -- dump(true)(game._lolloStreetData)
     end
 
     return {
@@ -285,7 +276,7 @@ function data()
             local streetData = game._lolloStreetData[params.streetType_ + 1]
             local streetType = streetData.type
 
-            print('LOLLO parallel streets updateFn')
+            -- print('LOLLO parallel streets updateFn')
             -- dump(true)(params)
 
             local result = {}

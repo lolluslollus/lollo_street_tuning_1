@@ -15,20 +15,20 @@ end
 fileUtils.readGameDataFile = function(filePath)
     local file = io.open(filePath, 'r')
     if file == nil then
-        print('LOLLO file not found')
+        -- print('LOLLO file not found')
         return false
     end
 
     -- this works, but it returns a file that returns nothing, coz street files are structured this way
-    -- local file, err = loadfile('C:/Program Files (x86)/Steam/userdata/71590188/1066780/local/staging_area/lollo_street_tuning_1/res/config/street/lollo_medium_1_way_1_lane_street.lua')
+    -- local file, err = loadfile(<full path>)
     -- print('LOLLO err = ', err)
     -- print(inspect(file)) -- a function
     -- print(inspect(file())) -- nil. Note that street files do not return anything.
 
     -- file has type userdata
-    print('LOLLO start reading the file')
+    -- print('LOLLO start reading the file')
     local fileContents = file:read('*a') -- this works! it reads the file contents! However, it adds a funny character at the beginning.
-    print('LOLLO closing the file')
+    -- print('LOLLO closing the file')
     file:close()
 
     -- We need to remove the funny character at the beginning
@@ -69,10 +69,10 @@ fileUtils.readGameDataFile = function(filePath)
             -- dump(true)(fc()) -- fc now contains my street data!
             return true, fc()
         else
-            print('Execution error:', fc)
+            print('lollo file utils - Execution error:', fc)
         end
     else
-        print('Compilation error:', err)
+        print('lollo file utils - Compilation error:', err)
     end
 
     return false
@@ -84,7 +84,7 @@ fileUtils.getCurrentPath = function()
     --    return string.sub(debug.getinfo(1, 'S').source, 2)
 
     -- returns something like
-    -- "@C:/Program Files (x86)/Steam/userdata/71590188/1066780/local/staging_area/lollo_street_tuning_1/res/scripts/fileUtils.lua"
+    -- "@<full path>"
     -- so we take out the first character, which is no control character by the way, so we cannot use gsub with %c
 
     -- local info
@@ -104,7 +104,7 @@ fileUtils.getCurrentPath = function()
     --     lastlinedefined = 91,
     --     linedefined = 75,
     --     short_src = "...ing_area/lollo_street_tuning_1/res/scripts/fileUtils.lua",
-    --     source = "@C:/Program Files (x86)/Steam/userdata/71590188/1066780/local/staging_area/lollo_street_tuning_1/res/scripts/fileUtils.lua",
+    --     source = "@<full path>",
     --     what = "Lua"
     -- }
     -- and then
@@ -112,7 +112,7 @@ fileUtils.getCurrentPath = function()
     --     lastlinedefined = 75,
     --     linedefined = 9,
     --     short_src = "[string "C:/Program Files (x86)/Steam/userdata/7159018..."]",
-    --     source = "C:/Program Files (x86)/Steam/userdata/71590188/1066780/local/staging_area/lollo_street_tuning_1/res/construction/lollo_parallel_streets.con",
+    --     source = ".../res/construction/lollo_parallel_streets.con",
     --     what = "Lua"
     -- }
     -- and then
@@ -120,7 +120,7 @@ fileUtils.getCurrentPath = function()
     --     lastlinedefined = 235,
     --     linedefined = 7,
     --     short_src = "[string "C:/Program Files (x86)/Steam/userdata/7159018..."]",
-    --     source = "C:/Program Files (x86)/Steam/userdata/71590188/1066780/local/staging_area/lollo_street_tuning_1/res/construction/lollo_parallel_streets.con",
+    --     source = ".../res/construction/lollo_parallel_streets.con",
     --     what = "Lua"
     -- }
     -- and then
@@ -128,7 +128,7 @@ fileUtils.getCurrentPath = function()
     --     lastlinedefined = 235,
     --     linedefined = 7,
     --     short_src = "[string "C:/Program Files (x86)/Steam/userdata/7159018..."]",
-    --     source = "C:/Program Files (x86)/Steam/userdata/71590188/1066780/local/staging_area/lollo_street_tuning_1/res/construction/lollo_parallel_streets.con",
+    --     source = ".../res/construction/lollo_parallel_streets.con",
     --     what = "Lua"
     -- }
 end
@@ -191,7 +191,7 @@ end
 fileUtils.getPackagePaths = function()
     -- returns something like
     -- {
-    --     "C:/Program Files (x86)/Steam/userdata/71590188/1066780/local/staging_area/lollo_street_tuning_1/res/scripts/?.lua",
+    --     "C:/Program Files (x86)/Steam/userdata/<steam user id>/1066780/local/staging_area/lollo_street_tuning_1/res/scripts/?.lua",
     --     "res/scripts/?.lua"
     -- }
 
