@@ -2,265 +2,62 @@ local dump = require 'luadump'
 local inspect = require('inspect')
 local vec3 = require 'vec3'
 local transf = require 'transf'
+local fileUtils = require('fileUtils')
 
 function data()
     --local test = require('lollo_medium_1_way_1_lane_street.lua')
-    local function _fileExists(fileName)
-        local file = io.open(fileName, 'r')
-        if file then
-            file:close()
-            return true
-        end
-        return false
-    end
-    local function _readFile(fileName)
-        local file = io.open(fileName, 'r')
-        if file then
-            print('LOLLO file found') -- it gets here
-            print(inspect(file)) -- file has type userdata
-            dump(true)(file)
-            print('LOLLO start reading the file')
-            local fileContents = file:read('*a') -- this works! it reads the file contents! However, it adds a funny character at the beginning
-            -- local fileContents = file:read() -- let's s ee about that funny character - nope, and it only reads the first line
-            -- print(inspect(fileContents))
-
-            --fileContents = 'return ' .. string.sub(fileContents, 4) -- -- get rid of the funny character at the beginning and add return
-            --fileContents = 'return ' .. string.sub(fileContents, 25) -- -- get rid of the funny character at the beginning and the named function
-            fileContents = string.sub(fileContents, 24) -- -- get rid of the funny character at the beginning and the named function
-            fileContents = string.sub(fileContents, 1, string.len(fileContents) - 4) -- get rid of end at the end
-            print('LOLLO adjusted file contents = ')
-            dump(true)(fileContents)
-
-            print('LOLLO closing the file')
-            file:close()
-
-            --local myFileFunc = loadstring(fileContents) -- it fails coz loadstring is not available
-            local func, err = load('return function(a,b) return a+b end')
-            if func then
-                local ok, add = pcall(func)
-                if ok then
-                    print('LOLLO test 4 load', add(2, 3))
-                else
-                    print('Execution error:', add)
-                end
-            else
-                print('Compilation error:', err)
-            end
-
-            local func, err = load(fileContents)
-            if func then
-                local ok, fc = pcall(func)
-                if ok then
-                    print('LOLLO test 4 load -----------------------------------')
-                    dump(true)(fc) -- fc now contains my street data!
-                else
-                    print('Execution error:', fc)
-                end
-            else
-                print('Compilation error:', err)
-            end
-
-            return true
-        else
-            print('LOLLO file not found')
-        end
-        return false
-    end
-
-    local function _readFile2(fileName)
-        local file = io.open(fileName, 'r')
-        if file then
-            print('LOLLO file found') -- it gets here
-            print(inspect(file)) -- file has type userdata
-            dump(true)(file)
-            print('LOLLO start reading the file')
-
-            local fileContents = file:read('*a') -- this works! it reads the file contents! However, it adds a funny character at the beginning
-            -- local fileContents = file:read() -- let's s ee about that funny character - nope, and it only reads the first line
-            -- print(inspect(fileContents))
-
-            --fileContents = 'return ' .. string.sub(fileContents, 4) -- -- get rid of the funny character at the beginning and add return
-            --fileContents = 'return ' .. string.sub(fileContents, 25) -- -- get rid of the funny character at the beginning and the named function
-            fileContents = string.sub(fileContents, 4) -- -- get rid of the funny character at the beginning
-            fileContents = string.gsub(fileContents, 'function data%(%)', '', 1) -- % escapes in lua...
-            fileContents = string.gsub(fileContents, 'end', '', 1)
-            print('LOLLO adjusted file contents = ')
-            dump(true)(fileContents)
-
-            print('LOLLO closing the file')
-            file:close()
-
-            --local myFileFunc = loadstring(fileContents) -- it fails coz loadstring is not available
-            local func, err = load('return function(a,b) return a+b end')
-            if func then
-                local ok, add = pcall(func)
-                if ok then
-                    print('LOLLO test 4 load', add(2, 3))
-                else
-                    print('Execution error:', add)
-                end
-            else
-                print('Compilation error:', err)
-            end
-
-            local func, err = load(fileContents)
-            if func then
-                print('LOLLO func = ##################')
-                print(inspect(func))
-                dump(true)(func)
-                local ok, fc = pcall(func)
-                if ok then
-                    print('LOLLO test 4 load -----------------------------------')
-                    dump(true)(fc) -- fc now contains my street data!
-                    print(inspect(fc))
-                else
-                    print('Execution error:', fc)
-                end
-            else
-                print('Compilation error:', err)
-            end
-
-            return true
-        else
-            print('LOLLO file not found')
-        end
-        return false
-    end
-
-    local function _readFile3(fileName)
-        local result = nil
-        local file = io.open(fileName, 'r')
-        if file == nil then
-            print('LOLLO file not found')
-            return false
-        end
-
-        print('LOLLO file found') -- it gets here
-        print(inspect(file)) -- file has type userdata
-        dump(true)(file)
-        print('LOLLO start reading the file')
-
-        local fileContents = file:read('*a') -- this works! it reads the file contents! However, it adds a funny character at the beginning
-        -- local fileContents = file:read() -- let's s ee about that funny character - nope, and it only reads the first line
-        -- print(inspect(fileContents))
-
-        --fileContents = 'return ' .. string.sub(fileContents, 4) -- -- get rid of the funny character at the beginning and add return
-        --fileContents = 'return ' .. string.sub(fileContents, 25) -- -- get rid of the funny character at the beginning and the named function
-        fileContents = 'return ' .. string.sub(fileContents, 4) -- -- get rid of the funny character at the beginning and prepend return instead
-        -- remove the function name (which is always "data"). Consider the following:
-        --[[             
-            local ee = return function(a,b) return a+b end -- works
-            local ee = return function data(a,b) return a+b end -- fails
- ]]
-        -- make several attempts just in case the file is badly formatted
-        local howManyMatches = 0
-        fileContents, howManyMatches = string.gsub(fileContents, ' data%(%)', '()', 1) -- % escapes in lua...
-        if howManyMatches == 0 then
-            fileContents, howManyMatches = string.gsub(fileContents, ' data %(%)', '()', 1) -- % escapes in lua, however, it must not go into the replacement string
-        end
-        if howManyMatches == 0 then
-            fileContents, howManyMatches = string.gsub(fileContents, ' data  %(%)', '()', 1) -- % escapes in lua...
-        end
-
-        -- leave if howManyMatches is still 0
-        if howManyMatches == 0 then
-            return false
-        end
-
-        print('LOLLO adjusted file contents = ')
-        dump(true)(fileContents)
-
-        print('LOLLO closing the file')
-        file:close()
-
-        --local myFileFunc = loadstring(fileContents) -- it fails coz loadstring is not available
-        local func, err = load('return function(a,b) return a+b end')
-        if func then
-            local ok, add = pcall(func)
-            if ok then
-                print('LOLLO test 4 load', add(2, 3))
-            else
-                print('Execution error:', add)
-            end
-        else
-            print('Compilation error:', err)
-        end
-
-        local func, err = load(fileContents)
-        if func then
-            print('LOLLO func = ##################')
-            print(inspect(func))
-            dump(true)(func)
-            local ok, fc = pcall(func)
-            if ok then
-                --print(inspect(fc))
-                print('LOLLO test 4 load -----------------------------------')
-                dump(true)(fc()) -- fc now contains my street data!
-                result = fc()
-            else
-                print('Execution error:', fc)
-            end
-        else
-            print('Compilation error:', err)
-        end
-
-        return true, result
-    end
     local function readFiles(files)
-        local info
-        local i = 1
-        repeat
-            info = debug.getinfo(i, 'S')
-            i = i + 1
-            print('LOLLO info = ')
-            require('luadump')(true)(info)
-        until info == nil
-        info = debug.getinfo(i - 2, 'S')
+        print('LOLLO current path = ')
+        dump(true)(fileUtils.getCurrentPath())
+        -- this works, but it returns a file that returns nothing, coz street files are structured this way
         local file, err = loadfile('C:/Program Files (x86)/Steam/userdata/71590188/1066780/local/staging_area/lollo_street_tuning_1/res/config/street/lollo_medium_1_way_1_lane_street.lua')
         print('LOLLO err = ', err)
         print(inspect(file)) -- a function
         print(inspect(file())) -- nil. Note that street files do not return anything.
 
-        -- this works!
-        --_readFile('C:/Program Files (x86)/Steam/userdata/71590188/1066780/local/staging_area/lollo_street_tuning_1/res/config/street/lollo_medium_1_way_1_lane_street.lua')
-        -- this works, too
-        -- _readFile2('C:/Program Files (x86)/Steam/userdata/71590188/1066780/local/staging_area/lollo_street_tuning_1/res/config/street/lollo_medium_1_way_1_lane_street.lua')
-        -- this works, too
-        print('############################ _readFile3 returned with')
-        dump(true)(_readFile3('C:/Program Files (x86)/Steam/userdata/71590188/1066780/local/staging_area/lollo_street_tuning_1/res/config/street/lollo_medium_1_way_1_lane_street.lua'))
-        --require('luadump')(true)(file.data()) -- NO! file is a function!
-        --require('luadump')(true)(file().data())
-        print('LOLLO package.path = ')
-        dump(true)(package.path)
-        -- this works
-        package.path = package.path .. ';C:/Program Files (x86)/Steam/userdata/71590188/1066780/local/staging_area/lollo_street_tuning_1/res/config/street/lollo_medium_4_lane_street.lua'
-        -- this fails
-        package.path = package.path .. ';C:/Program Files (x86)/Steam/userdata/71590188/1066780/local/staging_area/lollo_street_tuning_1/res/config/street/?.lua'
-        dump(true)(package.path)
+        local readFileResultSuccess, readFileResult =
+            fileUtils.readGameDataFile('C:/Program Files (x86)/Steam/userdata/71590188/1066780/local/staging_area/lollo_street_tuning_1/res/config/street/lollo_medium_1_way_1_lane_street.lua')
+        print('LOLLO readFileResultSuccess = ')
+        dump(true)(readFileResultSuccess) -- this fails coz readFileResult is boolean
+        print('LOLLO readFileResult = ')
+        dump(true)(readFileResult)
+        print('LOLLO package paths = ')
+        dump(true)(fileUtils.getPackagePaths())
         --print('LOLLO package.loaded = ')
         --dump(true)(package.loaded) huge
+        local a, b, c = package.loaders
         print('LOLLO package.loaders = ')
-        dump(true)(package.loaders)
-        --print('LOLLO package.preload =')
-        --dump(true)(package.preload)
-        -- table.insert(package.preload, #package.preload + 1, 'C:/Program Files (x86)/Steam/userdata/71590188/1066780/local/staging_area/lollo_street_tuning_1/res/config/street/?.lua')
-        -- table.insert(package.preload, #package.preload + 1, 'C:/Program Files (x86)/Steam/userdata/71590188/1066780/local/staging_area/lollo_street_tuning_1/res/config/street/lollo_medium_4_lane_street.lua')
-        -- table.insert(
-        --     package.preload,
-        --     #package.preload + 1,
-        --     {
-        --         ['lollo_medium_4_lane_street.lua'] = 'C:/Program Files (x86)/Steam/userdata/71590188/1066780/local/staging_area/lollo_street_tuning_1/res/config/street/lollo_medium_4_lane_street.lua'
-        --     }
-        -- )
-        --package.preload['lollo_medium_4_lane_street.lua'] = 'C:/Program Files (x86)/Steam/userdata/71590188/1066780/local/staging_area/lollo_street_tuning_1/res/config/street/lollo_medium_4_lane_street.lua'
-        --dump(true)(package.preload)
-        local qqq = require('lollo_medium_4_lane_street')
-        dump(true)(qqq) -- qqq is a boolean (true in this case).
-        -- Yes the require works, but the required file does not return anything,
-        -- because this is how street files are designed. So I need to read the file and parse it somehow.
-        --dump(true)(qqq.data)
-        -- dump(true)(qqq.data())
+        dump(true)(a) -- returns true
+        dump(true)(b) -- returns true
+        dump(true)(c) -- returns true
 
+        local a, b, c = package.preload
+        print('LOLLO package.preload = ')
+        dump(true)(a) -- returns true
+        dump(true)(b) -- returns true
+        dump(true)(c) -- returns true
+
+        print('LOLLO _G = ')
+        for key, value in pairs(_G) do
+            print(key, value)
+        end
+
+        -- this fails coz game.interface is not on this thread
+        -- local func = function()
+        --     return game.interface.findPath('lollo_medium_4_lane_street')
+        -- end
+        -- local ok, fc = pcall(func)
+        -- if ok then
+        --     print('LOLLO test 4 findPath succeeded')
+        --     dump(true)(fc)
+        --     dump(true)(fc())
+        -- else
+        --     print('Execution error:', fc)
+        -- end
+
+        -- You can change package.path (not with ?.lua but with the whole file name) and then require a street file,
+        -- but the required file does not return anything,
+        -- because this is how street files are designed. So I need to read the file and parse it somehow.
         -- local modPath
         -- if string.ends(info.source, 'mod.lua') then
         --     modPath = string.gsub(info.source, "@(.*/)mod[.]lua", "%1")
@@ -269,15 +66,8 @@ function data()
         -- elseif string.ends(info.source, '.lua') then
         --     modPath = string.gsub(info.source, "@(.*/)res/config/street/.+[.]lua", "%1")
         -- end
-
-        -- print('LOLLO modPath = ', modPath)
-
-        -- if _fileExists(modPath.."mod.lua") then
-        --     print('LOLLO file found')
-        -- else
-        --     print("LOLLO file found [ModUtil] Could not read files. Maybe the function was called from a wrong file.")
-        -- end
     end
+
     readFiles({})
 
     return {
