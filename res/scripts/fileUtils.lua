@@ -73,11 +73,13 @@ fileUtils.readGameDataFile = function(fileName)
 end
 
 fileUtils.getCurrentPath = function()
-    return string.sub(debug.getinfo(1, 'S').source, 2)
+    local currPath = string.sub(debug.getinfo(1, 'S').source, 2)
+    return string.gsub(currPath, '\\', '/')
+--    return string.sub(debug.getinfo(1, 'S').source, 2)
+
     -- returns something like
     -- "@C:/Program Files (x86)/Steam/userdata/71590188/1066780/local/staging_area/lollo_street_tuning_1/res/scripts/fileUtils.lua"
     -- so we take out the first character, which is no control character by the way, so we cannot use gsub with %c
-
 
     -- local info
     -- local i = 1
@@ -125,26 +127,47 @@ fileUtils.getCurrentPath = function()
     -- }
 end
 
+fileUtils.getDirFromFile = function(fileName)
+    local searchString = '[^/]*/'
+    return string.reverse(string.gsub(string.reverse(fileName), searchString, '', 1))
+end
+
+fileUtils.getResDirFromPath = function(dirName)
+    local searchString = '.*/ser/'
+    return string.reverse(string.gsub(string.reverse(dirName), searchString, 'ser/'))
+end
+
 fileUtils.getFilesInDir = function(dir, filterFn)
-	filterFn = filterFn or function(fileName) return true end
-	local result = {}
+    filterFn = filterFn or function(fileName)
+            return true
+        end
+    local result = {}
     local f = io.popen(string.format([[dir "%s" /b /a-d]], dir))
     --local f = io.popen(string.format([[dir "%s" /b /ad]], dir))
-	if f then
-		for s in f:lines() do
-			if ((string.len(s) > 0) and filterFn(s))then
+    if f then
+        for s in f:lines() do
+            if ((string.len(s) > 0) and filterFn(s)) then
                 result[#result + 1] = string.format([[%s%s]], dir, s)
-                --result[#result + 1] = string.format([[%s%s/]], dir, s)
-			end
-		end
-		f:close()
-	end
-	
-	return result
+            --result[#result + 1] = string.format([[%s%s/]], dir, s)
+            end
+        end
+        f:close()
+    end
+
+    return result
 end
 
 fileUtils.getFilesInDirWithExtension = function(dir, ext)
-    return fileUtils.getFilesInDir(dir, function(fname) return stringUtils.stringEndsWith(fname, '.' .. ext) end)
+    return fileUtils.getFilesInDir(
+        dir,
+        function(fname)
+            if ext == nil then
+                return true
+            else
+                return stringUtils.stringEndsWith(fname, '.' .. ext)
+            end
+        end
+    )
 end
 
 fileUtils.getPackagePaths = function()
@@ -153,7 +176,7 @@ fileUtils.getPackagePaths = function()
     --     "C:/Program Files (x86)/Steam/userdata/71590188/1066780/local/staging_area/lollo_street_tuning_1/res/scripts/?.lua",
     --     "res/scripts/?.lua"
     -- }
-    
+
     return stringUtils.stringSplit(package.path, ';')
 end
 
