@@ -6,7 +6,6 @@ local arrayUtils = require('arrayUtils')
 local fileUtils = require('fileUtils')
 local pitchUtil = require('pitchUtil')
 local stringUtils = require('stringUtils')
-
 function data()
     local _distances = {}
     for i = 0, 11 do -- watch out, the parameters have base 0
@@ -36,41 +35,52 @@ function data()
         local currPath = fileUtils.getCurrentPath()
         print('LOLLO currPath is')
         dump(true)(currPath)
-        if not stringUtils.isNullOrEmptyString(currPath) then
-            local resDir = fileUtils.getResDirFromPath(currPath)
-            print('LOLLO resDir is')
-            dump(true)(resDir)
-            if not stringUtils.isNullOrEmptyString(resDir) then
-                local streetDir = resDir .. '/config/street'
-                print('LOLLO streetDir is')
-                dump(true)(streetDir)
-                --streetDir = "C:/Program Files (x86)/Steam/userdata/71590188/1066780/local/staging_area/lollo_street_tuning_1/res/config/street"
-                if not stringUtils.isNullOrEmptyString(streetDir) then
-                    local streetFiles = fileUtils.getFilesInDirWithExtension(streetDir, 'lua')
-                    print('LOLLO streetfiles are')
-                    dump(true)(streetFiles)
-                    if type(streetFiles) == 'table' then
-                        for i = 1, #streetFiles do
-                            local isOk, fileData = fileUtils.readGameDataFile(streetFiles[i])
-                            if isOk then
-                                table.insert(
-                                    results,
-                                    #results + 1,
-                                    {
-                                        type = fileData.type,
-                                        name = fileData.name,
-                                        streetWidth = fileData.streetWidth,
-                                        sidewalkWidth = fileData.sidewalkWidth
-                                    }
-                                )
-                            end
-                        end
-                        for i = 1, #results do
-                            dump(true)(results[i])
-                        end
-                    end
-                end
+        print('LOLLO isNullOrEmptyString = ')
+        print(inspect(stringUtils))
+        print(inspect(stringUtils.isNullOrEmptyString))
+        if stringUtils.isNullOrEmptyString(currPath) then
+            return results
+        end
+
+        local resDir = fileUtils.getResDirFromPath(currPath)
+        print('LOLLO resDir is')
+        dump(true)(resDir)
+        if stringUtils.isNullOrEmptyString(resDir) then
+            return results
+        end
+
+        local streetDir = resDir .. '/config/street'
+        print('LOLLO streetDir is')
+        dump(true)(streetDir)
+        --streetDir = "C:/Program Files (x86)/Steam/userdata/71590188/1066780/local/staging_area/lollo_street_tuning_1/res/config/street"
+        if stringUtils.isNullOrEmptyString(streetDir) then
+            return results
+        end
+
+        local streetFiles = fileUtils.getFilesInDirWithExtension(streetDir, 'lua')
+        print('LOLLO streetfiles are')
+        dump(true)(streetFiles)
+        if type(streetFiles) ~= 'table' then
+            return results
+        end
+
+        for i = 1, #streetFiles do
+            local isOk, fileData = fileUtils.readGameDataFile(streetFiles[i])
+            if isOk then
+                table.insert(
+                    results,
+                    #results + 1,
+                    {
+                        type = fileData.type,
+                        name = fileData.name,
+                        streetWidth = fileData.streetWidth,
+                        sidewalkWidth = fileData.sidewalkWidth
+                    }
+                )
             end
+        end
+        for i = 1, #results do
+            dump(true)(results[i])
         end
 
         return results
@@ -267,7 +277,7 @@ function data()
         --     type = 'NONE'
         -- },
         -- autoRemovable = true,
-        --skipCollision = true,
+        skipCollision = true,
         --skipCollisionCheck = true,
         updateFn = function(params)
             params.pitch = params.pitch - pitchUtil.getMiddlePitchParamValue()
@@ -281,10 +291,24 @@ function data()
             local result = {}
             result.cost = 0
             result.groundFaces = {}
-            --result.colliders = {}
-            result.models = {}
+            result.colliders = {}
+            -- LOLLO TODO try to give the dummy model a name, so that the game won't show "no name" when configuring a done object.
+            -- LOLLO NOTE I need a dummy model, so the game stops saying "hello there" or other rubbish,
+            -- then pointing away,
+            -- when the user clicks on a done construction to configure it.
+            result.models = {
+                {
+                    id = 'lollo_assets/lollo_dummy.mdl',
+                    skipCollision = true,
+                    -- skipCollisionCheck = true,
+                    -- transf = {1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1}
+                    transf = pitchUtil.getIdTransfPitched(params.pitch)
+                }
+            }
 
             local tramTrackType = params.tramTrack and (({'NO', 'YES', 'ELECTRIC'})[params.tramTrack + 1]) or 'NO'
+            -- LOLLO NOTE we have 2 half edges for every chunk of road. The inner nodes are not free and do not snap, the outer ones do.
+            -- This is required if we want to make them snappable.
             if params.howManyStreets == 0 then -- 1 street
                 -- local streetFullWidth = streetData.sidewalkWidth + streetData.sidewalkWidth + streetData.streetWidth
                 local streetHalfWidth = streetData.sidewalkWidth + streetData.streetWidth / 2.0
@@ -292,12 +316,12 @@ function data()
                     {
                         type = 'STREET',
                         params = {
-                            -- skipCollision = true,
+                            skipCollision = true,
                             -- skipCollisionCheck = true,
                             type = streetType,
                             tramTrackType = tramTrackType
                         },
-                        edges = _makeEdges(params, {-streetHalfWidth, 0, 0}, {streetHalfWidth, 0, 0}, {1, 0, 0}, {1, 0, 0}),
+                        edges = _makeEdges(params, {-streetHalfWidth, 0, 0}, {0, 0, 0}, {1, 0, 0}, {1, 0, 0}),
                         -- edgeType = "BRIDGE",
                         -- edgeTypeName = "cement.lua",
                         freeNodes = {0, 1},
@@ -312,7 +336,38 @@ function data()
                         --					snapNodes = { 0 },  -- node 0 is allowed to snap to other edges of the same type --crashes
                         snapNodes = {0, 1}, -- node 1 is allowed to snap to other edges of the same type
                         snapNodes = {0},
-                        snapNodes = {}
+                        snapNodes = {},
+                        freeNodes = params.direction == 0 and {0} or {1},
+                        snapNodes = params.direction == 0 and {0} or {1}
+                        --					snapNodes = { 0, 1 },  -- node 0 and 1 are allowed to snap to other edges of the same type --crashes
+                        --					tag2nodes = {},
+                    },
+                    {
+                        type = 'STREET',
+                        params = {
+                            skipCollision = true,
+                            -- skipCollisionCheck = true,
+                            type = streetType,
+                            tramTrackType = tramTrackType
+                        },
+                        edges = _makeEdges(params, {0, 0, 0}, {streetHalfWidth, 0, 0}, {1, 0, 0}, {1, 0, 0}),
+                        -- edgeType = "BRIDGE",
+                        -- edgeTypeName = "cement.lua",
+                        freeNodes = {0, 1},
+                        --freeNodes = { 1 },
+                        -- freeNodes = {},
+                        -- collider = {
+                        --     type = 'NONE'
+                        -- },
+                        -- autoRemovable = true,
+                        --skipCollision = true, --useless
+                        --skipCollisionCheck = true, --useless
+                        --					snapNodes = { 0 },  -- node 0 is allowed to snap to other edges of the same type --crashes
+                        snapNodes = {0, 1}, -- node 1 is allowed to snap to other edges of the same type
+                        snapNodes = {0},
+                        snapNodes = {},
+                        freeNodes = params.direction == 0 and {1} or {0},
+                        snapNodes = params.direction == 0 and {1} or {0}
                         --					snapNodes = { 0, 1 },  -- node 0 and 1 are allowed to snap to other edges of the same type --crashes
                         --					tag2nodes = {},
                     }
@@ -324,24 +379,46 @@ function data()
                     {
                         type = 'STREET',
                         params = {
-                            -- skipCollision = true,
+                            skipCollision = true,
                             type = streetType,
                             tramTrackType = tramTrackType
                         },
-                        edges = _makeEdges(params, {-streetHalfWidth, -streetHalfWidth - halfDistance, 0}, {streetHalfWidth, -streetHalfWidth - halfDistance, 0}, {1, 0, 0}, {1, 0, 0}),
-                        freeNodes = {0, 1},
-                        snapNodes = {}
+                        edges = _makeEdges(params, {-streetHalfWidth, -streetHalfWidth - halfDistance, 0}, {0, -streetHalfWidth - halfDistance, 0}, {1, 0, 0}, {1, 0, 0}),
+                        freeNodes = params.direction == 0 and {0} or {1},
+                        snapNodes = params.direction == 0 and {0} or {1}
                     },
                     {
                         type = 'STREET',
                         params = {
-                            -- skipCollision = true,
+                            skipCollision = true,
                             type = streetType,
                             tramTrackType = tramTrackType
                         },
-                        edges = _makeEdges(params, {-streetHalfWidth, streetHalfWidth + halfDistance, 0}, {streetHalfWidth, streetHalfWidth + halfDistance, 0}, {1, 0, 0}, {1, 0, 0}),
-                        freeNodes = {0, 1},
-                        snapNodes = {}
+                        edges = _makeEdges(params, {-streetHalfWidth, streetHalfWidth + halfDistance, 0}, {0, streetHalfWidth + halfDistance, 0}, {1, 0, 0}, {1, 0, 0}),
+                        freeNodes = params.direction == 0 and {0} or {1},
+                        snapNodes = params.direction == 0 and {0} or {1}
+                    },
+                    {
+                        type = 'STREET',
+                        params = {
+                            skipCollision = true,
+                            type = streetType,
+                            tramTrackType = tramTrackType
+                        },
+                        edges = _makeEdges(params, {0, -streetHalfWidth - halfDistance, 0}, {streetHalfWidth, -streetHalfWidth - halfDistance, 0}, {1, 0, 0}, {1, 0, 0}),
+                        freeNodes = params.direction == 0 and {1} or {0},
+                        snapNodes = params.direction == 0 and {1} or {0}
+                    },
+                    {
+                        type = 'STREET',
+                        params = {
+                            skipCollision = true,
+                            type = streetType,
+                            tramTrackType = tramTrackType
+                        },
+                        edges = _makeEdges(params, {0, streetHalfWidth + halfDistance, 0}, {streetHalfWidth, streetHalfWidth + halfDistance, 0}, {1, 0, 0}, {1, 0, 0}),
+                        freeNodes = params.direction == 0 and {1} or {0},
+                        snapNodes = params.direction == 0 and {1} or {0}
                     }
                 }
             elseif params.howManyStreets == 2 then -- 3 streets
@@ -352,35 +429,68 @@ function data()
                     {
                         type = 'STREET',
                         params = {
-                            -- skipCollision = true,
+                            skipCollision = true,
                             type = streetType,
                             tramTrackType = tramTrackType
                         },
-                        edges = _makeEdges(params, {-streetHalfWidth, -streetFullWidth - distance, 0}, {streetHalfWidth, -streetFullWidth - distance, 0}, {1, 0, 0}, {1, 0, 0}),
-                        freeNodes = {0, 1},
-                        snapNodes = {}
+                        edges = _makeEdges(params, {-streetHalfWidth, -streetFullWidth - distance, 0}, {0, -streetFullWidth - distance, 0}, {1, 0, 0}, {1, 0, 0}),
+                        freeNodes = params.direction == 0 and {0} or {1},
+                        snapNodes = params.direction == 0 and {0} or {1}
                     },
                     {
                         type = 'STREET',
                         params = {
-                            -- skipCollision = true,
+                            skipCollision = true,
                             type = streetType,
                             tramTrackType = tramTrackType
                         },
-                        edges = _makeEdges(params, {-streetHalfWidth, 0, 0}, {streetHalfWidth, 0, 0}, {1, 0, 0}, {1, 0, 0}),
-                        freeNodes = {0, 1},
-                        snapNodes = {}
+                        edges = _makeEdges(params, {-streetHalfWidth, 0, 0}, {0, 0, 0}, {1, 0, 0}, {1, 0, 0}),
+                        freeNodes = params.direction == 0 and {0} or {1},
+                        snapNodes = params.direction == 0 and {0} or {1}
                     },
                     {
                         type = 'STREET',
                         params = {
-                            -- skipCollision = true,
+                            skipCollision = true,
                             type = streetType,
                             tramTrackType = tramTrackType
                         },
-                        edges = _makeEdges(params, {-streetHalfWidth, streetFullWidth + distance, 0}, {streetHalfWidth, streetFullWidth + distance, 0}, {1, 0, 0}, {1, 0, 0}),
-                        freeNodes = {0, 1},
-                        snapNodes = {}
+                        edges = _makeEdges(params, {-streetHalfWidth, streetFullWidth + distance, 0}, {0, streetFullWidth + distance, 0}, {1, 0, 0}, {1, 0, 0}),
+                        freeNodes = params.direction == 0 and {0} or {1},
+                        snapNodes = params.direction == 0 and {0} or {1}
+                    },
+                    {
+                        type = 'STREET',
+                        params = {
+                            skipCollision = true,
+                            type = streetType,
+                            tramTrackType = tramTrackType
+                        },
+                        edges = _makeEdges(params, {0, -streetFullWidth - distance, 0}, {streetHalfWidth, -streetFullWidth - distance, 0}, {1, 0, 0}, {1, 0, 0}),
+                        freeNodes = params.direction == 0 and {1} or {0},
+                        snapNodes = params.direction == 0 and {1} or {0}
+                    },
+                    {
+                        type = 'STREET',
+                        params = {
+                            skipCollision = true,
+                            type = streetType,
+                            tramTrackType = tramTrackType
+                        },
+                        edges = _makeEdges(params, {0, 0, 0}, {streetHalfWidth, 0, 0}, {1, 0, 0}, {1, 0, 0}),
+                        freeNodes = params.direction == 0 and {1} or {0},
+                        snapNodes = params.direction == 0 and {1} or {0}
+                    },
+                    {
+                        type = 'STREET',
+                        params = {
+                            skipCollision = true,
+                            type = streetType,
+                            tramTrackType = tramTrackType
+                        },
+                        edges = _makeEdges(params, {0, streetFullWidth + distance, 0}, {streetHalfWidth, streetFullWidth + distance, 0}, {1, 0, 0}, {1, 0, 0}),
+                        freeNodes = params.direction == 0 and {1} or {0},
+                        snapNodes = params.direction == 0 and {1} or {0}
                     }
                 }
             else --if params.howManyStreets == 3 then -- 4 streets -- always provide a fallback just in case
@@ -392,59 +502,115 @@ function data()
                     {
                         type = 'STREET',
                         params = {
-                            -- skipCollision = true,
+                            skipCollision = true,
                             type = streetType,
                             tramTrackType = tramTrackType
                         },
                         edges = _makeEdges(
                             params,
                             {-streetHalfWidth, -streetThreeHalfWidth - threeHalfDistance, 0},
-                            {streetHalfWidth, -streetThreeHalfWidth - threeHalfDistance, 0},
+                            {0, -streetThreeHalfWidth - threeHalfDistance, 0},
                             {1, 0, 0},
                             {1, 0, 0}
                         ),
-                        freeNodes = {0, 1},
-                        snapNodes = {}
+                        freeNodes = params.direction == 0 and {0} or {1},
+                        snapNodes = params.direction == 0 and {0} or {1}
                     },
                     {
                         type = 'STREET',
                         params = {
-                            -- skipCollision = true,
+                            skipCollision = true,
                             type = streetType,
                             tramTrackType = tramTrackType
                         },
-                        edges = _makeEdges(params, {-streetHalfWidth, -streetHalfWidth - halfDistance, 0}, {streetHalfWidth, -streetHalfWidth - halfDistance, 0}, {1, 0, 0}, {1, 0, 0}),
-                        freeNodes = {0, 1},
-                        snapNodes = {}
+                        edges = _makeEdges(params, {-streetHalfWidth, -streetHalfWidth - halfDistance, 0}, {0, -streetHalfWidth - halfDistance, 0}, {1, 0, 0}, {1, 0, 0}),
+                        freeNodes = params.direction == 0 and {0} or {1},
+                        snapNodes = params.direction == 0 and {0} or {1}
                     },
                     {
                         type = 'STREET',
                         params = {
-                            -- skipCollision = true,
+                            skipCollision = true,
                             type = streetType,
                             tramTrackType = tramTrackType
                         },
-                        edges = _makeEdges(params, {-streetHalfWidth, streetHalfWidth + halfDistance, 0}, {streetHalfWidth, streetHalfWidth + halfDistance, 0}, {1, 0, 0}, {1, 0, 0}),
-                        freeNodes = {0, 1},
-                        snapNodes = {}
+                        edges = _makeEdges(params, {-streetHalfWidth, streetHalfWidth + halfDistance, 0}, {0, streetHalfWidth + halfDistance, 0}, {1, 0, 0}, {1, 0, 0}),
+                        freeNodes = params.direction == 0 and {0} or {1},
+                        snapNodes = params.direction == 0 and {0} or {1}
                     },
                     {
                         type = 'STREET',
                         params = {
-                            -- skipCollision = true,
+                            skipCollision = true,
                             type = streetType,
                             tramTrackType = tramTrackType
                         },
                         edges = _makeEdges(
                             params,
                             {-streetHalfWidth, streetThreeHalfWidth + threeHalfDistance, 0},
+                            {0, streetThreeHalfWidth + threeHalfDistance, 0},
+                            {1, 0, 0},
+                            {1, 0, 0}
+                        ),
+                        freeNodes = params.direction == 0 and {0} or {1},
+                        snapNodes = params.direction == 0 and {0} or {1}
+                    },
+                    {
+                        type = 'STREET',
+                        params = {
+                            skipCollision = true,
+                            type = streetType,
+                            tramTrackType = tramTrackType
+                        },
+                        edges = _makeEdges(
+                            params,
+                            {0, -streetThreeHalfWidth - threeHalfDistance, 0},
+                            {streetHalfWidth, -streetThreeHalfWidth - threeHalfDistance, 0},
+                            {1, 0, 0},
+                            {1, 0, 0}
+                        ),
+                        freeNodes = params.direction == 0 and {1} or {0},
+                        snapNodes = params.direction == 0 and {1} or {0}
+                    },
+                    {
+                        type = 'STREET',
+                        params = {
+                            skipCollision = true,
+                            type = streetType,
+                            tramTrackType = tramTrackType
+                        },
+                        edges = _makeEdges(params, {0, -streetHalfWidth - halfDistance, 0}, {streetHalfWidth, -streetHalfWidth - halfDistance, 0}, {1, 0, 0}, {1, 0, 0}),
+                        freeNodes = params.direction == 0 and {1} or {0},
+                        snapNodes = params.direction == 0 and {1} or {0}
+                    },
+                    {
+                        type = 'STREET',
+                        params = {
+                            skipCollision = true,
+                            type = streetType,
+                            tramTrackType = tramTrackType
+                        },
+                        edges = _makeEdges(params, {0, streetHalfWidth + halfDistance, 0}, {streetHalfWidth, streetHalfWidth + halfDistance, 0}, {1, 0, 0}, {1, 0, 0}),
+                        freeNodes = params.direction == 0 and {1} or {0},
+                        snapNodes = params.direction == 0 and {1} or {0}
+                    },
+                    {
+                        type = 'STREET',
+                        params = {
+                            skipCollision = true,
+                            type = streetType,
+                            tramTrackType = tramTrackType
+                        },
+                        edges = _makeEdges(
+                            params,
+                            {0, streetThreeHalfWidth + threeHalfDistance, 0},
                             {streetHalfWidth, streetThreeHalfWidth + threeHalfDistance, 0},
                             {1, 0, 0},
                             {1, 0, 0}
                         ),
-                        freeNodes = {0, 1},
-                        snapNodes = {}
-                    }
+                        freeNodes = params.direction == 0 and {1} or {0},
+                        snapNodes = params.direction == 0 and {1} or {0}
+                    },
                 }
             end
 
