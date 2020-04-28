@@ -1,37 +1,29 @@
 function data()
-return {
-	boundingInfo = {
-		bbMax = { 1, 1, 0.3, },
-		bbMin = { -1, -1, 0, },
-	},
-	collider = {
-		params = {
-			halfExtents = { 1, 1, 0.15, },
-		},
-		transf = { 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, },
-		type = "BOX",
-	},
-	lods = {
-		{
-			node = {
-				children = {
-					-- {
-					-- 	materials = { "station/road/streetstation/streetstation_perron_border.mtl", "station/road/streetstation/streetstation_perron_base_new.mtl", },
-					-- 	mesh = "station/road/streetstation/pedestrian_era_c/corner_in_lod0.msh",
-					-- 	name = "corner_in",
-					-- 	transf = { 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, },
-					-- },
-				},
-				name = "RootNode",
-				transf = { 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, },
-			},
-			static = false,
-			visibleFrom = 0,
-			visibleTo = 1000,
-		},
-	},
-	metadata = {
-	},
-	version = 1,
-}
+    return {
+        boundingInfo = {
+            bbMax = {1, 1, 0.3},
+            bbMin = {-1, -1, 0}
+        },
+        collider = {
+            params = {
+                halfExtents = {1, 1, 0.15}
+            },
+            transf = {1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1},
+            type = 'BOX'
+        },
+        lods = {
+            {
+                node = {
+                    children = {},
+                    name = 'RootNode',
+                    transf = {1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1}
+                },
+                static = false,
+                visibleFrom = 0,
+                visibleTo = 1000
+            }
+        },
+        metadata = {},
+        version = 1
+    }
 end
