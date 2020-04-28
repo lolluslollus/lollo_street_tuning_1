@@ -4,6 +4,7 @@ stringUtils.arrayHasValue = function(tab, val)
 
     return false
 end
+
 stringUtils.stringSplit = function(testString, separatorString)
     local results = {}
     if testString == nil then return results end

@@ -1,0 +1,458 @@
+local dump = require 'luadump'
+local inspect = require('inspect')
+local vec3 = require 'vec3'
+local transf = require 'transf'
+local arrayUtils = require('arrayUtils')
+local fileUtils = require('fileUtils')
+local pitchUtil = require('pitchUtil')
+local stringUtils = require('stringUtils')
+
+function data()
+    local _distances = {}
+    for i = 0, 11 do -- watch out, the parameters have base 0
+        table.insert(_distances, i)
+    end
+
+    local _parallelisedStreetTypes = {
+        'lollo_medium_1_way_1_lane_street_narrow_sidewalk.lua',
+        'lollo_medium_1_way_1_lane_street.lua'
+    }
+
+    local function _getStreetFilesContents()
+        -- print('LOLLO current path = ')
+        -- dump(true)(fileUtils.getCurrentPath())
+        -- print('LOLLO package paths = ')
+        -- dump(true)(fileUtils.getPackagePaths())
+        -- print('LOLLO package cpaths = ')
+        -- dump(true)(fileUtils.getPackageCpaths())
+        -- print('LOLLO package.loaded = ')
+        -- --dump(true)(package.loaded) huge
+        -- for key, value in pairs(package.loaded) do
+        --     print(key, value)
+        -- end
+
+        -- this works
+        local results = {}
+        local currPath = fileUtils.getCurrentPath()
+        print('LOLLO currPath is')
+        dump(true)(currPath)
+        if not stringUtils.isNullOrEmptyString(currPath) then
+            local resDir = fileUtils.getResDirFromPath(currPath)
+            print('LOLLO resDir is')
+            dump(true)(resDir)
+            if not stringUtils.isNullOrEmptyString(resDir) then
+                local streetDir = resDir .. '/config/street'
+                print('LOLLO streetDir is')
+                dump(true)(streetDir)
+                --streetDir = "C:/Program Files (x86)/Steam/userdata/71590188/1066780/local/staging_area/lollo_street_tuning_1/res/config/street"
+                if not stringUtils.isNullOrEmptyString(streetDir) then
+                    local streetFiles = fileUtils.getFilesInDirWithExtension(streetDir, 'lua')
+                    print('LOLLO streetfiles are')
+                    dump(true)(streetFiles)
+                    if type(streetFiles) == 'table' then
+                        for i = 1, #streetFiles do
+                            local isOk, fileData = fileUtils.readGameDataFile(streetFiles[i])
+                            if isOk then
+                                table.insert(
+                                    results,
+                                    #results + 1,
+                                    {
+                                        type = fileData.type,
+                                        name = fileData.name,
+                                        streetWidth = fileData.streetWidth,
+                                        sidewalkWidth = fileData.sidewalkWidth
+                                    }
+                                )
+                            end
+                        end
+                        for i = 1, #results do
+                            dump(true)(results[i])
+                        end
+                    end
+                end
+            end
+        end
+
+        return results
+
+        -- LOLLO NOTE very useful to see what is going on
+        -- print('LOLLO debug.getregistry() = ')
+        -- print(inspect(debug.getregistry()))
+
+        -- LOLLO NOTE you can save the global var in game or in _G
+        -- print('LOLLO game.config = ')
+        -- -- dump(true)(game)
+        -- for key, value in pairs(game.config) do
+        --     print(key, value)
+        -- end
+        -- print('LOLLO game.res = ')
+        -- for key, value in pairs(game.res) do
+        --     print(key, value)
+        -- end
+        -- this fails coz game.interface is not on this thread
+        -- local func = function()
+        --     return game.interface.findPath('lollo_medium_4_lane_street')
+        -- end
+        -- local ok, fc = pcall(func)
+        -- if ok then
+        --     print('LOLLO test 4 findPath succeeded')
+        --     dump(true)(fc)
+        --     dump(true)(fc())
+        -- else
+        --     print('Execution error:', fc)
+        -- end
+
+        -- You can change package.path (not with ?.lua but with the whole file name) and then require a street file,
+        -- but the required file does not return anything,
+        -- because this is how street files are designed. So I need to read the file and parse it somehow.
+        -- local modPath
+        -- if string.ends(info.source, 'mod.lua') then
+        --     modPath = string.gsub(info.source, "@(.*/)mod[.]lua", "%1")
+        -- elseif string.ends(info.source, '.mdl') then
+        --     modPath = string.gsub(info.source, "@(.*/)res/models/model/.+[.]mdl", "%1")
+        -- elseif string.ends(info.source, '.lua') then
+        --     modPath = string.gsub(info.source, "@(.*/)res/config/street/.+[.]lua", "%1")
+        -- end
+    end
+
+    local function _getStreetData(streetData)
+        local results = {}
+        for _, val1 in pairs(streetData) do
+            for _, val2 in pairs(_parallelisedStreetTypes) do
+                print('val1 = ')
+                dump(true)(val1)
+                print('val2 = ')
+                dump(true)(val2)
+                if val1.type == val2 then
+                    table.insert(results, #results + 1, val1)
+                end
+            end
+        end
+
+        if #results > 0 then
+            return results
+        else
+            -- provide a default value coz the game will dump if it finds no parameter values
+            return {
+                {
+                    name = 'Medium 1-way street with 1 lane',
+                    sidewalkWidth = 2,
+                    streetWidth = 4,
+                    type = 'lollo_medium_1_way_1_lane_street.lua'
+                },
+                {
+                    name = 'Medium 1-way street with 1 lane and extra narrow pavement',
+                    sidewalkWidth = 0.8,
+                    streetWidth = 2.4,
+                    type = 'lollo_medium_1_way_1_lane_street_narrow_sidewalk.lua'
+                }
+            }
+        end
+    end
+
+    local function _makeEdges(params, node0, node1, tan0, tan1)
+        -- return params.direction == 0 and
+        --     {
+        --         -- one entry refers to a position and a tangent
+        --         {pitchUtil.getXYZPitched(params.pitch, {-6, -3, .0}), {1, .0, .0}}, -- node 0
+        --         {pitchUtil.getXYZPitched(params.pitch, {-2, -3, .0}), {1, .0, .0}} -- node 1
+        --     } or
+        --     {
+        --         {pitchUtil.getXYZPitched(params.pitch, {-2, -3, .0}), {-1, .0, .0}}, -- node 0
+        --         {pitchUtil.getXYZPitched(params.pitch, {-6, -3, .0}), {-1, .0, .0}} -- node 1
+        --     }
+        return params.direction == 0 and
+            {
+                -- one entry refers to a position and a tangent
+                {pitchUtil.getXYZPitched(params.pitch, node0), tan0}, -- node 0
+                {pitchUtil.getXYZPitched(params.pitch, node1), tan1} -- node 1
+            } or
+            {
+                {pitchUtil.getXYZPitched(params.pitch, node1), {-tan1[1], -tan1[2], -tan1[3]}}, -- node 0
+                {pitchUtil.getXYZPitched(params.pitch, node0), {-tan0[1], -tan0[2], -tan0[3]}} -- node 1
+            }
+    end
+
+    if game._lolloStreetData == nil then
+        print('LOLLO reading street data')
+        game._lolloStreetData = _getStreetData(_getStreetFilesContents())
+        print('LOLLO street data = ')
+        dump(true)(game._lolloStreetData)
+    end
+
+    return {
+        type = 'STREET_CONSTRUCTION',
+        description = {
+            name = _('Parallel streets'),
+            description = _('Lays two parallel chunks of street.')
+        },
+        availability = {
+            yearFrom = 1925,
+            yearTo = 0
+        },
+        params = {
+            {
+                key = 'streetType_',
+                name = _('Street type'),
+                --values = {_('Narrow pavement'), _('Medium pavement')},
+                values = arrayUtils.map(
+                    game._lolloStreetData,
+                    function(str)
+                        return str.name
+                    end
+                ),
+                defaultIndex = 0
+                -- yearFrom = 1925,
+                -- yearTo = 0
+            },
+            {
+                key = 'howManyStreets',
+                name = _('Number of streets'),
+                values = {_('1'), _('2'), _('3'), _('4')},
+                defaultIndex = 1
+                -- yearFrom = 1925,
+                -- yearTo = 0
+            },
+            {
+                key = 'distance',
+                name = _('Distance'),
+                -- values = {_('0m'), _('1m'), _('2m'), _('3m'), _('4m')},
+                values = arrayUtils.map(
+                    _distances,
+                    function(dis)
+                        return tostring(dis) .. 'm'
+                    end
+                ),
+                defaultIndex = 0
+            },
+            {
+                key = 'direction',
+                name = _('Direction'),
+                values = {
+                    _('↑'),
+                    _('↓')
+                },
+                defaultIndex = 0
+            },
+            {
+                key = 'tramTrack',
+                name = _('Tram track type'),
+                values = {
+                    -- must be in this sequence
+                    _('NO'),
+                    _('YES'),
+                    _('ELECTRIC')
+                },
+                defaultIndex = 2
+            },
+            {
+                key = 'snapNodes',
+                name = _('Snap to neighbours'),
+                values = {
+                    _('No'),
+                    _('Yes')
+                },
+                defaultIndex = 0
+            },
+            {
+                key = 'pitch',
+                name = _('Pitch (you can adjust it with arrow keys)'),
+                values = pitchUtil.getPitchParamValues(),
+                defaultIndex = pitchUtil.getDefaultPitchParamValue(),
+                uiType = 'SLIDER'
+            }
+        },
+        order = 1,
+        -- collider = {
+        --     type = 'NONE'
+        -- },
+        -- autoRemovable = true,
+        --skipCollision = true,
+        --skipCollisionCheck = true,
+        updateFn = function(params)
+            params.pitch = params.pitch - pitchUtil.getMiddlePitchParamValue()
+
+            local streetData = game._lolloStreetData[params.streetType_ + 1]
+            local streetType = streetData.type
+
+            print('LOLLO parallel streets updateFn')
+            -- dump(true)(params)
+
+            local result = {}
+            result.cost = 0
+            result.groundFaces = {}
+            --result.colliders = {}
+            result.models = {}
+
+            local tramTrackType = params.tramTrack and (({'NO', 'YES', 'ELECTRIC'})[params.tramTrack + 1]) or 'NO'
+            if params.howManyStreets == 0 then -- 1 street
+                -- local streetFullWidth = streetData.sidewalkWidth + streetData.sidewalkWidth + streetData.streetWidth
+                local streetHalfWidth = streetData.sidewalkWidth + streetData.streetWidth / 2.0
+                result.edgeLists = {
+                    {
+                        type = 'STREET',
+                        params = {
+                            -- skipCollision = true,
+                            -- skipCollisionCheck = true,
+                            type = streetType,
+                            tramTrackType = tramTrackType
+                        },
+                        edges = _makeEdges(params, {-streetHalfWidth, 0, 0}, {streetHalfWidth, 0, 0}, {1, 0, 0}, {1, 0, 0}),
+                        -- edgeType = "BRIDGE",
+                        -- edgeTypeName = "cement.lua",
+                        freeNodes = {0, 1},
+                        --freeNodes = { 1 },
+                        -- freeNodes = {},
+                        -- collider = {
+                        --     type = 'NONE'
+                        -- },
+                        -- autoRemovable = true,
+                        --skipCollision = true, --useless
+                        --skipCollisionCheck = true, --useless
+                        --					snapNodes = { 0 },  -- node 0 is allowed to snap to other edges of the same type --crashes
+                        snapNodes = {0, 1}, -- node 1 is allowed to snap to other edges of the same type
+                        snapNodes = {0},
+                        snapNodes = {}
+                        --					snapNodes = { 0, 1 },  -- node 0 and 1 are allowed to snap to other edges of the same type --crashes
+                        --					tag2nodes = {},
+                    }
+                }
+            elseif params.howManyStreets == 1 then -- 2 streets
+                local streetHalfWidth = streetData.sidewalkWidth + streetData.streetWidth / 2.0
+                local halfDistance = params.distance / 2.0
+                result.edgeLists = {
+                    {
+                        type = 'STREET',
+                        params = {
+                            -- skipCollision = true,
+                            type = streetType,
+                            tramTrackType = tramTrackType
+                        },
+                        edges = _makeEdges(params, {-streetHalfWidth, -streetHalfWidth - halfDistance, 0}, {streetHalfWidth, -streetHalfWidth - halfDistance, 0}, {1, 0, 0}, {1, 0, 0}),
+                        freeNodes = {0, 1},
+                        snapNodes = {}
+                    },
+                    {
+                        type = 'STREET',
+                        params = {
+                            -- skipCollision = true,
+                            type = streetType,
+                            tramTrackType = tramTrackType
+                        },
+                        edges = _makeEdges(params, {-streetHalfWidth, streetHalfWidth + halfDistance, 0}, {streetHalfWidth, streetHalfWidth + halfDistance, 0}, {1, 0, 0}, {1, 0, 0}),
+                        freeNodes = {0, 1},
+                        snapNodes = {}
+                    }
+                }
+            elseif params.howManyStreets == 2 then -- 3 streets
+                local streetHalfWidth = streetData.sidewalkWidth + streetData.streetWidth / 2.0
+                local streetFullWidth = streetData.sidewalkWidth + streetData.sidewalkWidth + streetData.streetWidth
+                local distance = params.distance
+                result.edgeLists = {
+                    {
+                        type = 'STREET',
+                        params = {
+                            -- skipCollision = true,
+                            type = streetType,
+                            tramTrackType = tramTrackType
+                        },
+                        edges = _makeEdges(params, {-streetHalfWidth, -streetFullWidth - distance, 0}, {streetHalfWidth, -streetFullWidth - distance, 0}, {1, 0, 0}, {1, 0, 0}),
+                        freeNodes = {0, 1},
+                        snapNodes = {}
+                    },
+                    {
+                        type = 'STREET',
+                        params = {
+                            -- skipCollision = true,
+                            type = streetType,
+                            tramTrackType = tramTrackType
+                        },
+                        edges = _makeEdges(params, {-streetHalfWidth, 0, 0}, {streetHalfWidth, 0, 0}, {1, 0, 0}, {1, 0, 0}),
+                        freeNodes = {0, 1},
+                        snapNodes = {}
+                    },
+                    {
+                        type = 'STREET',
+                        params = {
+                            -- skipCollision = true,
+                            type = streetType,
+                            tramTrackType = tramTrackType
+                        },
+                        edges = _makeEdges(params, {-streetHalfWidth, streetFullWidth + distance, 0}, {streetHalfWidth, streetFullWidth + distance, 0}, {1, 0, 0}, {1, 0, 0}),
+                        freeNodes = {0, 1},
+                        snapNodes = {}
+                    }
+                }
+            else --if params.howManyStreets == 3 then -- 4 streets -- always provide a fallback just in case
+                local streetHalfWidth = streetData.sidewalkWidth + streetData.streetWidth / 2.0
+                local streetThreeHalfWidth = 3.0 * streetHalfWidth
+                local halfDistance = params.distance / 2.0
+                local threeHalfDistance = 3.0 * halfDistance
+                result.edgeLists = {
+                    {
+                        type = 'STREET',
+                        params = {
+                            -- skipCollision = true,
+                            type = streetType,
+                            tramTrackType = tramTrackType
+                        },
+                        edges = _makeEdges(
+                            params,
+                            {-streetHalfWidth, -streetThreeHalfWidth - threeHalfDistance, 0},
+                            {streetHalfWidth, -streetThreeHalfWidth - threeHalfDistance, 0},
+                            {1, 0, 0},
+                            {1, 0, 0}
+                        ),
+                        freeNodes = {0, 1},
+                        snapNodes = {}
+                    },
+                    {
+                        type = 'STREET',
+                        params = {
+                            -- skipCollision = true,
+                            type = streetType,
+                            tramTrackType = tramTrackType
+                        },
+                        edges = _makeEdges(params, {-streetHalfWidth, -streetHalfWidth - halfDistance, 0}, {streetHalfWidth, -streetHalfWidth - halfDistance, 0}, {1, 0, 0}, {1, 0, 0}),
+                        freeNodes = {0, 1},
+                        snapNodes = {}
+                    },
+                    {
+                        type = 'STREET',
+                        params = {
+                            -- skipCollision = true,
+                            type = streetType,
+                            tramTrackType = tramTrackType
+                        },
+                        edges = _makeEdges(params, {-streetHalfWidth, streetHalfWidth + halfDistance, 0}, {streetHalfWidth, streetHalfWidth + halfDistance, 0}, {1, 0, 0}, {1, 0, 0}),
+                        freeNodes = {0, 1},
+                        snapNodes = {}
+                    },
+                    {
+                        type = 'STREET',
+                        params = {
+                            -- skipCollision = true,
+                            type = streetType,
+                            tramTrackType = tramTrackType
+                        },
+                        edges = _makeEdges(
+                            params,
+                            {-streetHalfWidth, streetThreeHalfWidth + threeHalfDistance, 0},
+                            {streetHalfWidth, streetThreeHalfWidth + threeHalfDistance, 0},
+                            {1, 0, 0},
+                            {1, 0, 0}
+                        ),
+                        freeNodes = {0, 1},
+                        snapNodes = {}
+                    }
+                }
+            end
+
+            return result
+        end,
+        upgradeFn = function(params)
+            -- print('LOLLO parallel streets upgradeFn')
+            -- dump(true)(params)
+        end
+    }
+end
