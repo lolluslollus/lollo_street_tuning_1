@@ -1,6 +1,8 @@
 local pitchUtil = {}
-local _maxAngleAbs = 0.36
-local _pitchAdjustmentFactor = 0.004
+
+local _maxPitch4Slider = 100 -- I need a high value coz the arrow key bumps it by 10 at every click
+local _maxAngleAbs = 0.36 -- More or less where the game starts complaining coz there is too much slope
+local _pitchAdjustmentFactor = _maxAngleAbs / _maxPitch4Slider
 
 local _getPitchAdjusted = function(pitch)
     return math.max(math.min(pitch * _pitchAdjustmentFactor, _maxAngleAbs), -_maxAngleAbs)
@@ -33,7 +35,6 @@ pitchUtil.getIdTransfPitched = function(pitch)
     return result
 end
 
-local _maxPitch4Slider = 100 -- I need a high value coz the arrow key bumps it by 10 at every click
 pitchUtil.getPitchParamValues = function()
     local result = {}
     for i = -_maxPitch4Slider, _maxPitch4Slider do

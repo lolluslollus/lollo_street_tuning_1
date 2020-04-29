@@ -1,6 +1,6 @@
 --local dump = require 'luadump'
 --local inspect = require('inspect')
-local stringUtils = require('lolloStringUtils')
+local stringUtils = require('lollo_street_tuning/lolloStringUtils')
 
 local fileUtils = {}
 fileUtils.fileExists = function(filePath)

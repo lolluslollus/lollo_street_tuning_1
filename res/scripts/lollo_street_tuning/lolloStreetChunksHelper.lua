@@ -2,10 +2,10 @@ local dump = require 'luadump'
 local inspect = require('inspect')
 local vec3 = require 'vec3'
 local transf = require 'transf'
-local arrayUtils = require('lolloArrayUtils')
-local fileUtils = require('lolloFileUtils')
-local pitchUtil = require('lolloPitchUtil')
-local stringUtils = require('lolloStringUtils')
+local arrayUtils = require('lollo_street_tuning/lolloArrayUtils')
+local fileUtils = require('lollo_street_tuning/lolloFileUtils')
+local pitchUtil = require('lollo_street_tuning/lolloPitchUtil')
+local stringUtils = require('lollo_street_tuning/lolloStringUtils')
 
 local helper = {}
 

@@ -1,5 +1,5 @@
 -- local dump = require('luadump')
--- local stringUtils = require('lolloStringUtils')
+-- local stringUtils = require('lollo_street_tuning/lolloStringUtils')
 
 local function isBuildingStreetSplitter(param)
     local toAdd =

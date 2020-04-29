@@ -2,11 +2,11 @@ local dump = require 'luadump'
 local inspect = require('inspect')
 local vec3 = require 'vec3'
 local transf = require 'transf'
-local arrayUtils = require('lolloArrayUtils')
-local fileUtils = require('lolloFileUtils')
-local streetChunksHelper = require('lolloStreetChunksHelper')
-local pitchUtil = require('lolloPitchUtil')
-local stringUtils = require('lolloStringUtils')
+local arrayUtils = require('lollo_street_tuning/lolloArrayUtils')
+local fileUtils = require('lollo_street_tuning/lolloFileUtils')
+local streetChunksHelper = require('lollo_street_tuning/lolloStreetChunksHelper')
+local pitchUtil = require('lollo_street_tuning/lolloPitchUtil')
+local stringUtils = require('lollo_street_tuning/lolloStringUtils')
 function data()
     -- local _chunkedStreetTypes = {
     --     'lollo_medium_1_way_1_lane_street_narrow_sidewalk.lua',
