@@ -679,7 +679,7 @@ function data()
         --         yearTo = 0
         --     },
         -- },
-        order = 1,
+        order = 1241,
         params = {
             {
                 key = 'mergingType',
