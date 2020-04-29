@@ -155,7 +155,7 @@ local function _getStreetDataFiltered(streetData) --, chunkedStreetTypes)
         -- end
         -- print('LOLLO val1 = ')
         -- dump(true)(val1)
-        if arrayUtils.arrayHasValue(val1.categories, 'one-way') then
+        if arrayUtils.arrayHasValue(val1.categories, 'one-way') or arrayUtils.arrayHasValue(val1.categories, 'highway') then
             table.insert(results, #results + 1, val1)
         end
     end
