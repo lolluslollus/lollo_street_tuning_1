@@ -6,10 +6,10 @@
             {forward = true},
             --		{forward = true },
             --		{forward = true, },
-            {forward = true},
+            {forward = false},
             {forward = false}
         },
-        transportModesStreet = {'CAR', 'BUS', 'ELECTRIC_TRAM', 'TRAM', 'TRUCK'}, -- with this, tram tracks appear on all lanes, not only on the right one
+        --transportModesStreet = {'CAR', 'BUS', 'ELECTRIC_TRAM', 'TRAM', 'TRUCK'}, -- with this, tram tracks appear on all lanes, not only on the right one
         --transportModesSidewalk = { "PERSON", "TRUCK" }, --crashes
         --transportModesSidewalk = { "PERSON" }, --crashes
         streetWidth = 12.0,
@@ -21,10 +21,10 @@
         country = false,
         speed = 50.0,
         -- priority = this crashes 4, -- LOLLO NOTE this is copied from airports, it should give priority to this street
-        type = 'lollo_medium_1_way_2_lane_2_tram_tracks_medium_sidewalk_street.lua',
-        name = _('Medium 1-way street with 2 lanes, 2 tram tracks and 2m pavement'),
-        desc = _('Medium 1-way street with 2 lanes, each with a tram track. The pavement is 2m wide. Speed limit is %2%.'),
-        categories = {'one-way'},
+        type = 'lollo_medium_2_lane_medium_sidewalk_street.lua',
+        name = _('Medium street with 2 lanes and 2m pavement'),
+        desc = _('Medium street with 2 lanes. The pavement is 2m wide. Speed limit is %2%.'),
+        categories = {'urban'},
         borderGroundTex = 'street_border.lua',
         materials = {
             streetPaving = {
