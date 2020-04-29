@@ -11,7 +11,7 @@ local helper = {}
 
 -- --------------- parameters ------------------------
 local _distances = {}
-for i = 0, 11 do -- watch out, the parameters have base 0
+for i = 0, 12 do -- watch out, the parameters have base 0
     table.insert(_distances, i)
 end
 
@@ -124,7 +124,7 @@ local function _getStreetFilesContents()
     -- end
 end
 
-local function _getStreetData(streetData, parallelisedStreetTypes)
+local function _getStreetData(streetData) --, parallelisedStreetTypes)
     local results = {}
     for _, val1 in pairs(streetData) do
         -- for _, val2 in pairs(parallelisedStreetTypes) do
@@ -163,10 +163,10 @@ helper.getGlobalStreetData = function(game)
     return game._lolloStreetData
 end
 
-helper.setGlobalStreetData = function(game, parallelisedStreetTypes)
+helper.setGlobalStreetData = function(game) --, parallelisedStreetTypes)
     if game._lolloStreetData == nil then
         print('LOLLO parallel streets reading street data')
-        game._lolloStreetData = _getStreetData(_getStreetFilesContents(), parallelisedStreetTypes)
+        game._lolloStreetData = _getStreetData(_getStreetFilesContents()) --, parallelisedStreetTypes)
         print('LOLLO parallel streets has read street data')
     -- print('LOLLO street data = ')
     -- dump(true)(game._lolloStreetData)

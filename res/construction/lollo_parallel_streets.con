@@ -8,10 +8,10 @@ local parallelStreetHelper = require('parallelStreetHelper')
 local pitchUtil = require('pitchUtil')
 local stringUtils = require('stringUtils')
 function data()
-    local _parallelisedStreetTypes = {
-        'lollo_medium_1_way_1_lane_street_narrow_sidewalk.lua',
-        'lollo_medium_1_way_1_lane_street.lua'
-    }
+    -- local _parallelisedStreetTypes = {
+    --     'lollo_medium_1_way_1_lane_street_narrow_sidewalk.lua',
+    --     'lollo_medium_1_way_1_lane_street.lua'
+    -- }
     local function _getNonSnapEdgeLists(params, pitch, streetData, tramTrackType)
         local edgeLists
         if params.howManyStreetsBase0 == 0 then -- 1 street
@@ -25,8 +25,8 @@ function data()
                         type = streetData.type,
                         tramTrackType = tramTrackType
                     },
-                    edges = parallelStreetHelper.makeEdges(direction, pitch, node0, node1, tan0, tan1)(
-                        params.directionOne,
+                    edges = parallelStreetHelper.makeEdges(
+                        params.direction,
                         pitch,
                         {-streetHalfWidth, 0, 0},
                         {streetHalfWidth, 0, 0},
@@ -60,7 +60,7 @@ function data()
                         tramTrackType = tramTrackType
                     },
                     edges = parallelStreetHelper.makeEdges(
-                        params.directionOne,
+                        params.direction,
                         pitch,
                         {-streetHalfWidth, -streetHalfWidth - halfDistance, 0},
                         {streetHalfWidth, -streetHalfWidth - halfDistance, 0},
@@ -78,7 +78,7 @@ function data()
                         tramTrackType = tramTrackType
                     },
                     edges = parallelStreetHelper.makeEdges(
-                        params.directionTwo,
+                        params.direction,
                         pitch,
                         {-streetHalfWidth, streetHalfWidth + halfDistance, 0},
                         {streetHalfWidth, streetHalfWidth + halfDistance, 0},
@@ -102,7 +102,7 @@ function data()
                         tramTrackType = tramTrackType
                     },
                     edges = parallelStreetHelper.makeEdges(
-                        params.directionOne,
+                        params.direction,
                         pitch,
                         {-streetHalfWidth, -streetFullWidth - distance, 0},
                         {streetHalfWidth, -streetFullWidth - distance, 0},
@@ -119,7 +119,7 @@ function data()
                         type = streetData.type,
                         tramTrackType = tramTrackType
                     },
-                    edges = parallelStreetHelper.makeEdges(params.directionTwo, pitch, {-streetHalfWidth, 0, 0}, {streetHalfWidth, 0, 0}, {1, 0, 0}, {1, 0, 0}),
+                    edges = parallelStreetHelper.makeEdges(params.direction, pitch, {-streetHalfWidth, 0, 0}, {streetHalfWidth, 0, 0}, {1, 0, 0}, {1, 0, 0}),
                     freeNodes = {0, 1},
                     snapNodes = {}
                 },
@@ -131,7 +131,7 @@ function data()
                         tramTrackType = tramTrackType
                     },
                     edges = parallelStreetHelper.makeEdges(
-                        params.directionThree,
+                        params.direction,
                         pitch,
                         {-streetHalfWidth, streetFullWidth + distance, 0},
                         {streetHalfWidth, streetFullWidth + distance, 0},
@@ -156,7 +156,7 @@ function data()
                         tramTrackType = tramTrackType
                     },
                     edges = parallelStreetHelper.makeEdges(
-                        params.directionOne,
+                        params.direction,
                         pitch,
                         {-streetHalfWidth, -streetThreeHalfWidth - threeHalfDistance, 0},
                         {streetHalfWidth, -streetThreeHalfWidth - threeHalfDistance, 0},
@@ -174,7 +174,7 @@ function data()
                         tramTrackType = tramTrackType
                     },
                     edges = parallelStreetHelper.makeEdges(
-                        params.directionTwo,
+                        params.direction,
                         pitch,
                         {-streetHalfWidth, -streetHalfWidth - halfDistance, 0},
                         {streetHalfWidth, -streetHalfWidth - halfDistance, 0},
@@ -192,7 +192,7 @@ function data()
                         tramTrackType = tramTrackType
                     },
                     edges = parallelStreetHelper.makeEdges(
-                        params.directionThree,
+                        params.direction,
                         pitch,
                         {-streetHalfWidth, streetHalfWidth + halfDistance, 0},
                         {streetHalfWidth, streetHalfWidth + halfDistance, 0},
@@ -210,7 +210,7 @@ function data()
                         tramTrackType = tramTrackType
                     },
                     edges = parallelStreetHelper.makeEdges(
-                        params.directionFour,
+                        params.direction,
                         pitch,
                         {-streetHalfWidth, streetThreeHalfWidth + threeHalfDistance, 0},
                         {streetHalfWidth, streetThreeHalfWidth + threeHalfDistance, 0},
@@ -238,7 +238,7 @@ function data()
                         type = streetData.type,
                         tramTrackType = tramTrackType
                     },
-                    edges = parallelStreetHelper.makeEdges(params.directionOne, pitch, {-streetHalfWidth, 0, 0}, {0, 0, 0}, {1, 0, 0}, {1, 0, 0}),
+                    edges = parallelStreetHelper.makeEdges(params.direction, pitch, {-streetHalfWidth, 0, 0}, {0, 0, 0}, {1, 0, 0}, {1, 0, 0}),
                     -- edgeType = "BRIDGE",
                     -- edgeTypeName = "cement.lua",
                     -- collider = {
@@ -248,9 +248,9 @@ function data()
                     --skipCollision = true, --useless
                     --skipCollisionCheck = true, --useless
                     -- nodes that stick out of the construction
-                    freeNodes = params.directionOne == 0 and {0} or {1},
+                    freeNodes = params.direction == 0 and {0} or {1},
                     -- nodes allowed to snap to other edges of the same type
-                    snapNodes = params.directionOne == 0 and {0} or {1}
+                    snapNodes = params.direction == 0 and {0} or {1}
                     --					snapNodes = { 0, 1 },  -- node 0 and 1 are allowed to snap to other edges of the same type --crashes
                     --					tag2nodes = {},
                 },
@@ -262,9 +262,9 @@ function data()
                         type = streetData.type,
                         tramTrackType = tramTrackType
                     },
-                    edges = parallelStreetHelper.makeEdges(params.directionOne, pitch, {0, 0, 0}, {streetHalfWidth, 0, 0}, {1, 0, 0}, {1, 0, 0}),
-                    freeNodes = params.directionOne == 0 and {1} or {0},
-                    snapNodes = params.directionOne == 0 and {1} or {0}
+                    edges = parallelStreetHelper.makeEdges(params.direction, pitch, {0, 0, 0}, {streetHalfWidth, 0, 0}, {1, 0, 0}, {1, 0, 0}),
+                    freeNodes = params.direction == 0 and {1} or {0},
+                    snapNodes = params.direction == 0 and {1} or {0}
                 }
             }
         elseif params.howManyStreetsBase0 == 1 then -- 2 streets
@@ -279,15 +279,15 @@ function data()
                         tramTrackType = tramTrackType
                     },
                     edges = parallelStreetHelper.makeEdges(
-                        params.directionOne,
+                        params.direction,
                         pitch,
                         {-streetHalfWidth, -streetHalfWidth - halfDistance, 0},
                         {0, -streetHalfWidth - halfDistance, 0},
                         {1, 0, 0},
                         {1, 0, 0}
                     ),
-                    freeNodes = params.directionOne == 0 and {0} or {1},
-                    snapNodes = params.directionOne == 0 and {0} or {1}
+                    freeNodes = params.direction == 0 and {0} or {1},
+                    snapNodes = params.direction == 0 and {0} or {1}
                 },
                 {
                     type = 'STREET',
@@ -297,15 +297,15 @@ function data()
                         tramTrackType = tramTrackType
                     },
                     edges = parallelStreetHelper.makeEdges(
-                        params.directionTwo,
+                        params.direction,
                         pitch,
                         {-streetHalfWidth, streetHalfWidth + halfDistance, 0},
                         {0, streetHalfWidth + halfDistance, 0},
                         {1, 0, 0},
                         {1, 0, 0}
                     ),
-                    freeNodes = params.directionTwo == 0 and {0} or {1},
-                    snapNodes = params.directionTwo == 0 and {0} or {1}
+                    freeNodes = params.direction == 0 and {0} or {1},
+                    snapNodes = params.direction == 0 and {0} or {1}
                 },
                 {
                     type = 'STREET',
@@ -315,15 +315,15 @@ function data()
                         tramTrackType = tramTrackType
                     },
                     edges = parallelStreetHelper.makeEdges(
-                        params.directionOne,
+                        params.direction,
                         pitch,
                         {0, -streetHalfWidth - halfDistance, 0},
                         {streetHalfWidth, -streetHalfWidth - halfDistance, 0},
                         {1, 0, 0},
                         {1, 0, 0}
                     ),
-                    freeNodes = params.directionOne == 0 and {1} or {0},
-                    snapNodes = params.directionOne == 0 and {1} or {0}
+                    freeNodes = params.direction == 0 and {1} or {0},
+                    snapNodes = params.direction == 0 and {1} or {0}
                 },
                 {
                     type = 'STREET',
@@ -333,15 +333,15 @@ function data()
                         tramTrackType = tramTrackType
                     },
                     edges = parallelStreetHelper.makeEdges(
-                        params.directionTwo,
+                        params.direction,
                         pitch,
                         {0, streetHalfWidth + halfDistance, 0},
                         {streetHalfWidth, streetHalfWidth + halfDistance, 0},
                         {1, 0, 0},
                         {1, 0, 0}
                     ),
-                    freeNodes = params.directionTwo == 0 and {1} or {0},
-                    snapNodes = params.directionTwo == 0 and {1} or {0}
+                    freeNodes = params.direction == 0 and {1} or {0},
+                    snapNodes = params.direction == 0 and {1} or {0}
                 }
             }
         elseif params.howManyStreetsBase0 == 2 then -- 3 streets
@@ -356,9 +356,9 @@ function data()
                         type = streetData.type,
                         tramTrackType = tramTrackType
                     },
-                    edges = parallelStreetHelper.makeEdges(params.directionOne, pitch, {-streetHalfWidth, -streetFullWidth - distance, 0}, {0, -streetFullWidth - distance, 0}, {1, 0, 0}, {1, 0, 0}),
-                    freeNodes = params.directionOne == 0 and {0} or {1},
-                    snapNodes = params.directionOne == 0 and {0} or {1}
+                    edges = parallelStreetHelper.makeEdges(params.direction, pitch, {-streetHalfWidth, -streetFullWidth - distance, 0}, {0, -streetFullWidth - distance, 0}, {1, 0, 0}, {1, 0, 0}),
+                    freeNodes = params.direction == 0 and {0} or {1},
+                    snapNodes = params.direction == 0 and {0} or {1}
                 },
                 {
                     type = 'STREET',
@@ -367,9 +367,9 @@ function data()
                         type = streetData.type,
                         tramTrackType = tramTrackType
                     },
-                    edges = parallelStreetHelper.makeEdges(params.directionTwo, pitch, {-streetHalfWidth, 0, 0}, {0, 0, 0}, {1, 0, 0}, {1, 0, 0}),
-                    freeNodes = params.directionTwo == 0 and {0} or {1},
-                    snapNodes = params.directionTwo == 0 and {0} or {1}
+                    edges = parallelStreetHelper.makeEdges(params.direction, pitch, {-streetHalfWidth, 0, 0}, {0, 0, 0}, {1, 0, 0}, {1, 0, 0}),
+                    freeNodes = params.direction == 0 and {0} or {1},
+                    snapNodes = params.direction == 0 and {0} or {1}
                 },
                 {
                     type = 'STREET',
@@ -378,9 +378,9 @@ function data()
                         type = streetData.type,
                         tramTrackType = tramTrackType
                     },
-                    edges = parallelStreetHelper.makeEdges(params.directionThree, pitch, {-streetHalfWidth, streetFullWidth + distance, 0}, {0, streetFullWidth + distance, 0}, {1, 0, 0}, {1, 0, 0}),
-                    freeNodes = params.directionThree == 0 and {0} or {1},
-                    snapNodes = params.directionThree == 0 and {0} or {1}
+                    edges = parallelStreetHelper.makeEdges(params.direction, pitch, {-streetHalfWidth, streetFullWidth + distance, 0}, {0, streetFullWidth + distance, 0}, {1, 0, 0}, {1, 0, 0}),
+                    freeNodes = params.direction == 0 and {0} or {1},
+                    snapNodes = params.direction == 0 and {0} or {1}
                 },
                 {
                     type = 'STREET',
@@ -389,9 +389,9 @@ function data()
                         type = streetData.type,
                         tramTrackType = tramTrackType
                     },
-                    edges = parallelStreetHelper.makeEdges(params.directionOne, pitch, {0, -streetFullWidth - distance, 0}, {streetHalfWidth, -streetFullWidth - distance, 0}, {1, 0, 0}, {1, 0, 0}),
-                    freeNodes = params.directionOne == 0 and {1} or {0},
-                    snapNodes = params.directionOne == 0 and {1} or {0}
+                    edges = parallelStreetHelper.makeEdges(params.direction, pitch, {0, -streetFullWidth - distance, 0}, {streetHalfWidth, -streetFullWidth - distance, 0}, {1, 0, 0}, {1, 0, 0}),
+                    freeNodes = params.direction == 0 and {1} or {0},
+                    snapNodes = params.direction == 0 and {1} or {0}
                 },
                 {
                     type = 'STREET',
@@ -400,9 +400,9 @@ function data()
                         type = streetData.type,
                         tramTrackType = tramTrackType
                     },
-                    edges = parallelStreetHelper.makeEdges(params.directionTwo, pitch, {0, 0, 0}, {streetHalfWidth, 0, 0}, {1, 0, 0}, {1, 0, 0}),
-                    freeNodes = params.directionTwo == 0 and {1} or {0},
-                    snapNodes = params.directionTwo == 0 and {1} or {0}
+                    edges = parallelStreetHelper.makeEdges(params.direction, pitch, {0, 0, 0}, {streetHalfWidth, 0, 0}, {1, 0, 0}, {1, 0, 0}),
+                    freeNodes = params.direction == 0 and {1} or {0},
+                    snapNodes = params.direction == 0 and {1} or {0}
                 },
                 {
                     type = 'STREET',
@@ -411,9 +411,9 @@ function data()
                         type = streetData.type,
                         tramTrackType = tramTrackType
                     },
-                    edges = parallelStreetHelper.makeEdges(params.directionThree, pitch, {0, streetFullWidth + distance, 0}, {streetHalfWidth, streetFullWidth + distance, 0}, {1, 0, 0}, {1, 0, 0}),
-                    freeNodes = params.directionThree == 0 and {1} or {0},
-                    snapNodes = params.directionThree == 0 and {1} or {0}
+                    edges = parallelStreetHelper.makeEdges(params.direction, pitch, {0, streetFullWidth + distance, 0}, {streetHalfWidth, streetFullWidth + distance, 0}, {1, 0, 0}, {1, 0, 0}),
+                    freeNodes = params.direction == 0 and {1} or {0},
+                    snapNodes = params.direction == 0 and {1} or {0}
                 }
             }
         else --if params.howManyStreetsBase0 == 3 then -- 4 streets -- always provide a fallback just in case
@@ -430,15 +430,15 @@ function data()
                         tramTrackType = tramTrackType
                     },
                     edges = parallelStreetHelper.makeEdges(
-                        params.directionOne,
+                        params.direction,
                         pitch,
                         {-streetHalfWidth, -streetThreeHalfWidth - threeHalfDistance, 0},
                         {0, -streetThreeHalfWidth - threeHalfDistance, 0},
                         {1, 0, 0},
                         {1, 0, 0}
                     ),
-                    freeNodes = params.directionOne == 0 and {0} or {1},
-                    snapNodes = params.directionOne == 0 and {0} or {1}
+                    freeNodes = params.direction == 0 and {0} or {1},
+                    snapNodes = params.direction == 0 and {0} or {1}
                 },
                 {
                     type = 'STREET',
@@ -448,15 +448,15 @@ function data()
                         tramTrackType = tramTrackType
                     },
                     edges = parallelStreetHelper.makeEdges(
-                        params.directionTwo,
+                        params.direction,
                         pitch,
                         {-streetHalfWidth, -streetHalfWidth - halfDistance, 0},
                         {0, -streetHalfWidth - halfDistance, 0},
                         {1, 0, 0},
                         {1, 0, 0}
                     ),
-                    freeNodes = params.directionTwo == 0 and {0} or {1},
-                    snapNodes = params.directionTwo == 0 and {0} or {1}
+                    freeNodes = params.direction == 0 and {0} or {1},
+                    snapNodes = params.direction == 0 and {0} or {1}
                 },
                 {
                     type = 'STREET',
@@ -466,15 +466,15 @@ function data()
                         tramTrackType = tramTrackType
                     },
                     edges = parallelStreetHelper.makeEdges(
-                        params.directionThree,
+                        params.direction,
                         pitch,
                         {-streetHalfWidth, streetHalfWidth + halfDistance, 0},
                         {0, streetHalfWidth + halfDistance, 0},
                         {1, 0, 0},
                         {1, 0, 0}
                     ),
-                    freeNodes = params.directionThree == 0 and {0} or {1},
-                    snapNodes = params.directionThree == 0 and {0} or {1}
+                    freeNodes = params.direction == 0 and {0} or {1},
+                    snapNodes = params.direction == 0 and {0} or {1}
                 },
                 {
                     type = 'STREET',
@@ -484,15 +484,15 @@ function data()
                         tramTrackType = tramTrackType
                     },
                     edges = parallelStreetHelper.makeEdges(
-                        params.directionFour,
+                        params.direction,
                         pitch,
                         {-streetHalfWidth, streetThreeHalfWidth + threeHalfDistance, 0},
                         {0, streetThreeHalfWidth + threeHalfDistance, 0},
                         {1, 0, 0},
                         {1, 0, 0}
                     ),
-                    freeNodes = params.directionFour == 0 and {0} or {1},
-                    snapNodes = params.directionFour == 0 and {0} or {1}
+                    freeNodes = params.direction == 0 and {0} or {1},
+                    snapNodes = params.direction == 0 and {0} or {1}
                 },
                 {
                     type = 'STREET',
@@ -502,15 +502,15 @@ function data()
                         tramTrackType = tramTrackType
                     },
                     edges = parallelStreetHelper.makeEdges(
-                        params.directionOne,
+                        params.direction,
                         pitch,
                         {0, -streetThreeHalfWidth - threeHalfDistance, 0},
                         {streetHalfWidth, -streetThreeHalfWidth - threeHalfDistance, 0},
                         {1, 0, 0},
                         {1, 0, 0}
                     ),
-                    freeNodes = params.directionOne == 0 and {1} or {0},
-                    snapNodes = params.directionOne == 0 and {1} or {0}
+                    freeNodes = params.direction == 0 and {1} or {0},
+                    snapNodes = params.direction == 0 and {1} or {0}
                 },
                 {
                     type = 'STREET',
@@ -520,15 +520,15 @@ function data()
                         tramTrackType = tramTrackType
                     },
                     edges = parallelStreetHelper.makeEdges(
-                        params.directionTwo,
+                        params.direction,
                         pitch,
                         {0, -streetHalfWidth - halfDistance, 0},
                         {streetHalfWidth, -streetHalfWidth - halfDistance, 0},
                         {1, 0, 0},
                         {1, 0, 0}
                     ),
-                    freeNodes = params.directionTwo == 0 and {1} or {0},
-                    snapNodes = params.directionTwo == 0 and {1} or {0}
+                    freeNodes = params.direction == 0 and {1} or {0},
+                    snapNodes = params.direction == 0 and {1} or {0}
                 },
                 {
                     type = 'STREET',
@@ -538,15 +538,15 @@ function data()
                         tramTrackType = tramTrackType
                     },
                     edges = parallelStreetHelper.makeEdges(
-                        params.directionThree,
+                        params.direction,
                         pitch,
                         {0, streetHalfWidth + halfDistance, 0},
                         {streetHalfWidth, streetHalfWidth + halfDistance, 0},
                         {1, 0, 0},
                         {1, 0, 0}
                     ),
-                    freeNodes = params.directionThree == 0 and {1} or {0},
-                    snapNodes = params.directionThree == 0 and {1} or {0}
+                    freeNodes = params.direction == 0 and {1} or {0},
+                    snapNodes = params.direction == 0 and {1} or {0}
                 },
                 {
                     type = 'STREET',
@@ -556,15 +556,15 @@ function data()
                         tramTrackType = tramTrackType
                     },
                     edges = parallelStreetHelper.makeEdges(
-                        params.directionFour,
+                        params.direction,
                         pitch,
                         {0, streetThreeHalfWidth + threeHalfDistance, 0},
                         {streetHalfWidth, streetThreeHalfWidth + threeHalfDistance, 0},
                         {1, 0, 0},
                         {1, 0, 0}
                     ),
-                    freeNodes = params.directionFour == 0 and {1} or {0},
-                    snapNodes = params.directionFour == 0 and {1} or {0}
+                    freeNodes = params.direction == 0 and {1} or {0},
+                    snapNodes = params.direction == 0 and {1} or {0}
                 }
             }
         end
@@ -591,7 +591,7 @@ function data()
                         type = streetData.type,
                         tramTrackType = tramTrackType
                     },
-                    edges = parallelStreetHelper.makeEdges(params.directionOne, pitch, {-xMax, 0, 0}, {0, 0, 0}, {1, 0, 0}, {1, 0, 0}),
+                    edges = parallelStreetHelper.makeEdges(params.direction, pitch, {-xMax, 0, 0}, {0, 0, 0}, {1, 0, 0}, {1, 0, 0}),
                     -- edgeType = "BRIDGE",
                     -- edgeTypeName = "cement.lua",
                     -- collider = {
@@ -615,7 +615,7 @@ function data()
                     -- Experiments show that two edges one after the other allow for a shorter crashless construction than one edge only,
                     -- and all nodes being free calls for some extra length,
                     -- while if only the outer nodes are free we can get away with a shorter construction.
-                    snapNodes = params.directionOne == 0 and {0} or {1}
+                    snapNodes = params.direction == 0 and {0} or {1}
                     --					snapNodes = { 0, 1 },  -- node 0 and 1 are allowed to snap to other edges of the same type --crashes
                     --					tag2nodes = {},
                 },
@@ -627,9 +627,9 @@ function data()
                         type = streetData.type,
                         tramTrackType = tramTrackType
                     },
-                    edges = parallelStreetHelper.makeEdges(params.directionOne, pitch, {0, 0, 0}, {xMax, 0, 0}, {1, 0, 0}, {1, 0, 0}),
+                    edges = parallelStreetHelper.makeEdges(params.direction, pitch, {0, 0, 0}, {xMax, 0, 0}, {1, 0, 0}, {1, 0, 0}),
                     freeNodes = {0, 1},
-                    snapNodes = params.directionOne == 0 and {1} or {0}
+                    snapNodes = params.direction == 0 and {1} or {0}
                 }
             }
         elseif params.howManyStreetsBase0 == 1 then -- 2 streets
@@ -641,9 +641,9 @@ function data()
                         type = streetData.type,
                         tramTrackType = tramTrackType
                     },
-                    edges = parallelStreetHelper.makeEdges(params.directionOne, pitch, {-xMax, -streetHalfWidth - halfDistance, 0}, {0, -streetHalfWidth - halfDistance, 0}, {1, 0, 0}, {1, 0, 0}),
+                    edges = parallelStreetHelper.makeEdges(params.direction, pitch, {-xMax, -streetHalfWidth - halfDistance, 0}, {0, -streetHalfWidth - halfDistance, 0}, {1, 0, 0}, {1, 0, 0}),
                     freeNodes = {0, 1},
-                    snapNodes = params.directionOne == 0 and {0} or {1}
+                    snapNodes = params.direction == 0 and {0} or {1}
                 },
                 {
                     type = 'STREET',
@@ -652,9 +652,9 @@ function data()
                         type = streetData.type,
                         tramTrackType = tramTrackType
                     },
-                    edges = parallelStreetHelper.makeEdges(params.directionTwo, pitch, {-xMax, streetHalfWidth + halfDistance, 0}, {0, streetHalfWidth + halfDistance, 0}, {1, 0, 0}, {1, 0, 0}),
+                    edges = parallelStreetHelper.makeEdges(params.direction, pitch, {-xMax, streetHalfWidth + halfDistance, 0}, {0, streetHalfWidth + halfDistance, 0}, {1, 0, 0}, {1, 0, 0}),
                     freeNodes = {0, 1},
-                    snapNodes = params.directionTwo == 0 and {0} or {1}
+                    snapNodes = params.direction == 0 and {0} or {1}
                 },
                 {
                     type = 'STREET',
@@ -663,9 +663,9 @@ function data()
                         type = streetData.type,
                         tramTrackType = tramTrackType
                     },
-                    edges = parallelStreetHelper.makeEdges(params.directionOne, pitch, {0, -streetHalfWidth - halfDistance, 0}, {xMax, -streetHalfWidth - halfDistance, 0}, {1, 0, 0}, {1, 0, 0}),
+                    edges = parallelStreetHelper.makeEdges(params.direction, pitch, {0, -streetHalfWidth - halfDistance, 0}, {xMax, -streetHalfWidth - halfDistance, 0}, {1, 0, 0}, {1, 0, 0}),
                     freeNodes = {0, 1},
-                    snapNodes = params.directionOne == 0 and {1} or {0}
+                    snapNodes = params.direction == 0 and {1} or {0}
                 },
                 {
                     type = 'STREET',
@@ -674,9 +674,9 @@ function data()
                         type = streetData.type,
                         tramTrackType = tramTrackType
                     },
-                    edges = parallelStreetHelper.makeEdges(params.directionTwo, pitch, {0, streetHalfWidth + halfDistance, 0}, {xMax, streetHalfWidth + halfDistance, 0}, {1, 0, 0}, {1, 0, 0}),
+                    edges = parallelStreetHelper.makeEdges(params.direction, pitch, {0, streetHalfWidth + halfDistance, 0}, {xMax, streetHalfWidth + halfDistance, 0}, {1, 0, 0}, {1, 0, 0}),
                     freeNodes = {0, 1},
-                    snapNodes = params.directionTwo == 0 and {1} or {0}
+                    snapNodes = params.direction == 0 and {1} or {0}
                 }
             }
         elseif params.howManyStreetsBase0 == 2 then -- 3 streets
@@ -688,9 +688,9 @@ function data()
                         type = streetData.type,
                         tramTrackType = tramTrackType
                     },
-                    edges = parallelStreetHelper.makeEdges(params.directionOne, pitch, {-xMax, -streetFullWidth - distance, 0}, {0, -streetFullWidth - distance, 0}, {1, 0, 0}, {1, 0, 0}),
+                    edges = parallelStreetHelper.makeEdges(params.direction, pitch, {-xMax, -streetFullWidth - distance, 0}, {0, -streetFullWidth - distance, 0}, {1, 0, 0}, {1, 0, 0}),
                     freeNodes = {0, 1},
-                    snapNodes = params.directionOne == 0 and {0} or {1}
+                    snapNodes = params.direction == 0 and {0} or {1}
                 },
                 {
                     type = 'STREET',
@@ -699,9 +699,9 @@ function data()
                         type = streetData.type,
                         tramTrackType = tramTrackType
                     },
-                    edges = parallelStreetHelper.makeEdges(params.directionTwo, pitch, {-xMax, 0, 0}, {0, 0, 0}, {1, 0, 0}, {1, 0, 0}),
+                    edges = parallelStreetHelper.makeEdges(params.direction, pitch, {-xMax, 0, 0}, {0, 0, 0}, {1, 0, 0}, {1, 0, 0}),
                     freeNodes = {0, 1},
-                    snapNodes = params.directionTwo == 0 and {0} or {1}
+                    snapNodes = params.direction == 0 and {0} or {1}
                 },
                 {
                     type = 'STREET',
@@ -710,9 +710,9 @@ function data()
                         type = streetData.type,
                         tramTrackType = tramTrackType
                     },
-                    edges = parallelStreetHelper.makeEdges(params.directionThree, pitch, {-xMax, streetFullWidth + distance, 0}, {0, streetFullWidth + distance, 0}, {1, 0, 0}, {1, 0, 0}),
+                    edges = parallelStreetHelper.makeEdges(params.direction, pitch, {-xMax, streetFullWidth + distance, 0}, {0, streetFullWidth + distance, 0}, {1, 0, 0}, {1, 0, 0}),
                     freeNodes = {0, 1},
-                    snapNodes = params.directionThree == 0 and {0} or {1}
+                    snapNodes = params.direction == 0 and {0} or {1}
                 },
                 {
                     type = 'STREET',
@@ -721,9 +721,9 @@ function data()
                         type = streetData.type,
                         tramTrackType = tramTrackType
                     },
-                    edges = parallelStreetHelper.makeEdges(params.directionOne, pitch, {0, -streetFullWidth - distance, 0}, {xMax, -streetFullWidth - distance, 0}, {1, 0, 0}, {1, 0, 0}),
+                    edges = parallelStreetHelper.makeEdges(params.direction, pitch, {0, -streetFullWidth - distance, 0}, {xMax, -streetFullWidth - distance, 0}, {1, 0, 0}, {1, 0, 0}),
                     freeNodes = {0, 1},
-                    snapNodes = params.directionOne == 0 and {1} or {0}
+                    snapNodes = params.direction == 0 and {1} or {0}
                 },
                 {
                     type = 'STREET',
@@ -732,9 +732,9 @@ function data()
                         type = streetData.type,
                         tramTrackType = tramTrackType
                     },
-                    edges = parallelStreetHelper.makeEdges(params.directionTwo, pitch, {0, 0, 0}, {xMax, 0, 0}, {1, 0, 0}, {1, 0, 0}),
+                    edges = parallelStreetHelper.makeEdges(params.direction, pitch, {0, 0, 0}, {xMax, 0, 0}, {1, 0, 0}, {1, 0, 0}),
                     freeNodes = {0, 1},
-                    snapNodes = params.directionTwo == 0 and {1} or {0}
+                    snapNodes = params.direction == 0 and {1} or {0}
                 },
                 {
                     type = 'STREET',
@@ -743,9 +743,9 @@ function data()
                         type = streetData.type,
                         tramTrackType = tramTrackType
                     },
-                    edges = parallelStreetHelper.makeEdges(params.directionThree, pitch, {0, streetFullWidth + distance, 0}, {xMax, streetFullWidth + distance, 0}, {1, 0, 0}, {1, 0, 0}),
+                    edges = parallelStreetHelper.makeEdges(params.direction, pitch, {0, streetFullWidth + distance, 0}, {xMax, streetFullWidth + distance, 0}, {1, 0, 0}, {1, 0, 0}),
                     freeNodes = {0, 1},
-                    snapNodes = params.directionThree == 0 and {1} or {0}
+                    snapNodes = params.direction == 0 and {1} or {0}
                 }
             }
         else --if params.howManyStreetsBase0 == 3 then -- 4 streets -- always provide a fallback just in case
@@ -758,7 +758,7 @@ function data()
                         tramTrackType = tramTrackType
                     },
                     edges = parallelStreetHelper.makeEdges(
-                        params.directionOne,
+                        params.direction,
                         pitch,
                         {-xMax, -streetThreeHalfWidth - threeHalfDistance, 0},
                         {0, -streetThreeHalfWidth - threeHalfDistance, 0},
@@ -766,7 +766,7 @@ function data()
                         {1, 0, 0}
                     ),
                     freeNodes = {0, 1},
-                    snapNodes = params.directionOne == 0 and {0} or {1}
+                    snapNodes = params.direction == 0 and {0} or {1}
                 },
                 {
                     type = 'STREET',
@@ -775,9 +775,9 @@ function data()
                         type = streetData.type,
                         tramTrackType = tramTrackType
                     },
-                    edges = parallelStreetHelper.makeEdges(params.directionTwo, pitch, {-xMax, -streetHalfWidth - halfDistance, 0}, {0, -streetHalfWidth - halfDistance, 0}, {1, 0, 0}, {1, 0, 0}),
+                    edges = parallelStreetHelper.makeEdges(params.direction, pitch, {-xMax, -streetHalfWidth - halfDistance, 0}, {0, -streetHalfWidth - halfDistance, 0}, {1, 0, 0}, {1, 0, 0}),
                     freeNodes = {0, 1},
-                    snapNodes = params.directionTwo == 0 and {0} or {1}
+                    snapNodes = params.direction == 0 and {0} or {1}
                 },
                 {
                     type = 'STREET',
@@ -786,9 +786,9 @@ function data()
                         type = streetData.type,
                         tramTrackType = tramTrackType
                     },
-                    edges = parallelStreetHelper.makeEdges(params.directionThree, pitch, {-xMax, streetHalfWidth + halfDistance, 0}, {0, streetHalfWidth + halfDistance, 0}, {1, 0, 0}, {1, 0, 0}),
+                    edges = parallelStreetHelper.makeEdges(params.direction, pitch, {-xMax, streetHalfWidth + halfDistance, 0}, {0, streetHalfWidth + halfDistance, 0}, {1, 0, 0}, {1, 0, 0}),
                     freeNodes = {0, 1},
-                    snapNodes = params.directionThree == 0 and {0} or {1}
+                    snapNodes = params.direction == 0 and {0} or {1}
                 },
                 {
                     type = 'STREET',
@@ -798,7 +798,7 @@ function data()
                         tramTrackType = tramTrackType
                     },
                     edges = parallelStreetHelper.makeEdges(
-                        params.directionFour,
+                        params.direction,
                         pitch,
                         {-xMax, streetThreeHalfWidth + threeHalfDistance, 0},
                         {0, streetThreeHalfWidth + threeHalfDistance, 0},
@@ -806,7 +806,7 @@ function data()
                         {1, 0, 0}
                     ),
                     freeNodes = {0, 1},
-                    snapNodes = params.directionFour == 0 and {0} or {1}
+                    snapNodes = params.direction == 0 and {0} or {1}
                 },
                 {
                     type = 'STREET',
@@ -816,7 +816,7 @@ function data()
                         tramTrackType = tramTrackType
                     },
                     edges = parallelStreetHelper.makeEdges(
-                        params.directionOne,
+                        params.direction,
                         pitch,
                         {0, -streetThreeHalfWidth - threeHalfDistance, 0},
                         {xMax, -streetThreeHalfWidth - threeHalfDistance, 0},
@@ -824,7 +824,7 @@ function data()
                         {1, 0, 0}
                     ),
                     freeNodes = {0, 1},
-                    snapNodes = params.directionOne == 0 and {1} or {0}
+                    snapNodes = params.direction == 0 and {1} or {0}
                 },
                 {
                     type = 'STREET',
@@ -833,9 +833,9 @@ function data()
                         type = streetData.type,
                         tramTrackType = tramTrackType
                     },
-                    edges = parallelStreetHelper.makeEdges(params.directionTwo, pitch, {0, -streetHalfWidth - halfDistance, 0}, {xMax, -streetHalfWidth - halfDistance, 0}, {1, 0, 0}, {1, 0, 0}),
+                    edges = parallelStreetHelper.makeEdges(params.direction, pitch, {0, -streetHalfWidth - halfDistance, 0}, {xMax, -streetHalfWidth - halfDistance, 0}, {1, 0, 0}, {1, 0, 0}),
                     freeNodes = {0, 1},
-                    snapNodes = params.directionTwo == 0 and {1} or {0}
+                    snapNodes = params.direction == 0 and {1} or {0}
                 },
                 {
                     type = 'STREET',
@@ -844,9 +844,9 @@ function data()
                         type = streetData.type,
                         tramTrackType = tramTrackType
                     },
-                    edges = parallelStreetHelper.makeEdges(params.directionThree, pitch, {0, streetHalfWidth + halfDistance, 0}, {xMax, streetHalfWidth + halfDistance, 0}, {1, 0, 0}, {1, 0, 0}),
+                    edges = parallelStreetHelper.makeEdges(params.direction, pitch, {0, streetHalfWidth + halfDistance, 0}, {xMax, streetHalfWidth + halfDistance, 0}, {1, 0, 0}, {1, 0, 0}),
                     freeNodes = {0, 1},
-                    snapNodes = params.directionThree == 0 and {1} or {0}
+                    snapNodes = params.direction == 0 and {1} or {0}
                 },
                 {
                     type = 'STREET',
@@ -856,7 +856,7 @@ function data()
                         tramTrackType = tramTrackType
                     },
                     edges = parallelStreetHelper.makeEdges(
-                        params.directionFour,
+                        params.direction,
                         pitch,
                         {0, streetThreeHalfWidth + threeHalfDistance, 0},
                         {xMax, streetThreeHalfWidth + threeHalfDistance, 0},
@@ -864,14 +864,14 @@ function data()
                         {1, 0, 0}
                     ),
                     freeNodes = {0, 1},
-                    snapNodes = params.directionFour == 0 and {1} or {0}
+                    snapNodes = params.direction == 0 and {1} or {0}
                 }
             }
         end
         return edgeLists
     end
 
-    parallelStreetHelper.setGlobalStreetData(game, _parallelisedStreetTypes)
+    parallelStreetHelper.setGlobalStreetData(game) --, _parallelisedStreetTypes)
 
     return {
         type = 'STREET_CONSTRUCTION',
@@ -907,6 +907,15 @@ function data()
                 -- yearTo = 0
             },
             {
+                key = 'snapNodes',
+                name = _('Snap to neighbours'),
+                values = {
+                    _('No'),
+                    _('Yes')
+                },
+                defaultIndex = 0
+            },
+            {
                 key = 'distance',
                 name = _('Distance'),
                 -- values = {_('0m'), _('1m'), _('2m'), _('3m'), _('4m')},
@@ -919,35 +928,8 @@ function data()
                 defaultIndex = 0
             },
             {
-                key = 'directionOne',
-                name = _('Direction 1'),
-                values = {
-                    _('↑'),
-                    _('↓')
-                },
-                defaultIndex = 0
-            },
-            {
-                key = 'directionTwo',
-                name = _('Direction 2'),
-                values = {
-                    _('↑'),
-                    _('↓')
-                },
-                defaultIndex = 0
-            },
-            {
-                key = 'directionThree',
-                name = _('Direction 3'),
-                values = {
-                    _('↑'),
-                    _('↓')
-                },
-                defaultIndex = 0
-            },
-            {
-                key = 'directionFour',
-                name = _('Direction 4'),
+                key = 'direction',
+                name = _('Direction'),
                 values = {
                     _('↑'),
                     _('↓')
@@ -964,15 +946,6 @@ function data()
                     _('ELECTRIC')
                 },
                 defaultIndex = 2
-            },
-            {
-                key = 'snapNodes',
-                name = _('Snap to neighbours'),
-                values = {
-                    _('No'),
-                    _('Yes')
-                },
-                defaultIndex = 0
             },
             {
                 key = 'pitch',
