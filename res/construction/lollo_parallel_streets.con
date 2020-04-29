@@ -988,6 +988,7 @@ function data()
             }
             result.models = {}
 
+            -- LOLLO NOTE I cannot use KEEP here
             local tramTrackType = params.tramTrack and (({'NO', 'YES', 'ELECTRIC'})[params.tramTrack + 1]) or 'NO'
             if params.snapNodes == 0 then
                 result.edgeLists = _getNonSnapEdgeLists(params, pitch, streetData, tramTrackType)
