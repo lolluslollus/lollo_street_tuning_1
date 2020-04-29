@@ -572,11 +572,10 @@ function data()
     end
 
     local function _getSnapAndFreeEdgeLists(params, pitch, streetData, streetType, tramTrackType)
-        local extraLength4SnappingBase = 0.5
         local streetHalfWidth = streetData.sidewalkWidth + streetData.streetWidth / 2.0
         local streetFullWidth = streetData.sidewalkWidth + streetData.sidewalkWidth + streetData.streetWidth
         local streetThreeHalfWidth = 3.0 * streetHalfWidth
-        local extraLength4Snapping = 4.5 -- streetHalfWidth + extraLength4SnappingBase
+        local xMax = math.max(8.0, streetHalfWidth + 1.0) -- this is the fruit of trial and error, see the notes
         local halfDistance = params.distance / 2.0
         local distance = params.distance
         local threeHalfDistance = 3.0 * halfDistance
@@ -592,7 +591,7 @@ function data()
                         type = streetType,
                         tramTrackType = tramTrackType
                     },
-                    edges = parallelStreetHelper.makeEdges(params.directionOne, pitch, {-streetHalfWidth - extraLength4Snapping, 0, 0}, {0, 0, 0}, {1, 0, 0}, {1, 0, 0}),
+                    edges = parallelStreetHelper.makeEdges(params.directionOne, pitch, {-xMax, 0, 0}, {0, 0, 0}, {1, 0, 0}, {1, 0, 0}),
                     -- edgeType = "BRIDGE",
                     -- edgeTypeName = "cement.lua",
                     -- collider = {
@@ -601,9 +600,21 @@ function data()
                     -- autoRemovable = true,
                     --skipCollision = true, --useless
                     --skipCollisionCheck = true, --useless
-                    -- nodes that stick out of the construction
+                    -- nodes that stick out of the construction. 
+                    -- LOLLO NOTE If all nodes are free, they can be upgraded with tram, bus lane, one-way once built,
+                    -- and clicking on the construction won't bring up the construction menu anymore.
+                    -- This allows a simple parameter menu coz the properties can be changed with the stock street menus.
+                    -- In general, it's easier to build and then change a construction.
                     freeNodes = {0, 1},
                     -- nodes allowed to snap to other edges of the same type
+                    -- LOLLO NOTE if the nodes are too close (ie the edges too short), the game will crash with
+                    -- c:\build\tpf2_steam\src\lib\geometry\streets\transitions\transition_util.cpp:125: 
+                    -- float __cdecl StreetGeometry::TransitionUtil::CompCurveHandleDistance(float,float): 
+                    -- Assertion `angle >= .0f && angle <= Math::PI' failed.
+                    --
+                    -- Experiments show that two edges one after the other allow for a shorter crashless construction than one edge only,
+                    -- and all nodes being free calls for some extra length,
+                    -- while if only the outer nodes are free we can get away with a shorter construction.
                     snapNodes = params.directionOne == 0 and {0} or {1}
                     --					snapNodes = { 0, 1 },  -- node 0 and 1 are allowed to snap to other edges of the same type --crashes
                     --					tag2nodes = {},
@@ -616,7 +627,7 @@ function data()
                         type = streetType,
                         tramTrackType = tramTrackType
                     },
-                    edges = parallelStreetHelper.makeEdges(params.directionOne, pitch, {0, 0, 0}, {streetHalfWidth + extraLength4Snapping, 0, 0}, {1, 0, 0}, {1, 0, 0}),
+                    edges = parallelStreetHelper.makeEdges(params.directionOne, pitch, {0, 0, 0}, {xMax, 0, 0}, {1, 0, 0}, {1, 0, 0}),
                     freeNodes = {0, 1},
                     snapNodes = params.directionOne == 0 and {1} or {0}
                 }
@@ -633,7 +644,7 @@ function data()
                     edges = parallelStreetHelper.makeEdges(
                         params.directionOne,
                         pitch,
-                        {-streetHalfWidth - extraLength4Snapping, -streetHalfWidth - halfDistance, 0},
+                        {-xMax, -streetHalfWidth - halfDistance, 0},
                         {0, -streetHalfWidth - halfDistance, 0},
                         {1, 0, 0},
                         {1, 0, 0}
@@ -651,7 +662,7 @@ function data()
                     edges = parallelStreetHelper.makeEdges(
                         params.directionTwo,
                         pitch,
-                        {-streetHalfWidth - extraLength4Snapping, streetHalfWidth + halfDistance, 0},
+                        {-xMax, streetHalfWidth + halfDistance, 0},
                         {0, streetHalfWidth + halfDistance, 0},
                         {1, 0, 0},
                         {1, 0, 0}
@@ -670,7 +681,7 @@ function data()
                         params.directionOne,
                         pitch,
                         {0, -streetHalfWidth - halfDistance, 0},
-                        {streetHalfWidth + extraLength4Snapping, -streetHalfWidth - halfDistance, 0},
+                        {xMax, -streetHalfWidth - halfDistance, 0},
                         {1, 0, 0},
                         {1, 0, 0}
                     ),
@@ -688,7 +699,7 @@ function data()
                         params.directionTwo,
                         pitch,
                         {0, streetHalfWidth + halfDistance, 0},
-                        {streetHalfWidth + extraLength4Snapping, streetHalfWidth + halfDistance, 0},
+                        {xMax, streetHalfWidth + halfDistance, 0},
                         {1, 0, 0},
                         {1, 0, 0}
                     ),
@@ -708,7 +719,7 @@ function data()
                     edges = parallelStreetHelper.makeEdges(
                         params.directionOne,
                         pitch,
-                        {-streetHalfWidth - extraLength4Snapping, -streetFullWidth - distance, 0},
+                        {-xMax, -streetFullWidth - distance, 0},
                         {0, -streetFullWidth - distance, 0},
                         {1, 0, 0},
                         {1, 0, 0}
@@ -723,7 +734,7 @@ function data()
                         type = streetType,
                         tramTrackType = tramTrackType
                     },
-                    edges = parallelStreetHelper.makeEdges(params.directionTwo, pitch, {-streetHalfWidth - extraLength4Snapping, 0, 0}, {0, 0, 0}, {1, 0, 0}, {1, 0, 0}),
+                    edges = parallelStreetHelper.makeEdges(params.directionTwo, pitch, {-xMax, 0, 0}, {0, 0, 0}, {1, 0, 0}, {1, 0, 0}),
                     freeNodes = {0, 1},
                     snapNodes = params.directionTwo == 0 and {0} or {1}
                 },
@@ -737,7 +748,7 @@ function data()
                     edges = parallelStreetHelper.makeEdges(
                         params.directionThree,
                         pitch,
-                        {-streetHalfWidth - extraLength4Snapping, streetFullWidth + distance, 0},
+                        {-xMax, streetFullWidth + distance, 0},
                         {0, streetFullWidth + distance, 0},
                         {1, 0, 0},
                         {1, 0, 0}
@@ -756,7 +767,7 @@ function data()
                         params.directionOne,
                         pitch,
                         {0, -streetFullWidth - distance, 0},
-                        {streetHalfWidth + extraLength4Snapping, -streetFullWidth - distance, 0},
+                        {xMax, -streetFullWidth - distance, 0},
                         {1, 0, 0},
                         {1, 0, 0}
                     ),
@@ -770,7 +781,7 @@ function data()
                         type = streetType,
                         tramTrackType = tramTrackType
                     },
-                    edges = parallelStreetHelper.makeEdges(params.directionTwo, pitch, {0, 0, 0}, {streetHalfWidth + extraLength4Snapping, 0, 0}, {1, 0, 0}, {1, 0, 0}),
+                    edges = parallelStreetHelper.makeEdges(params.directionTwo, pitch, {0, 0, 0}, {xMax, 0, 0}, {1, 0, 0}, {1, 0, 0}),
                     freeNodes = {0, 1},
                     snapNodes = params.directionTwo == 0 and {1} or {0}
                 },
@@ -785,7 +796,7 @@ function data()
                         params.directionThree,
                         pitch,
                         {0, streetFullWidth + distance, 0},
-                        {streetHalfWidth + extraLength4Snapping, streetFullWidth + distance, 0},
+                        {xMax, streetFullWidth + distance, 0},
                         {1, 0, 0},
                         {1, 0, 0}
                     ),
@@ -805,7 +816,7 @@ function data()
                     edges = parallelStreetHelper.makeEdges(
                         params.directionOne,
                         pitch,
-                        {-streetHalfWidth - extraLength4Snapping, -streetThreeHalfWidth - threeHalfDistance, 0},
+                        {-xMax, -streetThreeHalfWidth - threeHalfDistance, 0},
                         {0, -streetThreeHalfWidth - threeHalfDistance, 0},
                         {1, 0, 0},
                         {1, 0, 0}
@@ -823,7 +834,7 @@ function data()
                     edges = parallelStreetHelper.makeEdges(
                         params.directionTwo,
                         pitch,
-                        {-streetHalfWidth - extraLength4Snapping, -streetHalfWidth - halfDistance, 0},
+                        {-xMax, -streetHalfWidth - halfDistance, 0},
                         {0, -streetHalfWidth - halfDistance, 0},
                         {1, 0, 0},
                         {1, 0, 0}
@@ -841,7 +852,7 @@ function data()
                     edges = parallelStreetHelper.makeEdges(
                         params.directionThree,
                         pitch,
-                        {-streetHalfWidth - extraLength4Snapping, streetHalfWidth + halfDistance, 0},
+                        {-xMax, streetHalfWidth + halfDistance, 0},
                         {0, streetHalfWidth + halfDistance, 0},
                         {1, 0, 0},
                         {1, 0, 0}
@@ -859,7 +870,7 @@ function data()
                     edges = parallelStreetHelper.makeEdges(
                         params.directionFour,
                         pitch,
-                        {-streetHalfWidth - extraLength4Snapping, streetThreeHalfWidth + threeHalfDistance, 0},
+                        {-xMax, streetThreeHalfWidth + threeHalfDistance, 0},
                         {0, streetThreeHalfWidth + threeHalfDistance, 0},
                         {1, 0, 0},
                         {1, 0, 0}
@@ -878,7 +889,7 @@ function data()
                         params.directionOne,
                         pitch,
                         {0, -streetThreeHalfWidth - threeHalfDistance, 0},
-                        {streetHalfWidth + extraLength4Snapping, -streetThreeHalfWidth - threeHalfDistance, 0},
+                        {xMax, -streetThreeHalfWidth - threeHalfDistance, 0},
                         {1, 0, 0},
                         {1, 0, 0}
                     ),
@@ -896,7 +907,7 @@ function data()
                         params.directionTwo,
                         pitch,
                         {0, -streetHalfWidth - halfDistance, 0},
-                        {streetHalfWidth + extraLength4Snapping, -streetHalfWidth - halfDistance, 0},
+                        {xMax, -streetHalfWidth - halfDistance, 0},
                         {1, 0, 0},
                         {1, 0, 0}
                     ),
@@ -914,7 +925,7 @@ function data()
                         params.directionThree,
                         pitch,
                         {0, streetHalfWidth + halfDistance, 0},
-                        {streetHalfWidth + extraLength4Snapping, streetHalfWidth + halfDistance, 0},
+                        {xMax, streetHalfWidth + halfDistance, 0},
                         {1, 0, 0},
                         {1, 0, 0}
                     ),
@@ -932,7 +943,7 @@ function data()
                         params.directionFour,
                         pitch,
                         {0, streetThreeHalfWidth + threeHalfDistance, 0},
-                        {streetHalfWidth + extraLength4Snapping, streetThreeHalfWidth + threeHalfDistance, 0},
+                        {xMax, streetThreeHalfWidth + threeHalfDistance, 0},
                         {1, 0, 0},
                         {1, 0, 0}
                     ),
