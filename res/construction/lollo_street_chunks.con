@@ -814,7 +814,7 @@ function data()
         type = 'STREET_CONSTRUCTION',
         description = {
             name = _('Street chunks'),
-            description = _('Lays chunks of street, single or multiple in parallel.')
+            description = _('Lays chunks of street, single or multiple in parallel. Use O and P to adjust the pitch.')
         },
         availability = {
             yearFrom = 1925,
@@ -883,13 +883,6 @@ function data()
                     _('ELECTRIC')
                 },
                 defaultIndex = 2
-            },
-            {
-                key = 'pitch',
-                name = _('Pitch (you can adjust it with arrow keys)'),
-                values = pitchUtil.getPitchParamValues(),
-                defaultIndex = pitchUtil.getDefaultPitchParamValue(),
-                uiType = 'SLIDER'
             }
         },
         order = 1240,
@@ -900,11 +893,8 @@ function data()
         skipCollision = true,
         --skipCollisionCheck = true,
         updateFn = function(params)
-            local pitch = params.pitch - pitchUtil.getMiddlePitchParamValue()
+            local pitch = pitchUtil.adjustParamsPitch(params)
             local streetData = game._lolloStreetData[params.streetType_ + 1]
-
-            -- print('LOLLO street chunks updateFn')
-            -- dump(true)(params)
 
             local result = {}
             result.cost = 0
@@ -932,8 +922,6 @@ function data()
             -- LOLLO NOTE the game wants this function to be defined, even if it returns an empty table.
             -- If you leave it out, adding and removing tram tracks won't work.
             -- (Bus lanes don't work anyway.)
-            -- print('LOLLO streets merging upgradeFn')
-            -- dump(true)(params)
             return {}
         end
     }
