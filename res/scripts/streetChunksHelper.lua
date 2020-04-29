@@ -20,7 +20,45 @@ helper.getDistances = function()
 end
 
 -- --------------- global street data ------------------------
-local function _getStreetFilesContents()
+local function _getGameStreetDirPath()
+    local gamePath = fileUtils.getGamePath()
+    print('LOLLO gamePath is')
+    dump(true)(gamePath)
+
+    if stringUtils.isNullOrEmptyString(gamePath) then
+        return ''
+    end
+
+    if stringUtils.stringEndsWith(gamePath, '/') then
+        return gamePath .. 'res/config/street'
+    else
+        return gamePath .. '/res/config/street'
+    end
+end
+
+local function _getMyStreetDirPath()
+    local currPath = fileUtils.getCurrentPath()
+    -- print('LOLLO currPath is')
+    -- dump(true)(currPath)
+    if stringUtils.isNullOrEmptyString(currPath) then
+        return ''
+    end
+
+    local resDir = fileUtils.getResDirFromPath(currPath)
+    -- print('LOLLO resDir is')
+    -- dump(true)(resDir)
+    if stringUtils.isNullOrEmptyString(resDir) then
+        return ''
+    end
+
+    local streetDirPath = resDir .. '/config/street'
+    -- print('LOLLO streetDirPath is')
+    -- dump(true)(streetDirPath)
+
+    return streetDirPath
+end
+
+local function _getStreetFilesContents(streetDirPath)
     -- print('LOLLO current path = ')
     -- dump(true)(fileUtils.getCurrentPath())
     -- print('LOLLO package paths = ')
@@ -34,28 +72,8 @@ local function _getStreetFilesContents()
     -- end
 
     local results = {}
-    local currPath = fileUtils.getCurrentPath()
-    -- print('LOLLO currPath is')
-    -- dump(true)(currPath)
-    if stringUtils.isNullOrEmptyString(currPath) then
-        return results
-    end
 
-    local resDir = fileUtils.getResDirFromPath(currPath)
-    -- print('LOLLO resDir is')
-    -- dump(true)(resDir)
-    if stringUtils.isNullOrEmptyString(resDir) then
-        return results
-    end
-
-    local streetDir = resDir .. '/config/street'
-    -- print('LOLLO streetDir is')
-    -- dump(true)(streetDir)
-    if stringUtils.isNullOrEmptyString(streetDir) then
-        return results
-    end
-
-    local streetFiles = fileUtils.getFilesInDirWithExtension(streetDir, 'lua')
+    local streetFiles = fileUtils.getFilesInDirWithExtension(streetDirPath, 'lua')
     -- print('LOLLO streetfiles are')
     -- dump(true)(streetFiles)
     if type(streetFiles) ~= 'table' then
@@ -78,6 +96,7 @@ local function _getStreetFilesContents()
             )
         end
     end
+    -- print('LOLLO _getStreetFilesContents is about to return: ')
     -- for i = 1, #results do
     --     dump(true)(results[i])
     -- end
@@ -98,7 +117,7 @@ local function _getStreetFilesContents()
     -- for key, value in pairs(game.res) do
     --     print(key, value)
     -- end
-    -- this fails coz game.interface is not on this thread
+    -- this fails coz game.interface is not on this thread, and it has probably nothing to do with file paths anyway
     -- local func = function()
     --     return game.interface.findPath('lollo_medium_4_lane_street')
     -- end
@@ -124,7 +143,7 @@ local function _getStreetFilesContents()
     -- end
 end
 
-local function _getStreetData(streetData) --, chunkedStreetTypes)
+local function _getStreetDataFiltered(streetData) --, chunkedStreetTypes)
     local results = {}
     for _, val1 in pairs(streetData) do
         -- for _, val2 in pairs(chunkedStreetTypes) do
@@ -132,13 +151,19 @@ local function _getStreetData(streetData) --, chunkedStreetTypes)
         --         table.insert(results, #results + 1, val1)
         --     end
         -- end
+        -- print('LOLLO val1 = ')
+        -- dump(true)(val1)
         if arrayUtils.arrayHasValue(val1.categories, 'one-way') then
             table.insert(results, #results + 1, val1)
         end
     end
+    return results
+end
 
-    if #results > 0 then
-        return results
+local function _getStreetDataWithDefaults(streetData) --, chunkedStreetTypes)
+    -- print('LOLLO streetData has type = ', type(streetData))
+    if type(streetData) == 'table' and #streetData > 0 then
+        return streetData
     else
         print('LOLLO falling back to the default street data')
         -- provide a default value coz the game will dump if it finds no parameter values
@@ -166,7 +191,11 @@ end
 helper.setGlobalStreetData = function(game) --, chunkedStreetTypes)
     if game._lolloStreetData == nil then
         -- print('LOLLO street chunks reading street data')
-        game._lolloStreetData = _getStreetData(_getStreetFilesContents()) --, chunkedStreetTypes)
+        game._lolloStreetData = _getStreetDataFiltered(_getStreetFilesContents(_getMyStreetDirPath())) --, chunkedStreetTypes)
+        print('LOLLO game._lolloStreetData has ', type(game._lolloStreetData) == 'table' and #(game._lolloStreetData) or 0, ' records before the concat')
+        arrayUtils.concatValues(game._lolloStreetData, _getStreetDataFiltered(_getStreetFilesContents(_getGameStreetDirPath())))        
+        print('LOLLO game._lolloStreetData has ', type(game._lolloStreetData) == 'table' and #(game._lolloStreetData) or 0, ' records after the concat')
+        game._lolloStreetData = _getStreetDataWithDefaults(game._lolloStreetData)
         print('LOLLO street chunks has read street data')
     -- print('LOLLO street data = ')
     -- dump(true)(game._lolloStreetData)

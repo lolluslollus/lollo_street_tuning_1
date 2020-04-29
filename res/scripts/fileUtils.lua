@@ -178,6 +178,33 @@ fileUtils.getFilesInDirWithExtension = function(dirPath, ext)
     )
 end
 
+fileUtils.getGamePath = function()
+    local cpaths = fileUtils.getPackageCpaths()
+    if type(cpaths) ~= 'table' or #cpaths < 1 then
+        return ''
+    end
+
+    local cpath = ''
+    local i = 1
+    while stringUtils.isNullOrEmptyString(cpath) do
+        if stringUtils.stringContains(cpaths[i], 'Transport Fever 2') then
+            cpath = cpaths[i]
+        end
+        i = i + 1
+    end
+    if stringUtils.isNullOrEmptyString(cpath) then
+        return ''
+    end
+
+    local reversedPath = string.reverse(cpath)
+    local one, two = string.find(reversedPath, '/2 reveF tropsnarT/')
+    if one == nil then
+        return ''
+    end
+
+    return string.reverse(string.sub(reversedPath, one)) or ''
+end
+
 fileUtils.getPackageCpaths = function()
     -- returns something like
     -- {
@@ -186,7 +213,7 @@ fileUtils.getPackageCpaths = function()
     --     ".\?.dll"
     -- }
 
-    return stringUtils.stringSplit(package.cpath, ';')
+    return stringUtils.stringSplit(string.gsub(package.cpath, '\\', '/'), ';')
 end
 fileUtils.getPackagePaths = function()
     -- returns something like
@@ -195,7 +222,7 @@ fileUtils.getPackagePaths = function()
     --     "res/scripts/?.lua"
     -- }
 
-    return stringUtils.stringSplit(package.path, ';')
+    return stringUtils.stringSplit(string.gsub(package.path, '\\', '/'), ';')
 end
 
 return fileUtils

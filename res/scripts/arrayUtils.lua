@@ -17,4 +17,24 @@ arrayUtils.map = function(arr, func)
     return results
 end
 
+arrayUtils.concatValues = function(table1, table2)
+    if type(table1) ~= 'table' or type(table2) ~= 'table' then
+        return
+    end
+
+    for _, v in pairs(table2) do
+        table.insert(table1, #table1 + 1, v)
+    end
+end
+
+arrayUtils.concatKeysValues = function(table1, table2)
+    if type(table1) ~= 'table' or type(table2) ~= 'table' then
+        return
+    end
+
+    for k, v in pairs(table2) do
+        table1[k] = v
+    end
+end
+
 return arrayUtils
