@@ -7,20 +7,7 @@ local stringUtils = require('res/scripts/lollo_street_tuning/lolloStringUtils')
 
 local path = "C:/Program Files (x86)/Steam/steamapps/common/Transport Fever 2/?.dll/"
 
-local reversedPath = string.reverse(path)
-local one, two = string.find(reversedPath, '/2 reveF tropsnarT/')
---local one, two = string.find(string.reverse(path), '/2 reveF tropsnarZZZ/')
-if one ~= nil then
-    local prunedPath = string.reverse(string.sub(reversedPath, one))
-    local aaa = 'AAA'
-
-end
-
-if stringUtils.stringEndsWith(path, '/') then 
-    path = string.sub(path, 1, string.len(path) - 1)
-end
-
-local splits = stringUtils.stringSplit(path, '/')
-local fileName = splits[#splits]
+-- local fd = 0
+local sd = fd or 5
 
 local aaa = 'AAA'

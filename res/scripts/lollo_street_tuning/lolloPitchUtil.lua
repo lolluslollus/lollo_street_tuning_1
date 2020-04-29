@@ -43,7 +43,7 @@ local function _getMiddlePitchParamValue()
 end
 pitchUtil.adjustParamsPitch = function(params)
     params.paramX = params.paramX or 0
-    params.pitch = params.pitch == nil and _getMiddlePitchParamValue() or params.pitch
+    params.pitch = params.pitch or _getMiddlePitchParamValue()
 
     if params.upgrade then
         params.pitch = params.pitch - _getMiddlePitchParamValue()
