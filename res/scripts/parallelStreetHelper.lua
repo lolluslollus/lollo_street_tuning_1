@@ -165,9 +165,9 @@ end
 
 helper.setGlobalStreetData = function(game) --, parallelisedStreetTypes)
     if game._lolloStreetData == nil then
-        print('LOLLO parallel streets reading street data')
+        -- print('LOLLO street chunks reading street data')
         game._lolloStreetData = _getStreetData(_getStreetFilesContents()) --, parallelisedStreetTypes)
-        print('LOLLO parallel streets has read street data')
+        print('LOLLO street chunks has read street data')
     -- print('LOLLO street data = ')
     -- dump(true)(game._lolloStreetData)
     end
