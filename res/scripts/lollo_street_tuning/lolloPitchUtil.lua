@@ -42,6 +42,9 @@ local function _getMiddlePitchParamValue()
     return _maxPitch4Slider
 end
 pitchUtil.adjustParamsPitch = function(params)
+    params.paramX = params.paramX or 0
+    params.pitch = params.pitch == nil and _getMiddlePitchParamValue() or params.pitch
+
     if params.upgrade then
         params.pitch = params.pitch - _getMiddlePitchParamValue()
     else

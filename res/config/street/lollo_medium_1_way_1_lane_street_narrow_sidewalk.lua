@@ -22,8 +22,8 @@
         speed = 50.0,
         -- priority = this crashes 4, -- LOLLO NOTE this is copied from airports, it should give priority to this street
         type = 'lollo_medium_1_way_1_lane_street_narrow_sidewalk.lua',
-        name = _('Medium 1-way street with 1 lane and extra narrow pavement'),
-        desc = _('Medium 1-way street with 1 lane and extra narrow pavement. Speed limit is %2%.'),
+        name = _('Narrow 1-way street with 1 lane and .8 m pavement'),
+        desc = _('Narrow 1-way street with 1 lane and extra narrow pavement. Speed limit is %2%.'),
         categories = {'one-way'},
         borderGroundTex = 'street_border.lua',
         materials = {
@@ -110,18 +110,18 @@
             }
         },
         assets = {
-            -- {
-            --     name = 'street/street_light_eu_c.mdl',
-            --     offset = 8.0,
-            --     distance = 16.0,
-            --     prob = 1.0,
-            --     offsetOrth = 2.9, -- was 3.4,
-            --     randRot = false,
-            --     oneSideOnly = true, -- was false,
-            --     alignToElevation = false,
-            --     avoidFaceEdges = false,
-            --     placeOnBridge = true
-            -- },
+            {
+                name = 'street/street_light_eu_c.mdl',
+                offset = 8.0,
+                distance = 16.0,
+                prob = 1.0,
+                offsetOrth = 2.9, -- was 3.4,
+                randRot = false,
+                oneSideOnly = true, -- was false,
+                alignToElevation = false,
+                avoidFaceEdges = false,
+                placeOnBridge = true
+            },
             -- {
             --     name = 'street/street_asset_mix/fireplug_eu_c.mdl',
             --     offset = 9.0,

@@ -1123,7 +1123,7 @@ local function updateFn_4_to_4_two_way_large_street_narrow_sidewalk(params)
                 type = tramTrackType == 'NO' and 'standard/town_large_new.lua' or 'lollo_large_4_lane_4_tram_tracks_street.lua',
                 tramTrackType = tramTrackType
             },
-            edges = _makeEdges(params, {2, 0, 0}, {10, 0, 0}, {1, 0, 0}, {1, 0, 0}),
+            edges = _makeEdges(params, {2, 0, 0}, {14, 0, 0}, {1, 0, 0}, {1, 0, 0}),
             freeNodes = params.direction == 0 and {1} or {0},
             snapNodes = params.snapNodes == 0 and {} or (params.direction == 0 and {1} or {0})
         }

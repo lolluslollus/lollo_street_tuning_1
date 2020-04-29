@@ -22,7 +22,7 @@
         speed = 50.0,
         -- priority = this crashes 4, -- LOLLO NOTE this is copied from airports, it should give priority to this street
         type = 'lollo_medium_2_lane_medium_sidewalk_street.lua',
-        name = _('Medium street with 2 lanes and 2m pavement'),
+        name = _('Medium street with 2m pavement'),
         desc = _('Medium street with 2 lanes. The pavement is 2m wide. Speed limit is %2%.'),
         categories = {'urban'},
         borderGroundTex = 'street_border.lua',
@@ -39,16 +39,12 @@
                 name = 'street/new_medium_lane.mtl',
                 size = {4.0, 4.0}
             },
-            streetArrow = {
-                name = 'street/default_arrows.mtl',
-                size = {9.0, 3.0}
-            },
-            streetStripe = {
+            streetStripeMedian = {
                 name = 'street/new_medium_stripes.mtl',
                 size = {8.0, .5}
             },
             -- streetStripeMedian = {
-            --     name = 'street/new_large_median.mtl',
+            --     name = 'street/new_large_median.mtl', -- double continued
             --     size = {4.0, 1}
             -- },
             streetTram = {
