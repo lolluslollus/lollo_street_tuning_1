@@ -112,7 +112,7 @@ fileUtils.getCurrentPath = function()
     --     lastlinedefined = 75,
     --     linedefined = 9,
     --     short_src = "[string "C:/Program Files (x86)/Steam/userdata/7159018..."]",
-    --     source = ".../res/construction/lollo_parallel_streets.con",
+    --     source = ".../res/construction/lollo_street_chunks.con",
     --     what = "Lua"
     -- }
     -- and then
@@ -120,7 +120,7 @@ fileUtils.getCurrentPath = function()
     --     lastlinedefined = 235,
     --     linedefined = 7,
     --     short_src = "[string "C:/Program Files (x86)/Steam/userdata/7159018..."]",
-    --     source = ".../res/construction/lollo_parallel_streets.con",
+    --     source = ".../res/construction/lollo_street_chunks.con",
     --     what = "Lua"
     -- }
     -- and then
@@ -128,7 +128,7 @@ fileUtils.getCurrentPath = function()
     --     lastlinedefined = 235,
     --     linedefined = 7,
     --     short_src = "[string "C:/Program Files (x86)/Steam/userdata/7159018..."]",
-    --     source = ".../res/construction/lollo_parallel_streets.con",
+    --     source = ".../res/construction/lollo_street_chunks.con",
     --     what = "Lua"
     -- }
 end

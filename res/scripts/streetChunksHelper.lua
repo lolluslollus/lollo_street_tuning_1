@@ -124,10 +124,10 @@ local function _getStreetFilesContents()
     -- end
 end
 
-local function _getStreetData(streetData) --, parallelisedStreetTypes)
+local function _getStreetData(streetData) --, chunkedStreetTypes)
     local results = {}
     for _, val1 in pairs(streetData) do
-        -- for _, val2 in pairs(parallelisedStreetTypes) do
+        -- for _, val2 in pairs(chunkedStreetTypes) do
         --     if val1.type == val2 then
         --         table.insert(results, #results + 1, val1)
         --     end
@@ -163,10 +163,10 @@ helper.getGlobalStreetData = function(game)
     return game._lolloStreetData
 end
 
-helper.setGlobalStreetData = function(game) --, parallelisedStreetTypes)
+helper.setGlobalStreetData = function(game) --, chunkedStreetTypes)
     if game._lolloStreetData == nil then
         -- print('LOLLO street chunks reading street data')
-        game._lolloStreetData = _getStreetData(_getStreetFilesContents()) --, parallelisedStreetTypes)
+        game._lolloStreetData = _getStreetData(_getStreetFilesContents()) --, chunkedStreetTypes)
         print('LOLLO street chunks has read street data')
     -- print('LOLLO street data = ')
     -- dump(true)(game._lolloStreetData)
