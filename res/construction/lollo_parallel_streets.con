@@ -876,8 +876,8 @@ function data()
     return {
         type = 'STREET_CONSTRUCTION',
         description = {
-            name = _('Parallel streets'),
-            description = _('Lays parallel chunks of street.')
+            name = _('Street chunks'),
+            description = _('Lays chunks of street, single or multiple in parallel.')
         },
         availability = {
             yearFrom = 1925,
@@ -973,19 +973,10 @@ function data()
             result.cost = 0
             result.groundFaces = {}
             -- result.colliders = {}
-            -- LOLLO NOTE I need a dummy model, so the game stops saying "hello there" or other rubbish,
-            -- then pointing away,
+            -- LOLLO NOTE If some edges are not free, I will need a dummy model, 
+            -- otherwise the game will say "hello there" or "easter egg" or other rubbish,
+            -- then point away (to some animal) and do nothing,
             -- when the user clicks on a done construction to configure it.
-            -- LOLLO TODO see if you can get rid of it, once all nodes are free
-            result.models = {
-                {
-                    id = 'lollo_assets/lollo_dummy.mdl',
-                    skipCollision = true,
-                    -- skipCollisionCheck = true,
-                    -- transf = {1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1}
-                    transf = pitchUtil.getIdTransfPitched(pitch)
-                }
-            }
             result.models = {}
 
             -- LOLLO NOTE I cannot use KEEP here
