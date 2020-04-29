@@ -1,6 +1,6 @@
 --local dump = require 'luadump'
 --local inspect = require('inspect')
-local stringUtils = require('stringUtils')
+local stringUtils = require('lolloStringUtils')
 
 local fileUtils = {}
 fileUtils.fileExists = function(filePath)
@@ -131,6 +131,15 @@ fileUtils.getCurrentPath = function()
     --     source = ".../res/construction/lollo_street_chunks.con",
     --     what = "Lua"
     -- }
+end
+
+fileUtils.getFileNameFromPath = function(path)
+    if stringUtils.stringEndsWith(path, '/') then
+        path = string.sub(path, 1, string.len(path) - 1)
+    end
+
+    local splits = stringUtils.stringSplit(path, '/')
+    return splits[#splits] or ''
 end
 
 fileUtils.getParentDirFromPath = function(path)

@@ -1,6 +1,6 @@
 local dump = require 'luadump'
 local laneutil = require('laneutil')
-local pitchUtil = require('pitchUtil')
+local pitchUtil = require('lolloPitchUtil')
 local transf = require 'transf'
 
 local function _makeEdges(params, node0, node1, tan0, tan1)

@@ -1,11 +1,11 @@
 package.path = package.path .. ';res/scripts/?.lua'
 
 local dump = require('res/scripts/luadump')
-local arrayUtils = require('res/scripts/arrayUtils')
-local fileUtils = require('res/scripts/fileUtils')
-local stringUtils = require('res/scripts/stringUtils')
+local arrayUtils = require('res/scripts/lolloArrayUtils')
+local fileUtils = require('res/scripts/lolloFileUtils')
+local stringUtils = require('res/scripts/lolloStringUtils')
 
-local path = "C:/Program Files (x86)/Steam/steamapps/common/Transport Fever 2/?.dll"
+local path = "C:/Program Files (x86)/Steam/steamapps/common/Transport Fever 2/?.dll/"
 
 local reversedPath = string.reverse(path)
 local one, two = string.find(reversedPath, '/2 reveF tropsnarT/')
@@ -16,32 +16,11 @@ if one ~= nil then
 
 end
 
-local table1 = {
-    {
-        a = 1,
-        b = 2,
-    },
-    {
-        a = 10,
-        b = 20,
-    }
-}
+if stringUtils.stringEndsWith(path, '/') then 
+    path = string.sub(path, 1, string.len(path) - 1)
+end
 
-local table2 = {
-    {
-        a = 1,
-        b = 2,
-    },
-    {
-        a = 10,
-        b = 20,
-    },
-    {
-        a = 100,
-        b = 200,
-    }
-}
-
-arrayUtils.concatValues(table1, table2)
+local splits = stringUtils.stringSplit(path, '/')
+local fileName = splits[#splits]
 
 local aaa = 'AAA'
