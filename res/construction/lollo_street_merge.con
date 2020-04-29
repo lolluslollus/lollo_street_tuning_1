@@ -1208,7 +1208,6 @@ function data()
             -- but only when building, not when editing a completed construction.
             -- params.upgrade = true tells me that I am upgrading an existing construction
             -- when I am building anew, it is missing instead.
-            print('LOLLO updateFn, paramX = ', params.paramX, ' paramY = ', params.paramY, 'pitch = ', params.pitch)
 
             -- local lanes =
             --     laneutil.createLanes(
@@ -1228,7 +1227,6 @@ function data()
             -- dump(true)(lanes)
 
             pitchUtil.adjustParamsPitch(params)
-            print('LOLLO updateFn after adjusting the pitch, paramX = ', params.paramX, ' paramY = ', params.paramY, 'pitch = ', params.pitch)
 
             if params.mergingType == 0 then
                 return updateFn_2_to_2_one_way_narrow_sidewalk(params)

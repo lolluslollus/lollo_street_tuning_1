@@ -3,7 +3,7 @@ local pitchUtil = {}
 local _maxPitch4Slider = 100 -- I need a high value coz the arrow key bumps it by 10 at every click
 local _maxAngleAbs = 0.4 --0.36 -- More or less where the game starts complaining coz there is too much slope
 local _pitchAdjustmentFactor = _maxAngleAbs / _maxPitch4Slider
-local _paramX2Pitch = -10.0
+local _paramX2Pitch = 10.0
 
 -------------------------- pitch calculations --------------------------
 local _getPitchAdjusted = function(pitch)
@@ -45,10 +45,13 @@ pitchUtil.adjustParamsPitch = function(params)
     if params.upgrade then
         params.pitch = params.pitch - _getMiddlePitchParamValue()
     else
-        params.pitch = params.paramX * _paramX2Pitch
-        params.pitch = math.max(-_maxPitch4Slider, params.pitch)
-        params.pitch = math.min(_maxPitch4Slider, params.pitch)
+        -- print('LOLLO adjusting params.pitch: params.paramX = ', params.paramX, 'params.pitch = ', params.pitch)
+        params.pitch = params.pitch - _getMiddlePitchParamValue() + params.paramX * _paramX2Pitch
     end
+
+    params.pitch = math.max(-_maxPitch4Slider, params.pitch)
+    params.pitch = math.min(_maxPitch4Slider, params.pitch)
+
     return params.pitch
 end
 pitchUtil.getPitchParamValues = function()
