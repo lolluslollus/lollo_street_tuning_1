@@ -43,7 +43,7 @@ function data()
         speed = 80.0,
         -- priority = this crashes 5, -- LOLLO NOTE this is copied from airports, it should give priority to this street
         type = 'lollo_medium_4_lane_country_road',
-        name = _('Medium country road with 4 lanes'),
+        name = _('Medium country road - 4 lanes'),
         desc = _('Medium country road with 4 lanes crammed in. Speed limit is %2%.'),
         categories = {'country'},
         materials = {

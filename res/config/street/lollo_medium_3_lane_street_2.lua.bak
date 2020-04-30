@@ -21,7 +21,7 @@ return {
 	country = false,
 	speed = 50.0,
 	type = "lollo_medium_3_lane_street_2.lua",
-	name = _("Medium street with 3 lanes 2"),
+	name = _("Medium street - 3 lanes 2"),
 	desc = _("Medium street with 3 lanes crammed in, direction 2. Speed limit is %2%."),
 	categories = {'one-way'},
 	borderGroundTex = "street_border.lua",

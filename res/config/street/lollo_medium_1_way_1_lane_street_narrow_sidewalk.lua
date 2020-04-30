@@ -22,7 +22,7 @@
         speed = 50.0,
         -- priority = this crashes 4, -- LOLLO NOTE this is copied from airports, it should give priority to this street
         type = 'lollo_medium_1_way_1_lane_street_narrow_sidewalk.lua',
-        name = _('Narrow 1-way street with 1 lane and .8 m pavement'),
+        name = _('Narrow 1-way street - 1 lane - .8 m pavement'),
         desc = _('Narrow 1-way street with 1 lane and extra narrow pavement. Speed limit is %2%.'),
         categories = {'one-way'},
         borderGroundTex = 'street_border.lua',

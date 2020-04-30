@@ -32,7 +32,7 @@
         speed = 60.0,
         -- priority = this crashes 7, -- LOLLO NOTE this is copied from airports, it should give priority to this street
         type = 'lollo_large_6_lane_street.lua',
-        name = _('Large street with 6 lanes'),
+        name = _('Large street - 6 lanes'),
         desc = _('Large street with 6 lanes crammed in. Speed limit is %2%.'),
         categories = {'urban'},
         borderGroundTex = 'street_border.lua',
