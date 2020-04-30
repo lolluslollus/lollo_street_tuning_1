@@ -1,5 +1,6 @@
 --local dump = require 'luadump'
 --local inspect = require('inspect')
+local dbg = require('debugger')
 local stringUtils = require('lollo_street_tuning/lolloStringUtils')
 
 local fileUtils = {}
@@ -188,6 +189,7 @@ fileUtils.getFilesInDirWithExtension = function(dirPath, ext)
 end
 
 fileUtils.getGamePath = function()
+    dbg()
     local cpaths = fileUtils.getPackageCpaths()
     if type(cpaths) ~= 'table' or #cpaths < 1 then
         return ''
@@ -195,12 +197,14 @@ fileUtils.getGamePath = function()
 
     local cpath = ''
     local i = 1
-    while stringUtils.isNullOrEmptyString(cpath) do
+    while stringUtils.isNullOrEmptyString(cpath) and i <= #cpaths do
         if stringUtils.stringContains(cpaths[i], 'Transport Fever 2') then
             cpath = cpaths[i]
         end
         i = i + 1
     end
+
+    dbg()
     if stringUtils.isNullOrEmptyString(cpath) then
         return ''
     end
