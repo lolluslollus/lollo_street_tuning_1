@@ -10,4 +10,21 @@ local path = "C:/Program Files (x86)/Steam/steamapps/common/Transport Fever 2/?.
 -- local fd = 0
 local sd = fd or 5
 
+local table1 = {
+    {
+        name = 'aaa',
+        address = 'alalalal'
+    },
+    {
+        name = 'ccc',
+        address = 'rorororro'
+    },
+    {
+        name = 'bbb',
+        address = 'zazazaza'
+    }
+}
+
+local one = arrayUtils.sort(table1, 'ddd')
+local two = arrayUtils.sort(table1, 'name')
 local aaa = 'AAA'

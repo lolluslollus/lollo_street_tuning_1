@@ -37,4 +37,29 @@ arrayUtils.concatKeysValues = function(table1, table2)
     end
 end
 
+arrayUtils.sort = function(table0, elementName, asc)
+    if type(table0) ~= 'table' or type(elementName) ~= 'string' then
+        return table0
+    end
+
+    if type(asc) ~= 'boolean' then
+        asc = true
+    end
+
+    table.sort(
+        table0,
+        function(elem1, elem2)
+            if not elem1 or not elem2 or not (elem1[elementName]) or not (elem2[elementName]) then
+                return true
+            end
+            if asc then
+                return elem1[elementName] < elem2[elementName]
+            end
+            return elem1[elementName] > elem2[elementName]
+        end
+    )
+
+    return table0
+end
+
 return arrayUtils
