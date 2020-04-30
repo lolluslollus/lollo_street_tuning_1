@@ -26,13 +26,13 @@ local function _getGameStreetDirPath()
     -- dump(true)(gamePath)
 
     if stringUtils.isNullOrEmptyString(gamePath) then
-        return ''
+        return '', ''
     end
 
     if stringUtils.stringEndsWith(gamePath, '/') then
-        return gamePath .. 'res/config/street/standard'
+        return gamePath .. 'res/config/street/standard', 'standard/'
     else
-        return gamePath .. '/res/config/street/standard'
+        return gamePath .. '/res/config/street/standard', 'standard/'
     end
 end
 
@@ -41,21 +41,21 @@ local function _getMyStreetDirPath()
     -- print('LOLLO currPath is')
     -- dump(true)(currPath)
     if stringUtils.isNullOrEmptyString(currPath) then
-        return ''
+        return '', ''
     end
 
     local resDir = fileUtils.getResDirFromPath(currPath)
     -- print('LOLLO resDir is')
     -- dump(true)(resDir)
     if stringUtils.isNullOrEmptyString(resDir) then
-        return ''
+        return '', ''
     end
 
     local streetDirPath = resDir .. '/config/street'
     -- print('LOLLO streetDirPath is')
     -- dump(true)(streetDirPath)
 
-    return streetDirPath
+    return streetDirPath, ''
 end
 
 local function _getStreetFilesContents(streetDirPath, fileNamePrefix)
@@ -195,9 +195,9 @@ end
 helper.setGlobalStreetData = function(game) --, chunkedStreetTypes)
     if game._lolloStreetData == nil then
         -- print('LOLLO street chunks reading street data')
-        game._lolloStreetData = arrayUtils.sort(_getStreetDataFiltered(_getStreetFilesContents(_getMyStreetDirPath(), '')), 'name') --, chunkedStreetTypes)
+        game._lolloStreetData = arrayUtils.sort(_getStreetDataFiltered(_getStreetFilesContents(_getMyStreetDirPath())), 'name') --, chunkedStreetTypes)
         -- print('LOLLO game._lolloStreetData has ', type(game._lolloStreetData) == 'table' and #(game._lolloStreetData) or 0, ' records before the concat')
-        arrayUtils.concatValues(game._lolloStreetData, arrayUtils.sort(_getStreetDataFiltered(_getStreetFilesContents(_getGameStreetDirPath(), 'standard/')), 'name'))
+        arrayUtils.concatValues(game._lolloStreetData, arrayUtils.sort(_getStreetDataFiltered(_getStreetFilesContents(_getGameStreetDirPath())), 'name'))
         -- print('LOLLO game._lolloStreetData has ', type(game._lolloStreetData) == 'table' and #(game._lolloStreetData) or 0, ' records after the concat')
         game._lolloStreetData = _getStreetDataWithDefaults(game._lolloStreetData)
     -- print('LOLLO street chunks has read street data')
