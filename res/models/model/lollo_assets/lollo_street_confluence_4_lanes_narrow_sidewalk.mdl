@@ -112,7 +112,8 @@ function data()
                         --     transf = { .05, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, -3, -2.5, 0, 1, },
                         -- },
                     },
-                    transf = {.8, 0, 0, 0, 0, .8, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1}
+                    transf = {.8, 0, 0, 0, 0, .8, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1}, -- LOLLO TODO shouldn't I use the id transf?
+                    -- transf = idTransf
                 },
                 static = false,
                 visibleFrom = 0,
