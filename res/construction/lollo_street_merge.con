@@ -1,7 +1,7 @@
-local dump = require 'luadump'
-local laneutil = require('laneutil')
+-- local dump = require 'luadump'
+-- local laneutil = require('laneutil')
 local pitchUtil = require('lollo_street_tuning/lolloPitchUtil')
-local transf = require 'transf'
+-- local transf = require 'transf'
 
 local function _makeEdges(params, node0, node1, tan0, tan1)
     return params.direction == 0 and
@@ -1202,9 +1202,6 @@ function data()
         skipCollision = true,
         --skipCollisionCheck = true,
         updateFn = function(params)
-            print('LOLLO updateFn, os = ')
-            dump(true)(os.getenv('OS')) -- returns 'Windows_NT' on windows
-            dump(true)(package.config:sub(1,1)) -- '\' on windows, '/' on linux
             --dump(true)(package.config) 
             -- print('LOLLO updateFn, params = ')
             -- dump(true)(params)

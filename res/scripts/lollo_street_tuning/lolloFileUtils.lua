@@ -1,6 +1,6 @@
-local dump = require 'luadump'
---local inspect = require('inspect')
-local dbg = require('debugger')
+-- local dump = require('luadump')
+-- local inspect = require('inspect')
+-- local dbg = require('debugger')
 local stringUtils = require('lollo_street_tuning/lolloStringUtils')
 
 local function _getPackageCpaths()
@@ -231,8 +231,6 @@ fileUtils.getCurrentPath = function()
     -- repeat
     --     info = debug.getinfo(i, 'S')
     --     i = i + 1
-    --     print('LOLLO info = ')
-    --     require('luadump')(true)(info)
     -- until info == nil
     -- info = debug.getinfo(i - 2, 'S')
 

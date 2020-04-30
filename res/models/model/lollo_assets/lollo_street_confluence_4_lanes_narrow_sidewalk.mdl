@@ -13,7 +13,7 @@ function data()
             params = {
                 halfExtents = {4, 8.0, 0.15}
             },
-            transf = {1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1},
+            transf = idTransf,
             type = 'BOX'
         },
         lods = {

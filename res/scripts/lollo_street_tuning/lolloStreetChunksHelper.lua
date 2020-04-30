@@ -1,7 +1,7 @@
-local dump = require 'luadump'
-local inspect = require('inspect')
-local vec3 = require 'vec3'
-local transf = require 'transf'
+-- local dump = require 'luadump'
+-- local inspect = require('inspect')
+-- local vec3 = require 'vec3'
+-- local transf = require 'transf'
 local arrayUtils = require('lollo_street_tuning/lolloArrayUtils')
 local fileUtils = require('lollo_street_tuning/lolloFileUtils')
 local pitchUtil = require('lollo_street_tuning/lolloPitchUtil')
@@ -141,6 +141,55 @@ local function _getStreetFilesContents(streetDirPath, fileNamePrefix)
     -- end
 end
 
+local function _getStandardStreetData(streetData) --, chunkedStreetTypes)
+    -- I could read this from the files, but Linux won't allow it.
+    -- This is also more efficient, even if less interesting.
+    return {
+        {
+            categories = {'one-way'},
+            fileName = 'standard/town_large_one_way_new.lua',
+            name = 'Large one-way street',
+            sidewalkWidth = 4,
+            streetWidth = 12
+        },
+        {
+            categories = {'one-way'},
+            fileName = 'standard/town_medium_one_way_new.lua',
+            name = 'Medium one-way street',
+            sidewalkWidth = 4,
+            streetWidth = 8
+        },
+        {
+            categories = {'one-way'},
+            fileName = 'standard/town_small_one_way_new.lua',
+            name = 'Small one-way street',
+            sidewalkWidth = 3,
+            streetWidth = 3
+        },
+        {
+            categories = {'highway'},
+            fileName = 'standard/country_large_one_way_new.lua',
+            name = 'Large highway',
+            sidewalkWidth = 4,
+            streetWidth = 12
+        },
+        {
+            categories = {'highway'},
+            fileName = 'standard/country_medium_one_way_new.lua',
+            name = 'Medium highway',
+            sidewalkWidth = 4,
+            streetWidth = 8
+        },
+        {
+            categories = {'highway'},
+            fileName = 'standard/country_small_one_way_new.lua',
+            name = 'Highway ramp',
+            sidewalkWidth = 4,
+            streetWidth = 8
+        },
+    }
+end
+
 local function _getStreetDataFiltered(streetData) --, chunkedStreetTypes)
     local results = {}
     for _, val1 in pairs(streetData) do
@@ -191,11 +240,18 @@ end
 helper.setGlobalStreetData = function(game) --, chunkedStreetTypes)
     if game._lolloStreetData == nil then
         -- print('LOLLO street chunks reading street data')
-        game._lolloStreetData = arrayUtils.sort(_getStreetDataFiltered(_getStreetFilesContents(_getMyStreetDirPath())), 'name') --, chunkedStreetTypes)
+        game._lolloStreetData = arrayUtils.sort(
+            _getStreetDataWithDefaults(
+                _getStreetDataFiltered(
+                    _getStreetFilesContents(
+                        _getMyStreetDirPath()
+                    )
+                )
+            ),
+            'name'
+           ) --, chunkedStreetTypes)
         -- print('LOLLO game._lolloStreetData has ', type(game._lolloStreetData) == 'table' and #(game._lolloStreetData) or 0, ' records before the concat')
-        arrayUtils.concatValues(game._lolloStreetData, arrayUtils.sort(_getStreetDataFiltered(_getStreetFilesContents(_getGameStreetDirPath())), 'name'))
-        -- print('LOLLO game._lolloStreetData has ', type(game._lolloStreetData) == 'table' and #(game._lolloStreetData) or 0, ' records after the concat')
-        game._lolloStreetData = _getStreetDataWithDefaults(game._lolloStreetData)
+        arrayUtils.concatValues(game._lolloStreetData, arrayUtils.sort(_getStandardStreetData(), 'name'))
     -- print('LOLLO street chunks has read street data')
     -- print('LOLLO street data = ')
     -- dump(true)(game._lolloStreetData)
