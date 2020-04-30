@@ -1202,6 +1202,10 @@ function data()
         skipCollision = true,
         --skipCollisionCheck = true,
         updateFn = function(params)
+            print('LOLLO updateFn, os = ')
+            dump(true)(os.getenv('OS')) -- returns 'Windows_NT' on windows
+            dump(true)(package.config:sub(1,1)) -- '\' on windows, '/' on linux
+            --dump(true)(package.config) 
             -- print('LOLLO updateFn, params = ')
             -- dump(true)(params)
             -- LOLLO NOTE I can use O and P instead of that slider, they affect params.paramX,
