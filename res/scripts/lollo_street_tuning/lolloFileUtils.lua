@@ -1,7 +1,143 @@
---local dump = require 'luadump'
+local dump = require 'luadump'
 --local inspect = require('inspect')
 local dbg = require('debugger')
 local stringUtils = require('lollo_street_tuning/lolloStringUtils')
+
+local function _getPackageCpaths()
+    -- returns something like
+    -- {
+    --     "C:\Program Files (x86)\Steam\steamapps\common\Transport Fever 2\?.dll",
+    --     "C:\Program Files (x86)\Steam\steamapps\common\Transport Fever 2\loadall.dll",
+    --     ".\?.dll"
+    -- }
+    -- or
+    -- {
+    --     "/usr/local/lib/lua/5.2/?.so",
+    --     "/usr/local/lib/lua/5.2/loadall.so", 3 = "./?.so"
+    -- }
+
+    return stringUtils.stringSplit(string.gsub(package.cpath, '\\', '/'), ';')
+end
+local function _getPackagePaths()
+    -- returns something like
+    -- {
+    --     "C:/Program Files (x86)/Steam/userdata/<steam user id>/1066780/local/staging_area/lollo_street_tuning_1/res/scripts/?.lua",
+    --     "res/scripts/?.lua"
+    -- }
+    -- or
+    -- {
+    --     "/home/lollus/.local/share/Steam/userdata/71590188/1066780/local/staging_area/lollo_street_tuning_1/res/scripts/?.lua", 
+    --     "/home/lollus/.local/share/Steam/userdata/71590188/1066780/local/staging_area/lollo_elevated_stations_1/res/scripts/?.lua",
+    --     "res/scripts/?.lua"
+    -- }
+
+    return stringUtils.stringSplit(string.gsub(package.path, '\\', '/'), ';')
+end
+
+local function _getIsPosixSystem()
+    return package.config:sub(1,1) == '/'
+end
+
+local function _getFilesInDir_Posix(dirPath, filterFn)
+    filterFn = type(filterFn) == 'function' and filterFn or function(fileName)
+        return true
+    end
+
+    local dirPathWithEndingSlash = stringUtils.stringEndsWith(dirPath, '/') and dirPath or (dirPath .. '/')
+    local i, results, popen = 0, {}, io.popen
+    local pfile = popen('ls -a "'..dirPathWithEndingSlash..'"')
+    -- local pfile = popen('ls -l "'..dirPathWithEndingSlash..'"')
+    local pfileLines = pfile:lines()
+    for filePath in pfileLines do
+        if string.len(filePath) > 0 and filterFn(filePath) then
+            i = i + 1
+            results[i] = dirPathWithEndingSlash .. filePath
+        end
+    end
+    pfile:close()
+
+    -- print('LOLLO files in dir = ')
+    -- dump(true)(results)
+    return results
+end
+
+local function _getFilesInDir_Windows(dirPath, filterFn)
+    local dirPathWithEndingSlash = stringUtils.stringEndsWith(dirPath, '/') and dirPath or (dirPath .. '/')
+    filterFn = type(filterFn) == 'function' and filterFn or function(fileName)
+            return true
+        end
+    local result = {}
+    local pfile = io.popen(string.format([[dir "%s" /b /a-d]], dirPathWithEndingSlash))
+    --local pfile = io.popen(string.format([[dir "%s" /b /ad]], dirPathWithEndingSlash))
+    if pfile then
+        for filePath in pfile:lines() do
+            if ((string.len(filePath) > 0) and filterFn(filePath)) then
+                result[#result + 1] = string.format([[%s%s]], dirPathWithEndingSlash, filePath)
+            --result[#result + 1] = string.format([[%s%s/]], dirPathWithEndingSlash, filePath)
+            end
+        end
+        pfile:close()
+    end
+
+    return result
+end
+
+local function _getGamePath_Posix()
+    local paths = _getPackagePaths()
+    if type(paths) ~= 'table' or #paths < 1 then
+        return ''
+    end
+
+    local path = ''
+    local i = 1
+    while stringUtils.isNullOrEmptyString(path) and i <= #paths do
+        if stringUtils.stringContains(paths[i], '/Steam/userdata/') then
+            path = paths[i]
+        end
+        i = i + 1
+    end
+
+    if stringUtils.isNullOrEmptyString(path) then
+        return ''
+    end
+
+    local pos1 = string.find(path, '/Steam/userdata/')
+    if pos1 == nil then return '' end
+
+    local steamParentPath = string.sub(path, 1, pos1)
+    if stringUtils.isNullOrEmptyString(steamParentPath) then return '' end
+
+    return steamParentPath .. 'Steam/steamapps/common/\'Transport Fever 2\'/'
+end
+
+local function _getGamePath_Windows()
+    local cpaths = _getPackageCpaths()
+    if type(cpaths) ~= 'table' or #cpaths < 1 then
+        return ''
+    end
+
+    local cpath = ''
+    local i = 1
+    while stringUtils.isNullOrEmptyString(cpath) and i <= #cpaths do
+        if stringUtils.stringContains(cpaths[i], 'Transport Fever 2') then
+            cpath = cpaths[i]
+        end
+        i = i + 1
+    end
+
+    if stringUtils.isNullOrEmptyString(cpath) then
+        return ''
+    end
+
+    local reversedPath = string.reverse(cpath)
+    local one, two = string.find(reversedPath, '/2 reveF tropsnarT/')
+    if one == nil then
+        return ''
+    end
+
+    return string.reverse(string.sub(reversedPath, one)) or ''
+end
+
 
 local fileUtils = {}
 fileUtils.fileExists = function(filePath)
@@ -31,6 +167,8 @@ fileUtils.readGameDataFile = function(filePath)
     local fileContents = file:read('*a') -- this works! it reads the file contents! However, it adds a funny character at the beginning.
     -- print('LOLLO closing the file')
     file:close()
+
+    if stringUtils.isNullOrEmptyString(fileContents) then return false end
 
     -- We need to remove the funny character at the beginning
     -- and the function name, or load() will fail. Consider the following:
@@ -154,24 +292,11 @@ fileUtils.getResDirFromPath = function(path)
 end
 
 fileUtils.getFilesInDir = function(dirPath, filterFn)
-    local dirPathWithEndingSlash = stringUtils.stringEndsWith(dirPath, '/') and dirPath or (dirPath .. '/')
-    filterFn = type(filterFn) == 'function' and filterFn or function(fileName)
-            return true
-        end
-    local result = {}
-    local f = io.popen(string.format([[dir "%s" /b /a-d]], dirPathWithEndingSlash))
-    --local f = io.popen(string.format([[dir "%s" /b /ad]], dirPathWithEndingSlash))
-    if f then
-        for s in f:lines() do
-            if ((string.len(s) > 0) and filterFn(s)) then
-                result[#result + 1] = string.format([[%s%s]], dirPathWithEndingSlash, s)
-            --result[#result + 1] = string.format([[%s%s/]], dirPathWithEndingSlash, s)
-            end
-        end
-        f:close()
+    if _getIsPosixSystem() then
+        return _getFilesInDir_Posix(dirPath, filterFn)
+    else
+        return _getFilesInDir_Windows(dirPath, filterFn)
     end
-
-    return result
 end
 
 fileUtils.getFilesInDirWithExtension = function(dirPath, ext)
@@ -189,53 +314,11 @@ fileUtils.getFilesInDirWithExtension = function(dirPath, ext)
 end
 
 fileUtils.getGamePath = function()
-    dbg()
-    local cpaths = fileUtils.getPackageCpaths()
-    if type(cpaths) ~= 'table' or #cpaths < 1 then
-        return ''
+    if _getIsPosixSystem() then
+        return _getGamePath_Posix()
+    else
+        return _getGamePath_Windows()
     end
-
-    local cpath = ''
-    local i = 1
-    while stringUtils.isNullOrEmptyString(cpath) and i <= #cpaths do
-        if stringUtils.stringContains(cpaths[i], 'Transport Fever 2') then
-            cpath = cpaths[i]
-        end
-        i = i + 1
-    end
-
-    dbg()
-    if stringUtils.isNullOrEmptyString(cpath) then
-        return ''
-    end
-
-    local reversedPath = string.reverse(cpath)
-    local one, two = string.find(reversedPath, '/2 reveF tropsnarT/')
-    if one == nil then
-        return ''
-    end
-
-    return string.reverse(string.sub(reversedPath, one)) or ''
-end
-
-fileUtils.getPackageCpaths = function()
-    -- returns something like
-    -- {
-    --     "C:\Program Files (x86)\Steam\steamapps\common\Transport Fever 2\?.dll",
-    --     "C:\Program Files (x86)\Steam\steamapps\common\Transport Fever 2\loadall.dll",
-    --     ".\?.dll"
-    -- }
-
-    return stringUtils.stringSplit(string.gsub(package.cpath, '\\', '/'), ';')
-end
-fileUtils.getPackagePaths = function()
-    -- returns something like
-    -- {
-    --     "C:/Program Files (x86)/Steam/userdata/<steam user id>/1066780/local/staging_area/lollo_street_tuning_1/res/scripts/?.lua",
-    --     "res/scripts/?.lua"
-    -- }
-
-    return stringUtils.stringSplit(string.gsub(package.path, '\\', '/'), ';')
 end
 
 return fileUtils

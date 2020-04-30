@@ -61,10 +61,6 @@ end
 local function _getStreetFilesContents(streetDirPath, fileNamePrefix)
     -- print('LOLLO current path = ')
     -- dump(true)(fileUtils.getCurrentPath())
-    -- print('LOLLO package paths = ')
-    -- dump(true)(fileUtils.getPackagePaths())
-    -- print('LOLLO package cpaths = ')
-    -- dump(true)(fileUtils.getPackageCpaths())
     -- print('LOLLO package.loaded = ')
     -- --dump(true)(package.loaded) huge
     -- for key, value in pairs(package.loaded) do
