@@ -60,6 +60,7 @@ stringUtils.stringEndsWith = function(testString, endString)
     return string.sub(testString, -(#endString)) == endString
 end
 stringUtils.stringContains = function(testString, containedString)
+    if type(testString) ~= 'string' or type(containedString) ~= 'string' then return false end
     return not (not (string.find(testString, containedString)))
 end
 
