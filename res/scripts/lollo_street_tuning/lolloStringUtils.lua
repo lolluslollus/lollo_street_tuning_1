@@ -12,6 +12,13 @@ stringUtils.isNullOrEmptyString = function(str)
     return str == nil or (type(str) == 'string' and string.len(str) == 0)
 end
 stringUtils.stringContainsOneOf = function(testString, tab)
+    if stringUtils.isNullOrEmptyString(testString) then
+        return false
+    end
+    if type(tab) ~= 'table' or #tab == 0 then
+        return false
+    end
+
     for i, v in ipairs(tab) do
         if stringUtils.stringContains(testString, v) then
             return true
@@ -60,7 +67,9 @@ stringUtils.stringEndsWith = function(testString, endString)
     return string.sub(testString, -(#endString)) == endString
 end
 stringUtils.stringContains = function(testString, containedString)
-    if type(testString) ~= 'string' or type(containedString) ~= 'string' then return false end
+    if type(testString) ~= 'string' or type(containedString) ~= 'string' then
+        return false
+    end
     return not (not (string.find(testString, containedString)))
 end
 
