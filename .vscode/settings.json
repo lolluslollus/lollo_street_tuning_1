@@ -1,8 +1,13 @@
 {
-	"files.associations": {
-		"*.con": "lua",
-		"*.mdl": "lua",
-		"*.module": "lua",
-		"*.mtl": "lua"
-	}
+    "files.associations": {
+        "*.con": "lua",
+        "*.mdl": "lua",
+        "*.module": "lua",
+        "*.mtl": "lua"
+    },
+    "Lua.diagnostics.globals": [
+        "_",
+        "data",
+        "game",
+    ]
 }
