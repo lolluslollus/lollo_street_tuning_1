@@ -23,7 +23,7 @@ function data()
         country = false,
         speed = 60.0,
         type = "lollo_x_large_6_tram_tracks_street.lua",
-        name = _("Extra-large street with 6 tram tracks"),
+        name = _("Extra large street with 6 tram tracks"),
         desc = _("Six-lane street with 6 tram tracks. The speed limit is %2%."),
         categories = { "urban" },
         borderGroundTex = "street_border.lua",
