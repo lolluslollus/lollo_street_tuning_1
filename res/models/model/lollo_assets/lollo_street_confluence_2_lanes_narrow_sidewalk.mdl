@@ -25,30 +25,7 @@ function data()
                             materials = { "street/new_medium_sidewalk_border_inner.mtl", "street/new_medium_sidewalk.mtl", },
                             mesh = "station/road/streetstation/era_c/pltfrm_r_top_lod0.msh",
                             name = "pltfrm_r_top",
-                            transf = { 0, .93, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0, -7.5, 0, 0, 1, },
-                        },
-                        {
-                            materials = {'street/new_medium_sidewalk_border_inner.mtl', 'street/new_medium_sidewalk.mtl'},
-                            mesh = "station/road/streetstation/pedestrian_era_c/end_r_lod0.msh",
-                            name = "end_l",
-                            transf = { -1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, -5, 1.25, 0, 1, },
-                        },
-                        -- {
-                        --     materials = {'street/new_medium_sidewalk_border_inner.mtl', 'street/new_medium_sidewalk.mtl'},
-                        --     mesh = "station/road/streetstation/pedestrian_era_c/end_r_lod0.msh",
-                        --     name = "end_l",
-                        --     transf = { -1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, -5, 2.5, 0, 1, },
-                        -- },
-                        -- straight bits
-                        {
-                            materials = {'street/new_medium_sidewalk_border_inner.mtl', 'street/new_medium_sidewalk.mtl'},
-                            mesh = 'station/road/streetstation/pedestrian_era_c/straight_lod0.msh',
-                            transf = {1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, -7.5, 0, 1}
-                        },
-                        {
-                            materials = {'street/new_medium_sidewalk_border_inner.mtl', 'street/new_medium_sidewalk.mtl'},
-                            mesh = 'station/road/streetstation/pedestrian_era_c/straight_lod0.msh',
-                            transf = {1, 0, 0, 0, 0, -1, 0, 0, 0, 0, 1, 0, 0, 7.5, 0, 1}
+                            transf = { 0, .40, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0, -7.5, 0, 0, 1, },
                         },
                         -- bevel the pavement outside
                         -- left
@@ -56,57 +33,46 @@ function data()
                             --materials = {'station/road/streetstation/streetstation_perron_border.mtl', 'station/road/streetstation/streetstation_perron_base_new.mtl'},
                             materials = {'street/new_medium_sidewalk_border_inner.mtl', 'street/new_medium_sidewalk.mtl'},
                             mesh = 'station/road/streetstation/pedestrian_era_c/straight_spcl2_r_lod0.msh',
-                            mesh = "station/road/streetstation/pedestrian_era_c/corner_out_lod0.msh",
+                            -- mesh = "station/road/streetstation/pedestrian_era_c/corner_out_lod0.msh",
                             name = 'straight_spcl2_l',
-                            transf = {1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, -5, 10, 0, 1}
-                        },
-                        {
-                            materials = {'street/new_medium_sidewalk_border_inner.mtl', 'street/new_medium_sidewalk.mtl'},
-                            mesh = "station/road/streetstation/pedestrian_era_c/end_l_lod0.msh",
-                            name = "end_l",
-                            transf = { 1, 0, 0, 0, 0, .6, 0, 0, 0, 0, 1, 0, -5, 6, 0, 1, },
+                            transf = {2, 0, 0, 0, 0, 2, 0, 0, 0, 0, 1, 0, -2.5, 10, 0, 1}
                         },
                         -- right
                         {
                             --materials = {'station/road/streetstation/streetstation_perron_border.mtl', 'station/road/streetstation/streetstation_perron_base_new.mtl'},
                             materials = {'street/new_medium_sidewalk_border_inner.mtl', 'street/new_medium_sidewalk.mtl'},
-                            mesh = "station/road/streetstation/pedestrian_era_c/corner_out_lod0.msh",
+                            mesh = 'station/road/streetstation/pedestrian_era_c/straight_spcl2_r_lod0.msh',
+                            -- mesh = "station/road/streetstation/pedestrian_era_c/corner_out_lod0.msh",
                             name = 'straight_spcl2_l',
-                            transf = {1, 0, 0, 0, 0, -1, 0, 0, 0, 0, 1, 0, -5, -10, 0, 1}
+                            transf = {2, 0, 0, 0, 0, -2, 0, 0, 0, 0, 1, 0, -2.5, -10, 0, 1}
+                        },
+                        -- bevel the pavement inside
+                        {
+                            --materials = {'station/road/streetstation/streetstation_perron_border.mtl', 'station/road/streetstation/streetstation_perron_base_new.mtl'},
+                            materials = {'street/new_medium_sidewalk_border_inner.mtl', 'street/new_medium_sidewalk.mtl'},
+                            mesh = 'station/road/streetstation/pedestrian_era_c/straight_spcl2_r_lod0.msh',
+                            -- mesh = "station/road/streetstation/pedestrian_era_c/corner_out_lod0.msh",
+                            name = 'straight_spcl2_l',
+                            transf = {-0.4, 0, 0, 0, 0, 0.4, 0, 0, 0, 0, 1, 0, -1.6, -4, 0, 1}
                         },
                         {
+                            --materials = {'station/road/streetstation/streetstation_perron_border.mtl', 'station/road/streetstation/streetstation_perron_base_new.mtl'},
                             materials = {'street/new_medium_sidewalk_border_inner.mtl', 'street/new_medium_sidewalk.mtl'},
-                            mesh = "station/road/streetstation/pedestrian_era_c/end_l_lod0.msh",
-                            name = "end_l",
-                            transf = { 1, 0, 0, 0, 0, -.6, 0, 0, 0, 0, 1, 0, -5, -6, 0, 1, },
+                            mesh = 'station/road/streetstation/pedestrian_era_c/straight_spcl2_r_lod0.msh',
+                            -- mesh = "station/road/streetstation/pedestrian_era_c/corner_out_lod0.msh",
+                            name = 'straight_spcl2_l',
+                            transf = {-0.4, 0, 0, 0, 0, -0.4, 0, 0, 0, 0, 1, 0, -1.6, 4, 0, 1}
                         },
-                        -- {
-                        --     --materials = {'station/road/streetstation/streetstation_perron_border.mtl', 'station/road/streetstation/streetstation_perron_base_new.mtl'},
-                        --     materials = {'street/new_medium_sidewalk_border_inner.mtl', 'street/new_medium_sidewalk.mtl'},
-                        --     mesh = 'station/road/streetstation/pedestrian_era_c/straight_spcl2_r_lod0.msh',
-                        --     name = 'straight_spcl2_l',
-                        --     transf = {0, -1, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0, -2.5, -5, 0, 1}
-                        -- },
                         -- ground
                         {
                             materials = {'street/country_new_medium_paving.mtl'},
                             mesh = 'station/rail/era_c/station_1_main/station_1_main_perron_lod0.msh',
-                            transf = {.38, 0, 0, 0, 0, .6, 0, 0, 0, 0, 1, 0, -1.15, 7.6, -.795, 1}
+                            transf = {0.26, 0, 0, 0, 0, .99, 0, 0, 0, 0, 1, 0, 0.0, 4.9, -.795, 1}
                         },
                         {
                             materials = {'street/country_new_medium_paving.mtl'},
                             mesh = 'station/rail/era_c/station_1_main/station_1_main_perron_lod0.msh',
-                            transf = {.38, 0, 0, 0, 0, .99, 0, 0, 0, 0, 1, 0, -1.15, 4.9, -.795, 1}
-                        },
-                        {
-                            materials = {'street/country_new_medium_paving.mtl'},
-                            mesh = 'station/rail/era_c/station_1_main/station_1_main_perron_lod0.msh',
-                            transf = {.38, 0, 0, 0, 0, .99, 0, 0, 0, 0, 1, 0, -1.15, 0, -.795, 1}
-                        },
-                        {
-                            materials = {'street/country_new_medium_paving.mtl'},
-                            mesh = 'station/rail/era_c/station_1_main/station_1_main_perron_lod0.msh',
-                            transf = {.38, 0, 0, 0, 0, .6, 0, 0, 0, 0, 1, 0, -1.15, -4.9, -.795, 1}
+                            transf = {0.26, 0, 0, 0, 0, .99, 0, 0, 0, 0, 1, 0, 0.0, 0, -.795, 1}
                         },
                     },
                     transf = {.8, 0, 0, 0, 0, .8, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1}
@@ -134,29 +100,12 @@ function data()
                         linkable = false,
                         nodes = {
                             {
-                                {-2, -3, 0.00000},
+                                {-2, -2, 0.00000},
                                 {1, 0, 0},
                                 2.4
                             },
                             {
-                                {-1.8, -3, 0.00000},
-                                {1, 0, 0},
-                                2.4
-                            },
-                        },
-                        speedLimit = 100,
-                        transportModes = {'BUS', 'CAR', 'ELECTRIC_TRAM', 'TRAM', 'TRUCK'}
-                    },
-                    {
-                        linkable = false,
-                        nodes = {
-                            {
-                                {1.8, -3, 0.00000},
-                                {1, 0, 0},
-                                2.4
-                            },
-                            {
-                                {2, -3, 0.00000},
+                                {-1.8, -2, 0.00000},
                                 {1, 0, 0},
                                 2.4
                             },
@@ -168,12 +117,12 @@ function data()
                         linkable = false,
                         nodes = {
                             {
-                                {-2, 3, 0.00000},
+                                {1.8, -2, 0.00000},
                                 {1, 0, 0},
                                 2.4
                             },
                             {
-                                {-1.8, 3, 0.00000},
+                                {2, -2, 0.00000},
                                 {1, 0, 0},
                                 2.4
                             },
@@ -185,12 +134,29 @@ function data()
                         linkable = false,
                         nodes = {
                             {
-                                {1.8, 3, 0.00000},
+                                {-2, 2, 0.00000},
                                 {1, 0, 0},
                                 2.4
                             },
                             {
-                                {2, 3, 0.00000},
+                                {-1.8, 2, 0.00000},
+                                {1, 0, 0},
+                                2.4
+                            },
+                        },
+                        speedLimit = 100,
+                        transportModes = {'BUS', 'CAR', 'ELECTRIC_TRAM', 'TRAM', 'TRUCK'}
+                    },
+                    {
+                        linkable = false,
+                        nodes = {
+                            {
+                                {1.8, 2, 0.00000},
+                                {1, 0, 0},
+                                2.4
+                            },
+                            {
+                                {2, 2, 0.00000},
                                 {1, 0, 0},
                                 2.4
                             },
@@ -242,14 +208,14 @@ function data()
                                 -- },
                                 ['shorter_right_lane'] = {
                                     -- right with | | below and || above
-                                    {{6.00000, -7.00000, 0.30000}, {2.00000, -7.00000, 0.30000}, {-2.00000, -7.00000, 0.30000}}
+                                    {{2.00000, -6.00000, 0.30000}, {-2.00000, -3.60000, 0.30000}}
                                 },
                                 -- ['left_lane'] = { -- left with | | below and || above
                                 --     {{10.00000, 6.00000, 0.30000}, {2.00000, 6.00000, 0.30000}, {-2.00000, 7.00000, 0.30000}, {-6.00000, 7.00000, 0.30000}}
                                 -- }
                                 ['shorter_left_lane'] = {
                                     -- left with | | below and || above
-                                    {{6.00000, 7.00000, 0.30000}, {2.00000, 7.00000, 0.30000}, {-2.00000, 7.00000, 0.30000}}
+                                    {{2.00000, 6.00000, 0.30000}, {-2.00000, 3.60000, 0.30000}}
                                 }
                             }
                         },

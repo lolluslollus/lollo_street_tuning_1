@@ -2,36 +2,12 @@
     return {
         -- numLanes = 4,
         laneConfig = {
-            {
-                forward = false,
-                transportModesLane = {'BUS', 'ELECTRIC_TRAM', 'PERSON', 'TRAM'},
-                transportModes = {'BUS', 'ELECTRIC_TRAM', 'PERSON', 'TRAM'}
-            },
-            {
-                forward = false,
-                transportModesLane = {'BUS', 'CAR', 'ELECTRIC_TRAM', 'TRAM'},
-                transportModes = {'BUS', 'CAR', 'ELECTRIC_TRAM', 'TRAM'}
-            },
-            {
-                forward = false,
-                transportModesLane = {'BUS', 'CAR', 'ELECTRIC_TRAM', 'TRAM', 'TRUCK'},
-                transportModes = {'BUS', 'CAR', 'ELECTRIC_TRAM', 'TRAM', 'TRUCK'}
-            },
-            {
-                forward = true,
-                transportModesLane = {'BUS', 'CAR', 'ELECTRIC_TRAM', 'TRAM', 'TRUCK'},
-                transportModes = {'BUS', 'CAR', 'ELECTRIC_TRAM', 'TRAM', 'TRUCK'}
-            },
-            {
-                forward = true,
-                transportModesLane = {'BUS', 'CAR', 'ELECTRIC_TRAM', 'TRAM'},
-                transportModes = {'BUS', 'CAR', 'ELECTRIC_TRAM', 'TRAM'}
-            },
-            {
-                forward = true,
-                transportModesLane = {'BUS', 'ELECTRIC_TRAM', 'PERSON', 'TRAM'},
-                transportModes = {'BUS', 'ELECTRIC_TRAM', 'PERSON', 'TRAM'}
-            }
+            {forward = false},
+            {forward = false},
+            {forward = false},
+            {forward = true},
+            {forward = true},
+            {forward = true}
         },
         --transportModesStreet = {"CAR", "TRUCK"},
         --transportModesSidewalk = {"BUS", "ELECTRIC_TRAM", "PERSON", "TRAM"}, --crashes
@@ -101,7 +77,6 @@
             crossingCrosswalk = {
                 name = 'street/new_medium_crosswalk.mtl',
                 size = {3.0, 2.5}
-                -- size = { 2.5, 2.5 }
             },
             crossingStopline = {
                 name = 'street/new_medium_stopline.mtl',
