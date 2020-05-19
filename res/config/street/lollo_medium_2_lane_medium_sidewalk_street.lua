@@ -2,12 +2,12 @@
     return {
         --numLanes = 4,
         laneConfig = {
-            {forward = true},
-            {forward = true},
+            {forward = false},
+            {forward = false},
             --		{forward = true },
             --		{forward = true, },
-            {forward = false},
-            {forward = false}
+            {forward = true},
+            {forward = true}
         },
         --transportModesStreet = {'CAR', 'BUS', 'ELECTRIC_TRAM', 'TRAM', 'TRUCK'}, -- with this, tram tracks appear on all lanes, not only on the right one
         --transportModesSidewalk = { "PERSON", "TRUCK" }, --crashes
