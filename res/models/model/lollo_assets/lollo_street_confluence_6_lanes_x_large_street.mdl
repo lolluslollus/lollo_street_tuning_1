@@ -180,6 +180,14 @@ function data()
                                     -- right with | | below and || above
                                     {{1.8, -6, 0.00000}, {2, -6, 0.00000}}
                                 },
+                                ['inner_centre_right_lane'] = {
+                                    -- right with | | below and || above
+                                    {{-1.8, -6, 0.00000}, {1.8, -2, 0.00000}, {2, -2, 0.00000}}
+                                },
+                                ['inner_centre_left_lane'] = {
+                                    -- right with | | below and || above
+                                    {{-1.8, 6, 0.00000}, {1.8, 2, 0.00000}, {2, 2, 0.00000}}
+                                },
                                 ['centre_left_lane_one'] = {
                                     -- right with | | below and || above
                                     {{-2, 6, 0.00000}, {-1.8, 6, 0.00000}}
