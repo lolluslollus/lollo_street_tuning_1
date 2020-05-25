@@ -1,6 +1,7 @@
 function data()
     return {
         numLanes = 2,
+        -- transportModesStreet = {'PERSON'}, -- dumps
         sidewalkWidth = 0.2,
         sidewalkHeight = .0,
         streetWidth = 0.1,
