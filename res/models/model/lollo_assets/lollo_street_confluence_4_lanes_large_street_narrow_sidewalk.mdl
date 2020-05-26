@@ -177,7 +177,7 @@ function data()
                         },
                         {'BUS', 'CAR', 'ELECTRIC_TRAM', 'TRAM', 'TRUCK'},
                         100,
-                        2.4,
+                        3.0,
                         false --linkable
                     ),
                     -- pedestrians

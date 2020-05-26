@@ -4,8 +4,6 @@
         laneConfig = {
             {forward = false},
             {forward = false},
-            --		{forward = true },
-            --		{forward = true, },
             {forward = true},
             {forward = true}
         },

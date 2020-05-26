@@ -2,22 +2,14 @@
     return {
         --numLanes = 6,
         laneConfig = {
-            {forward = false, transportModesLane = {'PERSON', 'TRUCK'}, transportModes = {'PERSON', 'TRUCK'}},
-            {forward = false, transportModesLane = {'CAR', 'TRUCK'}, transportModes = {'CAR', 'TRUCK'}},
-            {forward = false, transportModesLane = {'CAR', 'TRUCK'}, transportModes = {'CAR', 'TRUCK'}},
-            {
-                forward = false,
-                transportModesLane = {'BUS', 'CAR', 'ELECTRIC_TRAM', 'TRAM', 'TRUCK'},
-                transportModes = {'BUS', 'CAR', 'ELECTRIC_TRAM', 'TRAM', 'TRUCK'}
-            },
-            {
-                forward = true,
-                transportModesLane = {'BUS', 'CAR', 'ELECTRIC_TRAM', 'TRAM', 'TRUCK'},
-                transportModes = {'BUS', 'CAR', 'ELECTRIC_TRAM', 'TRAM', 'TRUCK'}
-            },
-            {forward = true, transportModesLane = {'CAR', 'TRUCK'}, transportModes = {'CAR', 'TRUCK'}},
-            {forward = true, transportModesLane = {'CAR', 'TRUCK'}, transportModes = {'CAR', 'TRUCK'}},
-            {forward = true, transportModesLane = {'PERSON', 'TRUCK'}, transportModes = {'PERSON', 'TRUCK'}}
+            {forward = false},
+            {forward = false},
+            {forward = false},
+            {forward = false},
+            {forward = true},
+            {forward = true},
+            {forward = true},
+            {forward = true},
         },
         --transportModesStreet = {'CAR', 'BUS', 'ELECTRIC_TRAM', 'TRAM', 'TRUCK'}, -- with this, tram tracks appear on all lanes, not only on the right one
         --transportModesSidewalk = { "PERSON", "TRUCK" }, --crashes

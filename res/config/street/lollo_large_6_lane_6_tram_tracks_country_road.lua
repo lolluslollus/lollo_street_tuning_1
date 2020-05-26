@@ -2,46 +2,14 @@ function data()
     return {
         --numLanes = 6,
         laneConfig = {
-            {
-                forward = false,
-                transportModesLane = {'BUS', 'ELECTRIC_TRAM', 'PERSON', 'TRAM'},
-                transportModes = {'BUS', 'ELECTRIC_TRAM', 'PERSON', 'TRAM'}
-            },
-            {
-                forward = false,
-                transportModesLane = {'BUS', 'CAR', 'ELECTRIC_TRAM', 'TRAM'},
-                transportModes = {'BUS', 'CAR', 'ELECTRIC_TRAM', 'TRAM'}
-            },
-            {
-                forward = false,
-                transportModesLane = {'BUS', 'CAR', 'ELECTRIC_TRAM', 'TRAM'},
-                transportModes = {'BUS', 'CAR', 'ELECTRIC_TRAM', 'TRAM'}
-            },
-            {
-                forward = false,
-                transportModesLane = {'BUS', 'CAR', 'ELECTRIC_TRAM', 'TRAM', 'TRUCK'},
-                transportModes = {'BUS', 'CAR', 'ELECTRIC_TRAM', 'TRAM', 'TRUCK'}
-            },
-            {
-                forward = true,
-                transportModesLane = {'BUS', 'CAR', 'ELECTRIC_TRAM', 'TRAM', 'TRUCK'},
-                transportModes = {'BUS', 'CAR', 'ELECTRIC_TRAM', 'TRAM', 'TRUCK'}
-            },
-            {
-                forward = true,
-                transportModesLane = {'BUS', 'CAR', 'ELECTRIC_TRAM', 'TRAM'},
-                transportModes = {'BUS', 'CAR', 'ELECTRIC_TRAM', 'TRAM'}
-            },
-            {
-                forward = true,
-                transportModesLane = {'BUS', 'CAR', 'ELECTRIC_TRAM', 'TRAM'},
-                transportModes = {'BUS', 'CAR', 'ELECTRIC_TRAM', 'TRAM'}
-            },
-            {
-                forward = true,
-                transportModesLane = {'BUS', 'ELECTRIC_TRAM', 'PERSON', 'TRAM'},
-                transportModes = {'BUS', 'ELECTRIC_TRAM', 'PERSON', 'TRAM'}
-            }
+            {forward = false},
+            {forward = false},
+            {forward = false},
+            {forward = false},
+            {forward = true},
+            {forward = true},
+            {forward = true},
+            {forward = true},
         },
         transportModesStreet = {'CAR', 'BUS', 'ELECTRIC_TRAM', 'TRAM', 'TRUCK'}, -- with this, tram tracks appear on all lanes, not only on the right one
         streetWidth = 20.0,
