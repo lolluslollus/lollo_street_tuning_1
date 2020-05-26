@@ -270,6 +270,9 @@ helper.makeEdges = function(direction, pitch, node0, node1, tan0, tan1)
     --         {pitchUtil.getXYZPitched(pitch, {-2, -3, .0}), {-1, .0, .0}}, -- node 0
     --         {pitchUtil.getXYZPitched(pitch, {-6, -3, .0}), {-1, .0, .0}} -- node 1
     --     }
+    if tan0 == nil then tan0 = {1, 0, 0} end
+    if tan1 == nil then tan1 = {1, 0, 0} end
+
     return direction == 0 and
         {
             -- one entry refers to a position and a tangent

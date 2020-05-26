@@ -9,19 +9,24 @@ function data()
     --     'lollo_medium_1_way_1_lane_street.lua'
     -- }
     local function _getNonSnapEdgeLists(params, pitch, streetData, tramTrackType)
+        local distance = params.distance or 0.0
+        local halfDistance = distance / 2.0
+        local halfIslandWidth = (params.islandWidth or 0.0) / 2.0
+        local streetHalfWidth = streetData.sidewalkWidth + streetData.streetWidth / 2.0
+        local streetFullWidth = streetData.sidewalkWidth + streetData.sidewalkWidth + streetData.streetWidth
+        local edgeParams = {
+            skipCollision = true,
+            -- skipCollisionCheck = true,
+            type = streetData.fileName,
+            tramTrackType = tramTrackType
+        }
         local edgeLists
         if params.howManyStreetsBase0 == 0 then -- 1 street
-            local streetHalfWidth = streetData.sidewalkWidth + streetData.streetWidth / 2.0
             edgeLists = {
                 {
                     type = 'STREET',
-                    params = {
-                        skipCollision = true,
-                        -- skipCollisionCheck = true,
-                        type = streetData.fileName,
-                        tramTrackType = tramTrackType
-                    },
-                    edges = streetChunksHelper.makeEdges(params.direction, pitch, {-streetHalfWidth, 0, 0}, {streetHalfWidth, 0, 0}, {1, 0, 0}, {1, 0, 0}),
+                    params = edgeParams,
+                    edges = streetChunksHelper.makeEdges(params.direction, pitch, {-streetHalfWidth, 0, 0}, {streetHalfWidth, 0, 0}),
                     -- edgeType = "BRIDGE",
                     -- edgeTypeName = "cement.lua",
                     -- collider = {
@@ -38,466 +43,253 @@ function data()
                 }
             }
         elseif params.howManyStreetsBase0 == 1 then -- 2 streets
-            local streetHalfWidth = streetData.sidewalkWidth + streetData.streetWidth / 2.0
-            local halfDistance = params.distance / 2.0
             edgeLists = {
                 {
                     type = 'STREET',
-                    params = {
-                        skipCollision = true,
-                        type = streetData.fileName,
-                        tramTrackType = tramTrackType
-                    },
+                    params = edgeParams,
                     edges = streetChunksHelper.makeEdges(
                         params.direction,
                         pitch,
-                        {-streetHalfWidth, -streetHalfWidth - halfDistance, 0},
-                        {streetHalfWidth, -streetHalfWidth - halfDistance, 0},
-                        {1, 0, 0},
-                        {1, 0, 0}
+                        {-streetHalfWidth, -streetHalfWidth - halfDistance - halfIslandWidth, 0},
+                        {streetHalfWidth, -streetHalfWidth - halfDistance - halfIslandWidth, 0}
                     ),
                     freeNodes = {0, 1},
                     snapNodes = {}
                 },
                 {
                     type = 'STREET',
-                    params = {
-                        skipCollision = true,
-                        type = streetData.fileName,
-                        tramTrackType = tramTrackType
-                    },
+                    params = edgeParams,
                     edges = streetChunksHelper.makeEdges(
                         params.direction,
                         pitch,
-                        {-streetHalfWidth, streetHalfWidth + halfDistance, 0},
-                        {streetHalfWidth, streetHalfWidth + halfDistance, 0},
-                        {1, 0, 0},
-                        {1, 0, 0}
+                        {-streetHalfWidth, streetHalfWidth + halfDistance + halfIslandWidth, 0},
+                        {streetHalfWidth, streetHalfWidth + halfDistance +  halfIslandWidth, 0}
                     ),
                     freeNodes = {0, 1},
                     snapNodes = {}
                 }
             }
         elseif params.howManyStreetsBase0 == 2 then -- 3 streets
-            local streetHalfWidth = streetData.sidewalkWidth + streetData.streetWidth / 2.0
-            local streetFullWidth = streetData.sidewalkWidth + streetData.sidewalkWidth + streetData.streetWidth
-            local distance = params.distance
             edgeLists = {
                 {
                     type = 'STREET',
-                    params = {
-                        skipCollision = true,
-                        type = streetData.fileName,
-                        tramTrackType = tramTrackType
-                    },
+                    params = edgeParams,
                     edges = streetChunksHelper.makeEdges(
                         params.direction,
                         pitch,
                         {-streetHalfWidth, -streetFullWidth - distance, 0},
-                        {streetHalfWidth, -streetFullWidth - distance, 0},
-                        {1, 0, 0},
-                        {1, 0, 0}
+                        {streetHalfWidth, -streetFullWidth - distance, 0}
                     ),
                     freeNodes = {0, 1},
                     snapNodes = {}
                 },
                 {
                     type = 'STREET',
-                    params = {
-                        skipCollision = true,
-                        type = streetData.fileName,
-                        tramTrackType = tramTrackType
-                    },
-                    edges = streetChunksHelper.makeEdges(params.direction, pitch, {-streetHalfWidth, 0, 0}, {streetHalfWidth, 0, 0}, {1, 0, 0}, {1, 0, 0}),
+                    params = edgeParams,
+                    edges = streetChunksHelper.makeEdges(params.direction, pitch, {-streetHalfWidth, 0, 0}, {streetHalfWidth, 0, 0}),
                     freeNodes = {0, 1},
                     snapNodes = {}
                 },
                 {
                     type = 'STREET',
-                    params = {
-                        skipCollision = true,
-                        type = streetData.fileName,
-                        tramTrackType = tramTrackType
-                    },
+                    params = edgeParams,
                     edges = streetChunksHelper.makeEdges(
                         params.direction,
                         pitch,
                         {-streetHalfWidth, streetFullWidth + distance, 0},
-                        {streetHalfWidth, streetFullWidth + distance, 0},
-                        {1, 0, 0},
-                        {1, 0, 0}
+                        {streetHalfWidth, streetFullWidth + distance, 0}
                     ),
                     freeNodes = {0, 1},
                     snapNodes = {}
                 }
             }
-        else --if params.howManyStreetsBase0 == 3 then -- 4 streets -- always provide a fallback just in case
-            local streetHalfWidth = streetData.sidewalkWidth + streetData.streetWidth / 2.0
-            local streetThreeHalfWidth = 3.0 * streetHalfWidth
-            local halfDistance = params.distance / 2.0
-            local threeHalfDistance = 3.0 * halfDistance
+        elseif params.howManyStreetsBase0 == 3 then -- 4 streets
             edgeLists = {
                 {
                     type = 'STREET',
-                    params = {
-                        skipCollision = true,
-                        type = streetData.fileName,
-                        tramTrackType = tramTrackType
-                    },
+                    params = edgeParams,
                     edges = streetChunksHelper.makeEdges(
                         params.direction,
                         pitch,
-                        {-streetHalfWidth, -streetThreeHalfWidth - threeHalfDistance, 0},
-                        {streetHalfWidth, -streetThreeHalfWidth - threeHalfDistance, 0},
-                        {1, 0, 0},
-                        {1, 0, 0}
+                        {-streetHalfWidth, -3.0 * streetHalfWidth - 3.0 * halfDistance - halfIslandWidth, 0},
+                        {streetHalfWidth, -3.0 * streetHalfWidth - 3.0 * halfDistance - halfIslandWidth, 0}
                     ),
                     freeNodes = {0, 1},
                     snapNodes = {}
                 },
                 {
                     type = 'STREET',
-                    params = {
-                        skipCollision = true,
-                        type = streetData.fileName,
-                        tramTrackType = tramTrackType
-                    },
+                    params = edgeParams,
                     edges = streetChunksHelper.makeEdges(
                         params.direction,
                         pitch,
-                        {-streetHalfWidth, -streetHalfWidth - halfDistance, 0},
-                        {streetHalfWidth, -streetHalfWidth - halfDistance, 0},
-                        {1, 0, 0},
-                        {1, 0, 0}
+                        {-streetHalfWidth, -streetHalfWidth - halfDistance - halfIslandWidth, 0},
+                        {streetHalfWidth, -streetHalfWidth - halfDistance - halfIslandWidth, 0}
                     ),
                     freeNodes = {0, 1},
                     snapNodes = {}
                 },
                 {
                     type = 'STREET',
-                    params = {
-                        skipCollision = true,
-                        type = streetData.fileName,
-                        tramTrackType = tramTrackType
-                    },
+                    params = edgeParams,
                     edges = streetChunksHelper.makeEdges(
                         params.direction,
                         pitch,
-                        {-streetHalfWidth, streetHalfWidth + halfDistance, 0},
-                        {streetHalfWidth, streetHalfWidth + halfDistance, 0},
-                        {1, 0, 0},
-                        {1, 0, 0}
+                        {-streetHalfWidth, streetHalfWidth + halfDistance + halfIslandWidth, 0},
+                        {streetHalfWidth, streetHalfWidth + halfDistance + halfIslandWidth, 0}
                     ),
                     freeNodes = {0, 1},
                     snapNodes = {}
                 },
                 {
                     type = 'STREET',
-                    params = {
-                        skipCollision = true,
-                        type = streetData.fileName,
-                        tramTrackType = tramTrackType
-                    },
+                    params = edgeParams,
                     edges = streetChunksHelper.makeEdges(
                         params.direction,
                         pitch,
-                        {-streetHalfWidth, streetThreeHalfWidth + threeHalfDistance, 0},
-                        {streetHalfWidth, streetThreeHalfWidth + threeHalfDistance, 0},
-                        {1, 0, 0},
-                        {1, 0, 0}
+                        {-streetHalfWidth, 3.0 * streetHalfWidth + 3.0 * halfDistance + halfIslandWidth, 0},
+                        {streetHalfWidth, 3.0 * streetHalfWidth + 3.0 * halfDistance + halfIslandWidth, 0}
                     ),
                     freeNodes = {0, 1},
                     snapNodes = {}
                 }
             }
-        end
-        return edgeLists
-    end
-
-    local function _getSnapEdgeLists(params, pitch, streetData, tramTrackType)
-        local edgeLists
-        if params.howManyStreetsBase0 == 0 then -- 1 street
-            local streetHalfWidth = streetData.sidewalkWidth + streetData.streetWidth / 2.0
+        elseif params.howManyStreetsBase0 == 4 then -- 5 streets
             edgeLists = {
                 {
                     type = 'STREET',
-                    params = {
-                        skipCollision = true,
-                        -- skipCollisionCheck = true,
-                        type = streetData.fileName,
-                        tramTrackType = tramTrackType
-                    },
-                    edges = streetChunksHelper.makeEdges(params.direction, pitch, {-streetHalfWidth, 0, 0}, {0, 0, 0}, {1, 0, 0}, {1, 0, 0}),
-                    -- edgeType = "BRIDGE",
-                    -- edgeTypeName = "cement.lua",
-                    -- collider = {
-                    --     type = 'NONE'
-                    -- },
-                    -- autoRemovable = true,
-                    --skipCollision = true, --useless
-                    --skipCollisionCheck = true, --useless
-                    -- nodes that stick out of the construction
-                    freeNodes = params.direction == 0 and {0} or {1},
-                    -- nodes allowed to snap to other edges of the same type
-                    snapNodes = params.direction == 0 and {0} or {1}
-                    --					snapNodes = { 0, 1 },  -- node 0 and 1 are allowed to snap to other edges of the same type --crashes
-                    --					tag2nodes = {},
+                    params = edgeParams,
+                    edges = streetChunksHelper.makeEdges(
+                        params.direction,
+                        pitch,
+                        {-streetHalfWidth, -2.0 * streetFullWidth - 2.0 * distance, 0},
+                        {streetHalfWidth, -2.0 * streetFullWidth - 2.0 * distance, 0}
+                    ),
+                    freeNodes = {0, 1},
+                    snapNodes = {}
                 },
                 {
                     type = 'STREET',
-                    params = {
-                        skipCollision = true,
-                        -- skipCollisionCheck = true,
-                        type = streetData.fileName,
-                        tramTrackType = tramTrackType
-                    },
-                    edges = streetChunksHelper.makeEdges(params.direction, pitch, {0, 0, 0}, {streetHalfWidth, 0, 0}, {1, 0, 0}, {1, 0, 0}),
-                    freeNodes = params.direction == 0 and {1} or {0},
-                    snapNodes = params.direction == 0 and {1} or {0}
+                    params = edgeParams,
+                    edges = streetChunksHelper.makeEdges(
+                        params.direction,
+                        pitch,
+                        {-streetHalfWidth, -streetFullWidth - distance, 0},
+                        {streetHalfWidth, -streetFullWidth - distance, 0}
+                    ),
+                    freeNodes = {0, 1},
+                    snapNodes = {}
+                },
+                {
+                    type = 'STREET',
+                    params = edgeParams,
+                    edges = streetChunksHelper.makeEdges(
+                        params.direction,
+                        pitch,
+                        {-streetHalfWidth, 0, 0},
+                        {streetHalfWidth, 0, 0}
+                    ),
+                    freeNodes = {0, 1},
+                    snapNodes = {}
+                },
+                {
+                    type = 'STREET',
+                    params = edgeParams,
+                    edges = streetChunksHelper.makeEdges(
+                        params.direction,
+                        pitch,
+                        {-streetHalfWidth, streetFullWidth + distance, 0},
+                        {streetHalfWidth, streetFullWidth + distance, 0}
+                    ),
+                    freeNodes = {0, 1},
+                    snapNodes = {}
+                },
+                {
+                    type = 'STREET',
+                    params = edgeParams,
+                    edges = streetChunksHelper.makeEdges(
+                        params.direction,
+                        pitch,
+                        {-streetHalfWidth, 2.0 * streetFullWidth + 2.0 * distance, 0},
+                        {streetHalfWidth, 2.0 * streetFullWidth + 2.0 * distance, 0}
+                    ),
+                    freeNodes = {0, 1},
+                    snapNodes = {}
                 }
             }
-        elseif params.howManyStreetsBase0 == 1 then -- 2 streets
-            local streetHalfWidth = streetData.sidewalkWidth + streetData.streetWidth / 2.0
-            local halfDistance = params.distance / 2.0
+        else --if params.howManyStreetsBase0 == 5 then -- 6 streets -- always provide a fallback just in case
             edgeLists = {
                 {
                     type = 'STREET',
-                    params = {
-                        skipCollision = true,
-                        type = streetData.fileName,
-                        tramTrackType = tramTrackType
-                    },
-                    edges = streetChunksHelper.makeEdges(params.direction, pitch, {-streetHalfWidth, -streetHalfWidth - halfDistance, 0}, {0, -streetHalfWidth - halfDistance, 0}, {1, 0, 0}, {1, 0, 0}),
-                    freeNodes = params.direction == 0 and {0} or {1},
-                    snapNodes = params.direction == 0 and {0} or {1}
-                },
-                {
-                    type = 'STREET',
-                    params = {
-                        skipCollision = true,
-                        type = streetData.fileName,
-                        tramTrackType = tramTrackType
-                    },
-                    edges = streetChunksHelper.makeEdges(params.direction, pitch, {-streetHalfWidth, streetHalfWidth + halfDistance, 0}, {0, streetHalfWidth + halfDistance, 0}, {1, 0, 0}, {1, 0, 0}),
-                    freeNodes = params.direction == 0 and {0} or {1},
-                    snapNodes = params.direction == 0 and {0} or {1}
-                },
-                {
-                    type = 'STREET',
-                    params = {
-                        skipCollision = true,
-                        type = streetData.fileName,
-                        tramTrackType = tramTrackType
-                    },
-                    edges = streetChunksHelper.makeEdges(params.direction, pitch, {0, -streetHalfWidth - halfDistance, 0}, {streetHalfWidth, -streetHalfWidth - halfDistance, 0}, {1, 0, 0}, {1, 0, 0}),
-                    freeNodes = params.direction == 0 and {1} or {0},
-                    snapNodes = params.direction == 0 and {1} or {0}
-                },
-                {
-                    type = 'STREET',
-                    params = {
-                        skipCollision = true,
-                        type = streetData.fileName,
-                        tramTrackType = tramTrackType
-                    },
-                    edges = streetChunksHelper.makeEdges(params.direction, pitch, {0, streetHalfWidth + halfDistance, 0}, {streetHalfWidth, streetHalfWidth + halfDistance, 0}, {1, 0, 0}, {1, 0, 0}),
-                    freeNodes = params.direction == 0 and {1} or {0},
-                    snapNodes = params.direction == 0 and {1} or {0}
-                }
-            }
-        elseif params.howManyStreetsBase0 == 2 then -- 3 streets
-            local streetHalfWidth = streetData.sidewalkWidth + streetData.streetWidth / 2.0
-            local streetFullWidth = streetData.sidewalkWidth + streetData.sidewalkWidth + streetData.streetWidth
-            local distance = params.distance
-            edgeLists = {
-                {
-                    type = 'STREET',
-                    params = {
-                        skipCollision = true,
-                        type = streetData.fileName,
-                        tramTrackType = tramTrackType
-                    },
-                    edges = streetChunksHelper.makeEdges(params.direction, pitch, {-streetHalfWidth, -streetFullWidth - distance, 0}, {0, -streetFullWidth - distance, 0}, {1, 0, 0}, {1, 0, 0}),
-                    freeNodes = params.direction == 0 and {0} or {1},
-                    snapNodes = params.direction == 0 and {0} or {1}
-                },
-                {
-                    type = 'STREET',
-                    params = {
-                        skipCollision = true,
-                        type = streetData.fileName,
-                        tramTrackType = tramTrackType
-                    },
-                    edges = streetChunksHelper.makeEdges(params.direction, pitch, {-streetHalfWidth, 0, 0}, {0, 0, 0}, {1, 0, 0}, {1, 0, 0}),
-                    freeNodes = params.direction == 0 and {0} or {1},
-                    snapNodes = params.direction == 0 and {0} or {1}
-                },
-                {
-                    type = 'STREET',
-                    params = {
-                        skipCollision = true,
-                        type = streetData.fileName,
-                        tramTrackType = tramTrackType
-                    },
-                    edges = streetChunksHelper.makeEdges(params.direction, pitch, {-streetHalfWidth, streetFullWidth + distance, 0}, {0, streetFullWidth + distance, 0}, {1, 0, 0}, {1, 0, 0}),
-                    freeNodes = params.direction == 0 and {0} or {1},
-                    snapNodes = params.direction == 0 and {0} or {1}
-                },
-                {
-                    type = 'STREET',
-                    params = {
-                        skipCollision = true,
-                        type = streetData.fileName,
-                        tramTrackType = tramTrackType
-                    },
-                    edges = streetChunksHelper.makeEdges(params.direction, pitch, {0, -streetFullWidth - distance, 0}, {streetHalfWidth, -streetFullWidth - distance, 0}, {1, 0, 0}, {1, 0, 0}),
-                    freeNodes = params.direction == 0 and {1} or {0},
-                    snapNodes = params.direction == 0 and {1} or {0}
-                },
-                {
-                    type = 'STREET',
-                    params = {
-                        skipCollision = true,
-                        type = streetData.fileName,
-                        tramTrackType = tramTrackType
-                    },
-                    edges = streetChunksHelper.makeEdges(params.direction, pitch, {0, 0, 0}, {streetHalfWidth, 0, 0}, {1, 0, 0}, {1, 0, 0}),
-                    freeNodes = params.direction == 0 and {1} or {0},
-                    snapNodes = params.direction == 0 and {1} or {0}
-                },
-                {
-                    type = 'STREET',
-                    params = {
-                        skipCollision = true,
-                        type = streetData.fileName,
-                        tramTrackType = tramTrackType
-                    },
-                    edges = streetChunksHelper.makeEdges(params.direction, pitch, {0, streetFullWidth + distance, 0}, {streetHalfWidth, streetFullWidth + distance, 0}, {1, 0, 0}, {1, 0, 0}),
-                    freeNodes = params.direction == 0 and {1} or {0},
-                    snapNodes = params.direction == 0 and {1} or {0}
-                }
-            }
-        else --if params.howManyStreetsBase0 == 3 then -- 4 streets -- always provide a fallback just in case
-            local streetHalfWidth = streetData.sidewalkWidth + streetData.streetWidth / 2.0
-            local streetThreeHalfWidth = 3.0 * streetHalfWidth
-            local halfDistance = params.distance / 2.0
-            local threeHalfDistance = 3.0 * halfDistance
-            edgeLists = {
-                {
-                    type = 'STREET',
-                    params = {
-                        skipCollision = true,
-                        type = streetData.fileName,
-                        tramTrackType = tramTrackType
-                    },
+                    params = edgeParams,
                     edges = streetChunksHelper.makeEdges(
                         params.direction,
                         pitch,
-                        {-streetHalfWidth, -streetThreeHalfWidth - threeHalfDistance, 0},
-                        {0, -streetThreeHalfWidth - threeHalfDistance, 0},
-                        {1, 0, 0},
-                        {1, 0, 0}
+                        {-streetHalfWidth, -5.0 * streetHalfWidth - 5.0 * halfDistance - halfIslandWidth, 0},
+                        {streetHalfWidth, -5.0 * streetHalfWidth - 5.0 * halfDistance - halfIslandWidth, 0}
                     ),
-                    freeNodes = params.direction == 0 and {0} or {1},
-                    snapNodes = params.direction == 0 and {0} or {1}
+                    freeNodes = {0, 1},
+                    snapNodes = {}
                 },
                 {
                     type = 'STREET',
-                    params = {
-                        skipCollision = true,
-                        type = streetData.fileName,
-                        tramTrackType = tramTrackType
-                    },
-                    edges = streetChunksHelper.makeEdges(params.direction, pitch, {-streetHalfWidth, -streetHalfWidth - halfDistance, 0}, {0, -streetHalfWidth - halfDistance, 0}, {1, 0, 0}, {1, 0, 0}),
-                    freeNodes = params.direction == 0 and {0} or {1},
-                    snapNodes = params.direction == 0 and {0} or {1}
-                },
-                {
-                    type = 'STREET',
-                    params = {
-                        skipCollision = true,
-                        type = streetData.fileName,
-                        tramTrackType = tramTrackType
-                    },
-                    edges = streetChunksHelper.makeEdges(params.direction, pitch, {-streetHalfWidth, streetHalfWidth + halfDistance, 0}, {0, streetHalfWidth + halfDistance, 0}, {1, 0, 0}, {1, 0, 0}),
-                    freeNodes = params.direction == 0 and {0} or {1},
-                    snapNodes = params.direction == 0 and {0} or {1}
-                },
-                {
-                    type = 'STREET',
-                    params = {
-                        skipCollision = true,
-                        type = streetData.fileName,
-                        tramTrackType = tramTrackType
-                    },
+                    params = edgeParams,
                     edges = streetChunksHelper.makeEdges(
                         params.direction,
                         pitch,
-                        {-streetHalfWidth, streetThreeHalfWidth + threeHalfDistance, 0},
-                        {0, streetThreeHalfWidth + threeHalfDistance, 0},
-                        {1, 0, 0},
-                        {1, 0, 0}
+                        {-streetHalfWidth, -3.0 * streetHalfWidth - 3.0 * halfDistance - halfIslandWidth, 0},
+                        {streetHalfWidth, -3.0 * streetHalfWidth - 3.0 * halfDistance - halfIslandWidth, 0}
                     ),
-                    freeNodes = params.direction == 0 and {0} or {1},
-                    snapNodes = params.direction == 0 and {0} or {1}
+                    freeNodes = {0, 1},
+                    snapNodes = {}
                 },
                 {
                     type = 'STREET',
-                    params = {
-                        skipCollision = true,
-                        type = streetData.fileName,
-                        tramTrackType = tramTrackType
-                    },
+                    params = edgeParams,
                     edges = streetChunksHelper.makeEdges(
                         params.direction,
                         pitch,
-                        {0, -streetThreeHalfWidth - threeHalfDistance, 0},
-                        {streetHalfWidth, -streetThreeHalfWidth - threeHalfDistance, 0},
-                        {1, 0, 0},
-                        {1, 0, 0}
+                        {-streetHalfWidth, -streetHalfWidth - halfDistance - halfIslandWidth, 0},
+                        {streetHalfWidth, -streetHalfWidth - halfDistance - halfIslandWidth, 0}
                     ),
-                    freeNodes = params.direction == 0 and {1} or {0},
-                    snapNodes = params.direction == 0 and {1} or {0}
+                    freeNodes = {0, 1},
+                    snapNodes = {}
                 },
                 {
                     type = 'STREET',
-                    params = {
-                        skipCollision = true,
-                        type = streetData.fileName,
-                        tramTrackType = tramTrackType
-                    },
-                    edges = streetChunksHelper.makeEdges(params.direction, pitch, {0, -streetHalfWidth - halfDistance, 0}, {streetHalfWidth, -streetHalfWidth - halfDistance, 0}, {1, 0, 0}, {1, 0, 0}),
-                    freeNodes = params.direction == 0 and {1} or {0},
-                    snapNodes = params.direction == 0 and {1} or {0}
-                },
-                {
-                    type = 'STREET',
-                    params = {
-                        skipCollision = true,
-                        type = streetData.fileName,
-                        tramTrackType = tramTrackType
-                    },
-                    edges = streetChunksHelper.makeEdges(params.direction, pitch, {0, streetHalfWidth + halfDistance, 0}, {streetHalfWidth, streetHalfWidth + halfDistance, 0}, {1, 0, 0}, {1, 0, 0}),
-                    freeNodes = params.direction == 0 and {1} or {0},
-                    snapNodes = params.direction == 0 and {1} or {0}
-                },
-                {
-                    type = 'STREET',
-                    params = {
-                        skipCollision = true,
-                        type = streetData.fileName,
-                        tramTrackType = tramTrackType
-                    },
+                    params = edgeParams,
                     edges = streetChunksHelper.makeEdges(
                         params.direction,
                         pitch,
-                        {0, streetThreeHalfWidth + threeHalfDistance, 0},
-                        {streetHalfWidth, streetThreeHalfWidth + threeHalfDistance, 0},
-                        {1, 0, 0},
-                        {1, 0, 0}
+                        {-streetHalfWidth, streetHalfWidth + halfDistance + halfIslandWidth, 0},
+                        {streetHalfWidth, streetHalfWidth + halfDistance + halfIslandWidth, 0}
                     ),
-                    freeNodes = params.direction == 0 and {1} or {0},
-                    snapNodes = params.direction == 0 and {1} or {0}
+                    freeNodes = {0, 1},
+                    snapNodes = {}
+                },
+                {
+                    type = 'STREET',
+                    params = edgeParams,
+                    edges = streetChunksHelper.makeEdges(
+                        params.direction,
+                        pitch,
+                        {-streetHalfWidth, 3.0 * streetHalfWidth + 3.0 * halfDistance + halfIslandWidth, 0},
+                        {streetHalfWidth, 3.0 * streetHalfWidth + 3.0 * halfDistance + halfIslandWidth, 0}
+                    ),
+                    freeNodes = {0, 1},
+                    snapNodes = {}
+                },
+                {
+                    type = 'STREET',
+                    params = edgeParams,
+                    edges = streetChunksHelper.makeEdges(
+                        params.direction,
+                        pitch,
+                        {-streetHalfWidth, 5.0 * streetHalfWidth + 5.0 * halfDistance + halfIslandWidth, 0},
+                        {streetHalfWidth, 5.0 * streetHalfWidth + 5.0 * halfDistance + halfIslandWidth, 0}
+                    ),
+                    freeNodes = {0, 1},
+                    snapNodes = {}
                 }
             }
         end
@@ -507,24 +299,23 @@ function data()
     local function _getSnapAndFreeEdgeLists(params, pitch, streetData, tramTrackType)
         local streetHalfWidth = streetData.sidewalkWidth + streetData.streetWidth / 2.0
         local streetFullWidth = streetData.sidewalkWidth + streetData.sidewalkWidth + streetData.streetWidth
-        local streetThreeHalfWidth = 3.0 * streetHalfWidth
         local xMax = math.max(9.0, streetHalfWidth + 1.0) -- this is the fruit of trial and error, see the notes
-        local halfDistance = params.distance / 2.0
-        local distance = params.distance
-        local threeHalfDistance = 3.0 * halfDistance
-
+        local distance = params.distance or 0.0
+        local halfDistance = distance / 2.0
+        local halfIslandWidth = (params.islandWidth or 0.0) / 2.0
+        local edgeParams = {
+            skipCollision = true,
+            -- skipCollisionCheck = true,
+            type = streetData.fileName,
+            tramTrackType = tramTrackType
+        }
         local edgeLists
         if params.howManyStreetsBase0 == 0 then -- 1 street
             edgeLists = {
                 {
                     type = 'STREET',
-                    params = {
-                        skipCollision = true,
-                        -- skipCollisionCheck = true,
-                        type = streetData.fileName,
-                        tramTrackType = tramTrackType
-                    },
-                    edges = streetChunksHelper.makeEdges(params.direction, pitch, {-xMax, 0, 0}, {0, 0, 0}, {1, 0, 0}, {1, 0, 0}),
+                    params = edgeParams,
+                    edges = streetChunksHelper.makeEdges(params.direction, pitch, {-xMax, 0, 0}, {0, 0, 0}),
                     -- edgeType = "BRIDGE",
                     -- edgeTypeName = "cement.lua",
                     -- collider = {
@@ -554,13 +345,8 @@ function data()
                 },
                 {
                     type = 'STREET',
-                    params = {
-                        skipCollision = true,
-                        -- skipCollisionCheck = true,
-                        type = streetData.fileName,
-                        tramTrackType = tramTrackType
-                    },
-                    edges = streetChunksHelper.makeEdges(params.direction, pitch, {0, 0, 0}, {xMax, 0, 0}, {1, 0, 0}, {1, 0, 0}),
+                    params = edgeParams,
+                    edges = streetChunksHelper.makeEdges(params.direction, pitch, {0, 0, 0}, {xMax, 0, 0}),
                     freeNodes = {0, 1},
                     snapNodes = params.direction == 0 and {1} or {0}
                 }
@@ -569,45 +355,49 @@ function data()
             edgeLists = {
                 {
                     type = 'STREET',
-                    params = {
-                        skipCollision = true,
-                        type = streetData.fileName,
-                        tramTrackType = tramTrackType
-                    },
-                    edges = streetChunksHelper.makeEdges(params.direction, pitch, {-xMax, -streetHalfWidth - halfDistance, 0}, {0, -streetHalfWidth - halfDistance, 0}, {1, 0, 0}, {1, 0, 0}),
+                    params = edgeParams,
+                    edges = streetChunksHelper.makeEdges(
+                        params.direction,
+                        pitch,
+                        {-xMax, -streetHalfWidth - halfDistance - halfIslandWidth, 0},
+                        {0, -streetHalfWidth - halfDistance - halfIslandWidth, 0}
+                    ),
                     freeNodes = {0, 1},
                     snapNodes = params.direction == 0 and {0} or {1}
                 },
                 {
                     type = 'STREET',
-                    params = {
-                        skipCollision = true,
-                        type = streetData.fileName,
-                        tramTrackType = tramTrackType
-                    },
-                    edges = streetChunksHelper.makeEdges(params.direction, pitch, {-xMax, streetHalfWidth + halfDistance, 0}, {0, streetHalfWidth + halfDistance, 0}, {1, 0, 0}, {1, 0, 0}),
+                    params = edgeParams,
+                    edges = streetChunksHelper.makeEdges(
+                        params.direction,
+                        pitch,
+                        {-xMax, streetHalfWidth + halfDistance + halfIslandWidth, 0},
+                        {0, streetHalfWidth + halfDistance + halfIslandWidth, 0}
+                    ),
                     freeNodes = {0, 1},
                     snapNodes = params.direction == 0 and {0} or {1}
                 },
                 {
                     type = 'STREET',
-                    params = {
-                        skipCollision = true,
-                        type = streetData.fileName,
-                        tramTrackType = tramTrackType
-                    },
-                    edges = streetChunksHelper.makeEdges(params.direction, pitch, {0, -streetHalfWidth - halfDistance, 0}, {xMax, -streetHalfWidth - halfDistance, 0}, {1, 0, 0}, {1, 0, 0}),
+                    params = edgeParams,
+                    edges = streetChunksHelper.makeEdges(
+                        params.direction,
+                        pitch,
+                        {0, -streetHalfWidth - halfDistance - halfIslandWidth, 0},
+                        {xMax, -streetHalfWidth - halfDistance - halfIslandWidth, 0}
+                    ),
                     freeNodes = {0, 1},
                     snapNodes = params.direction == 0 and {1} or {0}
                 },
                 {
                     type = 'STREET',
-                    params = {
-                        skipCollision = true,
-                        type = streetData.fileName,
-                        tramTrackType = tramTrackType
-                    },
-                    edges = streetChunksHelper.makeEdges(params.direction, pitch, {0, streetHalfWidth + halfDistance, 0}, {xMax, streetHalfWidth + halfDistance, 0}, {1, 0, 0}, {1, 0, 0}),
+                    params = edgeParams,
+                    edges = streetChunksHelper.makeEdges(
+                        params.direction,
+                        pitch,
+                        {0, streetHalfWidth + halfDistance + halfIslandWidth, 0},
+                        {xMax, streetHalfWidth + halfDistance + halfIslandWidth, 0}
+                    ),
                     freeNodes = {0, 1},
                     snapNodes = params.direction == 0 and {1} or {0}
                 }
@@ -616,185 +406,367 @@ function data()
             edgeLists = {
                 {
                     type = 'STREET',
-                    params = {
-                        skipCollision = true,
-                        type = streetData.fileName,
-                        tramTrackType = tramTrackType
-                    },
-                    edges = streetChunksHelper.makeEdges(params.direction, pitch, {-xMax, -streetFullWidth - distance, 0}, {0, -streetFullWidth - distance, 0}, {1, 0, 0}, {1, 0, 0}),
+                    params = edgeParams,
+                    edges = streetChunksHelper.makeEdges(params.direction, pitch, {-xMax, -streetFullWidth - distance, 0}, {0, -streetFullWidth - distance, 0}),
                     freeNodes = {0, 1},
                     snapNodes = params.direction == 0 and {0} or {1}
                 },
                 {
                     type = 'STREET',
-                    params = {
-                        skipCollision = true,
-                        type = streetData.fileName,
-                        tramTrackType = tramTrackType
-                    },
-                    edges = streetChunksHelper.makeEdges(params.direction, pitch, {-xMax, 0, 0}, {0, 0, 0}, {1, 0, 0}, {1, 0, 0}),
+                    params = edgeParams,
+                    edges = streetChunksHelper.makeEdges(params.direction, pitch, {-xMax, 0, 0}, {0, 0, 0}),
                     freeNodes = {0, 1},
                     snapNodes = params.direction == 0 and {0} or {1}
                 },
                 {
                     type = 'STREET',
-                    params = {
-                        skipCollision = true,
-                        type = streetData.fileName,
-                        tramTrackType = tramTrackType
-                    },
-                    edges = streetChunksHelper.makeEdges(params.direction, pitch, {-xMax, streetFullWidth + distance, 0}, {0, streetFullWidth + distance, 0}, {1, 0, 0}, {1, 0, 0}),
+                    params = edgeParams,
+                    edges = streetChunksHelper.makeEdges(params.direction, pitch, {-xMax, streetFullWidth + distance, 0}, {0, streetFullWidth + distance, 0}),
                     freeNodes = {0, 1},
                     snapNodes = params.direction == 0 and {0} or {1}
                 },
                 {
                     type = 'STREET',
-                    params = {
-                        skipCollision = true,
-                        type = streetData.fileName,
-                        tramTrackType = tramTrackType
-                    },
-                    edges = streetChunksHelper.makeEdges(params.direction, pitch, {0, -streetFullWidth - distance, 0}, {xMax, -streetFullWidth - distance, 0}, {1, 0, 0}, {1, 0, 0}),
+                    params = edgeParams,
+                    edges = streetChunksHelper.makeEdges(params.direction, pitch, {0, -streetFullWidth - distance, 0}, {xMax, -streetFullWidth - distance, 0}),
                     freeNodes = {0, 1},
                     snapNodes = params.direction == 0 and {1} or {0}
                 },
                 {
                     type = 'STREET',
-                    params = {
-                        skipCollision = true,
-                        type = streetData.fileName,
-                        tramTrackType = tramTrackType
-                    },
-                    edges = streetChunksHelper.makeEdges(params.direction, pitch, {0, 0, 0}, {xMax, 0, 0}, {1, 0, 0}, {1, 0, 0}),
+                    params = edgeParams,
+                    edges = streetChunksHelper.makeEdges(params.direction, pitch, {0, 0, 0}, {xMax, 0, 0}),
                     freeNodes = {0, 1},
                     snapNodes = params.direction == 0 and {1} or {0}
                 },
                 {
                     type = 'STREET',
-                    params = {
-                        skipCollision = true,
-                        type = streetData.fileName,
-                        tramTrackType = tramTrackType
-                    },
-                    edges = streetChunksHelper.makeEdges(params.direction, pitch, {0, streetFullWidth + distance, 0}, {xMax, streetFullWidth + distance, 0}, {1, 0, 0}, {1, 0, 0}),
+                    params = edgeParams,
+                    edges = streetChunksHelper.makeEdges(params.direction, pitch, {0, streetFullWidth + distance, 0}, {xMax, streetFullWidth + distance, 0}),
                     freeNodes = {0, 1},
                     snapNodes = params.direction == 0 and {1} or {0}
                 }
             }
-        else --if params.howManyStreetsBase0 == 3 then -- 4 streets -- always provide a fallback just in case
+        elseif params.howManyStreetsBase0 == 3 then -- 4 streets
             edgeLists = {
+                -- backward
                 {
                     type = 'STREET',
-                    params = {
-                        skipCollision = true,
-                        type = streetData.fileName,
-                        tramTrackType = tramTrackType
-                    },
+                    params = edgeParams,
                     edges = streetChunksHelper.makeEdges(
                         params.direction,
                         pitch,
-                        {-xMax, -streetThreeHalfWidth - threeHalfDistance, 0},
-                        {0, -streetThreeHalfWidth - threeHalfDistance, 0},
-                        {1, 0, 0},
-                        {1, 0, 0}
+                        {-xMax, -3.0 * streetHalfWidth - 3.0 * halfDistance - halfIslandWidth, 0},
+                        {0, -3.0 * streetHalfWidth - 3.0 * halfDistance - halfIslandWidth, 0}
                     ),
                     freeNodes = {0, 1},
                     snapNodes = params.direction == 0 and {0} or {1}
                 },
                 {
                     type = 'STREET',
-                    params = {
-                        skipCollision = true,
-                        type = streetData.fileName,
-                        tramTrackType = tramTrackType
-                    },
-                    edges = streetChunksHelper.makeEdges(params.direction, pitch, {-xMax, -streetHalfWidth - halfDistance, 0}, {0, -streetHalfWidth - halfDistance, 0}, {1, 0, 0}, {1, 0, 0}),
-                    freeNodes = {0, 1},
-                    snapNodes = params.direction == 0 and {0} or {1}
-                },
-                {
-                    type = 'STREET',
-                    params = {
-                        skipCollision = true,
-                        type = streetData.fileName,
-                        tramTrackType = tramTrackType
-                    },
-                    edges = streetChunksHelper.makeEdges(params.direction, pitch, {-xMax, streetHalfWidth + halfDistance, 0}, {0, streetHalfWidth + halfDistance, 0}, {1, 0, 0}, {1, 0, 0}),
-                    freeNodes = {0, 1},
-                    snapNodes = params.direction == 0 and {0} or {1}
-                },
-                {
-                    type = 'STREET',
-                    params = {
-                        skipCollision = true,
-                        type = streetData.fileName,
-                        tramTrackType = tramTrackType
-                    },
+                    params = edgeParams,
                     edges = streetChunksHelper.makeEdges(
                         params.direction,
                         pitch,
-                        {-xMax, streetThreeHalfWidth + threeHalfDistance, 0},
-                        {0, streetThreeHalfWidth + threeHalfDistance, 0},
-                        {1, 0, 0},
-                        {1, 0, 0}
+                        {-xMax, -streetHalfWidth - halfDistance - halfIslandWidth, 0},
+                        {0, -streetHalfWidth - halfDistance - halfIslandWidth, 0}
                     ),
                     freeNodes = {0, 1},
                     snapNodes = params.direction == 0 and {0} or {1}
                 },
                 {
                     type = 'STREET',
-                    params = {
-                        skipCollision = true,
-                        type = streetData.fileName,
-                        tramTrackType = tramTrackType
-                    },
+                    params = edgeParams,
                     edges = streetChunksHelper.makeEdges(
                         params.direction,
                         pitch,
-                        {0, -streetThreeHalfWidth - threeHalfDistance, 0},
-                        {xMax, -streetThreeHalfWidth - threeHalfDistance, 0},
-                        {1, 0, 0},
-                        {1, 0, 0}
+                        {-xMax, streetHalfWidth + halfDistance + halfIslandWidth, 0},
+                        {0, streetHalfWidth + halfDistance + halfIslandWidth, 0}
+                    ),
+                    freeNodes = {0, 1},
+                    snapNodes = params.direction == 0 and {0} or {1}
+                },
+                {
+                    type = 'STREET',
+                    params = edgeParams,
+                    edges = streetChunksHelper.makeEdges(
+                        params.direction,
+                        pitch,
+                        {-xMax, 3.0 * streetHalfWidth + 3.0 * halfDistance + halfIslandWidth, 0},
+                        {0, 3.0 * streetHalfWidth + 3.0 * halfDistance + halfIslandWidth, 0}
+                    ),
+                    freeNodes = {0, 1},
+                    snapNodes = params.direction == 0 and {0} or {1}
+                },
+                -- forward
+                {
+                    type = 'STREET',
+                    params = edgeParams,
+                    edges = streetChunksHelper.makeEdges(
+                        params.direction,
+                        pitch,
+                        {0, -3.0 * streetHalfWidth - 3.0 * halfDistance - halfIslandWidth, 0},
+                        {xMax, -3.0 * streetHalfWidth - 3.0 * halfDistance - halfIslandWidth, 0}
                     ),
                     freeNodes = {0, 1},
                     snapNodes = params.direction == 0 and {1} or {0}
                 },
                 {
                     type = 'STREET',
-                    params = {
-                        skipCollision = true,
-                        type = streetData.fileName,
-                        tramTrackType = tramTrackType
-                    },
-                    edges = streetChunksHelper.makeEdges(params.direction, pitch, {0, -streetHalfWidth - halfDistance, 0}, {xMax, -streetHalfWidth - halfDistance, 0}, {1, 0, 0}, {1, 0, 0}),
-                    freeNodes = {0, 1},
-                    snapNodes = params.direction == 0 and {1} or {0}
-                },
-                {
-                    type = 'STREET',
-                    params = {
-                        skipCollision = true,
-                        type = streetData.fileName,
-                        tramTrackType = tramTrackType
-                    },
-                    edges = streetChunksHelper.makeEdges(params.direction, pitch, {0, streetHalfWidth + halfDistance, 0}, {xMax, streetHalfWidth + halfDistance, 0}, {1, 0, 0}, {1, 0, 0}),
-                    freeNodes = {0, 1},
-                    snapNodes = params.direction == 0 and {1} or {0}
-                },
-                {
-                    type = 'STREET',
-                    params = {
-                        skipCollision = true,
-                        type = streetData.fileName,
-                        tramTrackType = tramTrackType
-                    },
+                    params = edgeParams,
                     edges = streetChunksHelper.makeEdges(
                         params.direction,
                         pitch,
-                        {0, streetThreeHalfWidth + threeHalfDistance, 0},
-                        {xMax, streetThreeHalfWidth + threeHalfDistance, 0},
-                        {1, 0, 0},
-                        {1, 0, 0}
+                        {0, -streetHalfWidth - halfDistance - halfIslandWidth, 0},
+                        {xMax, -streetHalfWidth - halfDistance - halfIslandWidth, 0}
+                    ),
+                    freeNodes = {0, 1},
+                    snapNodes = params.direction == 0 and {1} or {0}
+                },
+                {
+                    type = 'STREET',
+                    params = edgeParams,
+                    edges = streetChunksHelper.makeEdges(
+                        params.direction,
+                        pitch,
+                        {0, streetHalfWidth + halfDistance + halfIslandWidth, 0},
+                        {xMax, streetHalfWidth + halfDistance + halfIslandWidth, 0}
+                    ),
+                    freeNodes = {0, 1},
+                    snapNodes = params.direction == 0 and {1} or {0}
+                },
+                {
+                    type = 'STREET',
+                    params = edgeParams,
+                    edges = streetChunksHelper.makeEdges(
+                        params.direction,
+                        pitch,
+                        {0, 3.0 * streetHalfWidth + 3.0 * halfDistance + halfIslandWidth, 0},
+                        {xMax, 3.0 * streetHalfWidth + 3.0 * halfDistance + halfIslandWidth, 0}
+                    ),
+                    freeNodes = {0, 1},
+                    snapNodes = params.direction == 0 and {1} or {0}
+                }
+            }
+        elseif params.howManyStreetsBase0 == 4 then -- 5 streets
+            edgeLists = {
+                -- backward
+                {
+                    type = 'STREET',
+                    params = edgeParams,
+                    edges = streetChunksHelper.makeEdges(params.direction, pitch, {-xMax, - 2.0 * streetFullWidth - 2.0 * distance, 0}, {0, - 2.0 * streetFullWidth - 2.0 * distance, 0}),
+                    freeNodes = {0, 1},
+                    snapNodes = params.direction == 0 and {0} or {1}
+                },
+                {
+                    type = 'STREET',
+                    params = edgeParams,
+                    edges = streetChunksHelper.makeEdges(params.direction, pitch, {-xMax, -streetFullWidth - distance, 0}, {0, -streetFullWidth - distance, 0}),
+                    freeNodes = {0, 1},
+                    snapNodes = params.direction == 0 and {0} or {1}
+                },
+                {
+                    type = 'STREET',
+                    params = edgeParams,
+                    edges = streetChunksHelper.makeEdges(params.direction, pitch, {-xMax, 0, 0}, {0, 0, 0}),
+                    freeNodes = {0, 1},
+                    snapNodes = params.direction == 0 and {0} or {1}
+                },
+                {
+                    type = 'STREET',
+                    params = edgeParams,
+                    edges = streetChunksHelper.makeEdges(params.direction, pitch, {-xMax, streetFullWidth + distance, 0}, {0, streetFullWidth + distance, 0}),
+                    freeNodes = {0, 1},
+                    snapNodes = params.direction == 0 and {0} or {1}
+                },
+                {
+                    type = 'STREET',
+                    params = edgeParams,
+                    edges = streetChunksHelper.makeEdges(params.direction, pitch, {-xMax, 2.0 * streetFullWidth + 2.0 * distance, 0}, {0, 2.0 * streetFullWidth + 2.0 * distance, 0}),
+                    freeNodes = {0, 1},
+                    snapNodes = params.direction == 0 and {0} or {1}
+                },
+                -- forward
+                {
+                    type = 'STREET',
+                    params = edgeParams,
+                    edges = streetChunksHelper.makeEdges(params.direction, pitch, {0, - 2.0 * streetFullWidth - 2.0 * distance, 0}, {xMax, - 2.0 * streetFullWidth - 2.0 * distance, 0}),
+                    freeNodes = {0, 1},
+                    snapNodes = params.direction == 0 and {1} or {0}
+                },
+                {
+                    type = 'STREET',
+                    params = edgeParams,
+                    edges = streetChunksHelper.makeEdges(params.direction, pitch, {0, -streetFullWidth - distance, 0}, {xMax, -streetFullWidth - distance, 0}),
+                    freeNodes = {0, 1},
+                    snapNodes = params.direction == 0 and {1} or {0}
+                },
+                {
+                    type = 'STREET',
+                    params = edgeParams,
+                    edges = streetChunksHelper.makeEdges(params.direction, pitch, {0, 0, 0}, {xMax, 0, 0}),
+                    freeNodes = {0, 1},
+                    snapNodes = params.direction == 0 and {1} or {0}
+                },
+                {
+                    type = 'STREET',
+                    params = edgeParams,
+                    edges = streetChunksHelper.makeEdges(params.direction, pitch, {0, streetFullWidth + distance, 0}, {xMax, streetFullWidth + distance, 0}),
+                    freeNodes = {0, 1},
+                    snapNodes = params.direction == 0 and {1} or {0}
+                },
+                {
+                    type = 'STREET',
+                    params = edgeParams,
+                    edges = streetChunksHelper.makeEdges(params.direction, pitch, {0, 2.0 * streetFullWidth + 2.0 * distance, 0}, {xMax, 2.0 * streetFullWidth + 2.0 * distance, 0}),
+                    freeNodes = {0, 1},
+                    snapNodes = params.direction == 0 and {1} or {0}
+                }
+            }
+        else -- if params.howManyStreetsBase0 == 5 then -- 6 streets -- fallback
+            edgeLists = {
+                -- backward
+                {
+                    type = 'STREET',
+                    params = edgeParams,
+                    edges = streetChunksHelper.makeEdges(
+                        params.direction,
+                        pitch,
+                        {-xMax, - 5.0 * streetHalfWidth - 5.0 * halfDistance - halfIslandWidth, 0},
+                        {0, - 5.0 * streetHalfWidth - 5.0 * halfDistance - halfIslandWidth, 0}
+                    ),
+                    freeNodes = {0, 1},
+                    snapNodes = params.direction == 0 and {0} or {1}
+                },
+                {
+                    type = 'STREET',
+                    params = edgeParams,
+                    edges = streetChunksHelper.makeEdges(
+                        params.direction,
+                        pitch,
+                        {-xMax, - 3.0 * streetHalfWidth - 3.0 * halfDistance - halfIslandWidth, 0},
+                        {0, - 3.0 * streetHalfWidth - 3.0 * halfDistance - halfIslandWidth, 0}
+                    ),
+                    freeNodes = {0, 1},
+                    snapNodes = params.direction == 0 and {0} or {1}
+                },
+                {
+                    type = 'STREET',
+                    params = edgeParams,
+                    edges = streetChunksHelper.makeEdges(
+                        params.direction,
+                        pitch,
+                        {-xMax, -streetHalfWidth - halfDistance - halfIslandWidth, 0},
+                        {0, -streetHalfWidth - halfDistance - halfIslandWidth, 0}
+                    ),
+                    freeNodes = {0, 1},
+                    snapNodes = params.direction == 0 and {0} or {1}
+                },
+                {
+                    type = 'STREET',
+                    params = edgeParams,
+                    edges = streetChunksHelper.makeEdges(
+                        params.direction,
+                        pitch,
+                        {-xMax, streetHalfWidth + halfDistance + halfIslandWidth, 0},
+                        {0, streetHalfWidth + halfDistance + halfIslandWidth, 0}
+                    ),
+                    freeNodes = {0, 1},
+                    snapNodes = params.direction == 0 and {0} or {1}
+                },
+                {
+                    type = 'STREET',
+                    params = edgeParams,
+                    edges = streetChunksHelper.makeEdges(
+                        params.direction,
+                        pitch,
+                        {-xMax, 3.0 * streetHalfWidth + 3.0 * halfDistance + halfIslandWidth, 0},
+                        {0, 3.0 * streetHalfWidth + 3.0 * halfDistance + halfIslandWidth, 0}
+                    ),
+                    freeNodes = {0, 1},
+                    snapNodes = params.direction == 0 and {0} or {1}
+                },
+                {
+                    type = 'STREET',
+                    params = edgeParams,
+                    edges = streetChunksHelper.makeEdges(
+                        params.direction,
+                        pitch,
+                        {-xMax, 5.0 * streetHalfWidth + 5.0 * halfDistance + halfIslandWidth, 0},
+                        {0, 5.0 * streetHalfWidth + 5.0 * halfDistance + halfIslandWidth, 0}
+                    ),
+                    freeNodes = {0, 1},
+                    snapNodes = params.direction == 0 and {0} or {1}
+                },
+                -- forward
+                {
+                    type = 'STREET',
+                    params = edgeParams,
+                    edges = streetChunksHelper.makeEdges(
+                        params.direction,
+                        pitch,
+                        {0, - 5.0 * streetHalfWidth - 5.0 * halfDistance - halfIslandWidth, 0},
+                        {xMax, - 5.0 * streetHalfWidth - 5.0 * halfDistance - halfIslandWidth, 0}
+                    ),
+                    freeNodes = {0, 1},
+                    snapNodes = params.direction == 0 and {1} or {0}
+                },
+                {
+                    type = 'STREET',
+                    params = edgeParams,
+                    edges = streetChunksHelper.makeEdges(
+                        params.direction,
+                        pitch,
+                        {0, - 3.0 * streetHalfWidth - 3.0 * halfDistance - halfIslandWidth, 0},
+                        {xMax, - 3.0 * streetHalfWidth - 3.0 * halfDistance - halfIslandWidth, 0}
+                    ),
+                    freeNodes = {0, 1},
+                    snapNodes = params.direction == 0 and {1} or {0}
+                },
+                {
+                    type = 'STREET',
+                    params = edgeParams,
+                    edges = streetChunksHelper.makeEdges(
+                        params.direction,
+                        pitch,
+                        {0, -streetHalfWidth - halfDistance - halfIslandWidth, 0},
+                        {xMax, -streetHalfWidth - halfDistance - halfIslandWidth, 0}
+                    ),
+                    freeNodes = {0, 1},
+                    snapNodes = params.direction == 0 and {1} or {0}
+                },
+                {
+                    type = 'STREET',
+                    params = edgeParams,
+                    edges = streetChunksHelper.makeEdges(
+                        params.direction,
+                        pitch,
+                        {0, streetHalfWidth + halfDistance + halfIslandWidth, 0},
+                        {xMax, streetHalfWidth + halfDistance + halfIslandWidth, 0}
+                    ),
+                    freeNodes = {0, 1},
+                    snapNodes = params.direction == 0 and {1} or {0}
+                },
+                {
+                    type = 'STREET',
+                    params = edgeParams,
+                    edges = streetChunksHelper.makeEdges(
+                        params.direction,
+                        pitch,
+                        {0, 3.0 * streetHalfWidth + 3.0 * halfDistance + halfIslandWidth, 0},
+                        {xMax, 3.0 * streetHalfWidth + 3.0 * halfDistance + halfIslandWidth, 0}
+                    ),
+                    freeNodes = {0, 1},
+                    snapNodes = params.direction == 0 and {1} or {0}
+                },
+                {
+                    type = 'STREET',
+                    params = edgeParams,
+                    edges = streetChunksHelper.makeEdges(
+                        params.direction,
+                        pitch,
+                        {0, 5.0 * streetHalfWidth + 5.0 * halfDistance + halfIslandWidth, 0},
+                        {xMax, 5.0 * streetHalfWidth + 5.0 * halfDistance + halfIslandWidth, 0}
                     ),
                     freeNodes = {0, 1},
                     snapNodes = params.direction == 0 and {1} or {0}
@@ -834,7 +806,7 @@ function data()
             {
                 key = 'howManyStreetsBase0',
                 name = _('Number of streets'),
-                values = {_('1'), _('2'), _('3'), _('4')},
+                values = {_('1'), _('2'), _('3'), _('4'), _('5'), _('6')},
                 defaultIndex = 1
                 -- yearFrom = 1925,
                 -- yearTo = 0
@@ -860,6 +832,23 @@ function data()
                 ),
                 defaultIndex = 0
             },
+            {
+                key = 'islandWidth',
+                name = _('Island Width'),
+                values = arrayUtils.map(
+                    streetChunksHelper.getDistances(),
+                    function(dis)
+                        return tostring(dis) .. 'm'
+                    end
+                ),
+                defaultIndex = 0
+            },
+            -- {
+            --     key = "terrainAlignment",
+            --     name = _("Terrain alignment"),
+            --     values = { _("Yes"), _("No") },
+            --     defaultIndex = 1
+            -- },
             {
                 key = 'direction',
                 name = _('Direction'),
@@ -911,6 +900,10 @@ function data()
                 -- This is required if we want to make them snappable.
                 result.edgeLists = _getSnapAndFreeEdgeLists(params, pitch, streetData, tramTrackType)
             end
+            -- LOLLO TODO copying from the groundTextureBuilder, we could make the terrain flat to ease the pain when building junctions
+            -- if params.terrainAlignment == 1 then
+            --     result.terrainAlignmentLists = { { type = "EQUAL", faces =  { } } }
+            -- end
 
             return result
         end,
