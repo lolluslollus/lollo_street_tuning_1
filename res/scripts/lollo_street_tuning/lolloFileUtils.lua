@@ -1,4 +1,4 @@
--- local dump = require('luadump')
+-- local dump = require('lollo_street_tuning/luadump')
 -- local inspect = require('inspect')
 -- local dbg = require('debugger')
 local stringUtils = require('lollo_street_tuning/lolloStringUtils')

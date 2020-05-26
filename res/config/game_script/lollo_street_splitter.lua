@@ -1,4 +1,4 @@
--- local dump = require('luadump')
+-- local luadump = require('lollo_street_tuning/luadump')
 -- local stringUtils = require('lollo_street_tuning/lolloStringUtils')
 
 local function isBuildingStreetSplitter(param)
@@ -31,7 +31,7 @@ function data()
             -- print('id = ', id)
             -- print('name = ', name)
             -- print('param = ')
-            -- dump(true)(param)
+            -- luadump(true)(param)
             -- print('type(param) = ', type(param))
             -- print('type(param.constructionEntityId) = ', type(param.constructionEntityId))
             if
@@ -41,7 +41,7 @@ function data()
                 return
             end
             -- print('about to bulldoze ', param.constructionEntityId)
-            -- dump(true)(game.interface.getEntity(param.constructionEntityId))
+            -- luadump(true)(game.interface.getEntity(param.constructionEntityId))
 
             game.interface.bulldoze(param.constructionEntityId)
 
@@ -198,15 +198,15 @@ function data()
             --                 print(key, value)
             --             end
             --             print("-- sol = ")
-            --             dump(true)(sol)
+            --             luadump(true)(sol)
             --             print("-- ug = ")
-            --             dump(true)(ug)
+            --             luadump(true)(ug)
             --             print("-- package = ")
-            --             dump(true)(package) --this hangs
+            --             luadump(true)(package) --this hangs
             --             print("-- getmetatable = ")
-            --             dump(true)(getmetatable(""))
+            --             luadump(true)(getmetatable(""))
             --             print("-- io = ")
-            --             dump(true)(io)
+            --             luadump(true)(io)
 
             -- LOLLO NOTE param can have different types, even boolean. If so, param.data below will fail!
             -- if param then print("type(param) = ", type(param)) end
@@ -219,7 +219,7 @@ function data()
              then
                 for k, v in pairs(param.data.entity2tn) do
                     print('entity id = ', k)
-                    dump(true)(game.interface.getEntity(k))
+                    luadump(true)(game.interface.getEntity(k))
                 end
             end
  ]]
@@ -256,16 +256,16 @@ function data()
                         {pos = constructionEntity.position, radius = 99},
                         {type = 'BASE_NODE', includeData = true}
                     )
-                    dump(true)(baseEdges)
-                    dump(true)(baseNodes)
+                    luadump(true)(baseEdges)
+                    luadump(true)(baseNodes)
                     print('nearby entities within 9= ')
-                    dump(true)(
+                    luadump(true)(
                         game.interface.getEntities(
                             {pos = constructionEntity.position, radius = 9},
                             {type = 'BASE_EDGE', includeData = true}
                         )
                     )
-                    dump(true)(
+                    luadump(true)(
                         game.interface.getEntities(
                             {pos = constructionEntity.position, radius = 9},
                             {type = 'BASE_NODE', includeData = true}
@@ -277,13 +277,13 @@ function data()
                 {pos = constructionEntity.position, radius = 1},
                 {type = 'BASE_EDGE', includeData = true}
             )
-            dump(true)(baseEdges)
+            luadump(true)(baseEdges)
             local baseNodes =
                 game.interface.getEntities(
                 {pos = constructionEntity.position, radius = 1},
                 {type = 'BASE_NODE', includeData = true}
             )
-            dump(true)(baseNodes)
+            luadump(true)(baseNodes)
  ]]
             -- game.interface.bulldoze(constructionEntity.id) -- cannot call it from this thread
             game.interface.sendScriptEvent(
@@ -306,7 +306,7 @@ function data()
             --[[ if param then
                 print("--- entity = ")
                 local entity = game.interface.getEntity(param)
-                dump(true)(entity)
+                luadump(true)(entity)
             end ]]
 
             --[[ game.gui = {

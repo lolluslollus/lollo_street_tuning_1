@@ -989,7 +989,7 @@ local function updateFn_4_1_lane_narrow_sidewalk_to_4_lane(params)
             snapNodes = params.snapNodes == 0 and {} or (params.direction == 0 and {1} or {0})
         }
     }
-luadump(true)(result)
+-- luadump(true)(result)
     return result
 end
 

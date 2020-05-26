@@ -1,4 +1,4 @@
--- local dump = require 'luadump'
+-- local dump = require('lollo_street_tuning/luadump')
 -- local inspect = require('inspect')
 -- local vec3 = require 'vec3'
 -- local transf = require 'transf'

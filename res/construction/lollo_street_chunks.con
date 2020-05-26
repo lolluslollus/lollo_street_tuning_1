@@ -1,4 +1,4 @@
--- local dump = require 'luadump'
+-- local luadump = require('lollo_street_tuning/luadump')
 -- local inspect = require('inspect')
 local arrayUtils = require('lollo_street_tuning/lolloArrayUtils')
 local streetChunksHelper = require('lollo_street_tuning/lolloStreetChunksHelper')
