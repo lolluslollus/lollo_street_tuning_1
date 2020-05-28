@@ -199,7 +199,7 @@ local function updateFn_2_1_lane_narrow_sidewalk_to_2_lane(params)
 
     result.models = {
         {
-            id = 'lollo_assets/lollo_street_confluence_2_lanes_narrow_sidewalk.mdl',
+            id = 'lollo_assets/lollo_street_confluence_2_lanes_narrow_sidewalk_allow_reverse.mdl',
             skipCollision = true,
             -- skipCollisionCheck = true,
             transf = pitchUtil.getIdTransfPitched(params.pitch)
@@ -252,6 +252,7 @@ local function updateFn_2_1_lane_narrow_sidewalk_to_2_lane(params)
             freeNodes = {},
             snapNodes = {}
         },
+        -- the reverse edge is too tight for streets, so we make a reverse lane in the model instead
         {
             type = 'STREET',
             params = {
@@ -403,7 +404,7 @@ local function updateFn_2_1_lane_medium_sidewalk_to_2_lane(params)
 
     result.models = {
         {
-            id = 'lollo_assets/lollo_street_confluence_2_lanes_medium_sidewalk.mdl',
+            id = 'lollo_assets/lollo_street_confluence_2_lanes_medium_sidewalk_allow_reverse.mdl',
             skipCollision = true,
             -- skipCollisionCheck = true,
             transf = pitchUtil.getIdTransfPitched(params.pitch)
@@ -456,6 +457,7 @@ local function updateFn_2_1_lane_medium_sidewalk_to_2_lane(params)
             freeNodes = {},
             snapNodes = {}
         },
+        -- the reverse edge is too tight for streets, so we make a reverse lane in the model instead
         {
             type = 'STREET',
             params = {
