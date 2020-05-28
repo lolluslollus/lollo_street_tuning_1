@@ -3,6 +3,10 @@ local luadump = require('lollo_street_tuning/luadump')
 local pitchUtil = require('lollo_street_tuning/lolloPitchUtil')
 -- local transf = require 'transf'
 
+local function _getHasBus(params)
+    return params.hasBus == 1
+end
+
 local function _getTramTrackType(params)
     return params.tramTrack == 0 and "NO" or params.tramTrack == 1 and "YES" or "ELECTRIC"
     -- return params.tramTrack and (({'NO', 'YES', 'ELECTRIC'})[params.tramTrack + 1]) or 'NO'
@@ -22,9 +26,9 @@ local function _makeEdges(params, node0, node1, tan0, tan1)
 end
 
 local function updateFn_2_1_lane_narrow_sidewalk_to_2_lane_one_way(params)
-    local result = {}
-
-    result.cost = 0
+    local result = {
+        cost = 0
+    }
 
     local connectorFace = {
         {2, -8.0, 0.0, 1.0},
@@ -81,14 +85,17 @@ local function updateFn_2_1_lane_narrow_sidewalk_to_2_lane_one_way(params)
         }
     }
 
-    -- does not pull, neither do hasBusLane and busLane, with true or false
+    -- does not pull, neither do hasBusLane, busLane or hasBus, with true or false
+    -- LOLLO TODO try hasBus with true or false, across the app, after the update has been released
     -- local busLaneType = params.busLane and (({'NO', 'YES'})[params.busLane + 1]) or 'NO'
     local tramTrackType = _getTramTrackType(params)
+    local hasBus = _getHasBus(params)
     result.edgeLists = {
         {
             type = 'STREET',
             params = {
                 -- busLaneType = busLaneType, -- does not pull, neither do hasBusLane and busLane, with true or false
+                hasBus = hasBus,
                 skipCollision = true,
                 --skipCollisionCheck = true,
                 type = 'lollo_medium_1_way_1_lane_street_narrow_sidewalk.lua',
@@ -108,6 +115,7 @@ local function updateFn_2_1_lane_narrow_sidewalk_to_2_lane_one_way(params)
         {
             type = 'STREET',
             params = {
+                hasBus = hasBus,
                 skipCollision = true,
                 type = 'lollo_medium_1_way_1_lane_street_narrow_sidewalk.lua',
                 tramTrackType = tramTrackType
@@ -119,6 +127,7 @@ local function updateFn_2_1_lane_narrow_sidewalk_to_2_lane_one_way(params)
         {
             type = 'STREET',
             params = {
+                hasBus = hasBus,
                 skipCollision = true,
                 type = 'lollo_internal_1_way_1_lane_street_no_sidewalk.lua',
                 tramTrackType = tramTrackType
@@ -130,6 +139,7 @@ local function updateFn_2_1_lane_narrow_sidewalk_to_2_lane_one_way(params)
         {
             type = 'STREET',
             params = {
+                hasBus = hasBus,
                 skipCollision = true,
                 type = 'lollo_internal_1_way_1_lane_street_no_sidewalk.lua',
                 tramTrackType = tramTrackType
@@ -141,6 +151,7 @@ local function updateFn_2_1_lane_narrow_sidewalk_to_2_lane_one_way(params)
         {
             type = 'STREET',
             params = {
+                hasBus = hasBus,
                 skipCollision = true,
                 type = tramTrackType == 'NO' and 'standard/town_medium_one_way_new.lua' or 'lollo_medium_1_way_2_lane_2_tram_tracks_street.lua',
                 tramTrackType = tramTrackType
@@ -1477,6 +1488,15 @@ function data()
                 },
                 defaultIndex = 2
             },
+            -- {
+            --     key = 'hasBus',
+            --     name = _('Bus lane'),
+            --     values = {
+            --         _('No'),
+            --         _('Yes')
+            --     },
+            --     defaultIndex = 0
+            -- },
             {
                 key = 'snapNodes',
                 name = _('Snap to neighbours'),
