@@ -344,6 +344,7 @@ function data()
                     -- Experiments show that two edges one after the other allow for a shorter crashless construction than one edge only,
                     -- and all nodes being free calls for some extra length,
                     -- while if only the outer nodes are free we can get away with a shorter construction.
+                    freeNodes = {0, 1},
                     snapNodes = params.direction == 0 and {0} or {1}
                     --					snapNodes = { 0, 1 },  -- node 0 and 1 are allowed to snap to other edges of the same type --crashes
                     --					tag2nodes = {},
