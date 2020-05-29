@@ -11,7 +11,7 @@ function data()
     end
 
     local function _getWidthFactor(streetHalfWidth)
-        -- this is the fruit of trial and error. In May 2020, the game does not allow really sharp bends.
+        -- this is the fruit of trial and error. In May 2020, the game does not allow really sharp curves.
         local result = 0.0
         if streetHalfWidth <= 2.01 then
             print('LOLLO very narrow')
@@ -141,8 +141,8 @@ function data()
     return {
         type = 'STREET_CONSTRUCTION',
         description = {
-            name = _('Street hairpin bends'),
-            description = _('Lays hairpin bends. Use O and P to adjust the pitch.')
+            name = _('Street hairpin curves'),
+            description = _('Lays streets as tightly bent as the game allows. Use O and P to adjust the pitch.')
         },
         availability = {
             yearFrom = 1925,
