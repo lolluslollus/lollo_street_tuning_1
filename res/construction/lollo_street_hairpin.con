@@ -91,7 +91,7 @@ function data()
                     {1, 0, 0},
                     {1, 0, 0}
                 ),
-                freeNodes = {0, 1},
+                freeNodes = params.direction == 0 and {0} or {1},
                 snapNodes = params.direction == 0 and {0} or {1}
             },
             -- the pitch plays no part in the bend as long as it is centred on x = 0
@@ -99,7 +99,7 @@ function data()
                 type = 'STREET',
                 params = edgeParams,
                 edges = {},
-                freeNodes = {0, 1},
+                freeNodes = {},
                 snapNodes = {},
             },
             {
@@ -113,7 +113,7 @@ function data()
                     {-1, 0, 0},
                     {-1, 0, 0}
                 ),
-                freeNodes = {0, 1},
+                freeNodes = params.direction == 0 and {1} or {0},
                 snapNodes = params.direction == 0 and {1} or {0}
             }
         }
@@ -213,7 +213,13 @@ function data()
             -- otherwise the game will say "hello there" or "easter egg" or other rubbish,
             -- then point away (to some animal) and do nothing,
             -- when the user clicks on a done construction to configure it.
-            result.models = {}
+            result.models = {
+                {
+                    id = 'lollo_assets/lollo_dummy.mdl',
+                    skipCollision = true,
+                    transf = pitchUtil.getIdTransfPitched(params.pitch)
+                }
+            }
 
             -- LOLLO NOTE I cannot use KEEP here
             local tramTrackType = params.tramTrack and (({'NO', 'YES', 'ELECTRIC'})[params.tramTrack + 1]) or 'NO'
