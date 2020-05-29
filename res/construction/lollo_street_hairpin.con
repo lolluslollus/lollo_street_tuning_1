@@ -73,7 +73,7 @@ function data()
         local streetHalfWidth = _getStreetHalfWidth(streetData)
         local widthFactorBend = _getWidthFactor(streetHalfWidth)
 
-        local xMax = streetHalfWidth * 0.5 -- this is the fruit of trial and error -- LOLLO TODO check this in the cazzilli and make it as short as possible
+        local xMax = streetHalfWidth * 0.5 -- this is the fruit of trial and error
         local edgeParams = {
             skipCollision = true,
             type = streetData.fileName,

@@ -2,7 +2,7 @@ local luadump = require('lollo_street_tuning/luadump')
 -- local laneutil = require('laneutil')
 local pitchUtil = require('lollo_street_tuning/lolloPitchUtil')
 -- local transf = require 'transf'
--- LOLLO TODO see if you can ease the pain when reconfiguring an existing merger. maybe skip collisions?
+-- LOLLO TODO see if you can ease the pain when reconfiguring an existing merger. maybe skip collisions? It is not enough.
 local function _getHasBus(params)
     return params.hasBus == 1
 end
@@ -26,7 +26,7 @@ local function _makeEdges(params, node0, node1, tan0, tan1)
 end
 
 local function updateFn_2_1_lane_narrow_sidewalk_to_2_lane_one_way(params)
-    local result = { cost = 0 }
+    local result = { cost = 0, skipCollision = true, }
 
     local connectorFace = {
         {2, -8.0, 0.0, 1.0},
@@ -166,7 +166,7 @@ end
 local function updateFn_2_1_lane_narrow_sidewalk_to_2_lane(params)
     params.direction = 0 -- 2-way streets cannot be reversed, the game is like that
 
-    local result = { cost = 0 }
+    local result = { cost = 0, skipCollision = true, }
 
     local connectorFace = {
         {2, -8.0, 0.0, 1.0},
@@ -199,7 +199,6 @@ local function updateFn_2_1_lane_narrow_sidewalk_to_2_lane(params)
         {
             id = 'lollo_assets/lollo_street_confluence_2_lanes_narrow_sidewalk_allow_reversal.mdl',
             skipCollision = true,
-            -- skipCollisionCheck = true,
             transf = pitchUtil.getIdTransfPitched(params.pitch)
         }
     }
@@ -268,7 +267,7 @@ local function updateFn_2_1_lane_narrow_sidewalk_to_2_lane(params)
 end
 
 local function updateFn_2_1_lane_medium_sidewalk_to_2_lane_one_way(params)
-    local result = { cost = 0 }
+    local result = { cost = 0, skipCollision = true, }
 
     local connectorFace = {
         {2, -8.0, 0.0, 1.0},
@@ -371,9 +370,7 @@ end
 local function updateFn_2_1_lane_medium_sidewalk_to_2_lane(params)
     params.direction = 0 -- 2-way streets cannot be reversed, the game is like that
 
-    local result = {
-        cost = 0
-    }
+    local result = { cost = 0, skipCollision = true, }
 
     local connectorFace = {
         {2, -8.0, 0.0, 1.0},
@@ -475,7 +472,7 @@ local function updateFn_2_1_lane_medium_sidewalk_to_2_lane(params)
 end
 
 local function updateFn_3_1_lane_narrow_sidewalk_to_3_lane_one_way(params)
-    local result = { cost = 0 }
+    local result = { cost = 0, skipCollision = true, }
 
     local connectorFace = {
         {2, -8.0, 0.0, 1.0},
@@ -507,6 +504,7 @@ local function updateFn_3_1_lane_narrow_sidewalk_to_3_lane_one_way(params)
     result.models = {
         {
             id = 'lollo_assets/lollo_street_confluence_3_lanes_narrow_sidewalk.mdl',
+            skipCollision = true,
             transf = pitchUtil.getIdTransfPitched(params.pitch)
         }
     }
@@ -596,7 +594,7 @@ local function updateFn_3_1_lane_narrow_sidewalk_to_3_lane_one_way(params)
 end
 
 local function updateFn_3_1_lane_medium_sidewalk_to_3_lane_one_way(params)
-    local result = { cost = 0 }
+    local result = { cost = 0, skipCollision = true, }
 
     local connectorFace = {
         {2, -12.0, 0.0, 1.0},
@@ -628,6 +626,7 @@ local function updateFn_3_1_lane_medium_sidewalk_to_3_lane_one_way(params)
     result.models = {
         {
             id = 'lollo_assets/lollo_street_confluence_3_lanes_medium_sidewalk.mdl',
+            skipCollision = true,
             transf = pitchUtil.getIdTransfPitched(params.pitch)
         }
     }
@@ -718,7 +717,7 @@ local function updateFn_3_1_lane_medium_sidewalk_to_3_lane_one_way(params)
 end
 
 local function updateFn_4_1_lane_narrow_sidewalk_to_4_lane_one_way(params)
-    local result = { cost = 0 }
+    local result = { cost = 0, skipCollision = true, }
 
     local connectorFace = {
         {2, -8.0, 0.0, 1.0},
@@ -750,6 +749,7 @@ local function updateFn_4_1_lane_narrow_sidewalk_to_4_lane_one_way(params)
     result.models = {
         {
             id = 'lollo_assets/lollo_street_confluence_4_lanes_narrow_sidewalk.mdl',
+            skipCollision = true,
             transf = pitchUtil.getIdTransfPitched(params.pitch)
         }
     }
@@ -864,7 +864,7 @@ end
 local function updateFn_4_1_lane_narrow_sidewalk_to_4_lane(params)
     params.direction = 0 -- 2-way streets cannot be reversed, the game is like that
 
-    local result = { cost = 0 }
+    local result = { cost = 0, skipCollision = true, }
 
     local connectorFace = {
         {2, -8.0, 0.0, 1.0},
@@ -896,6 +896,7 @@ local function updateFn_4_1_lane_narrow_sidewalk_to_4_lane(params)
     result.models = {
         {
             id = 'lollo_assets/lollo_street_confluence_4_lanes_narrow_sidewalk_allow_reversal.mdl',
+            skipCollision = true,
             transf = pitchUtil.getIdTransfPitched(params.pitch)
         }
     }
@@ -1010,7 +1011,7 @@ end
 local function updateFn_4_1_lane_narrow_sidewalk_to_4_lane_large(params)
     params.direction = 0 -- 2-way streets cannot be reversed, the game is like that
 
-    local result = { cost = 0 }
+    local result = { cost = 0, skipCollision = true, }
 
     local connectorFace = {
         {2, -12.0, 0.0, 1.0},
@@ -1042,6 +1043,7 @@ local function updateFn_4_1_lane_narrow_sidewalk_to_4_lane_large(params)
     result.models = {
         {
             id = 'lollo_assets/lollo_street_confluence_4_lanes_large_street_narrow_sidewalk.mdl',
+            skipCollision = true,
             transf = pitchUtil.getIdTransfPitched(params.pitch)
         }
     }
@@ -1153,8 +1155,7 @@ local function updateFn_4_1_lane_narrow_sidewalk_to_4_lane_large(params)
 end
 --[[ 
 local function updateFn_2_2_lane_one_way_medium_sidewalk_to_6_lane_x_large(params)
-    local result = {}
-    result.cost = 0
+    local result = { cost = 0, skipCollision = true, }
 
     local connectorFace = {
         {2, -16.0, 0.0, 1.0},
@@ -1186,6 +1187,7 @@ local function updateFn_2_2_lane_one_way_medium_sidewalk_to_6_lane_x_large(param
     result.models = {
         {
             id = 'lollo_assets/lollo_street_confluence_2_medium_sidewalk_one_way_into_6_lanes_x_large_street.mdl',
+            skipCollision = true,
             transf = pitchUtil.getIdTransfPitched(params.pitch)
         }
     }
@@ -1299,7 +1301,7 @@ end
 local function updateFn_2_2_lane_one_way_to_6_lane_x_large(params)
     params.direction = 0 -- 2-way streets cannot be reversed, the game is like that
 
-    local result = { cost = 0 }
+    local result = { cost = 0, skipCollision = true, }
 
     local connectorFace = {
         {2, -16.0, 0.0, 1.0},
@@ -1331,6 +1333,7 @@ local function updateFn_2_2_lane_one_way_to_6_lane_x_large(params)
     result.models = {
         {
             id = 'lollo_assets/lollo_street_confluence_6_lanes_x_large.mdl',
+            skipCollision = true,
             transf = pitchUtil.getIdTransfPitched(params.pitch)
         }
     }
@@ -1445,7 +1448,7 @@ end
 local function updateFn_Motorway_2_2_lane_one_way_to_6_lane_x_large(params)
     params.direction = 0 -- 2-way streets cannot be reversed, the game is like that
 
-    local result = { cost = 0 }
+    local result = { cost = 0, skipCollision = true, }
 
     local connectorFace = {
         {2, -16.0, 0.0, 1.0},
@@ -1477,6 +1480,7 @@ local function updateFn_Motorway_2_2_lane_one_way_to_6_lane_x_large(params)
     result.models = {
         {
             id = 'lollo_assets/lollo_street_confluence_6_lanes_x_large_country_road.mdl',
+            skipCollision = true,
             transf = pitchUtil.getIdTransfPitched(params.pitch)
         }
     }
