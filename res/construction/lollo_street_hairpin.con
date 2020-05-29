@@ -5,6 +5,7 @@ local streetChunksHelper = require('lollo_street_tuning/lolloStreetChunksHelper'
 local streetUtil = require('streetutil')
 local vec3 = require('vec3')
 local pitchUtil = require('lollo_street_tuning/lolloPitchUtil')
+-- LOLLO TODO allow bending all roads, not only 1-way
 function data()
     local function _getStreetHalfWidth(streetData)
         return streetData.sidewalkWidth + streetData.streetWidth * 0.5
@@ -14,16 +15,16 @@ function data()
         -- this is the fruit of trial and error. In May 2020, the game does not allow really sharp curves.
         local result = 0.0
         if streetHalfWidth <= 2.01 then
-            print('LOLLO very narrow')
+            -- print('LOLLO very narrow')
             result = 1.60
         elseif streetHalfWidth <= 4.01 then
-            print('LOLLO narrow')
+            -- print('LOLLO narrow')
             result = 1.32
         elseif streetHalfWidth <= 4.51 then
-            print('LOLLO medium')
+            -- print('LOLLO medium')
             result = 1.30
         else
-            print('LOLLO wide')
+            -- print('LOLLO wide')
             result = 1.20
         end
         return result

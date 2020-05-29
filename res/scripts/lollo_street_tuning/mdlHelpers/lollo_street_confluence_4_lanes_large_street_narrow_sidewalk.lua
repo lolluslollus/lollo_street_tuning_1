@@ -122,7 +122,7 @@ results.getLods = function()
     }
 end
 
-results.getTransportNetworkProvider = function()
+results.getTransportNetworkProvider_AllowReversal = function()
     return {
         laneLists = {
             -- vehicles

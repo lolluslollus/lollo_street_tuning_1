@@ -16,7 +16,7 @@ function data()
             --autoRemovable = true,
             skipCollision = true,
             --skipCollisionCheck = true,
-            transportNetworkProvider = myUtil.getTransportNetworkProvider()
+            transportNetworkProvider = myUtil.getTransportNetworkProvider_AllowReversal()
         },
         version = 1
     }
