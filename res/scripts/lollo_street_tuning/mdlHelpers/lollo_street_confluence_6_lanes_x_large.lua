@@ -19,7 +19,88 @@ results.getCollider = function()
     }
 end
 
-results.getLods = function()
+results.getCountryRoadLods = function()
+    return {
+        {
+            node = {
+                children = {
+                    -- LOLLO TODO maybe make some new dds with the white stripe
+                    -- -- close the incoming thinner roads
+                    -- {
+                    --     materials = { "street/new_medium_sidewalk_border_inner.mtl", "street/new_medium_sidewalk.mtl", },
+                    --     mesh = "station/road/streetstation/era_c/pltfrm_r_top_lod0.msh",
+                    --     name = "pltfrm_r_top",
+                    --     transf = { 0, 0.8, 0, 0, 0.8, 0, 0, 0, 0, 0, 0.1, 0, -6, -2, 0, 1, },
+                    -- },
+                    -- {
+                    --     materials = { "street/new_medium_sidewalk_border_inner.mtl", "street/new_medium_sidewalk.mtl", },
+                    --     mesh = "station/road/streetstation/era_c/pltfrm_r_top_lod0.msh",
+                    --     name = "pltfrm_r_top",
+                    --     transf = { 0, 0.8, 0, 0, 0.8, 0, 0, 0, 0, 0, 0.1, 0, -6, 2, 0, 1, },
+                    -- },
+                    -- -- straight bits
+                    -- {
+                    --     materials = {'street/new_medium_sidewalk_border_inner.mtl', 'street/new_medium_sidewalk.mtl'},
+                    --     mesh = 'station/road/streetstation/pedestrian_era_c/straight_lod0.msh',
+                    --     transf = {0.8, 0, 0, 0, 0, -0.8, 0, 0, 0, 0, 0.1, 0, 0, -16, 0, 1}
+                    -- },
+                    -- {
+                    --     materials = {'street/new_medium_sidewalk_border_inner.mtl', 'street/new_medium_sidewalk.mtl'},
+                    --     mesh = 'station/road/streetstation/pedestrian_era_c/straight_lod0.msh',
+                    --     transf = {0.8, 0, 0, 0, 0, -0.8, 0, 0, 0, 0, 0.1, 0, 0, -14, 0, 1}
+                    -- },
+                    -- {
+                    --     materials = {'street/new_medium_sidewalk_border_inner.mtl', 'street/new_medium_sidewalk.mtl'},
+                    --     mesh = 'station/road/streetstation/pedestrian_era_c/straight_lod0.msh',
+                    --     transf = {0.8, 0, 0, 0, 0, -0.8, 0, 0, 0, 0, 0.1, 0, 0, 12, 0, 1}
+                    -- },
+                    -- {
+                    --     materials = {'street/new_medium_sidewalk_border_inner.mtl', 'street/new_medium_sidewalk.mtl'},
+                    --     mesh = 'station/road/streetstation/pedestrian_era_c/straight_lod0.msh',
+                    --     transf = {0.8, 0, 0, 0, 0, -0.8, 0, 0, 0, 0, 0.1, 0, 0, 14, 0, 1}
+                    -- },
+                    -- ground
+                    {
+                        materials = {'street/country_new_medium_paving.mtl'},
+                        mesh = 'station/rail/era_c/station_1_main/station_1_main_perron_lod0.msh',
+                        transf = {.22, 0, 0, 0, 0, 1.0, 0, 0, 0, 0, 1, 0, 0, 11.9, -.795, 1}
+                    },
+                    {
+                        materials = {'street/country_new_medium_paving.mtl'},
+                        mesh = 'station/rail/era_c/station_1_main/station_1_main_perron_lod0.msh',
+                        transf = {.22, 0, 0, 0, 0, 1.0, 0, 0, 0, 0, 1, 0, 0, 10.0, -.795, 1}
+                    },
+                    {
+                        materials = {'street/country_new_medium_paving.mtl'},
+                        mesh = 'station/rail/era_c/station_1_main/station_1_main_perron_lod0.msh',
+                        transf = {.22, 0, 0, 0, 0, 1.0, 0, 0, 0, 0, 1, 0, 0, 5.0, -.795, 1}
+                    },
+                    {
+                        materials = {'street/country_new_medium_paving.mtl'},
+                        mesh = 'station/rail/era_c/station_1_main/station_1_main_perron_lod0.msh',
+                        transf = {.22, 0, 0, 0, 0, 1.0, 0, 0, 0, 0, 1, 0, 0, 0, -.795, 1}
+                    },
+                    {
+                        materials = {'street/country_new_medium_paving.mtl'},
+                        mesh = 'station/rail/era_c/station_1_main/station_1_main_perron_lod0.msh',
+                        transf = {.22, 0, 0, 0, 0, 1.0, 0, 0, 0, 0, 1, 0, 0, -5, -.795, 1}
+                    },
+                    {
+                        materials = {'street/country_new_medium_paving.mtl'},
+                        mesh = 'station/rail/era_c/station_1_main/station_1_main_perron_lod0.msh',
+                        transf = {.22, 0, 0, 0, 0, 1.0, 0, 0, 0, 0, 1, 0, 0, -6.9, -.795, 1}
+                    },
+                },
+                transf = idTransf
+            },
+            static = false,
+            visibleFrom = 0,
+            visibleTo = 1000
+        }
+    }
+end
+
+results.getStreetLods = function()
     return {
         {
             node = {

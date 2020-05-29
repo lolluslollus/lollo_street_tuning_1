@@ -4,7 +4,7 @@ function data()
     return {
         boundingInfo = myUtil.getBoundingInfo(),
         collider = myUtil.getCollider(),
-        lods = myUtil.getStreetLods(),
+        lods = myUtil.getCountryRoadLods(),
         metadata = {
             availability = {
                 yearFrom = 0,
@@ -16,7 +16,7 @@ function data()
             --autoRemovable = true,
             skipCollision = true,
             --skipCollisionCheck = true,
-            transportNetworkProvider = myUtil.getTransportNetworkProvider_AllowReversal()
+            transportNetworkProvider = myUtil.getTransportNetworkProvider()
         },
         version = 1
     }
