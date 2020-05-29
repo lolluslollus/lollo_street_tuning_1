@@ -6,6 +6,7 @@ local streetUtil = require('streetutil')
 local vec3 = require('vec3')
 local pitchUtil = require('lollo_street_tuning/lolloPitchUtil')
 -- LOLLO TODO allow bending all roads, not only 1-way
+-- LOLLO TODO make all nodes free like in the parallel chunks if it works
 function data()
     local function _getStreetHalfWidth(streetData)
         return streetData.sidewalkWidth + streetData.streetWidth * 0.5
