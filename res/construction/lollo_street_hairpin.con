@@ -1,0 +1,236 @@
+-- local luadump = require('lollo_street_tuning/luadump')
+-- local inspect = require('inspect')
+local arrayUtils = require('lollo_street_tuning/lolloArrayUtils')
+local streetChunksHelper = require('lollo_street_tuning/lolloStreetChunksHelper')
+local streetUtil = require('streetutil')
+local vec3 = require('vec3')
+local pitchUtil = require('lollo_street_tuning/lolloPitchUtil')
+function data()
+    local function _getStreetHalfWidth(streetData)
+        return streetData.sidewalkWidth + streetData.streetWidth * 0.5
+    end
+
+    local function _getWidthFactor(streetHalfWidth)
+        -- this is the fruit of trial and error. In May 2020, the game does not allow really sharp bends.
+        local result = 0.0
+        if streetHalfWidth <= 2.01 then
+            print('LOLLO very narrow')
+            result = 1.60
+        elseif streetHalfWidth <= 4.01 then
+            print('LOLLO narrow')
+            result = 1.32
+        elseif streetHalfWidth <= 4.51 then
+            print('LOLLO medium')
+            result = 1.30
+        else
+            print('LOLLO wide')
+            result = 1.20
+        end
+        return result
+    end
+
+    local function _getNonSnapEdgeLists(params, pitch, streetData, tramTrackType)
+        local streetHalfWidth = _getStreetHalfWidth(streetData)
+        local widthFactorBend = _getWidthFactor(streetHalfWidth)
+
+        local edgeParams = {
+            skipCollision = true,
+            type = streetData.fileName,
+            tramTrackType = tramTrackType
+        }
+        -- the pitch plays no part in the bend as long as it is centred on x = 0
+        local edgeLists = {
+            {
+                type = 'STREET',
+                params = edgeParams,
+                edges = {},
+                freeNodes = {0, 1},
+                snapNodes = {},
+            },
+        }
+        if params.direction == 0 then
+            streetUtil.addEdgeAutoTangents(
+                edgeLists[1].edges,
+                vec3.new(0, -widthFactorBend * streetHalfWidth, 0),
+                vec3.new(0, widthFactorBend * streetHalfWidth, 0),
+                vec3.new(1, 0, 0),
+                vec3.new(-1, 0, 0)
+            )
+        else
+            streetUtil.addEdgeAutoTangents(
+                edgeLists[1].edges,
+                vec3.new(0, widthFactorBend * streetHalfWidth, 0),
+                vec3.new(0, -widthFactorBend * streetHalfWidth, 0),
+                vec3.new(1, 0, 0),
+                vec3.new(-1, 0, 0)
+            )
+        end
+        return edgeLists
+    end
+
+    local function _getSnapAndFreeEdgeLists(params, pitch, streetData, tramTrackType)
+        local streetHalfWidth = _getStreetHalfWidth(streetData)
+        local widthFactorBend = _getWidthFactor(streetHalfWidth)
+
+        local xMax = streetHalfWidth * 0.5 -- this is the fruit of trial and error -- LOLLO TODO check this in the cazzilli and make it as short as possible
+        local edgeParams = {
+            skipCollision = true,
+            type = streetData.fileName,
+            tramTrackType = tramTrackType
+        }
+        local edgeLists = {
+            {
+                type = 'STREET',
+                params = edgeParams,
+                edges = streetChunksHelper.makeEdges(
+                    params.direction,
+                    pitch,
+                    {-xMax, -widthFactorBend * streetHalfWidth, 0},
+                    {0, -widthFactorBend * streetHalfWidth, 0},
+                    {1, 0, 0},
+                    {1, 0, 0}
+                ),
+                freeNodes = {0, 1},
+                snapNodes = params.direction == 0 and {0} or {1}
+            },
+            -- the pitch plays no part in the bend as long as it is centred on x = 0
+            {
+                type = 'STREET',
+                params = edgeParams,
+                edges = {},
+                freeNodes = {0, 1},
+                snapNodes = {},
+            },
+            {
+                type = 'STREET',
+                params = edgeParams,
+                edges = streetChunksHelper.makeEdges(
+                    params.direction,
+                    pitch,
+                    {0, widthFactorBend * streetHalfWidth, 0},
+                    {-xMax, widthFactorBend * streetHalfWidth, 0},
+                    {-1, 0, 0},
+                    {-1, 0, 0}
+                ),
+                freeNodes = {0, 1},
+                snapNodes = params.direction == 0 and {1} or {0}
+            }
+        }
+        if params.direction == 0 then
+            streetUtil.addEdgeAutoTangents(
+                edgeLists[2].edges,
+                vec3.new(0, -widthFactorBend * streetHalfWidth, 0),
+                vec3.new(0, widthFactorBend * streetHalfWidth, 0),
+                vec3.new(1, 0, 0),
+                vec3.new(-1, 0, 0)
+            )
+        else
+            streetUtil.addEdgeAutoTangents(
+                edgeLists[2].edges,
+                vec3.new(0, widthFactorBend * streetHalfWidth, 0),
+                vec3.new(0, -widthFactorBend * streetHalfWidth, 0),
+                vec3.new(1, 0, 0),
+                vec3.new(-1, 0, 0)
+            )
+        end
+        return edgeLists
+    end
+
+    streetChunksHelper.setGlobalStreetData(game)
+
+    return {
+        type = 'STREET_CONSTRUCTION',
+        description = {
+            name = _('Street hairpin bends'),
+            description = _('Lays hairpin bends. Use O and P to adjust the pitch.')
+        },
+        availability = {
+            yearFrom = 1925,
+            yearTo = 0
+        },
+        params = {
+            {
+                key = 'streetType_',
+                name = _('Street type'),
+                values = arrayUtils.map(
+                    game._lolloStreetData,
+                    function(str)
+                        return str.name
+                    end
+                ),
+                defaultIndex = 0
+                -- yearFrom = 1925,
+                -- yearTo = 0
+            },
+            {
+                key = 'snapNodes',
+                name = _('Snap to neighbours'),
+                values = {
+                    _('No'),
+                    _('Yes')
+                },
+                defaultIndex = 0
+            },
+            {
+                key = 'direction',
+                name = _('Direction'),
+                values = {
+                    _('↑'),
+                    _('↓')
+                },
+                defaultIndex = 0
+            },
+            {
+                key = 'tramTrack',
+                name = _('Tram track type'),
+                values = {
+                    -- must be in this sequence
+                    _('NO'),
+                    _('YES'),
+                    _('ELECTRIC')
+                },
+                defaultIndex = 2
+            },
+            {
+                key = 'pitch',
+                name = _('Pitch (adjust it with O and P while building)'),
+                values = pitchUtil.getPitchParamValues(),
+                defaultIndex = pitchUtil.getDefaultPitchParamValue(),
+                uiType = 'SLIDER'
+            }
+        },
+        order = 1242,
+        skipCollision = true,
+        updateFn = function(params)
+            local pitch = pitchUtil.adjustParamsPitch(params)
+            local streetData = game._lolloStreetData[params.streetType_ + 1]
+
+            local result = { cost = 0 }
+            result.groundFaces = {}
+            -- result.colliders = {}
+            -- LOLLO NOTE If some edges are not free, I will need a dummy model,
+            -- otherwise the game will say "hello there" or "easter egg" or other rubbish,
+            -- then point away (to some animal) and do nothing,
+            -- when the user clicks on a done construction to configure it.
+            result.models = {}
+
+            -- LOLLO NOTE I cannot use KEEP here
+            local tramTrackType = params.tramTrack and (({'NO', 'YES', 'ELECTRIC'})[params.tramTrack + 1]) or 'NO'
+            if params.snapNodes == 0 then
+                result.edgeLists = _getNonSnapEdgeLists(params, pitch, streetData, tramTrackType)
+            else
+                -- LOLLO NOTE we have 3 edges for every hairpin bend. The inner nodes are not free and do not snap, the outer ones do.
+                -- This is required if we want to make them snappable.
+                result.edgeLists = _getSnapAndFreeEdgeLists(params, pitch, streetData, tramTrackType)
+            end
+
+            return result
+        end,
+        upgradeFn = function(params)
+            -- LOLLO NOTE the game wants this function to be defined, even if it returns an empty table.
+            -- If you leave it out, adding and removing tram tracks won't work.
+            -- (Bus lanes don't work anyway.)
+            return {}
+        end
+    }
+end

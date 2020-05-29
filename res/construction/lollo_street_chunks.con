@@ -868,6 +868,13 @@ function data()
                     _('ELECTRIC')
                 },
                 defaultIndex = 2
+            },
+            {
+                key = 'pitch',
+                name = _('Pitch (adjust it with O and P while building)'),
+                values = pitchUtil.getPitchParamValues(),
+                defaultIndex = pitchUtil.getDefaultPitchParamValue(),
+                uiType = 'SLIDER'
             }
         },
         order = 1240,
@@ -881,8 +888,7 @@ function data()
             local pitch = pitchUtil.adjustParamsPitch(params)
             local streetData = game._lolloStreetData[params.streetType_ + 1]
 
-            local result = {}
-            result.cost = 0
+            local result = { cost = 0 }
             result.groundFaces = {}
             -- result.colliders = {}
             -- LOLLO NOTE If some edges are not free, I will need a dummy model,
