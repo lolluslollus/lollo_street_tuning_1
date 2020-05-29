@@ -1,5 +1,6 @@
 -- local luadump = require('lollo_street_tuning/luadump')
 -- local inspect = require('inspect')
+-- LOLLO NOTE we free all edges, so they can be converted freely. We couls also make a lot of combinations and upgrade them with the construction params, but that might look messy inm the end.
 local arrayUtils = require('lollo_street_tuning/lolloArrayUtils')
 local streetChunksHelper = require('lollo_street_tuning/lolloStreetChunksHelper')
 local pitchUtil = require('lollo_street_tuning/lolloPitchUtil')
@@ -86,7 +87,12 @@ function data()
                 {
                     type = 'STREET',
                     params = edgeParams,
-                    edges = streetChunksHelper.makeEdges(params.direction, pitch, {-streetHalfWidth, 0, 0}, {streetHalfWidth, 0, 0}),
+                    edges = streetChunksHelper.makeEdges(
+                        params.direction,
+                        pitch,
+                        {-streetHalfWidth, 0, 0},
+                        {streetHalfWidth, 0, 0}
+                    ),
                     freeNodes = {0, 1},
                     snapNodes = {}
                 },
@@ -329,7 +335,6 @@ function data()
                     -- and clicking on the construction won't bring up the construction menu anymore.
                     -- This allows a simple parameter menu coz the properties can be changed with the stock street menus.
                     -- In general, it's easier to build and then change a construction.
-                    freeNodes = {0, 1},
                     -- nodes allowed to snap to other edges of the same type
                     -- LOLLO NOTE if the nodes are too close (ie the edges too short), the game will crash with
                     -- c:\build\tpf2_steam\src\lib\geometry\streets\transitions\transition_util.cpp:125:
@@ -347,6 +352,7 @@ function data()
                     type = 'STREET',
                     params = edgeParams,
                     edges = streetChunksHelper.makeEdges(params.direction, pitch, {0, 0, 0}, {xMax, 0, 0}),
+                    -- freeNodes = params.direction == 0 and {1} or {0},,
                     freeNodes = {0, 1},
                     snapNodes = params.direction == 0 and {1} or {0}
                 }
@@ -362,6 +368,7 @@ function data()
                         {-xMax, -streetHalfWidth - halfDistance - halfIslandWidth, 0},
                         {0, -streetHalfWidth - halfDistance - halfIslandWidth, 0}
                     ),
+                    -- freeNodes = params.direction == 0 and {0} or {1},
                     freeNodes = {0, 1},
                     snapNodes = params.direction == 0 and {0} or {1}
                 },
@@ -374,6 +381,7 @@ function data()
                         {-xMax, streetHalfWidth + halfDistance + halfIslandWidth, 0},
                         {0, streetHalfWidth + halfDistance + halfIslandWidth, 0}
                     ),
+                    -- freeNodes = params.direction == 0 and {0} or {1},
                     freeNodes = {0, 1},
                     snapNodes = params.direction == 0 and {0} or {1}
                 },
@@ -386,6 +394,7 @@ function data()
                         {0, -streetHalfWidth - halfDistance - halfIslandWidth, 0},
                         {xMax, -streetHalfWidth - halfDistance - halfIslandWidth, 0}
                     ),
+                    -- freeNodes = params.direction == 0 and {1} or {0},
                     freeNodes = {0, 1},
                     snapNodes = params.direction == 0 and {1} or {0}
                 },
@@ -398,6 +407,7 @@ function data()
                         {0, streetHalfWidth + halfDistance + halfIslandWidth, 0},
                         {xMax, streetHalfWidth + halfDistance + halfIslandWidth, 0}
                     ),
+                    -- freeNodes = params.direction == 0 and {1} or {0},
                     freeNodes = {0, 1},
                     snapNodes = params.direction == 0 and {1} or {0}
                 }
@@ -408,6 +418,7 @@ function data()
                     type = 'STREET',
                     params = edgeParams,
                     edges = streetChunksHelper.makeEdges(params.direction, pitch, {-xMax, -streetFullWidth - distance, 0}, {0, -streetFullWidth - distance, 0}),
+                    -- freeNodes = params.direction == 0 and {0} or {1},
                     freeNodes = {0, 1},
                     snapNodes = params.direction == 0 and {0} or {1}
                 },
@@ -415,6 +426,7 @@ function data()
                     type = 'STREET',
                     params = edgeParams,
                     edges = streetChunksHelper.makeEdges(params.direction, pitch, {-xMax, 0, 0}, {0, 0, 0}),
+                    -- freeNodes = params.direction == 0 and {0} or {1},
                     freeNodes = {0, 1},
                     snapNodes = params.direction == 0 and {0} or {1}
                 },
@@ -422,6 +434,7 @@ function data()
                     type = 'STREET',
                     params = edgeParams,
                     edges = streetChunksHelper.makeEdges(params.direction, pitch, {-xMax, streetFullWidth + distance, 0}, {0, streetFullWidth + distance, 0}),
+                    -- freeNodes = params.direction == 0 and {0} or {1},
                     freeNodes = {0, 1},
                     snapNodes = params.direction == 0 and {0} or {1}
                 },
@@ -429,6 +442,7 @@ function data()
                     type = 'STREET',
                     params = edgeParams,
                     edges = streetChunksHelper.makeEdges(params.direction, pitch, {0, -streetFullWidth - distance, 0}, {xMax, -streetFullWidth - distance, 0}),
+                    -- freeNodes = params.direction == 0 and {1} or {0},
                     freeNodes = {0, 1},
                     snapNodes = params.direction == 0 and {1} or {0}
                 },
@@ -436,6 +450,7 @@ function data()
                     type = 'STREET',
                     params = edgeParams,
                     edges = streetChunksHelper.makeEdges(params.direction, pitch, {0, 0, 0}, {xMax, 0, 0}),
+                    -- freeNodes = params.direction == 0 and {1} or {0},
                     freeNodes = {0, 1},
                     snapNodes = params.direction == 0 and {1} or {0}
                 },
@@ -443,6 +458,7 @@ function data()
                     type = 'STREET',
                     params = edgeParams,
                     edges = streetChunksHelper.makeEdges(params.direction, pitch, {0, streetFullWidth + distance, 0}, {xMax, streetFullWidth + distance, 0}),
+                    -- freeNodes = params.direction == 0 and {1} or {0},
                     freeNodes = {0, 1},
                     snapNodes = params.direction == 0 and {1} or {0}
                 }
@@ -459,6 +475,7 @@ function data()
                         {-xMax, -3.0 * streetHalfWidth - 3.0 * halfDistance - halfIslandWidth, 0},
                         {0, -3.0 * streetHalfWidth - 3.0 * halfDistance - halfIslandWidth, 0}
                     ),
+                    -- freeNodes = params.direction == 0 and {0} or {1},
                     freeNodes = {0, 1},
                     snapNodes = params.direction == 0 and {0} or {1}
                 },
@@ -471,6 +488,7 @@ function data()
                         {-xMax, -streetHalfWidth - halfDistance - halfIslandWidth, 0},
                         {0, -streetHalfWidth - halfDistance - halfIslandWidth, 0}
                     ),
+                    -- freeNodes = params.direction == 0 and {0} or {1},
                     freeNodes = {0, 1},
                     snapNodes = params.direction == 0 and {0} or {1}
                 },
@@ -483,6 +501,7 @@ function data()
                         {-xMax, streetHalfWidth + halfDistance + halfIslandWidth, 0},
                         {0, streetHalfWidth + halfDistance + halfIslandWidth, 0}
                     ),
+                    -- freeNodes = params.direction == 0 and {0} or {1},
                     freeNodes = {0, 1},
                     snapNodes = params.direction == 0 and {0} or {1}
                 },
@@ -495,6 +514,7 @@ function data()
                         {-xMax, 3.0 * streetHalfWidth + 3.0 * halfDistance + halfIslandWidth, 0},
                         {0, 3.0 * streetHalfWidth + 3.0 * halfDistance + halfIslandWidth, 0}
                     ),
+                    -- freeNodes = params.direction == 0 and {0} or {1},
                     freeNodes = {0, 1},
                     snapNodes = params.direction == 0 and {0} or {1}
                 },
@@ -508,6 +528,7 @@ function data()
                         {0, -3.0 * streetHalfWidth - 3.0 * halfDistance - halfIslandWidth, 0},
                         {xMax, -3.0 * streetHalfWidth - 3.0 * halfDistance - halfIslandWidth, 0}
                     ),
+                    -- freeNodes = params.direction == 0 and {1} or {0},
                     freeNodes = {0, 1},
                     snapNodes = params.direction == 0 and {1} or {0}
                 },
@@ -520,6 +541,7 @@ function data()
                         {0, -streetHalfWidth - halfDistance - halfIslandWidth, 0},
                         {xMax, -streetHalfWidth - halfDistance - halfIslandWidth, 0}
                     ),
+                    -- freeNodes = params.direction == 0 and {1} or {0},
                     freeNodes = {0, 1},
                     snapNodes = params.direction == 0 and {1} or {0}
                 },
@@ -532,6 +554,7 @@ function data()
                         {0, streetHalfWidth + halfDistance + halfIslandWidth, 0},
                         {xMax, streetHalfWidth + halfDistance + halfIslandWidth, 0}
                     ),
+                    -- freeNodes = params.direction == 0 and {1} or {0},
                     freeNodes = {0, 1},
                     snapNodes = params.direction == 0 and {1} or {0}
                 },
@@ -544,6 +567,7 @@ function data()
                         {0, 3.0 * streetHalfWidth + 3.0 * halfDistance + halfIslandWidth, 0},
                         {xMax, 3.0 * streetHalfWidth + 3.0 * halfDistance + halfIslandWidth, 0}
                     ),
+                    -- freeNodes = params.direction == 0 and {1} or {0},
                     freeNodes = {0, 1},
                     snapNodes = params.direction == 0 and {1} or {0}
                 }
@@ -555,6 +579,7 @@ function data()
                     type = 'STREET',
                     params = edgeParams,
                     edges = streetChunksHelper.makeEdges(params.direction, pitch, {-xMax, - 2.0 * streetFullWidth - 2.0 * distance, 0}, {0, - 2.0 * streetFullWidth - 2.0 * distance, 0}),
+                    -- freeNodes = params.direction == 0 and {0} or {1},
                     freeNodes = {0, 1},
                     snapNodes = params.direction == 0 and {0} or {1}
                 },
@@ -562,6 +587,7 @@ function data()
                     type = 'STREET',
                     params = edgeParams,
                     edges = streetChunksHelper.makeEdges(params.direction, pitch, {-xMax, -streetFullWidth - distance, 0}, {0, -streetFullWidth - distance, 0}),
+                    -- freeNodes = params.direction == 0 and {0} or {1},
                     freeNodes = {0, 1},
                     snapNodes = params.direction == 0 and {0} or {1}
                 },
@@ -569,6 +595,7 @@ function data()
                     type = 'STREET',
                     params = edgeParams,
                     edges = streetChunksHelper.makeEdges(params.direction, pitch, {-xMax, 0, 0}, {0, 0, 0}),
+                    -- freeNodes = params.direction == 0 and {0} or {1},
                     freeNodes = {0, 1},
                     snapNodes = params.direction == 0 and {0} or {1}
                 },
@@ -576,6 +603,7 @@ function data()
                     type = 'STREET',
                     params = edgeParams,
                     edges = streetChunksHelper.makeEdges(params.direction, pitch, {-xMax, streetFullWidth + distance, 0}, {0, streetFullWidth + distance, 0}),
+                    -- freeNodes = params.direction == 0 and {0} or {1},
                     freeNodes = {0, 1},
                     snapNodes = params.direction == 0 and {0} or {1}
                 },
@@ -583,6 +611,7 @@ function data()
                     type = 'STREET',
                     params = edgeParams,
                     edges = streetChunksHelper.makeEdges(params.direction, pitch, {-xMax, 2.0 * streetFullWidth + 2.0 * distance, 0}, {0, 2.0 * streetFullWidth + 2.0 * distance, 0}),
+                    -- freeNodes = params.direction == 0 and {0} or {1},
                     freeNodes = {0, 1},
                     snapNodes = params.direction == 0 and {0} or {1}
                 },
@@ -591,6 +620,7 @@ function data()
                     type = 'STREET',
                     params = edgeParams,
                     edges = streetChunksHelper.makeEdges(params.direction, pitch, {0, - 2.0 * streetFullWidth - 2.0 * distance, 0}, {xMax, - 2.0 * streetFullWidth - 2.0 * distance, 0}),
+                    -- freeNodes = params.direction == 0 and {1} or {0},
                     freeNodes = {0, 1},
                     snapNodes = params.direction == 0 and {1} or {0}
                 },
@@ -598,6 +628,7 @@ function data()
                     type = 'STREET',
                     params = edgeParams,
                     edges = streetChunksHelper.makeEdges(params.direction, pitch, {0, -streetFullWidth - distance, 0}, {xMax, -streetFullWidth - distance, 0}),
+                    -- freeNodes = params.direction == 0 and {1} or {0},
                     freeNodes = {0, 1},
                     snapNodes = params.direction == 0 and {1} or {0}
                 },
@@ -605,6 +636,7 @@ function data()
                     type = 'STREET',
                     params = edgeParams,
                     edges = streetChunksHelper.makeEdges(params.direction, pitch, {0, 0, 0}, {xMax, 0, 0}),
+                    -- freeNodes = params.direction == 0 and {1} or {0},
                     freeNodes = {0, 1},
                     snapNodes = params.direction == 0 and {1} or {0}
                 },
@@ -612,6 +644,7 @@ function data()
                     type = 'STREET',
                     params = edgeParams,
                     edges = streetChunksHelper.makeEdges(params.direction, pitch, {0, streetFullWidth + distance, 0}, {xMax, streetFullWidth + distance, 0}),
+                    -- freeNodes = params.direction == 0 and {1} or {0},
                     freeNodes = {0, 1},
                     snapNodes = params.direction == 0 and {1} or {0}
                 },
@@ -619,6 +652,7 @@ function data()
                     type = 'STREET',
                     params = edgeParams,
                     edges = streetChunksHelper.makeEdges(params.direction, pitch, {0, 2.0 * streetFullWidth + 2.0 * distance, 0}, {xMax, 2.0 * streetFullWidth + 2.0 * distance, 0}),
+                    -- freeNodes = params.direction == 0 and {1} or {0},
                     freeNodes = {0, 1},
                     snapNodes = params.direction == 0 and {1} or {0}
                 }
@@ -635,6 +669,7 @@ function data()
                         {-xMax, - 5.0 * streetHalfWidth - 5.0 * halfDistance - halfIslandWidth, 0},
                         {0, - 5.0 * streetHalfWidth - 5.0 * halfDistance - halfIslandWidth, 0}
                     ),
+                    -- freeNodes = params.direction == 0 and {0} or {1},
                     freeNodes = {0, 1},
                     snapNodes = params.direction == 0 and {0} or {1}
                 },
@@ -647,6 +682,7 @@ function data()
                         {-xMax, - 3.0 * streetHalfWidth - 3.0 * halfDistance - halfIslandWidth, 0},
                         {0, - 3.0 * streetHalfWidth - 3.0 * halfDistance - halfIslandWidth, 0}
                     ),
+                    -- freeNodes = params.direction == 0 and {0} or {1},
                     freeNodes = {0, 1},
                     snapNodes = params.direction == 0 and {0} or {1}
                 },
@@ -659,6 +695,7 @@ function data()
                         {-xMax, -streetHalfWidth - halfDistance - halfIslandWidth, 0},
                         {0, -streetHalfWidth - halfDistance - halfIslandWidth, 0}
                     ),
+                    -- freeNodes = params.direction == 0 and {0} or {1},
                     freeNodes = {0, 1},
                     snapNodes = params.direction == 0 and {0} or {1}
                 },
@@ -671,6 +708,7 @@ function data()
                         {-xMax, streetHalfWidth + halfDistance + halfIslandWidth, 0},
                         {0, streetHalfWidth + halfDistance + halfIslandWidth, 0}
                     ),
+                    -- freeNodes = params.direction == 0 and {0} or {1},
                     freeNodes = {0, 1},
                     snapNodes = params.direction == 0 and {0} or {1}
                 },
@@ -683,6 +721,7 @@ function data()
                         {-xMax, 3.0 * streetHalfWidth + 3.0 * halfDistance + halfIslandWidth, 0},
                         {0, 3.0 * streetHalfWidth + 3.0 * halfDistance + halfIslandWidth, 0}
                     ),
+                    -- freeNodes = params.direction == 0 and {0} or {1},
                     freeNodes = {0, 1},
                     snapNodes = params.direction == 0 and {0} or {1}
                 },
@@ -695,6 +734,7 @@ function data()
                         {-xMax, 5.0 * streetHalfWidth + 5.0 * halfDistance + halfIslandWidth, 0},
                         {0, 5.0 * streetHalfWidth + 5.0 * halfDistance + halfIslandWidth, 0}
                     ),
+                    -- freeNodes = params.direction == 0 and {0} or {1},
                     freeNodes = {0, 1},
                     snapNodes = params.direction == 0 and {0} or {1}
                 },
@@ -708,6 +748,7 @@ function data()
                         {0, - 5.0 * streetHalfWidth - 5.0 * halfDistance - halfIslandWidth, 0},
                         {xMax, - 5.0 * streetHalfWidth - 5.0 * halfDistance - halfIslandWidth, 0}
                     ),
+                    -- freeNodes = params.direction == 0 and {1} or {0},
                     freeNodes = {0, 1},
                     snapNodes = params.direction == 0 and {1} or {0}
                 },
@@ -720,6 +761,7 @@ function data()
                         {0, - 3.0 * streetHalfWidth - 3.0 * halfDistance - halfIslandWidth, 0},
                         {xMax, - 3.0 * streetHalfWidth - 3.0 * halfDistance - halfIslandWidth, 0}
                     ),
+                    -- freeNodes = params.direction == 0 and {1} or {0},
                     freeNodes = {0, 1},
                     snapNodes = params.direction == 0 and {1} or {0}
                 },
@@ -732,6 +774,7 @@ function data()
                         {0, -streetHalfWidth - halfDistance - halfIslandWidth, 0},
                         {xMax, -streetHalfWidth - halfDistance - halfIslandWidth, 0}
                     ),
+                    -- freeNodes = params.direction == 0 and {1} or {0},
                     freeNodes = {0, 1},
                     snapNodes = params.direction == 0 and {1} or {0}
                 },
@@ -744,6 +787,7 @@ function data()
                         {0, streetHalfWidth + halfDistance + halfIslandWidth, 0},
                         {xMax, streetHalfWidth + halfDistance + halfIslandWidth, 0}
                     ),
+                    -- freeNodes = params.direction == 0 and {1} or {0},
                     freeNodes = {0, 1},
                     snapNodes = params.direction == 0 and {1} or {0}
                 },
@@ -756,6 +800,7 @@ function data()
                         {0, 3.0 * streetHalfWidth + 3.0 * halfDistance + halfIslandWidth, 0},
                         {xMax, 3.0 * streetHalfWidth + 3.0 * halfDistance + halfIslandWidth, 0}
                     ),
+                    -- freeNodes = params.direction == 0 and {1} or {0},
                     freeNodes = {0, 1},
                     snapNodes = params.direction == 0 and {1} or {0}
                 },
@@ -768,6 +813,7 @@ function data()
                         {0, 5.0 * streetHalfWidth + 5.0 * halfDistance + halfIslandWidth, 0},
                         {xMax, 5.0 * streetHalfWidth + 5.0 * halfDistance + halfIslandWidth, 0}
                     ),
+                    -- freeNodes = params.direction == 0 and {1} or {0},
                     freeNodes = {0, 1},
                     snapNodes = params.direction == 0 and {1} or {0}
                 }
@@ -895,7 +941,13 @@ function data()
             -- otherwise the game will say "hello there" or "easter egg" or other rubbish,
             -- then point away (to some animal) and do nothing,
             -- when the user clicks on a done construction to configure it.
-            result.models = {}
+            result.models = {
+                {
+                    id = 'lollo_assets/lollo_dummy.mdl',
+                    skipCollision = true,
+                    transf = pitchUtil.getIdTransfPitched(params.pitch)
+                }
+            }
 
             -- LOLLO NOTE I cannot use KEEP here
             local tramTrackType = params.tramTrack and (({'NO', 'YES', 'ELECTRIC'})[params.tramTrack + 1]) or 'NO'
