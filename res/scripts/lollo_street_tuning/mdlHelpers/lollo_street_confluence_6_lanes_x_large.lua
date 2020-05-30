@@ -109,13 +109,11 @@ results.getStreetLods = function()
                     {
                         materials = { "street/new_medium_sidewalk_border_inner.mtl", "street/new_medium_sidewalk.mtl", },
                         mesh = "station/road/streetstation/era_c/pltfrm_r_top_lod0.msh",
-                        name = "pltfrm_r_top",
                         transf = { 0, 0.8, 0, 0, 0.8, 0, 0, 0, 0, 0, 1, 0, -6, -2, 0, 1, },
                     },
                     {
                         materials = { "street/new_medium_sidewalk_border_inner.mtl", "street/new_medium_sidewalk.mtl", },
                         mesh = "station/road/streetstation/era_c/pltfrm_r_top_lod0.msh",
-                        name = "pltfrm_r_top",
                         transf = { 0, 0.8, 0, 0, 0.8, 0, 0, 0, 0, 0, 1, 0, -6, 2, 0, 1, },
                     },
                     -- -- join
@@ -123,14 +121,12 @@ results.getStreetLods = function()
                     --     -- materials = { "station/road/streetstation/streetstation_perron_border.mtl", "station/road/streetstation/streetstation_perron_base_new.mtl", },
                     --     materials = {'street/new_medium_sidewalk_border_inner.mtl', 'street/new_medium_sidewalk.mtl'},
                     --     mesh = "station/road/streetstation/era_c/pltfrm_l_top_spcl_lod0.msh",
-                    --     name = "pltfrm_l_top_spcl",
                     --     transf = { 0, -1, 0, 0, -1, 0, 0, 0, 0, 0, 1, 0, 7.5, -17.5, 0, 1, },
                     -- },
                     -- {
                     --     -- materials = { "station/road/streetstation/streetstation_perron_border.mtl", "station/road/streetstation/streetstation_perron_base_new.mtl", },
                     --     materials = {'street/new_medium_sidewalk_border_inner.mtl', 'street/new_medium_sidewalk.mtl'},
                     --     mesh = "station/road/streetstation/era_c/pltfrm_l_top_spcl_lod0.msh",
-                    --     name = "pltfrm_l_top_spcl",
                     --     transf = { 0, 1, 0, 0, -1, 0, 0, 0, 0, 0, 1, 0, 7.5, 17.5, 0, 1, },
                     -- },
                     -- straight bits

@@ -6,8 +6,17 @@ local streetUtil = require('streetutil')
 local vec3 = require('vec3')
 local pitchUtil = require('lollo_street_tuning/lolloPitchUtil')
 -- LOLLO TODO allow bending all roads, not only 1-way
--- LOLLO TODO make all nodes free like in the parallel chunks if it works
 function data()
+    local _minRadius = 1.0
+    local _maxRadius = 12.0
+    local function _getRadiusParamValues()
+        local result = {}
+        for i = _minRadius, _maxRadius do
+            table.insert(result, #result + 1, tostring(i))
+        end
+        return result
+    end
+
     local function _getStreetHalfWidth(streetData)
         return streetData.sidewalkWidth + streetData.streetWidth * 0.5
     end
@@ -74,7 +83,9 @@ function data()
         local streetHalfWidth = _getStreetHalfWidth(streetData)
         local widthFactorBend = _getWidthFactor(streetHalfWidth)
 
-        local xMax = streetHalfWidth * 0.5 -- this is the fruit of trial and error
+        -- this is the fruit of trial and error, see the notes
+        -- local xMax = math.max(9.0, streetHalfWidth + 1.0)
+        local xMax = streetHalfWidth -- LOLLO TODO check this, it might need extending
         local edgeParams = {
             skipCollision = true,
             type = streetData.fileName,
@@ -92,7 +103,8 @@ function data()
                     {1, 0, 0},
                     {1, 0, 0}
                 ),
-                freeNodes = params.direction == 0 and {0} or {1},
+                -- freeNodes = params.direction == 0 and {0} or {1},
+                freeNodes = {0, 1},
                 snapNodes = params.direction == 0 and {0} or {1}
             },
             -- the pitch plays no part in the bend as long as it is centred on x = 0
@@ -100,7 +112,8 @@ function data()
                 type = 'STREET',
                 params = edgeParams,
                 edges = {},
-                freeNodes = {},
+                -- freeNodes = {},
+                freeNodes = {0, 1},
                 snapNodes = {},
             },
             {
@@ -114,7 +127,8 @@ function data()
                     {-1, 0, 0},
                     {-1, 0, 0}
                 ),
-                freeNodes = params.direction == 0 and {1} or {0},
+                -- freeNodes = params.direction == 0 and {1} or {0},
+                freeNodes = {0, 1},
                 snapNodes = params.direction == 0 and {1} or {0}
             }
         }
@@ -138,7 +152,7 @@ function data()
         return edgeLists
     end
 
-    streetChunksHelper.setGlobalStreetData(game)
+    streetChunksHelper.setGlobalStreetDataOneWay(game)
 
     return {
         type = 'STREET_CONSTRUCTION',
@@ -155,7 +169,7 @@ function data()
                 key = 'streetType_',
                 name = _('Street type'),
                 values = arrayUtils.map(
-                    game._lolloStreetData,
+                    game._lolloStreetDataOneWay,
                     function(str)
                         return str.name
                     end
@@ -193,6 +207,13 @@ function data()
                 },
                 defaultIndex = 2
             },
+            -- {
+            --     key = 'radius',
+            --     name = _('Radius'),
+            --     values = _getRadiusParamValues(),
+            --     defaultIndex = _minRadius,
+            --     uiType = 'SLIDER'
+            -- },
             {
                 key = 'pitch',
                 name = _('Pitch (adjust it with O and P while building)'),
@@ -205,7 +226,7 @@ function data()
         skipCollision = true,
         updateFn = function(params)
             local pitch = pitchUtil.adjustParamsPitch(params)
-            local streetData = game._lolloStreetData[params.streetType_ + 1]
+            local streetData = game._lolloStreetDataOneWay[params.streetType_ + 1]
 
             local result = { cost = 0 }
             result.groundFaces = {}

@@ -233,14 +233,14 @@ local function _getStreetDataWithDefaults(streetData) --, chunkedStreetTypes)
     end
 end
 
-helper.getGlobalStreetData = function(game)
-    return game._lolloStreetData
+helper.getGlobalStreetDataOneWay = function(game)
+    return game._lolloStreetDataOneWay
 end
 
-helper.setGlobalStreetData = function(game) --, chunkedStreetTypes)
-    if game._lolloStreetData == nil then
+helper.setGlobalStreetDataOneWay = function(game) --, chunkedStreetTypes)
+    if game._lolloStreetDataOneWay == nil then
         -- print('LOLLO street chunks reading street data')
-        game._lolloStreetData = arrayUtils.sort(
+        game._lolloStreetDataOneWay = arrayUtils.sort(
             _getStreetDataWithDefaults(
                 _getStreetDataFiltered(
                     _getStreetFilesContents(
@@ -250,11 +250,11 @@ helper.setGlobalStreetData = function(game) --, chunkedStreetTypes)
             ),
             'name'
            ) --, chunkedStreetTypes)
-        -- print('LOLLO game._lolloStreetData has ', type(game._lolloStreetData) == 'table' and #(game._lolloStreetData) or 0, ' records before the concat')
-        arrayUtils.concatValues(game._lolloStreetData, arrayUtils.sort(_getStandardStreetData(), 'name'))
+        -- print('LOLLO game._lolloStreetDataOneWay has ', type(game._lolloStreetDataOneWay) == 'table' and #(game._lolloStreetDataOneWay) or 0, ' records before the concat')
+        arrayUtils.concatValues(game._lolloStreetDataOneWay, arrayUtils.sort(_getStandardStreetData(), 'name'))
     -- print('LOLLO street chunks has read street data')
     -- print('LOLLO street data = ')
-    -- dump(true)(game._lolloStreetData)
+    -- dump(true)(game._lolloStreetDataOneWay)
     end
 end
 

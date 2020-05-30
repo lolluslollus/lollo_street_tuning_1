@@ -823,7 +823,841 @@ function data()
         return edgeLists
     end
 
-    streetChunksHelper.setGlobalStreetData(game) --, _chunkedStreetTypes)
+    -- LOLLO TODO check if this works well
+    local function _getSnapAndFreeEdgeLists_3Chunks(params, pitch, streetData, tramTrackType)
+        local streetHalfWidth = streetData.sidewalkWidth + streetData.streetWidth / 2.0
+        local streetFullWidth = streetData.sidewalkWidth + streetData.sidewalkWidth + streetData.streetWidth
+        local xMax = math.max(9.0, streetHalfWidth + 1.0) -- this is the fruit of trial and error, see the notes
+        local distance = params.distance or 0.0
+        local halfDistance = distance / 2.0
+        local halfIslandWidth = (params.islandWidth or 0.0) / 2.0
+        local edgeParams = {
+            skipCollision = true,
+            type = streetData.fileName,
+            tramTrackType = tramTrackType
+        }
+        local edgeLists
+        if params.howManyStreetsBase0 == 0 then -- 1 street
+            edgeLists = {
+                -- left
+                {
+                    type = 'STREET',
+                    params = edgeParams,
+                    edges = streetChunksHelper.makeEdges(
+                        params.direction,
+                        pitch,
+                        {-2 * streetHalfWidth, 0, 0},
+                        {-streetHalfWidth, 0, 0}
+                    ),
+                    -- edgeType = "BRIDGE",
+                    -- edgeTypeName = "cement.lua",
+                    -- collider = {
+                    --     type = 'NONE'
+                    -- },
+                    -- autoRemovable = true,
+                    --skipCollision = true, --useless
+                    --skipCollisionCheck = true, --useless
+                    -- nodes that stick out of the construction.
+                    -- LOLLO NOTE If all nodes are free, they can be upgraded with tram, bus lane, one-way once built,
+                    -- and clicking on the construction won't bring up the construction menu anymore.
+                    -- This allows a simple parameter menu coz the properties can be changed with the stock street menus.
+                    -- In general, it's easier to build and then change a construction.
+                    -- nodes allowed to snap to other edges of the same type
+                    -- LOLLO NOTE if the nodes are too close (ie the edges too short), the game will crash with
+                    -- c:\build\tpf2_steam\src\lib\geometry\streets\transitions\transition_util.cpp:125:
+                    -- float __cdecl StreetGeometry::TransitionUtil::CompCurveHandleDistance(float,float):
+                    -- Assertion `angle >= .0f && angle <= Math::PI' failed.
+                    --
+                    -- Experiments show that two edges one after the other allow for a shorter crashless construction than one edge only,
+                    -- and all nodes being free calls for some extra length,
+                    -- while if only the outer nodes are free we can get away with a shorter construction.
+                    freeNodes = {0, 1},
+                    snapNodes = params.direction == 0 and {0} or {1}
+                    --					snapNodes = { 0, 1 },  -- node 0 and 1 are allowed to snap to other edges of the same type --crashes
+                    --					tag2nodes = {},
+                },
+                -- centre
+                {
+                    type = 'STREET',
+                    params = edgeParams,
+                    edges = streetChunksHelper.makeEdges(
+                        params.direction,
+                        pitch,
+                        {-streetHalfWidth, 0, 0},
+                        {streetHalfWidth, 0, 0}
+                    ),
+                    freeNodes = {0, 1},
+                    snapNodes = {}
+                },
+                -- right
+                {
+                    type = 'STREET',
+                    params = edgeParams,
+                    edges = streetChunksHelper.makeEdges(
+                        params.direction,
+                        pitch,
+                        {streetHalfWidth, 0, 0},
+                        {2.0 * streetHalfWidth, 0, 0}
+                    ),
+                    freeNodes = {0, 1},
+                    snapNodes = params.direction == 0 and {1} or {0}
+                }
+            }
+        elseif params.howManyStreetsBase0 == 1 then -- 2 streets
+            edgeLists = {
+                -- left
+                {
+                    type = 'STREET',
+                    params = edgeParams,
+                    edges = streetChunksHelper.makeEdges(
+                        params.direction,
+                        pitch,
+                        {-2 * streetHalfWidth, -streetHalfWidth - halfDistance - halfIslandWidth, 0},
+                        {-streetHalfWidth, -streetHalfWidth - halfDistance - halfIslandWidth, 0}
+                    ),
+                    freeNodes = {0, 1},
+                    snapNodes = params.direction == 0 and {0} or {1}
+                },
+                {
+                    type = 'STREET',
+                    params = edgeParams,
+                    edges = streetChunksHelper.makeEdges(
+                        params.direction,
+                        pitch,
+                        {-2 * streetHalfWidth, streetHalfWidth + halfDistance + halfIslandWidth, 0},
+                        {-streetHalfWidth, streetHalfWidth + halfDistance + halfIslandWidth, 0}
+                    ),
+                    freeNodes = {0, 1},
+                    snapNodes = params.direction == 0 and {0} or {1}
+                },
+                -- centre
+                {
+                    type = 'STREET',
+                    params = edgeParams,
+                    edges = streetChunksHelper.makeEdges(
+                        params.direction,
+                        pitch,
+                        {-streetHalfWidth, -streetHalfWidth - halfDistance - halfIslandWidth, 0},
+                        {streetHalfWidth, -streetHalfWidth - halfDistance - halfIslandWidth, 0}
+                    ),
+                    freeNodes = {0, 1},
+                    snapNodes = {},
+                },
+                {
+                    type = 'STREET',
+                    params = edgeParams,
+                    edges = streetChunksHelper.makeEdges(
+                        params.direction,
+                        pitch,
+                        {-streetHalfWidth, streetHalfWidth + halfDistance + halfIslandWidth, 0},
+                        {streetHalfWidth, streetHalfWidth + halfDistance + halfIslandWidth, 0}
+                    ),
+                    freeNodes = {0, 1},
+                    snapNodes = {},
+                },
+                -- right
+                {
+                    type = 'STREET',
+                    params = edgeParams,
+                    edges = streetChunksHelper.makeEdges(
+                        params.direction,
+                        pitch,
+                        {streetHalfWidth, -streetHalfWidth - halfDistance - halfIslandWidth, 0},
+                        {2 * streetHalfWidth, -streetHalfWidth - halfDistance - halfIslandWidth, 0}
+                    ),
+                    freeNodes = {0, 1},
+                    snapNodes = params.direction == 0 and {1} or {0}
+                },
+                {
+                    type = 'STREET',
+                    params = edgeParams,
+                    edges = streetChunksHelper.makeEdges(
+                        params.direction,
+                        pitch,
+                        {streetHalfWidth, streetHalfWidth + halfDistance + halfIslandWidth, 0},
+                        {2 * streetHalfWidth, streetHalfWidth + halfDistance + halfIslandWidth, 0}
+                    ),
+                    freeNodes = {0, 1},
+                    snapNodes = params.direction == 0 and {1} or {0}
+                }
+            }
+        elseif params.howManyStreetsBase0 == 2 then -- 3 streets
+            edgeLists = {
+                -- left
+                {
+                    type = 'STREET',
+                    params = edgeParams,
+                    edges = streetChunksHelper.makeEdges(
+                        params.direction,
+                        pitch,
+                        {-2 * streetHalfWidth, -streetHalfWidth - distance, 0},
+                        {-streetHalfWidth, -streetFullWidth - distance, 0}
+                    ),
+                    freeNodes = {0, 1},
+                    snapNodes = params.direction == 0 and {0} or {1}
+                },
+                {
+                    type = 'STREET',
+                    params = edgeParams,
+                    edges = streetChunksHelper.makeEdges(
+                        params.direction,
+                        pitch,
+                        {-2 * streetHalfWidth, 0, 0},
+                        {-streetHalfWidth, 0, 0}
+                    ),
+                    freeNodes = {0, 1},
+                    snapNodes = params.direction == 0 and {0} or {1}
+                },
+                {
+                    type = 'STREET',
+                    params = edgeParams,
+                    edges = streetChunksHelper.makeEdges(
+                        params.direction,
+                        pitch,
+                        {-2 * streetHalfWidth, streetFullWidth + distance, 0},
+                        {-streetHalfWidth, streetFullWidth + distance, 0}
+                    ),
+                    freeNodes = {0, 1},
+                    snapNodes = params.direction == 0 and {0} or {1}
+                },
+                -- centre
+                {
+                    type = 'STREET',
+                    params = edgeParams,
+                    edges = streetChunksHelper.makeEdges(
+                        params.direction,
+                        pitch,
+                        {-streetHalfWidth, -streetHalfWidth - distance, 0},
+                        {streetHalfWidth, -streetFullWidth - distance, 0}
+                    ),
+                    freeNodes = {0, 1},
+                    snapNodes = {}
+                },
+                {
+                    type = 'STREET',
+                    params = edgeParams,
+                    edges = streetChunksHelper.makeEdges(
+                        params.direction,
+                        pitch,
+                        {-streetHalfWidth, 0, 0},
+                        {streetHalfWidth, 0, 0}
+                    ),
+                    freeNodes = {0, 1},
+                    snapNodes = {}
+                },
+                {
+                    type = 'STREET',
+                    params = edgeParams,
+                    edges = streetChunksHelper.makeEdges(
+                        params.direction,
+                        pitch,
+                        {-streetHalfWidth, streetFullWidth + distance, 0},
+                        {streetHalfWidth, streetFullWidth + distance, 0}
+                    ),
+                    freeNodes = {0, 1},
+                    snapNodes = {}
+                },
+                -- right
+                {
+                    type = 'STREET',
+                    params = edgeParams,
+                    edges = streetChunksHelper.makeEdges(
+                        params.direction,
+                        pitch,
+                        {streetHalfWidth, -streetFullWidth - distance, 0},
+                        {2 * streetHalfWidth, -streetFullWidth - distance, 0}
+                    ),
+                    freeNodes = {0, 1},
+                    snapNodes = params.direction == 0 and {1} or {0}
+                },
+                {
+                    type = 'STREET',
+                    params = edgeParams,
+                    edges = streetChunksHelper.makeEdges(
+                        params.direction,
+                        pitch,
+                        {streetHalfWidth, 0, 0},
+                        {2 * streetHalfWidth, 0, 0}
+                    ),
+                    freeNodes = {0, 1},
+                    snapNodes = params.direction == 0 and {1} or {0}
+                },
+                {
+                    type = 'STREET',
+                    params = edgeParams,
+                    edges = streetChunksHelper.makeEdges(
+                        params.direction,
+                        pitch,
+                        {streetHalfWidth, streetFullWidth + distance, 0},
+                        {2 * streetHalfWidth, streetFullWidth + distance, 0}
+                    ),
+                    freeNodes = {0, 1},
+                    snapNodes = params.direction == 0 and {1} or {0}
+                }
+            }
+        elseif params.howManyStreetsBase0 == 3 then -- 4 streets
+            edgeLists = {
+                -- left
+                {
+                    type = 'STREET',
+                    params = edgeParams,
+                    edges = streetChunksHelper.makeEdges(
+                        params.direction,
+                        pitch,
+                        {-2 * streetHalfWidth, -3.0 * streetHalfWidth - 3.0 * halfDistance - halfIslandWidth, 0},
+                        {- streetHalfWidth, -3.0 * streetHalfWidth - 3.0 * halfDistance - halfIslandWidth, 0}
+                    ),
+                    freeNodes = {0, 1},
+                    snapNodes = params.direction == 0 and {0} or {1}
+                },
+                {
+                    type = 'STREET',
+                    params = edgeParams,
+                    edges = streetChunksHelper.makeEdges(
+                        params.direction,
+                        pitch,
+                        {-2 * streetHalfWidth, -streetHalfWidth - halfDistance - halfIslandWidth, 0},
+                        {-streetHalfWidth, -streetHalfWidth - halfDistance - halfIslandWidth, 0}
+                    ),
+                    freeNodes = {0, 1},
+                    snapNodes = params.direction == 0 and {0} or {1}
+                },
+                {
+                    type = 'STREET',
+                    params = edgeParams,
+                    edges = streetChunksHelper.makeEdges(
+                        params.direction,
+                        pitch,
+                        {-2 * streetHalfWidth, streetHalfWidth + halfDistance + halfIslandWidth, 0},
+                        {-streetHalfWidth, streetHalfWidth + halfDistance + halfIslandWidth, 0}
+                    ),
+                    freeNodes = {0, 1},
+                    snapNodes = params.direction == 0 and {0} or {1}
+                },
+                {
+                    type = 'STREET',
+                    params = edgeParams,
+                    edges = streetChunksHelper.makeEdges(
+                        params.direction,
+                        pitch,
+                        {-2 * streetHalfWidth, 3.0 * streetHalfWidth + 3.0 * halfDistance + halfIslandWidth, 0},
+                        {-streetHalfWidth, 3.0 * streetHalfWidth + 3.0 * halfDistance + halfIslandWidth, 0}
+                    ),
+                    freeNodes = {0, 1},
+                    snapNodes = params.direction == 0 and {0} or {1}
+                },
+                -- centre
+                {
+                    type = 'STREET',
+                    params = edgeParams,
+                    edges = streetChunksHelper.makeEdges(
+                        params.direction,
+                        pitch,
+                        {-streetHalfWidth, -3.0 * streetHalfWidth - 3.0 * halfDistance - halfIslandWidth, 0},
+                        {streetHalfWidth, -3.0 * streetHalfWidth - 3.0 * halfDistance - halfIslandWidth, 0}
+                    ),
+                    freeNodes = {0, 1},
+                    snapNodes = {}
+                },
+                {
+                    type = 'STREET',
+                    params = edgeParams,
+                    edges = streetChunksHelper.makeEdges(
+                        params.direction,
+                        pitch,
+                        {-streetHalfWidth, -streetHalfWidth - halfDistance - halfIslandWidth, 0},
+                        {streetHalfWidth, -streetHalfWidth - halfDistance - halfIslandWidth, 0}
+                    ),
+                    freeNodes = {0, 1},
+                    snapNodes = {}
+                },
+                {
+                    type = 'STREET',
+                    params = edgeParams,
+                    edges = streetChunksHelper.makeEdges(
+                        params.direction,
+                        pitch,
+                        {-streetHalfWidth, streetHalfWidth + halfDistance + halfIslandWidth, 0},
+                        {streetHalfWidth, streetHalfWidth + halfDistance + halfIslandWidth, 0}
+                    ),
+                    freeNodes = {0, 1},
+                    snapNodes = {}
+                },
+                {
+                    type = 'STREET',
+                    params = edgeParams,
+                    edges = streetChunksHelper.makeEdges(
+                        params.direction,
+                        pitch,
+                        {-streetHalfWidth, 3.0 * streetHalfWidth + 3.0 * halfDistance + halfIslandWidth, 0},
+                        {streetHalfWidth, 3.0 * streetHalfWidth + 3.0 * halfDistance + halfIslandWidth, 0}
+                    ),
+                    freeNodes = {0, 1},
+                    snapNodes = {}
+                },
+                -- right
+                {
+                    type = 'STREET',
+                    params = edgeParams,
+                    edges = streetChunksHelper.makeEdges(
+                        params.direction,
+                        pitch,
+                        {streetHalfWidth, -3.0 * streetHalfWidth - 3.0 * halfDistance - halfIslandWidth, 0},
+                        {2 * streetHalfWidth, -3.0 * streetHalfWidth - 3.0 * halfDistance - halfIslandWidth, 0}
+                    ),
+                    freeNodes = {0, 1},
+                    snapNodes = params.direction == 0 and {1} or {0}
+                },
+                {
+                    type = 'STREET',
+                    params = edgeParams,
+                    edges = streetChunksHelper.makeEdges(
+                        params.direction,
+                        pitch,
+                        {streetHalfWidth, -streetHalfWidth - halfDistance - halfIslandWidth, 0},
+                        {2 * streetHalfWidth, -streetHalfWidth - halfDistance - halfIslandWidth, 0}
+                    ),
+                    freeNodes = {0, 1},
+                    snapNodes = params.direction == 0 and {1} or {0}
+                },
+                {
+                    type = 'STREET',
+                    params = edgeParams,
+                    edges = streetChunksHelper.makeEdges(
+                        params.direction,
+                        pitch,
+                        {streetHalfWidth, streetHalfWidth + halfDistance + halfIslandWidth, 0},
+                        {2 * streetHalfWidth, streetHalfWidth + halfDistance + halfIslandWidth, 0}
+                    ),
+                    freeNodes = {0, 1},
+                    snapNodes = params.direction == 0 and {1} or {0}
+                },
+                {
+                    type = 'STREET',
+                    params = edgeParams,
+                    edges = streetChunksHelper.makeEdges(
+                        params.direction,
+                        pitch,
+                        {streetHalfWidth, 3.0 * streetHalfWidth + 3.0 * halfDistance + halfIslandWidth, 0},
+                        {2 * streetHalfWidth, 3.0 * streetHalfWidth + 3.0 * halfDistance + halfIslandWidth, 0}
+                    ),
+                    freeNodes = {0, 1},
+                    snapNodes = params.direction == 0 and {1} or {0}
+                }
+            }
+        elseif params.howManyStreetsBase0 == 4 then -- 5 streets
+            edgeLists = {
+                -- left
+                {
+                    type = 'STREET',
+                    params = edgeParams,
+                    edges = streetChunksHelper.makeEdges(
+                        params.direction,
+                        pitch,
+                        {-2 * streetHalfWidth, - 2.0 * streetFullWidth - 2.0 * distance, 0},
+                        {-streetHalfWidth, - 2.0 * streetFullWidth - 2.0 * distance, 0}
+                    ),
+                    freeNodes = {0, 1},
+                    snapNodes = params.direction == 0 and {0} or {1}
+                },
+                {
+                    type = 'STREET',
+                    params = edgeParams,
+                    edges = streetChunksHelper.makeEdges(
+                        params.direction,
+                        pitch,
+                        {-2 * streetHalfWidth, -streetFullWidth - distance, 0},
+                        {-streetHalfWidth, -streetFullWidth - distance, 0}
+                    ),
+                    freeNodes = {0, 1},
+                    snapNodes = params.direction == 0 and {0} or {1}
+                },
+                {
+                    type = 'STREET',
+                    params = edgeParams,
+                    edges = streetChunksHelper.makeEdges(
+                        params.direction,
+                        pitch,
+                        {-2 * streetHalfWidth, 0, 0},
+                        {-streetHalfWidth, 0, 0}
+                    ),
+                    freeNodes = {0, 1},
+                    snapNodes = params.direction == 0 and {0} or {1}
+                },
+                {
+                    type = 'STREET',
+                    params = edgeParams,
+                    edges = streetChunksHelper.makeEdges(
+                        params.direction,
+                        pitch,
+                        {-2 * streetHalfWidth, streetFullWidth + distance, 0},
+                        {-streetHalfWidth, streetFullWidth + distance, 0}
+                    ),
+                    freeNodes = {0, 1},
+                    snapNodes = params.direction == 0 and {0} or {1}
+                },
+                {
+                    type = 'STREET',
+                    params = edgeParams,
+                    edges = streetChunksHelper.makeEdges(
+                        params.direction,
+                        pitch,
+                        {-2 * streetHalfWidth, 2.0 * streetFullWidth + 2.0 * distance, 0},
+                        {-streetHalfWidth, 2.0 * streetFullWidth + 2.0 * distance, 0}
+                    ),
+                    freeNodes = {0, 1},
+                    snapNodes = params.direction == 0 and {0} or {1}
+                },
+                -- centre
+                {
+                    type = 'STREET',
+                    params = edgeParams,
+                    edges = streetChunksHelper.makeEdges(
+                        params.direction,
+                        pitch,
+                        {-streetHalfWidth, - 2.0 * streetFullWidth - 2.0 * distance, 0},
+                        {streetHalfWidth, - 2.0 * streetFullWidth - 2.0 * distance, 0}
+                    ),
+                    freeNodes = {0, 1},
+                    snapNodes = {}
+                },
+                {
+                    type = 'STREET',
+                    params = edgeParams,
+                    edges = streetChunksHelper.makeEdges(
+                        params.direction,
+                        pitch,
+                        {-streetHalfWidth, -streetFullWidth - distance, 0},
+                        {streetHalfWidth, -streetFullWidth - distance, 0}
+                    ),
+                    freeNodes = {0, 1},
+                    snapNodes = {}
+                },
+                {
+                    type = 'STREET',
+                    params = edgeParams,
+                    edges = streetChunksHelper.makeEdges(
+                        params.direction,
+                        pitch,
+                        {-streetHalfWidth, 0, 0},
+                        {streetHalfWidth, 0, 0}
+                    ),
+                    freeNodes = {0, 1},
+                    snapNodes = {}
+                },
+                {
+                    type = 'STREET',
+                    params = edgeParams,
+                    edges = streetChunksHelper.makeEdges(
+                        params.direction,
+                        pitch,
+                        {-streetHalfWidth, streetFullWidth + distance, 0},
+                        {streetHalfWidth, streetFullWidth + distance, 0}
+                    ),
+                    freeNodes = {0, 1},
+                    snapNodes = {}
+                },
+                {
+                    type = 'STREET',
+                    params = edgeParams,
+                    edges = streetChunksHelper.makeEdges(
+                        params.direction,
+                        pitch,
+                        {-streetHalfWidth, 2.0 * streetFullWidth + 2.0 * distance, 0},
+                        {streetHalfWidth, 2.0 * streetFullWidth + 2.0 * distance, 0}
+                    ),
+                    freeNodes = {0, 1},
+                    snapNodes = {}
+                },
+                -- right
+                {
+                    type = 'STREET',
+                    params = edgeParams,
+                    edges = streetChunksHelper.makeEdges(
+                        params.direction,
+                        pitch,
+                        {streetHalfWidth, - 2.0 * streetFullWidth - 2.0 * distance, 0},
+                        {2 * streetHalfWidth, - 2.0 * streetFullWidth - 2.0 * distance, 0}
+                    ),
+                    freeNodes = {0, 1},
+                    snapNodes = params.direction == 0 and {1} or {0}
+                },
+                {
+                    type = 'STREET',
+                    params = edgeParams,
+                    edges = streetChunksHelper.makeEdges(
+                        params.direction,
+                        pitch,
+                        {streetHalfWidth, -streetFullWidth - distance, 0},
+                        {2 * streetHalfWidth, -streetFullWidth - distance, 0}
+                    ),
+                    freeNodes = {0, 1},
+                    snapNodes = params.direction == 0 and {1} or {0}
+                },
+                {
+                    type = 'STREET',
+                    params = edgeParams,
+                    edges = streetChunksHelper.makeEdges(
+                        params.direction,
+                        pitch,
+                        {streetHalfWidth, 0, 0},
+                        {2 * streetHalfWidth, 0, 0}
+                    ),
+                    freeNodes = {0, 1},
+                    snapNodes = params.direction == 0 and {1} or {0}
+                },
+                {
+                    type = 'STREET',
+                    params = edgeParams,
+                    edges = streetChunksHelper.makeEdges(
+                        params.direction,
+                        pitch,
+                        {streetHalfWidth, streetFullWidth + distance, 0},
+                        {2 * streetHalfWidth, streetFullWidth + distance, 0}
+                    ),
+                    freeNodes = {0, 1},
+                    snapNodes = params.direction == 0 and {1} or {0}
+                },
+                {
+                    type = 'STREET',
+                    params = edgeParams,
+                    edges = streetChunksHelper.makeEdges(
+                        params.direction,
+                        pitch,
+                        {streetHalfWidth, 2.0 * streetFullWidth + 2.0 * distance, 0},
+                        {2 * streetHalfWidth, 2.0 * streetFullWidth + 2.0 * distance, 0}
+                    ),
+                    freeNodes = {0, 1},
+                    snapNodes = params.direction == 0 and {1} or {0}
+                }
+            }
+        else -- if params.howManyStreetsBase0 == 5 then -- 6 streets -- fallback
+            edgeLists = {
+                -- left
+                {
+                    type = 'STREET',
+                    params = edgeParams,
+                    edges = streetChunksHelper.makeEdges(
+                        params.direction,
+                        pitch,
+                        {-2 * streetHalfWidth, - 5.0 * streetHalfWidth - 5.0 * halfDistance - halfIslandWidth, 0},
+                        {-streetHalfWidth, - 5.0 * streetHalfWidth - 5.0 * halfDistance - halfIslandWidth, 0}
+                    ),
+                    freeNodes = {0, 1},
+                    snapNodes = params.direction == 0 and {0} or {1}
+                },
+                {
+                    type = 'STREET',
+                    params = edgeParams,
+                    edges = streetChunksHelper.makeEdges(
+                        params.direction,
+                        pitch,
+                        {-2 * streetHalfWidth, - 3.0 * streetHalfWidth - 3.0 * halfDistance - halfIslandWidth, 0},
+                        {-streetHalfWidth, - 3.0 * streetHalfWidth - 3.0 * halfDistance - halfIslandWidth, 0}
+                    ),
+                    freeNodes = {0, 1},
+                    snapNodes = params.direction == 0 and {0} or {1}
+                },
+                {
+                    type = 'STREET',
+                    params = edgeParams,
+                    edges = streetChunksHelper.makeEdges(
+                        params.direction,
+                        pitch,
+                        {-2 * streetHalfWidth, -streetHalfWidth - halfDistance - halfIslandWidth, 0},
+                        {-streetHalfWidth, -streetHalfWidth - halfDistance - halfIslandWidth, 0}
+                    ),
+                    freeNodes = {0, 1},
+                    snapNodes = params.direction == 0 and {0} or {1}
+                },
+                {
+                    type = 'STREET',
+                    params = edgeParams,
+                    edges = streetChunksHelper.makeEdges(
+                        params.direction,
+                        pitch,
+                        {-2 * streetHalfWidth, streetHalfWidth + halfDistance + halfIslandWidth, 0},
+                        {-streetHalfWidth, streetHalfWidth + halfDistance + halfIslandWidth, 0}
+                    ),
+                    freeNodes = {0, 1},
+                    snapNodes = params.direction == 0 and {0} or {1}
+                },
+                {
+                    type = 'STREET',
+                    params = edgeParams,
+                    edges = streetChunksHelper.makeEdges(
+                        params.direction,
+                        pitch,
+                        {-2 * streetHalfWidth, 3.0 * streetHalfWidth + 3.0 * halfDistance + halfIslandWidth, 0},
+                        {-streetHalfWidth, 3.0 * streetHalfWidth + 3.0 * halfDistance + halfIslandWidth, 0}
+                    ),
+                    freeNodes = {0, 1},
+                    snapNodes = params.direction == 0 and {0} or {1}
+                },
+                {
+                    type = 'STREET',
+                    params = edgeParams,
+                    edges = streetChunksHelper.makeEdges(
+                        params.direction,
+                        pitch,
+                        {-2 * streetHalfWidth, 5.0 * streetHalfWidth + 5.0 * halfDistance + halfIslandWidth, 0},
+                        {-streetHalfWidth, 5.0 * streetHalfWidth + 5.0 * halfDistance + halfIslandWidth, 0}
+                    ),
+                    freeNodes = {0, 1},
+                    snapNodes = params.direction == 0 and {0} or {1}
+                },
+                -- centre
+                {
+                    type = 'STREET',
+                    params = edgeParams,
+                    edges = streetChunksHelper.makeEdges(
+                        params.direction,
+                        pitch,
+                        {-streetHalfWidth, - 5.0 * streetHalfWidth - 5.0 * halfDistance - halfIslandWidth, 0},
+                        {streetHalfWidth, - 5.0 * streetHalfWidth - 5.0 * halfDistance - halfIslandWidth, 0}
+                    ),
+                    freeNodes = {0, 1},
+                    snapNodes = {}
+                },
+                {
+                    type = 'STREET',
+                    params = edgeParams,
+                    edges = streetChunksHelper.makeEdges(
+                        params.direction,
+                        pitch,
+                        {-streetHalfWidth, - 3.0 * streetHalfWidth - 3.0 * halfDistance - halfIslandWidth, 0},
+                        {streetHalfWidth, - 3.0 * streetHalfWidth - 3.0 * halfDistance - halfIslandWidth, 0}
+                    ),
+                    freeNodes = {0, 1},
+                    snapNodes = {}
+                },
+                {
+                    type = 'STREET',
+                    params = edgeParams,
+                    edges = streetChunksHelper.makeEdges(
+                        params.direction,
+                        pitch,
+                        {-streetHalfWidth, -streetHalfWidth - halfDistance - halfIslandWidth, 0},
+                        {streetHalfWidth, -streetHalfWidth - halfDistance - halfIslandWidth, 0}
+                    ),
+                    freeNodes = {0, 1},
+                    snapNodes = {}
+                },
+                {
+                    type = 'STREET',
+                    params = edgeParams,
+                    edges = streetChunksHelper.makeEdges(
+                        params.direction,
+                        pitch,
+                        {-streetHalfWidth, streetHalfWidth + halfDistance + halfIslandWidth, 0},
+                        {streetHalfWidth, streetHalfWidth + halfDistance + halfIslandWidth, 0}
+                    ),
+                    freeNodes = {0, 1},
+                    snapNodes = {}
+                },
+                {
+                    type = 'STREET',
+                    params = edgeParams,
+                    edges = streetChunksHelper.makeEdges(
+                        params.direction,
+                        pitch,
+                        {-streetHalfWidth, 3.0 * streetHalfWidth + 3.0 * halfDistance + halfIslandWidth, 0},
+                        {streetHalfWidth, 3.0 * streetHalfWidth + 3.0 * halfDistance + halfIslandWidth, 0}
+                    ),
+                    freeNodes = {0, 1},
+                    snapNodes = {}
+                },
+                {
+                    type = 'STREET',
+                    params = edgeParams,
+                    edges = streetChunksHelper.makeEdges(
+                        params.direction,
+                        pitch,
+                        {-streetHalfWidth, 5.0 * streetHalfWidth + 5.0 * halfDistance + halfIslandWidth, 0},
+                        {streetHalfWidth, 5.0 * streetHalfWidth + 5.0 * halfDistance + halfIslandWidth, 0}
+                    ),
+                    freeNodes = {0, 1},
+                    snapNodes = {}
+                },
+                -- right
+                {
+                    type = 'STREET',
+                    params = edgeParams,
+                    edges = streetChunksHelper.makeEdges(
+                        params.direction,
+                        pitch,
+                        {streetHalfWidth, - 5.0 * streetHalfWidth - 5.0 * halfDistance - halfIslandWidth, 0},
+                        {2 * streetHalfWidth, - 5.0 * streetHalfWidth - 5.0 * halfDistance - halfIslandWidth, 0}
+                    ),
+                    freeNodes = {0, 1},
+                    snapNodes = params.direction == 0 and {1} or {0}
+                },
+                {
+                    type = 'STREET',
+                    params = edgeParams,
+                    edges = streetChunksHelper.makeEdges(
+                        params.direction,
+                        pitch,
+                        {streetHalfWidth, - 3.0 * streetHalfWidth - 3.0 * halfDistance - halfIslandWidth, 0},
+                        {2 * streetHalfWidth, - 3.0 * streetHalfWidth - 3.0 * halfDistance - halfIslandWidth, 0}
+                    ),
+                    freeNodes = {0, 1},
+                    snapNodes = params.direction == 0 and {1} or {0}
+                },
+                {
+                    type = 'STREET',
+                    params = edgeParams,
+                    edges = streetChunksHelper.makeEdges(
+                        params.direction,
+                        pitch,
+                        {streetHalfWidth, -streetHalfWidth - halfDistance - halfIslandWidth, 0},
+                        {2 * streetHalfWidth, -streetHalfWidth - halfDistance - halfIslandWidth, 0}
+                    ),
+                    freeNodes = {0, 1},
+                    snapNodes = params.direction == 0 and {1} or {0}
+                },
+                {
+                    type = 'STREET',
+                    params = edgeParams,
+                    edges = streetChunksHelper.makeEdges(
+                        params.direction,
+                        pitch,
+                        {streetHalfWidth, streetHalfWidth + halfDistance + halfIslandWidth, 0},
+                        {2 * streetHalfWidth, streetHalfWidth + halfDistance + halfIslandWidth, 0}
+                    ),
+                    freeNodes = {0, 1},
+                    snapNodes = params.direction == 0 and {1} or {0}
+                },
+                {
+                    type = 'STREET',
+                    params = edgeParams,
+                    edges = streetChunksHelper.makeEdges(
+                        params.direction,
+                        pitch,
+                        {streetHalfWidth, 3.0 * streetHalfWidth + 3.0 * halfDistance + halfIslandWidth, 0},
+                        {2 * streetHalfWidth, 3.0 * streetHalfWidth + 3.0 * halfDistance + halfIslandWidth, 0}
+                    ),
+                    freeNodes = {0, 1},
+                    snapNodes = params.direction == 0 and {1} or {0}
+                },
+                {
+                    type = 'STREET',
+                    params = edgeParams,
+                    edges = streetChunksHelper.makeEdges(
+                        params.direction,
+                        pitch,
+                        {streetHalfWidth, 5.0 * streetHalfWidth + 5.0 * halfDistance + halfIslandWidth, 0},
+                        {2 * streetHalfWidth, 5.0 * streetHalfWidth + 5.0 * halfDistance + halfIslandWidth, 0}
+                    ),
+                    freeNodes = {0, 1},
+                    snapNodes = params.direction == 0 and {1} or {0}
+                }
+            }
+        end
+        return edgeLists
+    end
+
+    streetChunksHelper.setGlobalStreetDataOneWay(game)
 
     return {
         type = 'STREET_CONSTRUCTION',
@@ -839,9 +1673,8 @@ function data()
             {
                 key = 'streetType_',
                 name = _('Street type'),
-                --values = {_('Narrow pavement'), _('Medium pavement')},
                 values = arrayUtils.map(
-                    game._lolloStreetData,
+                    game._lolloStreetDataOneWay,
                     function(str)
                         return str.name
                     end
@@ -933,7 +1766,7 @@ function data()
         --skipCollisionCheck = true,
         updateFn = function(params)
             local pitch = pitchUtil.adjustParamsPitch(params)
-            local streetData = game._lolloStreetData[params.streetType_ + 1]
+            local streetData = game._lolloStreetDataOneWay[params.streetType_ + 1]
 
             local result = { cost = 0 }
             result.groundFaces = {}
@@ -955,8 +1788,10 @@ function data()
             if params.snapNodes == 0 then
                 result.edgeLists = _getNonSnapEdgeLists(params, pitch, streetData, tramTrackType)
             else
-                -- LOLLO NOTE we have 2 half edges for every chunk of road. The inner nodes are not free and do not snap, the outer ones do.
-                -- This is required if we want to make them snappable.
+                -- LOLLO NOTE here, we have 2 half edges for every chunk of road. The inner nodes do not snap, the outer ones do.
+                -- This is required if we want to make them snappable at all, to avoid crashes.
+                -- We free all edges, so they can be freely converted to whatever one needs.
+                -- We could make a lot of combinations and upgrade them with the construction params instead, but that would be a mess to use.
                 result.edgeLists = _getSnapAndFreeEdgeLists(params, pitch, streetData, tramTrackType)
             end
             -- LOLLO TODO copying from the groundTextureBuilder, we could make the terrain flat to ease the pain when building junctions
