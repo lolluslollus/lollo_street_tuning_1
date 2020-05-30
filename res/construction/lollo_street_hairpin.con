@@ -49,7 +49,6 @@ function data()
             type = streetData.fileName,
             tramTrackType = tramTrackType
         }
-        -- the pitch plays no part in the bend as long as it is centred on x = 0
         local edgeLists = {
             {
                 type = 'STREET',
@@ -59,6 +58,7 @@ function data()
                 snapNodes = {},
             },
         }
+        -- the pitch plays no part in the bend as long as it is centred on x = 0
         if params.direction == 0 then
             streetUtil.addEdgeAutoTangents(
                 edgeLists[1].edges,
@@ -85,7 +85,7 @@ function data()
 
         -- this is the fruit of trial and error, see the notes
         -- local xMax = math.max(9.0, streetHalfWidth + 1.0)
-        local xMax = streetHalfWidth -- LOLLO TODO check this, it might need extending
+        local xMax = streetHalfWidth + 1.0 -- LOLLO TODO check this, it might need extending
         local edgeParams = {
             skipCollision = true,
             type = streetData.fileName,
@@ -107,7 +107,6 @@ function data()
                 freeNodes = {0, 1},
                 snapNodes = params.direction == 0 and {0} or {1}
             },
-            -- the pitch plays no part in the bend as long as it is centred on x = 0
             {
                 type = 'STREET',
                 params = edgeParams,
@@ -132,6 +131,7 @@ function data()
                 snapNodes = params.direction == 0 and {1} or {0}
             }
         }
+        -- the pitch plays no part in the bend as long as it is centred on x = 0
         if params.direction == 0 then
             streetUtil.addEdgeAutoTangents(
                 edgeLists[2].edges,
@@ -250,6 +250,13 @@ function data()
             else
                 -- LOLLO NOTE we have 3 edges for every hairpin bend. The inner nodes do not snap, the outer ones do.
                 -- This is required if we want to make them snappable at all and avoid crashes.
+                -- The 2 outer nodes are always free, otherwise the curve cannot join the other streets.
+                -- If I make the 4 inner nodes free, the curve will become a street like all the others once plopped:
+                -- I can upgrade them later with common street tools,
+                -- I can join other streets into the curve
+                -- clicking the bend won't bring up the construction menu (once plopped).
+                -- Otherwise, the construction will stay isolated from the rest,
+                -- and clicking it will bring up the params menu.
                 result.edgeLists = _getSnapAndFreeEdgeLists(params, pitch, streetData, tramTrackType)
             end
 

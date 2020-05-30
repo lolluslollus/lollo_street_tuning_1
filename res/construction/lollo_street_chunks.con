@@ -28,7 +28,7 @@ function data()
                     type = 'STREET',
                     params = edgeParams,
                     edges = streetChunksHelper.makeEdges(params.direction, pitch, {-streetHalfWidth, 0, 0}, {streetHalfWidth, 0, 0}),
-                    -- edgeType = "BRIDGE",
+                    -- edgeType = "BRIDGE", "TUNNEL"
                     -- edgeTypeName = "cement.lua",
                     -- collider = {
                     --     type = 'NONE'
@@ -36,7 +36,21 @@ function data()
                     -- autoRemovable = true,
                     --skipCollision = true, --useless
                     --skipCollisionCheck = true, --useless
+                    -- LOLLO NOTE If all nodes are free, they can be upgraded with tram, bus lane, one-way once built,
+                    -- and clicking on the construction won't bring up the construction menu anymore.
+                    -- This allows a simple parameter menu coz the properties can be changed with the stock street menus.
+                    -- In general, it's easier to build and then change a construction.
+                    -- nodes allowed to snap to other edges of the same type
+                    -- LOLLO NOTE if the nodes are too close (ie the edges too short), the game will crash with
+                    -- c:\build\tpf2_steam\src\lib\geometry\streets\transitions\transition_util.cpp:125:
+                    -- float __cdecl StreetGeometry::TransitionUtil::CompCurveHandleDistance(float,float):
+                    -- Assertion `angle >= .0f && angle <= Math::PI' failed.
+                    --
+                    -- Experiments show that two edges one after the other allow for a shorter crashless construction than one edge only,
+                    -- and all nodes being free calls for some extra length,
+                    -- while if only the outer nodes are free we can get away with a shorter construction.
                     -- free nodes can be upgraded with the street tools, and joined to other streets, after plopping the construction
+                    -- if edge (ie street chunk) A - B has B set as free node and adge B - C hasn't, B will be free.
                     freeNodes = {0, 1},
                     -- nodes allowed to snap to other edges of the same type
                     snapNodes = {}
@@ -322,38 +336,15 @@ function data()
                     type = 'STREET',
                     params = edgeParams,
                     edges = streetChunksHelper.makeEdges(params.direction, pitch, {-xMax, 0, 0}, {0, 0, 0}),
-                    -- edgeType = "BRIDGE",
-                    -- edgeTypeName = "cement.lua",
-                    -- collider = {
-                    --     type = 'NONE'
-                    -- },
-                    -- autoRemovable = true,
-                    --skipCollision = true, --useless
-                    --skipCollisionCheck = true, --useless
-                    -- LOLLO NOTE If all nodes are free, they can be upgraded with tram, bus lane, one-way once built,
-                    -- and clicking on the construction won't bring up the construction menu anymore.
-                    -- This allows a simple parameter menu coz the properties can be changed with the stock street menus.
-                    -- In general, it's easier to build and then change a construction.
-                    -- nodes allowed to snap to other edges of the same type
-                    -- LOLLO NOTE if the nodes are too close (ie the edges too short), the game will crash with
-                    -- c:\build\tpf2_steam\src\lib\geometry\streets\transitions\transition_util.cpp:125:
-                    -- float __cdecl StreetGeometry::TransitionUtil::CompCurveHandleDistance(float,float):
-                    -- Assertion `angle >= .0f && angle <= Math::PI' failed.
-                    --
-                    -- Experiments show that two edges one after the other allow for a shorter crashless construction than one edge only,
-                    -- and all nodes being free calls for some extra length,
-                    -- while if only the outer nodes are free we can get away with a shorter construction.
-                    -- free nodes can be upgraded with the street tools, and joined to other streets, after plopping the construction
+                    -- freeNodes = params.direction == 0 and {1} or {0},
                     freeNodes = {0, 1},
                     snapNodes = params.direction == 0 and {0} or {1}
-                    --					snapNodes = { 0, 1 },  -- node 0 and 1 are allowed to snap to other edges of the same type --crashes
-                    --					tag2nodes = {},
                 },
                 {
                     type = 'STREET',
                     params = edgeParams,
                     edges = streetChunksHelper.makeEdges(params.direction, pitch, {0, 0, 0}, {xMax, 0, 0}),
-                    -- freeNodes = params.direction == 0 and {1} or {0},,
+                    -- freeNodes = params.direction == 0 and {1} or {0},
                     freeNodes = {0, 1},
                     snapNodes = params.direction == 0 and {1} or {0}
                 }
@@ -849,28 +840,6 @@ function data()
                         {-2 * streetHalfWidth, 0, 0},
                         {-streetHalfWidth, 0, 0}
                     ),
-                    -- edgeType = "BRIDGE",
-                    -- edgeTypeName = "cement.lua",
-                    -- collider = {
-                    --     type = 'NONE'
-                    -- },
-                    -- autoRemovable = true,
-                    --skipCollision = true, --useless
-                    --skipCollisionCheck = true, --useless
-                    -- LOLLO NOTE If all nodes are free, they can be upgraded with tram, bus lane, one-way once built,
-                    -- and clicking on the construction won't bring up the construction menu anymore.
-                    -- This allows a simple parameter menu coz the properties can be changed with the stock street menus.
-                    -- In general, it's easier to build and then change a construction.
-                    -- nodes allowed to snap to other edges of the same type
-                    -- LOLLO NOTE if the nodes are too close (ie the edges too short), the game will crash with
-                    -- c:\build\tpf2_steam\src\lib\geometry\streets\transitions\transition_util.cpp:125:
-                    -- float __cdecl StreetGeometry::TransitionUtil::CompCurveHandleDistance(float,float):
-                    -- Assertion `angle >= .0f && angle <= Math::PI' failed.
-                    --
-                    -- Experiments show that two edges one after the other allow for a shorter crashless construction than one edge only,
-                    -- and all nodes being free calls for some extra length,
-                    -- while if only the outer nodes are free we can get away with a shorter construction.
-                    -- free nodes can be upgraded with the street tools, and joined to other streets, after plopping the construction
                     freeNodes = {0, 1},
                     snapNodes = params.direction == 0 and {0} or {1}
                     --					snapNodes = { 0, 1 },  -- node 0 and 1 are allowed to snap to other edges of the same type --crashes
