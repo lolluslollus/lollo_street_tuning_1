@@ -68,11 +68,6 @@ local function updateFn_2_1_lane_narrow_sidewalk_to_2_lane_one_way(params)
     --         faces = {}
     --     }
     -- }
-    -- LOLLO try the models/model/station/road/streetstation/pedestrian_era_c/
-    -- straight_spcl_l, straight_spcl_r, straight_spcl2_l and straight_spcl2_r mdl files
-    -- or corner_in.mdl and corner_out.mdl
-    -- from the stock game to make rounded pavement corners
-    -- the entr_cntr* files are the tram tracks with or without catenary
     result.models = {
         {
             id = 'lollo_assets/lollo_street_confluence_2_lanes_narrow_sidewalk.mdl',

@@ -36,7 +36,7 @@ function data()
                     -- autoRemovable = true,
                     --skipCollision = true, --useless
                     --skipCollisionCheck = true, --useless
-                    -- nodes that stick out of the construction and can be upgraded with the street tools
+                    -- free nodes can be upgraded with the street tools, and joined to other streets, after plopping the construction
                     freeNodes = {0, 1},
                     -- nodes allowed to snap to other edges of the same type
                     snapNodes = {}
@@ -330,7 +330,6 @@ function data()
                     -- autoRemovable = true,
                     --skipCollision = true, --useless
                     --skipCollisionCheck = true, --useless
-                    -- nodes that stick out of the construction.
                     -- LOLLO NOTE If all nodes are free, they can be upgraded with tram, bus lane, one-way once built,
                     -- and clicking on the construction won't bring up the construction menu anymore.
                     -- This allows a simple parameter menu coz the properties can be changed with the stock street menus.
@@ -344,6 +343,7 @@ function data()
                     -- Experiments show that two edges one after the other allow for a shorter crashless construction than one edge only,
                     -- and all nodes being free calls for some extra length,
                     -- while if only the outer nodes are free we can get away with a shorter construction.
+                    -- free nodes can be upgraded with the street tools, and joined to other streets, after plopping the construction
                     freeNodes = {0, 1},
                     snapNodes = params.direction == 0 and {0} or {1}
                     --					snapNodes = { 0, 1 },  -- node 0 and 1 are allowed to snap to other edges of the same type --crashes
@@ -857,7 +857,6 @@ function data()
                     -- autoRemovable = true,
                     --skipCollision = true, --useless
                     --skipCollisionCheck = true, --useless
-                    -- nodes that stick out of the construction.
                     -- LOLLO NOTE If all nodes are free, they can be upgraded with tram, bus lane, one-way once built,
                     -- and clicking on the construction won't bring up the construction menu anymore.
                     -- This allows a simple parameter menu coz the properties can be changed with the stock street menus.
@@ -871,6 +870,7 @@ function data()
                     -- Experiments show that two edges one after the other allow for a shorter crashless construction than one edge only,
                     -- and all nodes being free calls for some extra length,
                     -- while if only the outer nodes are free we can get away with a shorter construction.
+                    -- free nodes can be upgraded with the street tools, and joined to other streets, after plopping the construction
                     freeNodes = {0, 1},
                     snapNodes = params.direction == 0 and {0} or {1}
                     --					snapNodes = { 0, 1 },  -- node 0 and 1 are allowed to snap to other edges of the same type --crashes

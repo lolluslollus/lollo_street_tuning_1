@@ -248,8 +248,8 @@ function data()
             if params.snapNodes == 0 then
                 result.edgeLists = _getNonSnapEdgeLists(params, pitch, streetData, tramTrackType)
             else
-                -- LOLLO NOTE we have 3 edges for every hairpin bend. The inner nodes are not free and do not snap, the outer ones do.
-                -- This is required if we want to make them snappable.
+                -- LOLLO NOTE we have 3 edges for every hairpin bend. The inner nodes do not snap, the outer ones do.
+                -- This is required if we want to make them snappable at all and avoid crashes.
                 result.edgeLists = _getSnapAndFreeEdgeLists(params, pitch, streetData, tramTrackType)
             end
 
