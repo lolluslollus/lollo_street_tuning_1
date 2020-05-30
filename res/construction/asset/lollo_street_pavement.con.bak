@@ -1,0 +1,164 @@
+-- local luadump = require('lollo_street_tuning/luadump')
+-- local inspect = require('inspect')
+local idTransf = {1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1}
+local pitchUtil = require('lollo_street_tuning/lolloPitchUtil')
+local transf = require 'transf'
+local vec3 = require 'vec3'
+
+function data()
+    local function _getModels(params)
+        local result = {}
+        local idTransfPitched = pitchUtil.getIdTransfPitched(params.pitch)
+        if params.size == 0 then
+            result[1] = {
+                id = 'lollo_assets/lollo_pavement_square.mdl',
+                skipCollision = true,
+                -- transf = idTransfPitched,
+                transf = idTransf,
+            }
+        elseif params.size == 1 then
+            result[1] = {
+                id = 'lollo_assets/lollo_pavement_square.mdl',
+                skipCollision = true,
+                transf = transf.transl(vec3.new(-0.5, -0.5, 0)),
+            }
+            result[2] = {
+                id = 'lollo_assets/lollo_pavement_square.mdl',
+                skipCollision = true,
+                transf = transf.transl(vec3.new(-0.5, 0.5, 0)),
+            }
+            result[3] = {
+                id = 'lollo_assets/lollo_pavement_square.mdl',
+                skipCollision = true,
+                transf = transf.transl(vec3.new(0.5, -0.5, 0)),
+            }
+            result[4] = {
+                id = 'lollo_assets/lollo_pavement_square.mdl',
+                skipCollision = true,
+                transf = transf.transl(vec3.new(0.5, 0.5, 0)),
+            }
+
+        elseif params.size == 2 then
+        else
+        end
+
+        return result
+    end
+
+    local function _getGroundFace(params)
+        local height = 0.0
+        local side = 0.5 * (params.size + 1)
+        return {
+            {-side, -side, height},
+            {-side, side, height},
+            {side, side, height},
+            {side, -side, height},
+        }
+    end
+
+    local function _getTerrainAlignmentFaces(params)
+        local height = 0.30
+        local height = 0.0
+        local side = 0.5 * (params.size + 1)
+        return {
+            {
+                {-side, -side, height},
+                {-side, side, height},
+                {side, side, height},
+                {side, -side, height},
+            }
+        }
+    end
+-- LOLLO NOTE
+-- the stock ground_texture_builder.com won't do coz it cannot be made thick.
+-- we need a smallish square and an automated procedure to set the height properly, so the constructions are even.
+-- the height must be level with the pavement.
+-- Let's wait and see if the new api solves some problems.
+    return {
+        -- type = 'ASSET_DEFAULT', -- this seems to make no difference
+        -- type = 'ASSET_TRACK',
+        type = 'ASSET_DEFAULT',
+        description = {
+            name = _('Square chunk of pavement'),
+            description = _('Lays a square chunk of pavement. Use O and P to adjust the pitch.')
+        },
+        availability = {
+            yearFrom = 1925,
+            yearTo = 0
+        },
+        params = {
+            {
+                key = 'size',
+                name = _('Size'),
+                values = {_('1x1'), _('2x2'), _('3x3'), _('4x4')},
+                defaultIndex = 0,
+                -- uiType = 'SLIDER'
+            },
+            {
+                key = 'pitch',
+                name = _('Pitch (adjust it with O and P while building)'),
+                values = pitchUtil.getPitchParamValues(),
+                defaultIndex = pitchUtil.getDefaultPitchParamValue(),
+                uiType = 'SLIDER'
+            }
+        },
+        buildMode = 'MULTI',
+        categories = { 'misc' },
+        order = 1242,
+        skipCollision = true,
+        autoRemovable = false,
+        updateFn = function(params)
+            -- LOLLO TODO do I need this? Check
+            -- local pitch = pitchUtil.adjustParamsPitch(params)
+
+            local result = { }
+            result.cost = 10 * (params.size + 1) * (params.size + 1)
+
+            -- these hide the grass
+            result.groundFaces = {
+                {
+                    face = _getGroundFace(params),
+                    modes = {
+                        {
+                            type = "FILL",            -- accepted values: "FILL", "STROKE", "STROKE_INNER" and "STROKE_OUTER"
+                            key = "industry_floor"    -- ground texture, see res/config/ground_texture/
+                        }
+                    }
+                }
+            }
+
+            result.colliders = {
+                {
+                    params = {
+                        halfExtents = {
+                            0.5 * (params.size + 1),
+                            0.5 * (params.size + 1),
+                            0.15
+                        }
+                    },
+                    transf = idTransf,
+                    type = 'BOX'
+                }
+            }
+
+            result.edgeLists = {}
+            result.models = _getModels(params)
+            result.terrainAlignmentLists = {
+                {
+                    type = 'LESS', -- 'EQUAL' -- 'LESS' -- 'GREATER'
+                    faces =  _getTerrainAlignmentFaces(params),
+                    slopeLow = 0.995,
+					slopeHigh = 0.6
+                }
+            }
+
+            return result
+        end,
+        upgradeFn = function(params)
+            -- LOLLO NOTE the game wants this function to be defined, even if it returns an empty table.
+            -- If you leave it out, adding and removing tram tracks won't work.
+            -- (Bus lanes don't work anyway.)
+            return {}
+        end
+    }
+end
