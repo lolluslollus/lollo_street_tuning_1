@@ -314,10 +314,9 @@ helper.setGlobalStreetData = function(game) --, chunkedStreetTypes)
 end
 
 -- --------------- utils ------------------------
-helper.makeEdges = function(direction, pitch, node0, node1, tan0, tan1)
+helper.makeEdges = function(direction, pitch, node0, node1, isLeftOfIsland, tan0, tan1)
     -- return params.direction == 0 and
     --     {
-    --         -- one entry refers to a position and a tangent
     --         {pitchUtil.getXYZPitched(pitch, {-6, -3, .0}), {1, .0, .0}}, -- node 0
     --         {pitchUtil.getXYZPitched(pitch, {-2, -3, .0}), {1, .0, .0}} -- node 1
     --     } or
@@ -327,17 +326,19 @@ helper.makeEdges = function(direction, pitch, node0, node1, tan0, tan1)
     --     }
     if tan0 == nil then tan0 = {1, 0, 0} end
     if tan1 == nil then tan1 = {1, 0, 0} end
+    isLeftOfIsland = false -- this causes trouble when snapping
 
-    return direction == 0 and
+    if direction == 0 or (direction == 2 and isLeftOfIsland) then return
         {
-            -- one entry refers to a position and a tangent
             {pitchUtil.getXYZPitched(pitch, node0), tan0}, -- node 0
             {pitchUtil.getXYZPitched(pitch, node1), tan1} -- node 1
-        } or
+        }
+    else return
         {
             {pitchUtil.getXYZPitched(pitch, node1), {-tan1[1], -tan1[2], -tan1[3]}}, -- node 0
             {pitchUtil.getXYZPitched(pitch, node0), {-tan0[1], -tan0[2], -tan0[3]}} -- node 1
         }
+    end
 end
 
 helper.getFreeNodesLeft = function(params)

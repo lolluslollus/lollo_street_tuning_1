@@ -61,6 +61,7 @@ function data()
                     pitch,
                     {-xMax, -widthFactorBend * streetHalfWidth, 0},
                     {0, -widthFactorBend * streetHalfWidth, 0},
+                    false,
                     {1, 0, 0},
                     {1, 0, 0}
                 ),
@@ -82,6 +83,7 @@ function data()
                     pitch,
                     {0, widthFactorBend * streetHalfWidth, 0},
                     {-xMax, widthFactorBend * streetHalfWidth, 0},
+                    false,
                     {-1, 0, 0},
                     {-1, 0, 0}
                 ),
