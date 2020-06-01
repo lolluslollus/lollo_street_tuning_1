@@ -314,7 +314,7 @@ helper.setGlobalStreetData = function(game) --, chunkedStreetTypes)
 end
 
 -- --------------- utils ------------------------
-helper.makeEdges = function(direction, pitch, node0, node1, isLeftOfIsland, tan0, tan1)
+helper.makeEdges = function(direction, pitch, node0, node1, isRightOfIsland, tan0, tan1)
     -- return params.direction == 0 and
     --     {
     --         {pitchUtil.getXYZPitched(pitch, {-6, -3, .0}), {1, .0, .0}}, -- node 0
@@ -326,9 +326,8 @@ helper.makeEdges = function(direction, pitch, node0, node1, isLeftOfIsland, tan0
     --     }
     if tan0 == nil then tan0 = {1, 0, 0} end
     if tan1 == nil then tan1 = {1, 0, 0} end
-    isLeftOfIsland = false -- this causes trouble when snapping
 
-    if direction == 0 or (direction == 2 and isLeftOfIsland) then return
+    if direction == 0 or (direction == 2 and isRightOfIsland) then return
         {
             {pitchUtil.getXYZPitched(pitch, node0), tan0}, -- node 0
             {pitchUtil.getXYZPitched(pitch, node1), tan1} -- node 1
@@ -341,15 +340,19 @@ helper.makeEdges = function(direction, pitch, node0, node1, isLeftOfIsland, tan0
     end
 end
 
-helper.getFreeNodesLeft = function(params)
+helper.getFreeNodesLowX = function(params, isRightOfIsland)
     if params.lockLayoutCentre == 1 then
-        return params.direction == 0 and {0} or {1}
+        if params.direction == 2 and isRightOfIsland then
+            return params.direction == 0 and {1} or {0}
+        else
+            return params.direction == 0 and {0} or {1}
+        end
     else
         return {0, 1}
     end
 end
 
-helper.getFreeNodesCentre = function(params)
+helper.getFreeNodesCentre = function(params, isRightOfIsland)
     if params.lockLayoutCentre == 1 then
         return {}
     else
@@ -357,11 +360,43 @@ helper.getFreeNodesCentre = function(params)
     end
 end
 
-helper.getFreeNodesRight = function(params)
+helper.getFreeNodesHighX = function(params, isRightOfIsland)
     if params.lockLayoutCentre == 1 then
-        return params.direction == 0 and {1} or {0}
+        if params.direction == 2 and isRightOfIsland then
+            return params.direction == 0 and {0} or {1}
+        else
+            return params.direction == 0 and {1} or {0}
+        end
     else
         return {0, 1}
+    end
+end
+
+helper.getSnapNodesLowX = function(params, isRightOfIsland)
+    if params.snapNodes == 1 and params.direction ~= 2 then
+        -- if isRightOfIsland then
+        --     return params.direction == 0 and {1} or {0}
+        -- else
+            return params.direction == 0 and {0} or {1}
+        -- end
+    else
+        return {}
+    end
+end
+
+helper.getSnapNodesCentre = function(params, isRightOfIsland)
+    return {}
+end
+
+helper.getSnapNodesHighX = function(params, isRightOfIsland)
+    if params.snapNodes == 1 and params.direction ~= 2 then
+        -- if isRightOfIsland then
+        --     return params.direction == 0 and {0} or {1}
+        -- else
+            return params.direction == 0 and {1} or {0}
+        -- end
+    else
+        return {}
     end
 end
 
