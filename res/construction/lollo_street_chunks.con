@@ -9,7 +9,8 @@ function data()
     --     'lollo_medium_1_way_1_lane_street_narrow_sidewalk.lua',
     --     'lollo_medium_1_way_1_lane_street.lua'
     -- }
-    local function _getNonSnapEdgeLists(params, pitch, streetData, tramTrackType)
+
+--[[     local function _getNonSnapNonLockedEdgeLists(params, pitch, streetData, tramTrackType)
         local distance = params.distance or 0.0
         local halfDistance = distance / 2.0
         local halfIslandWidth = (params.islandWidth or 0.0) / 2.0
@@ -316,7 +317,7 @@ function data()
         return edgeLists
     end
 
-    local function _getSnapAndFreeEdgeLists(params, pitch, streetData, tramTrackType)
+    local function _getSnapNonLockedEdgeLists(params, pitch, streetData, tramTrackType)
         local streetHalfWidth = streetData.sidewalkWidth + streetData.streetWidth / 2.0
         local streetFullWidth = streetData.sidewalkWidth + streetData.sidewalkWidth + streetData.streetWidth
         local xMax = math.max(9.0, streetHalfWidth + 1.0) -- this is the fruit of trial and error, see the notes
@@ -812,13 +813,12 @@ function data()
             }
         end
         return edgeLists
-    end
+    end ]]
 
-    -- LOLLO TODO check if this works well
-    local function _getSnapAndFreeEdgeLists_3Chunks(params, pitch, streetData, tramTrackType)
+    local function _getSnapEdgeLists(params, pitch, streetData, tramTrackType)
         local streetHalfWidth = streetData.sidewalkWidth + streetData.streetWidth / 2.0
         local streetFullWidth = streetData.sidewalkWidth + streetData.sidewalkWidth + streetData.streetWidth
-        local xMax = math.max(9.0, streetHalfWidth + 1.0) -- this is the fruit of trial and error, see the notes
+        -- local xMax = math.max(9.0, streetHalfWidth + 1.0) -- this is the fruit of trial and error, see the notes
         local distance = params.distance or 0.0
         local halfDistance = distance / 2.0
         local halfIslandWidth = (params.islandWidth or 0.0) / 2.0
@@ -840,7 +840,7 @@ function data()
                         {-2 * streetHalfWidth, 0, 0},
                         {-streetHalfWidth, 0, 0}
                     ),
-                    freeNodes = {0, 1},
+                    freeNodes = streetChunksHelper.getFreeNodesLeft(params),
                     snapNodes = params.direction == 0 and {0} or {1}
                     --					snapNodes = { 0, 1 },  -- node 0 and 1 are allowed to snap to other edges of the same type --crashes
                     --					tag2nodes = {},
@@ -855,7 +855,7 @@ function data()
                         {-streetHalfWidth, 0, 0},
                         {streetHalfWidth, 0, 0}
                     ),
-                    freeNodes = {0, 1},
+                    freeNodes = streetChunksHelper.getFreeNodesCentre(params),
                     snapNodes = {}
                 },
                 -- right
@@ -868,7 +868,7 @@ function data()
                         {streetHalfWidth, 0, 0},
                         {2.0 * streetHalfWidth, 0, 0}
                     ),
-                    freeNodes = {0, 1},
+                    freeNodes = streetChunksHelper.getFreeNodesRight(params),
                     snapNodes = params.direction == 0 and {1} or {0}
                 }
             }
@@ -884,7 +884,7 @@ function data()
                         {-2 * streetHalfWidth, -streetHalfWidth - halfDistance - halfIslandWidth, 0},
                         {-streetHalfWidth, -streetHalfWidth - halfDistance - halfIslandWidth, 0}
                     ),
-                    freeNodes = {0, 1},
+                    freeNodes = streetChunksHelper.getFreeNodesLeft(params),
                     snapNodes = params.direction == 0 and {0} or {1}
                 },
                 {
@@ -896,7 +896,7 @@ function data()
                         {-2 * streetHalfWidth, streetHalfWidth + halfDistance + halfIslandWidth, 0},
                         {-streetHalfWidth, streetHalfWidth + halfDistance + halfIslandWidth, 0}
                     ),
-                    freeNodes = {0, 1},
+                    freeNodes = streetChunksHelper.getFreeNodesLeft(params),
                     snapNodes = params.direction == 0 and {0} or {1}
                 },
                 -- centre
@@ -909,7 +909,7 @@ function data()
                         {-streetHalfWidth, -streetHalfWidth - halfDistance - halfIslandWidth, 0},
                         {streetHalfWidth, -streetHalfWidth - halfDistance - halfIslandWidth, 0}
                     ),
-                    freeNodes = {0, 1},
+                    freeNodes = streetChunksHelper.getFreeNodesCentre(params),
                     snapNodes = {},
                 },
                 {
@@ -921,7 +921,7 @@ function data()
                         {-streetHalfWidth, streetHalfWidth + halfDistance + halfIslandWidth, 0},
                         {streetHalfWidth, streetHalfWidth + halfDistance + halfIslandWidth, 0}
                     ),
-                    freeNodes = {0, 1},
+                    freeNodes = streetChunksHelper.getFreeNodesCentre(params),
                     snapNodes = {},
                 },
                 -- right
@@ -934,7 +934,7 @@ function data()
                         {streetHalfWidth, -streetHalfWidth - halfDistance - halfIslandWidth, 0},
                         {2 * streetHalfWidth, -streetHalfWidth - halfDistance - halfIslandWidth, 0}
                     ),
-                    freeNodes = {0, 1},
+                    freeNodes = streetChunksHelper.getFreeNodesRight(params),
                     snapNodes = params.direction == 0 and {1} or {0}
                 },
                 {
@@ -946,7 +946,7 @@ function data()
                         {streetHalfWidth, streetHalfWidth + halfDistance + halfIslandWidth, 0},
                         {2 * streetHalfWidth, streetHalfWidth + halfDistance + halfIslandWidth, 0}
                     ),
-                    freeNodes = {0, 1},
+                    freeNodes = streetChunksHelper.getFreeNodesRight(params),
                     snapNodes = params.direction == 0 and {1} or {0}
                 }
             }
@@ -962,7 +962,7 @@ function data()
                         {-2 * streetHalfWidth, -streetHalfWidth - distance, 0},
                         {-streetHalfWidth, -streetFullWidth - distance, 0}
                     ),
-                    freeNodes = {0, 1},
+                    freeNodes = streetChunksHelper.getFreeNodesLeft(params),
                     snapNodes = params.direction == 0 and {0} or {1}
                 },
                 {
@@ -974,7 +974,7 @@ function data()
                         {-2 * streetHalfWidth, 0, 0},
                         {-streetHalfWidth, 0, 0}
                     ),
-                    freeNodes = {0, 1},
+                    freeNodes = streetChunksHelper.getFreeNodesLeft(params),
                     snapNodes = params.direction == 0 and {0} or {1}
                 },
                 {
@@ -986,7 +986,7 @@ function data()
                         {-2 * streetHalfWidth, streetFullWidth + distance, 0},
                         {-streetHalfWidth, streetFullWidth + distance, 0}
                     ),
-                    freeNodes = {0, 1},
+                    freeNodes = streetChunksHelper.getFreeNodesLeft(params),
                     snapNodes = params.direction == 0 and {0} or {1}
                 },
                 -- centre
@@ -999,7 +999,7 @@ function data()
                         {-streetHalfWidth, -streetHalfWidth - distance, 0},
                         {streetHalfWidth, -streetFullWidth - distance, 0}
                     ),
-                    freeNodes = {0, 1},
+                    freeNodes = streetChunksHelper.getFreeNodesCentre(params),
                     snapNodes = {}
                 },
                 {
@@ -1011,7 +1011,7 @@ function data()
                         {-streetHalfWidth, 0, 0},
                         {streetHalfWidth, 0, 0}
                     ),
-                    freeNodes = {0, 1},
+                    freeNodes = streetChunksHelper.getFreeNodesCentre(params),
                     snapNodes = {}
                 },
                 {
@@ -1023,7 +1023,7 @@ function data()
                         {-streetHalfWidth, streetFullWidth + distance, 0},
                         {streetHalfWidth, streetFullWidth + distance, 0}
                     ),
-                    freeNodes = {0, 1},
+                    freeNodes = streetChunksHelper.getFreeNodesCentre(params),
                     snapNodes = {}
                 },
                 -- right
@@ -1036,7 +1036,7 @@ function data()
                         {streetHalfWidth, -streetFullWidth - distance, 0},
                         {2 * streetHalfWidth, -streetFullWidth - distance, 0}
                     ),
-                    freeNodes = {0, 1},
+                    freeNodes = streetChunksHelper.getFreeNodesRight(params),
                     snapNodes = params.direction == 0 and {1} or {0}
                 },
                 {
@@ -1048,7 +1048,7 @@ function data()
                         {streetHalfWidth, 0, 0},
                         {2 * streetHalfWidth, 0, 0}
                     ),
-                    freeNodes = {0, 1},
+                    freeNodes = streetChunksHelper.getFreeNodesRight(params),
                     snapNodes = params.direction == 0 and {1} or {0}
                 },
                 {
@@ -1060,7 +1060,7 @@ function data()
                         {streetHalfWidth, streetFullWidth + distance, 0},
                         {2 * streetHalfWidth, streetFullWidth + distance, 0}
                     ),
-                    freeNodes = {0, 1},
+                    freeNodes = streetChunksHelper.getFreeNodesRight(params),
                     snapNodes = params.direction == 0 and {1} or {0}
                 }
             }
@@ -1076,7 +1076,7 @@ function data()
                         {-2 * streetHalfWidth, -3.0 * streetHalfWidth - 3.0 * halfDistance - halfIslandWidth, 0},
                         {- streetHalfWidth, -3.0 * streetHalfWidth - 3.0 * halfDistance - halfIslandWidth, 0}
                     ),
-                    freeNodes = {0, 1},
+                    freeNodes = streetChunksHelper.getFreeNodesLeft(params),
                     snapNodes = params.direction == 0 and {0} or {1}
                 },
                 {
@@ -1088,7 +1088,7 @@ function data()
                         {-2 * streetHalfWidth, -streetHalfWidth - halfDistance - halfIslandWidth, 0},
                         {-streetHalfWidth, -streetHalfWidth - halfDistance - halfIslandWidth, 0}
                     ),
-                    freeNodes = {0, 1},
+                    freeNodes = streetChunksHelper.getFreeNodesLeft(params),
                     snapNodes = params.direction == 0 and {0} or {1}
                 },
                 {
@@ -1100,7 +1100,7 @@ function data()
                         {-2 * streetHalfWidth, streetHalfWidth + halfDistance + halfIslandWidth, 0},
                         {-streetHalfWidth, streetHalfWidth + halfDistance + halfIslandWidth, 0}
                     ),
-                    freeNodes = {0, 1},
+                    freeNodes = streetChunksHelper.getFreeNodesLeft(params),
                     snapNodes = params.direction == 0 and {0} or {1}
                 },
                 {
@@ -1112,7 +1112,7 @@ function data()
                         {-2 * streetHalfWidth, 3.0 * streetHalfWidth + 3.0 * halfDistance + halfIslandWidth, 0},
                         {-streetHalfWidth, 3.0 * streetHalfWidth + 3.0 * halfDistance + halfIslandWidth, 0}
                     ),
-                    freeNodes = {0, 1},
+                    freeNodes = streetChunksHelper.getFreeNodesLeft(params),
                     snapNodes = params.direction == 0 and {0} or {1}
                 },
                 -- centre
@@ -1125,7 +1125,7 @@ function data()
                         {-streetHalfWidth, -3.0 * streetHalfWidth - 3.0 * halfDistance - halfIslandWidth, 0},
                         {streetHalfWidth, -3.0 * streetHalfWidth - 3.0 * halfDistance - halfIslandWidth, 0}
                     ),
-                    freeNodes = {0, 1},
+                    freeNodes = streetChunksHelper.getFreeNodesCentre(params),
                     snapNodes = {}
                 },
                 {
@@ -1137,7 +1137,7 @@ function data()
                         {-streetHalfWidth, -streetHalfWidth - halfDistance - halfIslandWidth, 0},
                         {streetHalfWidth, -streetHalfWidth - halfDistance - halfIslandWidth, 0}
                     ),
-                    freeNodes = {0, 1},
+                    freeNodes = streetChunksHelper.getFreeNodesCentre(params),
                     snapNodes = {}
                 },
                 {
@@ -1149,7 +1149,7 @@ function data()
                         {-streetHalfWidth, streetHalfWidth + halfDistance + halfIslandWidth, 0},
                         {streetHalfWidth, streetHalfWidth + halfDistance + halfIslandWidth, 0}
                     ),
-                    freeNodes = {0, 1},
+                    freeNodes = streetChunksHelper.getFreeNodesCentre(params),
                     snapNodes = {}
                 },
                 {
@@ -1161,7 +1161,7 @@ function data()
                         {-streetHalfWidth, 3.0 * streetHalfWidth + 3.0 * halfDistance + halfIslandWidth, 0},
                         {streetHalfWidth, 3.0 * streetHalfWidth + 3.0 * halfDistance + halfIslandWidth, 0}
                     ),
-                    freeNodes = {0, 1},
+                    freeNodes = streetChunksHelper.getFreeNodesCentre(params),
                     snapNodes = {}
                 },
                 -- right
@@ -1174,7 +1174,7 @@ function data()
                         {streetHalfWidth, -3.0 * streetHalfWidth - 3.0 * halfDistance - halfIslandWidth, 0},
                         {2 * streetHalfWidth, -3.0 * streetHalfWidth - 3.0 * halfDistance - halfIslandWidth, 0}
                     ),
-                    freeNodes = {0, 1},
+                    freeNodes = streetChunksHelper.getFreeNodesRight(params),
                     snapNodes = params.direction == 0 and {1} or {0}
                 },
                 {
@@ -1186,7 +1186,7 @@ function data()
                         {streetHalfWidth, -streetHalfWidth - halfDistance - halfIslandWidth, 0},
                         {2 * streetHalfWidth, -streetHalfWidth - halfDistance - halfIslandWidth, 0}
                     ),
-                    freeNodes = {0, 1},
+                    freeNodes = streetChunksHelper.getFreeNodesRight(params),
                     snapNodes = params.direction == 0 and {1} or {0}
                 },
                 {
@@ -1198,7 +1198,7 @@ function data()
                         {streetHalfWidth, streetHalfWidth + halfDistance + halfIslandWidth, 0},
                         {2 * streetHalfWidth, streetHalfWidth + halfDistance + halfIslandWidth, 0}
                     ),
-                    freeNodes = {0, 1},
+                    freeNodes = streetChunksHelper.getFreeNodesRight(params),
                     snapNodes = params.direction == 0 and {1} or {0}
                 },
                 {
@@ -1210,7 +1210,7 @@ function data()
                         {streetHalfWidth, 3.0 * streetHalfWidth + 3.0 * halfDistance + halfIslandWidth, 0},
                         {2 * streetHalfWidth, 3.0 * streetHalfWidth + 3.0 * halfDistance + halfIslandWidth, 0}
                     ),
-                    freeNodes = {0, 1},
+                    freeNodes = streetChunksHelper.getFreeNodesRight(params),
                     snapNodes = params.direction == 0 and {1} or {0}
                 }
             }
@@ -1226,7 +1226,7 @@ function data()
                         {-2 * streetHalfWidth, - 2.0 * streetFullWidth - 2.0 * distance, 0},
                         {-streetHalfWidth, - 2.0 * streetFullWidth - 2.0 * distance, 0}
                     ),
-                    freeNodes = {0, 1},
+                    freeNodes = streetChunksHelper.getFreeNodesLeft(params),
                     snapNodes = params.direction == 0 and {0} or {1}
                 },
                 {
@@ -1238,7 +1238,7 @@ function data()
                         {-2 * streetHalfWidth, -streetFullWidth - distance, 0},
                         {-streetHalfWidth, -streetFullWidth - distance, 0}
                     ),
-                    freeNodes = {0, 1},
+                    freeNodes = streetChunksHelper.getFreeNodesLeft(params),
                     snapNodes = params.direction == 0 and {0} or {1}
                 },
                 {
@@ -1250,7 +1250,7 @@ function data()
                         {-2 * streetHalfWidth, 0, 0},
                         {-streetHalfWidth, 0, 0}
                     ),
-                    freeNodes = {0, 1},
+                    freeNodes = streetChunksHelper.getFreeNodesLeft(params),
                     snapNodes = params.direction == 0 and {0} or {1}
                 },
                 {
@@ -1262,7 +1262,7 @@ function data()
                         {-2 * streetHalfWidth, streetFullWidth + distance, 0},
                         {-streetHalfWidth, streetFullWidth + distance, 0}
                     ),
-                    freeNodes = {0, 1},
+                    freeNodes = streetChunksHelper.getFreeNodesLeft(params),
                     snapNodes = params.direction == 0 and {0} or {1}
                 },
                 {
@@ -1274,7 +1274,7 @@ function data()
                         {-2 * streetHalfWidth, 2.0 * streetFullWidth + 2.0 * distance, 0},
                         {-streetHalfWidth, 2.0 * streetFullWidth + 2.0 * distance, 0}
                     ),
-                    freeNodes = {0, 1},
+                    freeNodes = streetChunksHelper.getFreeNodesLeft(params),
                     snapNodes = params.direction == 0 and {0} or {1}
                 },
                 -- centre
@@ -1287,7 +1287,7 @@ function data()
                         {-streetHalfWidth, - 2.0 * streetFullWidth - 2.0 * distance, 0},
                         {streetHalfWidth, - 2.0 * streetFullWidth - 2.0 * distance, 0}
                     ),
-                    freeNodes = {0, 1},
+                    freeNodes = streetChunksHelper.getFreeNodesCentre(params),
                     snapNodes = {}
                 },
                 {
@@ -1299,7 +1299,7 @@ function data()
                         {-streetHalfWidth, -streetFullWidth - distance, 0},
                         {streetHalfWidth, -streetFullWidth - distance, 0}
                     ),
-                    freeNodes = {0, 1},
+                    freeNodes = streetChunksHelper.getFreeNodesCentre(params),
                     snapNodes = {}
                 },
                 {
@@ -1311,7 +1311,7 @@ function data()
                         {-streetHalfWidth, 0, 0},
                         {streetHalfWidth, 0, 0}
                     ),
-                    freeNodes = {0, 1},
+                    freeNodes = streetChunksHelper.getFreeNodesCentre(params),
                     snapNodes = {}
                 },
                 {
@@ -1323,7 +1323,7 @@ function data()
                         {-streetHalfWidth, streetFullWidth + distance, 0},
                         {streetHalfWidth, streetFullWidth + distance, 0}
                     ),
-                    freeNodes = {0, 1},
+                    freeNodes = streetChunksHelper.getFreeNodesCentre(params),
                     snapNodes = {}
                 },
                 {
@@ -1335,7 +1335,7 @@ function data()
                         {-streetHalfWidth, 2.0 * streetFullWidth + 2.0 * distance, 0},
                         {streetHalfWidth, 2.0 * streetFullWidth + 2.0 * distance, 0}
                     ),
-                    freeNodes = {0, 1},
+                    freeNodes = streetChunksHelper.getFreeNodesCentre(params),
                     snapNodes = {}
                 },
                 -- right
@@ -1348,7 +1348,7 @@ function data()
                         {streetHalfWidth, - 2.0 * streetFullWidth - 2.0 * distance, 0},
                         {2 * streetHalfWidth, - 2.0 * streetFullWidth - 2.0 * distance, 0}
                     ),
-                    freeNodes = {0, 1},
+                    freeNodes = streetChunksHelper.getFreeNodesRight(params),
                     snapNodes = params.direction == 0 and {1} or {0}
                 },
                 {
@@ -1360,7 +1360,7 @@ function data()
                         {streetHalfWidth, -streetFullWidth - distance, 0},
                         {2 * streetHalfWidth, -streetFullWidth - distance, 0}
                     ),
-                    freeNodes = {0, 1},
+                    freeNodes = streetChunksHelper.getFreeNodesRight(params),
                     snapNodes = params.direction == 0 and {1} or {0}
                 },
                 {
@@ -1372,7 +1372,7 @@ function data()
                         {streetHalfWidth, 0, 0},
                         {2 * streetHalfWidth, 0, 0}
                     ),
-                    freeNodes = {0, 1},
+                    freeNodes = streetChunksHelper.getFreeNodesRight(params),
                     snapNodes = params.direction == 0 and {1} or {0}
                 },
                 {
@@ -1384,7 +1384,7 @@ function data()
                         {streetHalfWidth, streetFullWidth + distance, 0},
                         {2 * streetHalfWidth, streetFullWidth + distance, 0}
                     ),
-                    freeNodes = {0, 1},
+                    freeNodes = streetChunksHelper.getFreeNodesRight(params),
                     snapNodes = params.direction == 0 and {1} or {0}
                 },
                 {
@@ -1396,7 +1396,7 @@ function data()
                         {streetHalfWidth, 2.0 * streetFullWidth + 2.0 * distance, 0},
                         {2 * streetHalfWidth, 2.0 * streetFullWidth + 2.0 * distance, 0}
                     ),
-                    freeNodes = {0, 1},
+                    freeNodes = streetChunksHelper.getFreeNodesRight(params),
                     snapNodes = params.direction == 0 and {1} or {0}
                 }
             }
@@ -1412,7 +1412,7 @@ function data()
                         {-2 * streetHalfWidth, - 5.0 * streetHalfWidth - 5.0 * halfDistance - halfIslandWidth, 0},
                         {-streetHalfWidth, - 5.0 * streetHalfWidth - 5.0 * halfDistance - halfIslandWidth, 0}
                     ),
-                    freeNodes = {0, 1},
+                    freeNodes = streetChunksHelper.getFreeNodesLeft(params),
                     snapNodes = params.direction == 0 and {0} or {1}
                 },
                 {
@@ -1424,7 +1424,7 @@ function data()
                         {-2 * streetHalfWidth, - 3.0 * streetHalfWidth - 3.0 * halfDistance - halfIslandWidth, 0},
                         {-streetHalfWidth, - 3.0 * streetHalfWidth - 3.0 * halfDistance - halfIslandWidth, 0}
                     ),
-                    freeNodes = {0, 1},
+                    freeNodes = streetChunksHelper.getFreeNodesLeft(params),
                     snapNodes = params.direction == 0 and {0} or {1}
                 },
                 {
@@ -1436,7 +1436,7 @@ function data()
                         {-2 * streetHalfWidth, -streetHalfWidth - halfDistance - halfIslandWidth, 0},
                         {-streetHalfWidth, -streetHalfWidth - halfDistance - halfIslandWidth, 0}
                     ),
-                    freeNodes = {0, 1},
+                    freeNodes = streetChunksHelper.getFreeNodesLeft(params),
                     snapNodes = params.direction == 0 and {0} or {1}
                 },
                 {
@@ -1448,7 +1448,7 @@ function data()
                         {-2 * streetHalfWidth, streetHalfWidth + halfDistance + halfIslandWidth, 0},
                         {-streetHalfWidth, streetHalfWidth + halfDistance + halfIslandWidth, 0}
                     ),
-                    freeNodes = {0, 1},
+                    freeNodes = streetChunksHelper.getFreeNodesLeft(params),
                     snapNodes = params.direction == 0 and {0} or {1}
                 },
                 {
@@ -1460,7 +1460,7 @@ function data()
                         {-2 * streetHalfWidth, 3.0 * streetHalfWidth + 3.0 * halfDistance + halfIslandWidth, 0},
                         {-streetHalfWidth, 3.0 * streetHalfWidth + 3.0 * halfDistance + halfIslandWidth, 0}
                     ),
-                    freeNodes = {0, 1},
+                    freeNodes = streetChunksHelper.getFreeNodesLeft(params),
                     snapNodes = params.direction == 0 and {0} or {1}
                 },
                 {
@@ -1472,7 +1472,7 @@ function data()
                         {-2 * streetHalfWidth, 5.0 * streetHalfWidth + 5.0 * halfDistance + halfIslandWidth, 0},
                         {-streetHalfWidth, 5.0 * streetHalfWidth + 5.0 * halfDistance + halfIslandWidth, 0}
                     ),
-                    freeNodes = {0, 1},
+                    freeNodes = streetChunksHelper.getFreeNodesLeft(params),
                     snapNodes = params.direction == 0 and {0} or {1}
                 },
                 -- centre
@@ -1485,7 +1485,7 @@ function data()
                         {-streetHalfWidth, - 5.0 * streetHalfWidth - 5.0 * halfDistance - halfIslandWidth, 0},
                         {streetHalfWidth, - 5.0 * streetHalfWidth - 5.0 * halfDistance - halfIslandWidth, 0}
                     ),
-                    freeNodes = {0, 1},
+                    freeNodes = streetChunksHelper.getFreeNodesCentre(params),
                     snapNodes = {}
                 },
                 {
@@ -1497,7 +1497,7 @@ function data()
                         {-streetHalfWidth, - 3.0 * streetHalfWidth - 3.0 * halfDistance - halfIslandWidth, 0},
                         {streetHalfWidth, - 3.0 * streetHalfWidth - 3.0 * halfDistance - halfIslandWidth, 0}
                     ),
-                    freeNodes = {0, 1},
+                    freeNodes = streetChunksHelper.getFreeNodesCentre(params),
                     snapNodes = {}
                 },
                 {
@@ -1509,7 +1509,7 @@ function data()
                         {-streetHalfWidth, -streetHalfWidth - halfDistance - halfIslandWidth, 0},
                         {streetHalfWidth, -streetHalfWidth - halfDistance - halfIslandWidth, 0}
                     ),
-                    freeNodes = {0, 1},
+                    freeNodes = streetChunksHelper.getFreeNodesCentre(params),
                     snapNodes = {}
                 },
                 {
@@ -1521,7 +1521,7 @@ function data()
                         {-streetHalfWidth, streetHalfWidth + halfDistance + halfIslandWidth, 0},
                         {streetHalfWidth, streetHalfWidth + halfDistance + halfIslandWidth, 0}
                     ),
-                    freeNodes = {0, 1},
+                    freeNodes = streetChunksHelper.getFreeNodesCentre(params),
                     snapNodes = {}
                 },
                 {
@@ -1533,7 +1533,7 @@ function data()
                         {-streetHalfWidth, 3.0 * streetHalfWidth + 3.0 * halfDistance + halfIslandWidth, 0},
                         {streetHalfWidth, 3.0 * streetHalfWidth + 3.0 * halfDistance + halfIslandWidth, 0}
                     ),
-                    freeNodes = {0, 1},
+                    freeNodes = streetChunksHelper.getFreeNodesCentre(params),
                     snapNodes = {}
                 },
                 {
@@ -1545,7 +1545,7 @@ function data()
                         {-streetHalfWidth, 5.0 * streetHalfWidth + 5.0 * halfDistance + halfIslandWidth, 0},
                         {streetHalfWidth, 5.0 * streetHalfWidth + 5.0 * halfDistance + halfIslandWidth, 0}
                     ),
-                    freeNodes = {0, 1},
+                    freeNodes = streetChunksHelper.getFreeNodesCentre(params),
                     snapNodes = {}
                 },
                 -- right
@@ -1558,7 +1558,7 @@ function data()
                         {streetHalfWidth, - 5.0 * streetHalfWidth - 5.0 * halfDistance - halfIslandWidth, 0},
                         {2 * streetHalfWidth, - 5.0 * streetHalfWidth - 5.0 * halfDistance - halfIslandWidth, 0}
                     ),
-                    freeNodes = {0, 1},
+                    freeNodes = streetChunksHelper.getFreeNodesRight(params),
                     snapNodes = params.direction == 0 and {1} or {0}
                 },
                 {
@@ -1570,7 +1570,7 @@ function data()
                         {streetHalfWidth, - 3.0 * streetHalfWidth - 3.0 * halfDistance - halfIslandWidth, 0},
                         {2 * streetHalfWidth, - 3.0 * streetHalfWidth - 3.0 * halfDistance - halfIslandWidth, 0}
                     ),
-                    freeNodes = {0, 1},
+                    freeNodes = streetChunksHelper.getFreeNodesRight(params),
                     snapNodes = params.direction == 0 and {1} or {0}
                 },
                 {
@@ -1582,7 +1582,7 @@ function data()
                         {streetHalfWidth, -streetHalfWidth - halfDistance - halfIslandWidth, 0},
                         {2 * streetHalfWidth, -streetHalfWidth - halfDistance - halfIslandWidth, 0}
                     ),
-                    freeNodes = {0, 1},
+                    freeNodes = streetChunksHelper.getFreeNodesRight(params),
                     snapNodes = params.direction == 0 and {1} or {0}
                 },
                 {
@@ -1594,7 +1594,7 @@ function data()
                         {streetHalfWidth, streetHalfWidth + halfDistance + halfIslandWidth, 0},
                         {2 * streetHalfWidth, streetHalfWidth + halfDistance + halfIslandWidth, 0}
                     ),
-                    freeNodes = {0, 1},
+                    freeNodes = streetChunksHelper.getFreeNodesRight(params),
                     snapNodes = params.direction == 0 and {1} or {0}
                 },
                 {
@@ -1606,7 +1606,7 @@ function data()
                         {streetHalfWidth, 3.0 * streetHalfWidth + 3.0 * halfDistance + halfIslandWidth, 0},
                         {2 * streetHalfWidth, 3.0 * streetHalfWidth + 3.0 * halfDistance + halfIslandWidth, 0}
                     ),
-                    freeNodes = {0, 1},
+                    freeNodes = streetChunksHelper.getFreeNodesRight(params),
                     snapNodes = params.direction == 0 and {1} or {0}
                 },
                 {
@@ -1618,7 +1618,7 @@ function data()
                         {streetHalfWidth, 5.0 * streetHalfWidth + 5.0 * halfDistance + halfIslandWidth, 0},
                         {2 * streetHalfWidth, 5.0 * streetHalfWidth + 5.0 * halfDistance + halfIslandWidth, 0}
                     ),
-                    freeNodes = {0, 1},
+                    freeNodes = streetChunksHelper.getFreeNodesRight(params),
                     snapNodes = params.direction == 0 and {1} or {0}
                 }
             }
@@ -1663,6 +1663,15 @@ function data()
             {
                 key = 'snapNodes',
                 name = _('Snap to neighbours'),
+                values = {
+                    _('No'),
+                    _('Yes')
+                },
+                defaultIndex = 0
+            },
+            {
+                key = 'lockLayoutCentre',
+                name = _('Lock chunks to keep their shape pretty and prevent other roads merging in. You cannot relock an unlocked construction.'),
                 values = {
                     _('No'),
                     _('Yes')
@@ -1754,14 +1763,15 @@ function data()
 
             -- LOLLO NOTE I cannot use KEEP here
             local tramTrackType = params.tramTrack and (({'NO', 'YES', 'ELECTRIC'})[params.tramTrack + 1]) or 'NO'
+            -- LOLLO NOTE here, we have 2 half edges for every chunk of road. The inner nodes do not snap, the outer ones do.
+            -- This is required if we want to make them snappable at all, to avoid crashes.
+            -- We free all edges, so they can be freely converted to whatever one needs.
+            -- We could make a lot of combinations and upgrade them with the construction params instead, but that would be a mess to use.
+            result.edgeLists = _getSnapEdgeLists(params, pitch, streetData, tramTrackType)
             if params.snapNodes == 0 then
-                result.edgeLists = _getNonSnapEdgeLists(params, pitch, streetData, tramTrackType)
-            else
-                -- LOLLO NOTE here, we have 2 half edges for every chunk of road. The inner nodes do not snap, the outer ones do.
-                -- This is required if we want to make them snappable at all, to avoid crashes.
-                -- We free all edges, so they can be freely converted to whatever one needs.
-                -- We could make a lot of combinations and upgrade them with the construction params instead, but that would be a mess to use.
-                result.edgeLists = _getSnapAndFreeEdgeLists(params, pitch, streetData, tramTrackType)
+                for _, vv in pairs(result.edgeLists) do
+                    vv.snapNodes = {}
+                end
             end
             -- LOLLO TODO copying from the groundTextureBuilder, we could make the terrain flat to ease the pain when building junctions
             -- if params.terrainAlignment == 1 then

@@ -15,7 +15,6 @@ end
 local function _makeEdges(params, node0, node1, tan0, tan1)
     return params.direction == 0 and
         {
-            -- one entry refers to a position and a tangent
             {pitchUtil.getXYZPitched(params.pitch, node0), tan0}, -- node 0
             {pitchUtil.getXYZPitched(params.pitch, node1), tan1} -- node 1
         } or

@@ -285,4 +285,28 @@ helper.makeEdges = function(direction, pitch, node0, node1, tan0, tan1)
         }
 end
 
+helper.getFreeNodesLeft = function(params)
+    if params.lockLayoutCentre == 1 then
+        return params.direction == 0 and {0} or {1}
+    else
+        return {0, 1}
+    end
+end
+
+helper.getFreeNodesCentre = function(params)
+    if params.lockLayoutCentre == 1 then
+        return {}
+    else
+        return {0, 1}
+    end
+end
+
+helper.getFreeNodesRight = function(params)
+    if params.lockLayoutCentre == 1 then
+        return params.direction == 0 and {1} or {0}
+    else
+        return {0, 1}
+    end
+end
+
 return helper
