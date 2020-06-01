@@ -373,12 +373,12 @@ helper.getFreeNodesHighX = function(params, isRightOfIsland)
 end
 
 helper.getSnapNodesLowX = function(params, isRightOfIsland)
-    if params.snapNodes == 1 and params.direction ~= 2 then
-        -- if isRightOfIsland then
-        --     return params.direction == 0 and {1} or {0}
-        -- else
+    if params.snapNodes == 1 then
+        if params.direction == 2 and isRightOfIsland then
+            return params.direction == 0 and {1} or {0}
+        else
             return params.direction == 0 and {0} or {1}
-        -- end
+        end
     else
         return {}
     end
@@ -389,12 +389,12 @@ helper.getSnapNodesCentre = function(params, isRightOfIsland)
 end
 
 helper.getSnapNodesHighX = function(params, isRightOfIsland)
-    if params.snapNodes == 1 and params.direction ~= 2 then
-        -- if isRightOfIsland then
-        --     return params.direction == 0 and {0} or {1}
-        -- else
+    if params.snapNodes == 1 then
+        if params.direction == 2 and isRightOfIsland then
+            return params.direction == 0 and {0} or {1}
+        else
             return params.direction == 0 and {1} or {0}
-        -- end
+        end
     else
         return {}
     end
