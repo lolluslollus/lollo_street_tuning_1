@@ -19,7 +19,8 @@ function data()
         local halfExtraLength = (params.extraLength or 0.0) * 0.5 * streetChunksHelper.getLengthMultiplier()
         local halfIslandWidth = (params.islandWidth or 0.0) * 0.5
 
-        -- local xMax = math.max(9.0, streetHalfWidth + 1.0)
+        -- local x0 = - math.max(9.0, streetHalfWidth + 1.0) - halfExtraLength
+        -- LOLLO TODO check this, it might need extending
         local x0 = - 2.0 * streetHalfWidth - 1.0 - halfExtraLength -- this is the fruit of trial and error: if x1 - x0 is too little, snapping will dump
         local x1 = - streetHalfWidth - halfExtraLength
         local x2 = - x1
