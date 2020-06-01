@@ -10,14 +10,21 @@ function data()
     --     'lollo_medium_1_way_1_lane_street.lua'
     -- }
 
-    local function _getSnapEdgeLists(params, pitch, streetData, tramTrackType)
+    local function _getSnapEdgeLists(params, pitchAdjusted, streetData, tramTrackType)
         local streetHalfWidth = streetData.sidewalkWidth + streetData.streetWidth * 0.5
         local streetFullWidth = streetData.sidewalkWidth + streetData.sidewalkWidth + streetData.streetWidth
-        -- local xMax = math.max(9.0, streetHalfWidth + 1.0) -- this is the fruit of trial and error, see the notes
-        local xMax = 2.0 * streetHalfWidth + 1.0 -- this is the fruit of trial and error, see the notes
+
         local distance = params.distance or 0.0
         local halfDistance = distance * 0.5
+        local halfExtraLength = (params.extraLength or 0.0) * 0.5 * streetChunksHelper.getLengthMultiplier()
         local halfIslandWidth = (params.islandWidth or 0.0) * 0.5
+
+        -- local xMax = math.max(9.0, streetHalfWidth + 1.0)
+        local x0 = - 2.0 * streetHalfWidth - 1.0 - halfExtraLength -- this is the fruit of trial and error: if x1 - x0 is too little, snapping will dump
+        local x1 = - streetHalfWidth - halfExtraLength
+        local x2 = - x1
+        local x3 = - x0
+
         -- print('LOLLO streetHalfWidth = ', streetHalfWidth)
         -- print('LOLLO 2.0 * streetHalfWidth = ', 2.0 * streetHalfWidth)
         -- print('LOLLO streetFullWidth = ', streetFullWidth)
@@ -37,9 +44,9 @@ function data()
                     params = edgeParams,
                     edges = streetChunksHelper.makeEdges(
                         params.direction,
-                        pitch,
-                        {-xMax, 0, 0},
-                        {-streetHalfWidth, 0, 0}
+                        pitchAdjusted,
+                        {x0, 0, 0},
+                        {x1, 0, 0}
                     ),
                     freeNodes = streetChunksHelper.getFreeNodesLowX(params),
                     snapNodes = streetChunksHelper.getSnapNodesLowX(params)
@@ -52,9 +59,9 @@ function data()
                     params = edgeParams,
                     edges = streetChunksHelper.makeEdges(
                         params.direction,
-                        pitch,
-                        {-streetHalfWidth, 0, 0},
-                        {streetHalfWidth, 0, 0}
+                        pitchAdjusted,
+                        {x1, 0, 0},
+                        {x2, 0, 0}
                     ),
                     freeNodes = streetChunksHelper.getFreeNodesCentre(params),
                     snapNodes = streetChunksHelper.getSnapNodesCentre(params)
@@ -65,9 +72,9 @@ function data()
                     params = edgeParams,
                     edges = streetChunksHelper.makeEdges(
                         params.direction,
-                        pitch,
-                        {streetHalfWidth, 0, 0},
-                        {xMax, 0, 0}
+                        pitchAdjusted,
+                        {x2, 0, 0},
+                        {x3, 0, 0}
                     ),
                     freeNodes = streetChunksHelper.getFreeNodesHighX(params),
                     snapNodes = streetChunksHelper.getSnapNodesHighX(params)
@@ -81,9 +88,9 @@ function data()
                     params = edgeParams,
                     edges = streetChunksHelper.makeEdges(
                         params.direction,
-                        pitch,
-                        {-xMax, -streetHalfWidth - halfDistance - halfIslandWidth, 0},
-                        {-streetHalfWidth, -streetHalfWidth - halfDistance - halfIslandWidth, 0},
+                        pitchAdjusted,
+                        {x0, -streetHalfWidth - halfDistance - halfIslandWidth, 0},
+                        {x1, -streetHalfWidth - halfDistance - halfIslandWidth, 0},
                         true
                     ),
                     freeNodes = streetChunksHelper.getFreeNodesLowX(params, true),
@@ -94,9 +101,9 @@ function data()
                     params = edgeParams,
                     edges = streetChunksHelper.makeEdges(
                         params.direction,
-                        pitch,
-                        {-xMax, streetHalfWidth + halfDistance + halfIslandWidth, 0},
-                        {-streetHalfWidth, streetHalfWidth + halfDistance + halfIslandWidth, 0}
+                        pitchAdjusted,
+                        {x0, streetHalfWidth + halfDistance + halfIslandWidth, 0},
+                        {x1, streetHalfWidth + halfDistance + halfIslandWidth, 0}
                     ),
                     freeNodes = streetChunksHelper.getFreeNodesLowX(params),
                     snapNodes = streetChunksHelper.getSnapNodesLowX(params)
@@ -107,9 +114,9 @@ function data()
                     params = edgeParams,
                     edges = streetChunksHelper.makeEdges(
                         params.direction,
-                        pitch,
-                        {-streetHalfWidth, -streetHalfWidth - halfDistance - halfIslandWidth, 0},
-                        {streetHalfWidth, -streetHalfWidth - halfDistance - halfIslandWidth, 0},
+                        pitchAdjusted,
+                        {x1, -streetHalfWidth - halfDistance - halfIslandWidth, 0},
+                        {x2, -streetHalfWidth - halfDistance - halfIslandWidth, 0},
                         true
                     ),
                     freeNodes = streetChunksHelper.getFreeNodesCentre(params, true),
@@ -120,9 +127,9 @@ function data()
                     params = edgeParams,
                     edges = streetChunksHelper.makeEdges(
                         params.direction,
-                        pitch,
-                        {-streetHalfWidth, streetHalfWidth + halfDistance + halfIslandWidth, 0},
-                        {streetHalfWidth, streetHalfWidth + halfDistance + halfIslandWidth, 0}
+                        pitchAdjusted,
+                        {x1, streetHalfWidth + halfDistance + halfIslandWidth, 0},
+                        {x2, streetHalfWidth + halfDistance + halfIslandWidth, 0}
                     ),
                     freeNodes = streetChunksHelper.getFreeNodesCentre(params),
                     snapNodes = streetChunksHelper.getSnapNodesCentre(params)
@@ -133,9 +140,9 @@ function data()
                     params = edgeParams,
                     edges = streetChunksHelper.makeEdges(
                         params.direction,
-                        pitch,
-                        {streetHalfWidth, -streetHalfWidth - halfDistance - halfIslandWidth, 0},
-                        {xMax, -streetHalfWidth - halfDistance - halfIslandWidth, 0},
+                        pitchAdjusted,
+                        {x2, -streetHalfWidth - halfDistance - halfIslandWidth, 0},
+                        {x3, -streetHalfWidth - halfDistance - halfIslandWidth, 0},
                         true
                     ),
                     freeNodes = streetChunksHelper.getFreeNodesHighX(params, true),
@@ -146,9 +153,9 @@ function data()
                     params = edgeParams,
                     edges = streetChunksHelper.makeEdges(
                         params.direction,
-                        pitch,
-                        {streetHalfWidth, streetHalfWidth + halfDistance + halfIslandWidth, 0},
-                        {xMax, streetHalfWidth + halfDistance + halfIslandWidth, 0}
+                        pitchAdjusted,
+                        {x2, streetHalfWidth + halfDistance + halfIslandWidth, 0},
+                        {x3, streetHalfWidth + halfDistance + halfIslandWidth, 0}
                     ),
                     freeNodes = streetChunksHelper.getFreeNodesHighX(params),
                     snapNodes = streetChunksHelper.getSnapNodesHighX(params)
@@ -162,9 +169,9 @@ function data()
                     params = edgeParams,
                     edges = streetChunksHelper.makeEdges(
                         params.direction,
-                        pitch,
-                        {-xMax, -streetFullWidth - distance - halfIslandWidth, 0},
-                        {-streetHalfWidth, -streetFullWidth - distance - halfIslandWidth, 0},
+                        pitchAdjusted,
+                        {x0, -streetFullWidth - distance - halfIslandWidth, 0},
+                        {x1, -streetFullWidth - distance - halfIslandWidth, 0},
                         true
                     ),
                     freeNodes = streetChunksHelper.getFreeNodesLowX(params, true),
@@ -175,9 +182,9 @@ function data()
                     params = edgeParams,
                     edges = streetChunksHelper.makeEdges(
                         params.direction,
-                        pitch,
-                        {-xMax, halfIslandWidth, 0},
-                        {-streetHalfWidth, halfIslandWidth, 0}
+                        pitchAdjusted,
+                        {x0, halfIslandWidth, 0},
+                        {x1, halfIslandWidth, 0}
                     ),
                     freeNodes = streetChunksHelper.getFreeNodesLowX(params),
                     snapNodes = streetChunksHelper.getSnapNodesLowX(params)
@@ -187,9 +194,9 @@ function data()
                     params = edgeParams,
                     edges = streetChunksHelper.makeEdges(
                         params.direction,
-                        pitch,
-                        {-xMax, streetFullWidth + distance + halfIslandWidth, 0},
-                        {-streetHalfWidth, streetFullWidth + distance + halfIslandWidth, 0}
+                        pitchAdjusted,
+                        {x0, streetFullWidth + distance + halfIslandWidth, 0},
+                        {x1, streetFullWidth + distance + halfIslandWidth, 0}
                     ),
                     freeNodes = streetChunksHelper.getFreeNodesLowX(params),
                     snapNodes = streetChunksHelper.getSnapNodesLowX(params)
@@ -200,9 +207,9 @@ function data()
                     params = edgeParams,
                     edges = streetChunksHelper.makeEdges(
                         params.direction,
-                        pitch,
-                        {-streetHalfWidth, -streetFullWidth - distance - halfIslandWidth, 0},
-                        {streetHalfWidth, -streetFullWidth - distance - halfIslandWidth, 0},
+                        pitchAdjusted,
+                        {x1, -streetFullWidth - distance - halfIslandWidth, 0},
+                        {x2, -streetFullWidth - distance - halfIslandWidth, 0},
                         true
                     ),
                     freeNodes = streetChunksHelper.getFreeNodesCentre(params, true),
@@ -213,9 +220,9 @@ function data()
                     params = edgeParams,
                     edges = streetChunksHelper.makeEdges(
                         params.direction,
-                        pitch,
-                        {-streetHalfWidth, halfIslandWidth, 0},
-                        {streetHalfWidth, halfIslandWidth, 0}
+                        pitchAdjusted,
+                        {x1, halfIslandWidth, 0},
+                        {x2, halfIslandWidth, 0}
                     ),
                     freeNodes = streetChunksHelper.getFreeNodesCentre(params),
                     snapNodes = streetChunksHelper.getSnapNodesCentre(params)
@@ -225,9 +232,9 @@ function data()
                     params = edgeParams,
                     edges = streetChunksHelper.makeEdges(
                         params.direction,
-                        pitch,
-                        {-streetHalfWidth, streetFullWidth + distance + halfIslandWidth, 0},
-                        {streetHalfWidth, streetFullWidth + distance + halfIslandWidth, 0}
+                        pitchAdjusted,
+                        {x1, streetFullWidth + distance + halfIslandWidth, 0},
+                        {x2, streetFullWidth + distance + halfIslandWidth, 0}
                     ),
                     freeNodes = streetChunksHelper.getFreeNodesCentre(params),
                     snapNodes = streetChunksHelper.getSnapNodesCentre(params)
@@ -238,9 +245,9 @@ function data()
                     params = edgeParams,
                     edges = streetChunksHelper.makeEdges(
                         params.direction,
-                        pitch,
-                        {streetHalfWidth, -streetFullWidth - distance - halfIslandWidth, 0},
-                        {xMax, -streetFullWidth - distance - halfIslandWidth, 0},
+                        pitchAdjusted,
+                        {x2, -streetFullWidth - distance - halfIslandWidth, 0},
+                        {x3, -streetFullWidth - distance - halfIslandWidth, 0},
                         true
                     ),
                     freeNodes = streetChunksHelper.getFreeNodesHighX(params, true),
@@ -251,9 +258,9 @@ function data()
                     params = edgeParams,
                     edges = streetChunksHelper.makeEdges(
                         params.direction,
-                        pitch,
-                        {streetHalfWidth, halfIslandWidth, 0},
-                        {xMax, halfIslandWidth, 0}
+                        pitchAdjusted,
+                        {x2, halfIslandWidth, 0},
+                        {x3, halfIslandWidth, 0}
                     ),
                     freeNodes = streetChunksHelper.getFreeNodesHighX(params),
                     snapNodes = streetChunksHelper.getSnapNodesHighX(params)
@@ -263,9 +270,9 @@ function data()
                     params = edgeParams,
                     edges = streetChunksHelper.makeEdges(
                         params.direction,
-                        pitch,
-                        {streetHalfWidth, streetFullWidth + distance + halfIslandWidth, 0},
-                        {xMax, streetFullWidth + distance + halfIslandWidth, 0}
+                        pitchAdjusted,
+                        {x2, streetFullWidth + distance + halfIslandWidth, 0},
+                        {x3, streetFullWidth + distance + halfIslandWidth, 0}
                     ),
                     freeNodes = streetChunksHelper.getFreeNodesHighX(params),
                     snapNodes = streetChunksHelper.getSnapNodesHighX(params)
@@ -279,8 +286,8 @@ function data()
                     params = edgeParams,
                     edges = streetChunksHelper.makeEdges(
                         params.direction,
-                        pitch,
-                        {-xMax, -3.0 * streetHalfWidth - 3.0 * halfDistance - halfIslandWidth, 0},
+                        pitchAdjusted,
+                        {x0, -3.0 * streetHalfWidth - 3.0 * halfDistance - halfIslandWidth, 0},
                         {- streetHalfWidth, -3.0 * streetHalfWidth - 3.0 * halfDistance - halfIslandWidth, 0},
                         true
                     ),
@@ -292,9 +299,9 @@ function data()
                     params = edgeParams,
                     edges = streetChunksHelper.makeEdges(
                         params.direction,
-                        pitch,
-                        {-xMax, -streetHalfWidth - halfDistance - halfIslandWidth, 0},
-                        {-streetHalfWidth, -streetHalfWidth - halfDistance - halfIslandWidth, 0},
+                        pitchAdjusted,
+                        {x0, -streetHalfWidth - halfDistance - halfIslandWidth, 0},
+                        {x1, -streetHalfWidth - halfDistance - halfIslandWidth, 0},
                         true
                     ),
                     freeNodes = streetChunksHelper.getFreeNodesLowX(params, true),
@@ -305,9 +312,9 @@ function data()
                     params = edgeParams,
                     edges = streetChunksHelper.makeEdges(
                         params.direction,
-                        pitch,
-                        {-xMax, streetHalfWidth + halfDistance + halfIslandWidth, 0},
-                        {-streetHalfWidth, streetHalfWidth + halfDistance + halfIslandWidth, 0}
+                        pitchAdjusted,
+                        {x0, streetHalfWidth + halfDistance + halfIslandWidth, 0},
+                        {x1, streetHalfWidth + halfDistance + halfIslandWidth, 0}
                     ),
                     freeNodes = streetChunksHelper.getFreeNodesLowX(params),
                     snapNodes = streetChunksHelper.getSnapNodesLowX(params)
@@ -317,9 +324,9 @@ function data()
                     params = edgeParams,
                     edges = streetChunksHelper.makeEdges(
                         params.direction,
-                        pitch,
-                        {-xMax, 3.0 * streetHalfWidth + 3.0 * halfDistance + halfIslandWidth, 0},
-                        {-streetHalfWidth, 3.0 * streetHalfWidth + 3.0 * halfDistance + halfIslandWidth, 0}
+                        pitchAdjusted,
+                        {x0, 3.0 * streetHalfWidth + 3.0 * halfDistance + halfIslandWidth, 0},
+                        {x1, 3.0 * streetHalfWidth + 3.0 * halfDistance + halfIslandWidth, 0}
                     ),
                     freeNodes = streetChunksHelper.getFreeNodesLowX(params),
                     snapNodes = streetChunksHelper.getSnapNodesLowX(params)
@@ -330,9 +337,9 @@ function data()
                     params = edgeParams,
                     edges = streetChunksHelper.makeEdges(
                         params.direction,
-                        pitch,
-                        {-streetHalfWidth, -3.0 * streetHalfWidth - 3.0 * halfDistance - halfIslandWidth, 0},
-                        {streetHalfWidth, -3.0 * streetHalfWidth - 3.0 * halfDistance - halfIslandWidth, 0},
+                        pitchAdjusted,
+                        {x1, -3.0 * streetHalfWidth - 3.0 * halfDistance - halfIslandWidth, 0},
+                        {x2, -3.0 * streetHalfWidth - 3.0 * halfDistance - halfIslandWidth, 0},
                         true
                     ),
                     freeNodes = streetChunksHelper.getFreeNodesCentre(params, true),
@@ -343,9 +350,9 @@ function data()
                     params = edgeParams,
                     edges = streetChunksHelper.makeEdges(
                         params.direction,
-                        pitch,
-                        {-streetHalfWidth, -streetHalfWidth - halfDistance - halfIslandWidth, 0},
-                        {streetHalfWidth, -streetHalfWidth - halfDistance - halfIslandWidth, 0},
+                        pitchAdjusted,
+                        {x1, -streetHalfWidth - halfDistance - halfIslandWidth, 0},
+                        {x2, -streetHalfWidth - halfDistance - halfIslandWidth, 0},
                         true
                     ),
                     freeNodes = streetChunksHelper.getFreeNodesCentre(params, true),
@@ -356,9 +363,9 @@ function data()
                     params = edgeParams,
                     edges = streetChunksHelper.makeEdges(
                         params.direction,
-                        pitch,
-                        {-streetHalfWidth, streetHalfWidth + halfDistance + halfIslandWidth, 0},
-                        {streetHalfWidth, streetHalfWidth + halfDistance + halfIslandWidth, 0}
+                        pitchAdjusted,
+                        {x1, streetHalfWidth + halfDistance + halfIslandWidth, 0},
+                        {x2, streetHalfWidth + halfDistance + halfIslandWidth, 0}
                     ),
                     freeNodes = streetChunksHelper.getFreeNodesCentre(params),
                     snapNodes = streetChunksHelper.getSnapNodesCentre(params)
@@ -368,9 +375,9 @@ function data()
                     params = edgeParams,
                     edges = streetChunksHelper.makeEdges(
                         params.direction,
-                        pitch,
-                        {-streetHalfWidth, 3.0 * streetHalfWidth + 3.0 * halfDistance + halfIslandWidth, 0},
-                        {streetHalfWidth, 3.0 * streetHalfWidth + 3.0 * halfDistance + halfIslandWidth, 0}
+                        pitchAdjusted,
+                        {x1, 3.0 * streetHalfWidth + 3.0 * halfDistance + halfIslandWidth, 0},
+                        {x2, 3.0 * streetHalfWidth + 3.0 * halfDistance + halfIslandWidth, 0}
                     ),
                     freeNodes = streetChunksHelper.getFreeNodesCentre(params),
                     snapNodes = streetChunksHelper.getSnapNodesCentre(params)
@@ -381,9 +388,9 @@ function data()
                     params = edgeParams,
                     edges = streetChunksHelper.makeEdges(
                         params.direction,
-                        pitch,
-                        {streetHalfWidth, -3.0 * streetHalfWidth - 3.0 * halfDistance - halfIslandWidth, 0},
-                        {xMax, -3.0 * streetHalfWidth - 3.0 * halfDistance - halfIslandWidth, 0},
+                        pitchAdjusted,
+                        {x2, -3.0 * streetHalfWidth - 3.0 * halfDistance - halfIslandWidth, 0},
+                        {x3, -3.0 * streetHalfWidth - 3.0 * halfDistance - halfIslandWidth, 0},
                         true
                     ),
                     freeNodes = streetChunksHelper.getFreeNodesHighX(params, true),
@@ -394,9 +401,9 @@ function data()
                     params = edgeParams,
                     edges = streetChunksHelper.makeEdges(
                         params.direction,
-                        pitch,
-                        {streetHalfWidth, -streetHalfWidth - halfDistance - halfIslandWidth, 0},
-                        {xMax, -streetHalfWidth - halfDistance - halfIslandWidth, 0},
+                        pitchAdjusted,
+                        {x2, -streetHalfWidth - halfDistance - halfIslandWidth, 0},
+                        {x3, -streetHalfWidth - halfDistance - halfIslandWidth, 0},
                         true
                     ),
                     freeNodes = streetChunksHelper.getFreeNodesHighX(params, true),
@@ -407,9 +414,9 @@ function data()
                     params = edgeParams,
                     edges = streetChunksHelper.makeEdges(
                         params.direction,
-                        pitch,
-                        {streetHalfWidth, streetHalfWidth + halfDistance + halfIslandWidth, 0},
-                        {xMax, streetHalfWidth + halfDistance + halfIslandWidth, 0}
+                        pitchAdjusted,
+                        {x2, streetHalfWidth + halfDistance + halfIslandWidth, 0},
+                        {x3, streetHalfWidth + halfDistance + halfIslandWidth, 0}
                     ),
                     freeNodes = streetChunksHelper.getFreeNodesHighX(params),
                     snapNodes = streetChunksHelper.getSnapNodesHighX(params)
@@ -419,9 +426,9 @@ function data()
                     params = edgeParams,
                     edges = streetChunksHelper.makeEdges(
                         params.direction,
-                        pitch,
-                        {streetHalfWidth, 3.0 * streetHalfWidth + 3.0 * halfDistance + halfIslandWidth, 0},
-                        {xMax, 3.0 * streetHalfWidth + 3.0 * halfDistance + halfIslandWidth, 0}
+                        pitchAdjusted,
+                        {x2, 3.0 * streetHalfWidth + 3.0 * halfDistance + halfIslandWidth, 0},
+                        {x3, 3.0 * streetHalfWidth + 3.0 * halfDistance + halfIslandWidth, 0}
                     ),
                     freeNodes = streetChunksHelper.getFreeNodesHighX(params),
                     snapNodes = streetChunksHelper.getSnapNodesHighX(params)
@@ -435,9 +442,9 @@ function data()
                     params = edgeParams,
                     edges = streetChunksHelper.makeEdges(
                         params.direction,
-                        pitch,
-                        {-xMax, - 2.0 * streetFullWidth - 2.0 * distance - halfIslandWidth, 0},
-                        {-streetHalfWidth, - 2.0 * streetFullWidth - 2.0 * distance - halfIslandWidth, 0},
+                        pitchAdjusted,
+                        {x0, - 2.0 * streetFullWidth - 2.0 * distance - halfIslandWidth, 0},
+                        {x1, - 2.0 * streetFullWidth - 2.0 * distance - halfIslandWidth, 0},
                         true
                     ),
                     freeNodes = streetChunksHelper.getFreeNodesLowX(params, true),
@@ -448,9 +455,9 @@ function data()
                     params = edgeParams,
                     edges = streetChunksHelper.makeEdges(
                         params.direction,
-                        pitch,
-                        {-xMax, -streetFullWidth - distance - halfIslandWidth, 0},
-                        {-streetHalfWidth, -streetFullWidth - distance - halfIslandWidth, 0},
+                        pitchAdjusted,
+                        {x0, -streetFullWidth - distance - halfIslandWidth, 0},
+                        {x1, -streetFullWidth - distance - halfIslandWidth, 0},
                         true
                     ),
                     freeNodes = streetChunksHelper.getFreeNodesLowX(params, true),
@@ -461,9 +468,9 @@ function data()
                     params = edgeParams,
                     edges = streetChunksHelper.makeEdges(
                         params.direction,
-                        pitch,
-                        {-xMax, halfIslandWidth, 0},
-                        {-streetHalfWidth, halfIslandWidth, 0}
+                        pitchAdjusted,
+                        {x0, halfIslandWidth, 0},
+                        {x1, halfIslandWidth, 0}
                     ),
                     freeNodes = streetChunksHelper.getFreeNodesLowX(params),
                     snapNodes = streetChunksHelper.getSnapNodesLowX(params)
@@ -473,9 +480,9 @@ function data()
                     params = edgeParams,
                     edges = streetChunksHelper.makeEdges(
                         params.direction,
-                        pitch,
-                        {-xMax, streetFullWidth + distance + halfIslandWidth, 0},
-                        {-streetHalfWidth, streetFullWidth + distance + halfIslandWidth, 0}
+                        pitchAdjusted,
+                        {x0, streetFullWidth + distance + halfIslandWidth, 0},
+                        {x1, streetFullWidth + distance + halfIslandWidth, 0}
                     ),
                     freeNodes = streetChunksHelper.getFreeNodesLowX(params),
                     snapNodes = streetChunksHelper.getSnapNodesLowX(params)
@@ -485,9 +492,9 @@ function data()
                     params = edgeParams,
                     edges = streetChunksHelper.makeEdges(
                         params.direction,
-                        pitch,
-                        {-xMax, 2.0 * streetFullWidth + 2.0 * distance + halfIslandWidth, 0},
-                        {-streetHalfWidth, 2.0 * streetFullWidth + 2.0 * distance + halfIslandWidth, 0}
+                        pitchAdjusted,
+                        {x0, 2.0 * streetFullWidth + 2.0 * distance + halfIslandWidth, 0},
+                        {x1, 2.0 * streetFullWidth + 2.0 * distance + halfIslandWidth, 0}
                     ),
                     freeNodes = streetChunksHelper.getFreeNodesLowX(params),
                     snapNodes = streetChunksHelper.getSnapNodesLowX(params)
@@ -498,9 +505,9 @@ function data()
                     params = edgeParams,
                     edges = streetChunksHelper.makeEdges(
                         params.direction,
-                        pitch,
-                        {-streetHalfWidth, - 2.0 * streetFullWidth - 2.0 * distance - halfIslandWidth, 0},
-                        {streetHalfWidth, - 2.0 * streetFullWidth - 2.0 * distance - halfIslandWidth, 0},
+                        pitchAdjusted,
+                        {x1, - 2.0 * streetFullWidth - 2.0 * distance - halfIslandWidth, 0},
+                        {x2, - 2.0 * streetFullWidth - 2.0 * distance - halfIslandWidth, 0},
                         true
                     ),
                     freeNodes = streetChunksHelper.getFreeNodesCentre(params, true),
@@ -511,9 +518,9 @@ function data()
                     params = edgeParams,
                     edges = streetChunksHelper.makeEdges(
                         params.direction,
-                        pitch,
-                        {-streetHalfWidth, -streetFullWidth - distance - halfIslandWidth, 0},
-                        {streetHalfWidth, -streetFullWidth - distance - halfIslandWidth, 0},
+                        pitchAdjusted,
+                        {x1, -streetFullWidth - distance - halfIslandWidth, 0},
+                        {x2, -streetFullWidth - distance - halfIslandWidth, 0},
                         true
                     ),
                     freeNodes = streetChunksHelper.getFreeNodesCentre(params, true),
@@ -524,9 +531,9 @@ function data()
                     params = edgeParams,
                     edges = streetChunksHelper.makeEdges(
                         params.direction,
-                        pitch,
-                        {-streetHalfWidth, halfIslandWidth, 0},
-                        {streetHalfWidth, halfIslandWidth, 0}
+                        pitchAdjusted,
+                        {x1, halfIslandWidth, 0},
+                        {x2, halfIslandWidth, 0}
                     ),
                     freeNodes = streetChunksHelper.getFreeNodesCentre(params),
                     snapNodes = streetChunksHelper.getSnapNodesCentre(params)
@@ -536,9 +543,9 @@ function data()
                     params = edgeParams,
                     edges = streetChunksHelper.makeEdges(
                         params.direction,
-                        pitch,
-                        {-streetHalfWidth, streetFullWidth + distance + halfIslandWidth, 0},
-                        {streetHalfWidth, streetFullWidth + distance + halfIslandWidth, 0}
+                        pitchAdjusted,
+                        {x1, streetFullWidth + distance + halfIslandWidth, 0},
+                        {x2, streetFullWidth + distance + halfIslandWidth, 0}
                     ),
                     freeNodes = streetChunksHelper.getFreeNodesCentre(params),
                     snapNodes = streetChunksHelper.getSnapNodesCentre(params)
@@ -548,9 +555,9 @@ function data()
                     params = edgeParams,
                     edges = streetChunksHelper.makeEdges(
                         params.direction,
-                        pitch,
-                        {-streetHalfWidth, 2.0 * streetFullWidth + 2.0 * distance + halfIslandWidth, 0},
-                        {streetHalfWidth, 2.0 * streetFullWidth + 2.0 * distance + halfIslandWidth, 0}
+                        pitchAdjusted,
+                        {x1, 2.0 * streetFullWidth + 2.0 * distance + halfIslandWidth, 0},
+                        {x2, 2.0 * streetFullWidth + 2.0 * distance + halfIslandWidth, 0}
                     ),
                     freeNodes = streetChunksHelper.getFreeNodesCentre(params),
                     snapNodes = streetChunksHelper.getSnapNodesCentre(params)
@@ -561,9 +568,9 @@ function data()
                     params = edgeParams,
                     edges = streetChunksHelper.makeEdges(
                         params.direction,
-                        pitch,
-                        {streetHalfWidth, - 2.0 * streetFullWidth - 2.0 * distance - halfIslandWidth, 0},
-                        {xMax, - 2.0 * streetFullWidth - 2.0 * distance - halfIslandWidth, 0},
+                        pitchAdjusted,
+                        {x2, - 2.0 * streetFullWidth - 2.0 * distance - halfIslandWidth, 0},
+                        {x3, - 2.0 * streetFullWidth - 2.0 * distance - halfIslandWidth, 0},
                         true
                     ),
                     freeNodes = streetChunksHelper.getFreeNodesHighX(params, true),
@@ -574,9 +581,9 @@ function data()
                     params = edgeParams,
                     edges = streetChunksHelper.makeEdges(
                         params.direction,
-                        pitch,
-                        {streetHalfWidth, -streetFullWidth - distance - halfIslandWidth, 0},
-                        {xMax, -streetFullWidth - distance - halfIslandWidth, 0},
+                        pitchAdjusted,
+                        {x2, -streetFullWidth - distance - halfIslandWidth, 0},
+                        {x3, -streetFullWidth - distance - halfIslandWidth, 0},
                         true
                     ),
                     freeNodes = streetChunksHelper.getFreeNodesHighX(params, true),
@@ -587,9 +594,9 @@ function data()
                     params = edgeParams,
                     edges = streetChunksHelper.makeEdges(
                         params.direction,
-                        pitch,
-                        {streetHalfWidth, halfIslandWidth, 0},
-                        {xMax, halfIslandWidth, 0}
+                        pitchAdjusted,
+                        {x2, halfIslandWidth, 0},
+                        {x3, halfIslandWidth, 0}
                     ),
                     freeNodes = streetChunksHelper.getFreeNodesHighX(params),
                     snapNodes = streetChunksHelper.getSnapNodesHighX(params)
@@ -599,9 +606,9 @@ function data()
                     params = edgeParams,
                     edges = streetChunksHelper.makeEdges(
                         params.direction,
-                        pitch,
-                        {streetHalfWidth, streetFullWidth + distance + halfIslandWidth, 0},
-                        {xMax, streetFullWidth + distance + halfIslandWidth, 0}
+                        pitchAdjusted,
+                        {x2, streetFullWidth + distance + halfIslandWidth, 0},
+                        {x3, streetFullWidth + distance + halfIslandWidth, 0}
                     ),
                     freeNodes = streetChunksHelper.getFreeNodesHighX(params),
                     snapNodes = streetChunksHelper.getSnapNodesHighX(params)
@@ -611,9 +618,9 @@ function data()
                     params = edgeParams,
                     edges = streetChunksHelper.makeEdges(
                         params.direction,
-                        pitch,
-                        {streetHalfWidth, 2.0 * streetFullWidth + 2.0 * distance + halfIslandWidth, 0},
-                        {xMax, 2.0 * streetFullWidth + 2.0 * distance + halfIslandWidth, 0}
+                        pitchAdjusted,
+                        {x2, 2.0 * streetFullWidth + 2.0 * distance + halfIslandWidth, 0},
+                        {x3, 2.0 * streetFullWidth + 2.0 * distance + halfIslandWidth, 0}
                     ),
                     freeNodes = streetChunksHelper.getFreeNodesHighX(params),
                     snapNodes = streetChunksHelper.getSnapNodesHighX(params)
@@ -627,9 +634,9 @@ function data()
                     params = edgeParams,
                     edges = streetChunksHelper.makeEdges(
                         params.direction,
-                        pitch,
-                        {-xMax, - 5.0 * streetHalfWidth - 5.0 * halfDistance - halfIslandWidth, 0},
-                        {-streetHalfWidth, - 5.0 * streetHalfWidth - 5.0 * halfDistance - halfIslandWidth, 0},
+                        pitchAdjusted,
+                        {x0, - 5.0 * streetHalfWidth - 5.0 * halfDistance - halfIslandWidth, 0},
+                        {x1, - 5.0 * streetHalfWidth - 5.0 * halfDistance - halfIslandWidth, 0},
                         true
                     ),
                     freeNodes = streetChunksHelper.getFreeNodesLowX(params, true),
@@ -640,9 +647,9 @@ function data()
                     params = edgeParams,
                     edges = streetChunksHelper.makeEdges(
                         params.direction,
-                        pitch,
-                        {-xMax, - 3.0 * streetHalfWidth - 3.0 * halfDistance - halfIslandWidth, 0},
-                        {-streetHalfWidth, - 3.0 * streetHalfWidth - 3.0 * halfDistance - halfIslandWidth, 0},
+                        pitchAdjusted,
+                        {x0, - 3.0 * streetHalfWidth - 3.0 * halfDistance - halfIslandWidth, 0},
+                        {x1, - 3.0 * streetHalfWidth - 3.0 * halfDistance - halfIslandWidth, 0},
                         true
                     ),
                     freeNodes = streetChunksHelper.getFreeNodesLowX(params, true),
@@ -653,9 +660,9 @@ function data()
                     params = edgeParams,
                     edges = streetChunksHelper.makeEdges(
                         params.direction,
-                        pitch,
-                        {-xMax, -streetHalfWidth - halfDistance - halfIslandWidth, 0},
-                        {-streetHalfWidth, -streetHalfWidth - halfDistance - halfIslandWidth, 0},
+                        pitchAdjusted,
+                        {x0, -streetHalfWidth - halfDistance - halfIslandWidth, 0},
+                        {x1, -streetHalfWidth - halfDistance - halfIslandWidth, 0},
                         true
                     ),
                     freeNodes = streetChunksHelper.getFreeNodesLowX(params, true),
@@ -666,9 +673,9 @@ function data()
                     params = edgeParams,
                     edges = streetChunksHelper.makeEdges(
                         params.direction,
-                        pitch,
-                        {-xMax, streetHalfWidth + halfDistance + halfIslandWidth, 0},
-                        {-streetHalfWidth, streetHalfWidth + halfDistance + halfIslandWidth, 0}
+                        pitchAdjusted,
+                        {x0, streetHalfWidth + halfDistance + halfIslandWidth, 0},
+                        {x1, streetHalfWidth + halfDistance + halfIslandWidth, 0}
                     ),
                     freeNodes = streetChunksHelper.getFreeNodesLowX(params),
                     snapNodes = streetChunksHelper.getSnapNodesLowX(params)
@@ -678,9 +685,9 @@ function data()
                     params = edgeParams,
                     edges = streetChunksHelper.makeEdges(
                         params.direction,
-                        pitch,
-                        {-xMax, 3.0 * streetHalfWidth + 3.0 * halfDistance + halfIslandWidth, 0},
-                        {-streetHalfWidth, 3.0 * streetHalfWidth + 3.0 * halfDistance + halfIslandWidth, 0}
+                        pitchAdjusted,
+                        {x0, 3.0 * streetHalfWidth + 3.0 * halfDistance + halfIslandWidth, 0},
+                        {x1, 3.0 * streetHalfWidth + 3.0 * halfDistance + halfIslandWidth, 0}
                     ),
                     freeNodes = streetChunksHelper.getFreeNodesLowX(params),
                     snapNodes = streetChunksHelper.getSnapNodesLowX(params)
@@ -690,9 +697,9 @@ function data()
                     params = edgeParams,
                     edges = streetChunksHelper.makeEdges(
                         params.direction,
-                        pitch,
-                        {-xMax, 5.0 * streetHalfWidth + 5.0 * halfDistance + halfIslandWidth, 0},
-                        {-streetHalfWidth, 5.0 * streetHalfWidth + 5.0 * halfDistance + halfIslandWidth, 0}
+                        pitchAdjusted,
+                        {x0, 5.0 * streetHalfWidth + 5.0 * halfDistance + halfIslandWidth, 0},
+                        {x1, 5.0 * streetHalfWidth + 5.0 * halfDistance + halfIslandWidth, 0}
                     ),
                     freeNodes = streetChunksHelper.getFreeNodesLowX(params),
                     snapNodes = streetChunksHelper.getSnapNodesLowX(params)
@@ -703,9 +710,9 @@ function data()
                     params = edgeParams,
                     edges = streetChunksHelper.makeEdges(
                         params.direction,
-                        pitch,
-                        {-streetHalfWidth, - 5.0 * streetHalfWidth - 5.0 * halfDistance - halfIslandWidth, 0},
-                        {streetHalfWidth, - 5.0 * streetHalfWidth - 5.0 * halfDistance - halfIslandWidth, 0},
+                        pitchAdjusted,
+                        {x1, - 5.0 * streetHalfWidth - 5.0 * halfDistance - halfIslandWidth, 0},
+                        {x2, - 5.0 * streetHalfWidth - 5.0 * halfDistance - halfIslandWidth, 0},
                         true
                     ),
                     freeNodes = streetChunksHelper.getFreeNodesCentre(params, true),
@@ -716,9 +723,9 @@ function data()
                     params = edgeParams,
                     edges = streetChunksHelper.makeEdges(
                         params.direction,
-                        pitch,
-                        {-streetHalfWidth, - 3.0 * streetHalfWidth - 3.0 * halfDistance - halfIslandWidth, 0},
-                        {streetHalfWidth, - 3.0 * streetHalfWidth - 3.0 * halfDistance - halfIslandWidth, 0},
+                        pitchAdjusted,
+                        {x1, - 3.0 * streetHalfWidth - 3.0 * halfDistance - halfIslandWidth, 0},
+                        {x2, - 3.0 * streetHalfWidth - 3.0 * halfDistance - halfIslandWidth, 0},
                         true
                     ),
                     freeNodes = streetChunksHelper.getFreeNodesCentre(params, true),
@@ -729,9 +736,9 @@ function data()
                     params = edgeParams,
                     edges = streetChunksHelper.makeEdges(
                         params.direction,
-                        pitch,
-                        {-streetHalfWidth, -streetHalfWidth - halfDistance - halfIslandWidth, 0},
-                        {streetHalfWidth, -streetHalfWidth - halfDistance - halfIslandWidth, 0},
+                        pitchAdjusted,
+                        {x1, -streetHalfWidth - halfDistance - halfIslandWidth, 0},
+                        {x2, -streetHalfWidth - halfDistance - halfIslandWidth, 0},
                         true
                     ),
                     freeNodes = streetChunksHelper.getFreeNodesCentre(params, true),
@@ -742,9 +749,9 @@ function data()
                     params = edgeParams,
                     edges = streetChunksHelper.makeEdges(
                         params.direction,
-                        pitch,
-                        {-streetHalfWidth, streetHalfWidth + halfDistance + halfIslandWidth, 0},
-                        {streetHalfWidth, streetHalfWidth + halfDistance + halfIslandWidth, 0}
+                        pitchAdjusted,
+                        {x1, streetHalfWidth + halfDistance + halfIslandWidth, 0},
+                        {x2, streetHalfWidth + halfDistance + halfIslandWidth, 0}
                     ),
                     freeNodes = streetChunksHelper.getFreeNodesCentre(params),
                     snapNodes = streetChunksHelper.getSnapNodesCentre(params)
@@ -754,9 +761,9 @@ function data()
                     params = edgeParams,
                     edges = streetChunksHelper.makeEdges(
                         params.direction,
-                        pitch,
-                        {-streetHalfWidth, 3.0 * streetHalfWidth + 3.0 * halfDistance + halfIslandWidth, 0},
-                        {streetHalfWidth, 3.0 * streetHalfWidth + 3.0 * halfDistance + halfIslandWidth, 0}
+                        pitchAdjusted,
+                        {x1, 3.0 * streetHalfWidth + 3.0 * halfDistance + halfIslandWidth, 0},
+                        {x2, 3.0 * streetHalfWidth + 3.0 * halfDistance + halfIslandWidth, 0}
                     ),
                     freeNodes = streetChunksHelper.getFreeNodesCentre(params),
                     snapNodes = streetChunksHelper.getSnapNodesCentre(params)
@@ -766,9 +773,9 @@ function data()
                     params = edgeParams,
                     edges = streetChunksHelper.makeEdges(
                         params.direction,
-                        pitch,
-                        {-streetHalfWidth, 5.0 * streetHalfWidth + 5.0 * halfDistance + halfIslandWidth, 0},
-                        {streetHalfWidth, 5.0 * streetHalfWidth + 5.0 * halfDistance + halfIslandWidth, 0}
+                        pitchAdjusted,
+                        {x1, 5.0 * streetHalfWidth + 5.0 * halfDistance + halfIslandWidth, 0},
+                        {x2, 5.0 * streetHalfWidth + 5.0 * halfDistance + halfIslandWidth, 0}
                     ),
                     freeNodes = streetChunksHelper.getFreeNodesCentre(params),
                     snapNodes = streetChunksHelper.getSnapNodesCentre(params)
@@ -779,9 +786,9 @@ function data()
                     params = edgeParams,
                     edges = streetChunksHelper.makeEdges(
                         params.direction,
-                        pitch,
-                        {streetHalfWidth, - 5.0 * streetHalfWidth - 5.0 * halfDistance - halfIslandWidth, 0},
-                        {xMax, - 5.0 * streetHalfWidth - 5.0 * halfDistance - halfIslandWidth, 0},
+                        pitchAdjusted,
+                        {x2, - 5.0 * streetHalfWidth - 5.0 * halfDistance - halfIslandWidth, 0},
+                        {x3, - 5.0 * streetHalfWidth - 5.0 * halfDistance - halfIslandWidth, 0},
                         true
                     ),
                     freeNodes = streetChunksHelper.getFreeNodesHighX(params, true),
@@ -792,9 +799,9 @@ function data()
                     params = edgeParams,
                     edges = streetChunksHelper.makeEdges(
                         params.direction,
-                        pitch,
-                        {streetHalfWidth, - 3.0 * streetHalfWidth - 3.0 * halfDistance - halfIslandWidth, 0},
-                        {xMax, - 3.0 * streetHalfWidth - 3.0 * halfDistance - halfIslandWidth, 0},
+                        pitchAdjusted,
+                        {x2, - 3.0 * streetHalfWidth - 3.0 * halfDistance - halfIslandWidth, 0},
+                        {x3, - 3.0 * streetHalfWidth - 3.0 * halfDistance - halfIslandWidth, 0},
                         true
                     ),
                     freeNodes = streetChunksHelper.getFreeNodesHighX(params, true),
@@ -805,9 +812,9 @@ function data()
                     params = edgeParams,
                     edges = streetChunksHelper.makeEdges(
                         params.direction,
-                        pitch,
-                        {streetHalfWidth, -streetHalfWidth - halfDistance - halfIslandWidth, 0},
-                        {xMax, -streetHalfWidth - halfDistance - halfIslandWidth, 0},
+                        pitchAdjusted,
+                        {x2, -streetHalfWidth - halfDistance - halfIslandWidth, 0},
+                        {x3, -streetHalfWidth - halfDistance - halfIslandWidth, 0},
                         true
                     ),
                     freeNodes = streetChunksHelper.getFreeNodesHighX(params, true),
@@ -818,9 +825,9 @@ function data()
                     params = edgeParams,
                     edges = streetChunksHelper.makeEdges(
                         params.direction,
-                        pitch,
-                        {streetHalfWidth, streetHalfWidth + halfDistance + halfIslandWidth, 0},
-                        {xMax, streetHalfWidth + halfDistance + halfIslandWidth, 0}
+                        pitchAdjusted,
+                        {x2, streetHalfWidth + halfDistance + halfIslandWidth, 0},
+                        {x3, streetHalfWidth + halfDistance + halfIslandWidth, 0}
                     ),
                     freeNodes = streetChunksHelper.getFreeNodesHighX(params),
                     snapNodes = streetChunksHelper.getSnapNodesHighX(params)
@@ -830,9 +837,9 @@ function data()
                     params = edgeParams,
                     edges = streetChunksHelper.makeEdges(
                         params.direction,
-                        pitch,
-                        {streetHalfWidth, 3.0 * streetHalfWidth + 3.0 * halfDistance + halfIslandWidth, 0},
-                        {xMax, 3.0 * streetHalfWidth + 3.0 * halfDistance + halfIslandWidth, 0}
+                        pitchAdjusted,
+                        {x2, 3.0 * streetHalfWidth + 3.0 * halfDistance + halfIslandWidth, 0},
+                        {x3, 3.0 * streetHalfWidth + 3.0 * halfDistance + halfIslandWidth, 0}
                     ),
                     freeNodes = streetChunksHelper.getFreeNodesHighX(params),
                     snapNodes = streetChunksHelper.getSnapNodesHighX(params)
@@ -842,9 +849,9 @@ function data()
                     params = edgeParams,
                     edges = streetChunksHelper.makeEdges(
                         params.direction,
-                        pitch,
-                        {streetHalfWidth, 5.0 * streetHalfWidth + 5.0 * halfDistance + halfIslandWidth, 0},
-                        {xMax, 5.0 * streetHalfWidth + 5.0 * halfDistance + halfIslandWidth, 0}
+                        pitchAdjusted,
+                        {x2, 5.0 * streetHalfWidth + 5.0 * halfDistance + halfIslandWidth, 0},
+                        {x3, 5.0 * streetHalfWidth + 5.0 * halfDistance + halfIslandWidth, 0}
                     ),
                     freeNodes = streetChunksHelper.getFreeNodesHighX(params),
                     snapNodes = streetChunksHelper.getSnapNodesHighX(params)
@@ -884,7 +891,7 @@ function data()
             },
             {
                 key = 'howManyStreetsBase0',
-                name = _('Number of streets'),
+                name = _('Number of roads'),
                 values = {_('1'), _('2'), _('3'), _('4'), _('5'), _('6')},
                 defaultIndex = 1
                 -- yearFrom = 1925,
@@ -932,6 +939,18 @@ function data()
                 ),
                 defaultIndex = 0
             },
+            {
+                key = 'extraLength',
+                name = _('Extra Length'),
+                -- values = {_('0m'), _('1m'), _('2m'), _('3m'), _('4m')},
+                values = arrayUtils.map(
+                    streetChunksHelper.getLengths(),
+                    function(length)
+                        return tostring(length) .. 'm'
+                    end
+                ),
+                defaultIndex = 0
+            },
             -- {
             --     key = "terrainAlignment",
             --     name = _("Terrain alignment"),
@@ -975,7 +994,7 @@ function data()
         skipCollision = true,
         --skipCollisionCheck = true,
         updateFn = function(params)
-            local pitch = pitchUtil.adjustParamsPitch(params)
+            local pitchAdjusted = pitchUtil.adjustParamsPitch(params)
             local streetData = streetChunksHelper.getGlobalStreetData(game)[params.streetType_ + 1]
 
             local result = { cost = 0 }
@@ -999,7 +1018,7 @@ function data()
             -- This is required if we want to make them snappable at all, to avoid crashes.
             -- We free all edges, so they can be freely converted to whatever one needs.
             -- We could make a lot of combinations and upgrade them with the construction params instead, but that would be a mess to use.
-            result.edgeLists = _getSnapEdgeLists(params, pitch, streetData, tramTrackType)
+            result.edgeLists = _getSnapEdgeLists(params, pitchAdjusted, streetData, tramTrackType)
 
             -- print('LOLLO edgeLists = ')
             -- luadump(true)(result.edgeLists)

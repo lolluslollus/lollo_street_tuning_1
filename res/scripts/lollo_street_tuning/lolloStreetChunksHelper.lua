@@ -19,6 +19,20 @@ helper.getDistances = function()
     return _distances
 end
 
+local _lengthMultiplier = 10
+local _lengths = {}
+for i = 0, 12 do -- watch out, the parameters have base 0
+    table.insert(_lengths, i * _lengthMultiplier)
+end
+
+helper.getLengthMultiplier = function()
+    return _lengthMultiplier
+end
+
+helper.getLengths = function()
+    return _lengths
+end
+
 -- --------------- global street data ------------------------
 local function _getGameStreetDirPath()
     local gamePath = fileUtils.getGamePath()

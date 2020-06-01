@@ -40,7 +40,7 @@ function data()
         return result
     end
 
-    local function _getSnapEdgeLists(params, pitch, streetData, tramTrackType)
+    local function _getSnapEdgeLists(params, pitchAdjusted, streetData, tramTrackType)
         local streetHalfWidth = _getStreetHalfWidth(streetData)
         local widthFactorBend = _getWidthFactor(streetHalfWidth)
 
@@ -58,7 +58,7 @@ function data()
                 params = edgeParams,
                 edges = streetChunksHelper.makeEdges(
                     params.direction,
-                    pitch,
+                    pitchAdjusted,
                     {-xMax, -widthFactorBend * streetHalfWidth, 0},
                     {0, -widthFactorBend * streetHalfWidth, 0},
                     false,
@@ -80,7 +80,7 @@ function data()
                 params = edgeParams,
                 edges = streetChunksHelper.makeEdges(
                     params.direction,
-                    pitch,
+                    pitchAdjusted,
                     {0, widthFactorBend * streetHalfWidth, 0},
                     {-xMax, widthFactorBend * streetHalfWidth, 0},
                     false,
@@ -197,7 +197,7 @@ function data()
         order = 1242,
         skipCollision = true,
         updateFn = function(params)
-            local pitch = pitchUtil.adjustParamsPitch(params)
+            local pitchAdjusted = pitchUtil.adjustParamsPitch(params)
             local streetData = streetChunksHelper.getGlobalStreetData(game)[params.streetType_ + 1]
 
             local result = { cost = 0 }
@@ -226,7 +226,7 @@ function data()
             -- clicking the bend won't bring up the construction menu (once plopped).
             -- Otherwise, the construction will stay isolated from the rest,
             -- and clicking it will bring up the params menu.
-            result.edgeLists = _getSnapEdgeLists(params, pitch, streetData, tramTrackType)
+            result.edgeLists = _getSnapEdgeLists(params, pitchAdjusted, streetData, tramTrackType)
 
             return result
         end,
