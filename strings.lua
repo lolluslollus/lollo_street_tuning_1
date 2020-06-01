@@ -14,12 +14,12 @@ function data()
 				- Add two lane switchers before and after your roadside stop, with no crossings in between.
 				- Replace the road between them with one of the same width, but an extra lane and maybe extra tram lanes.
 				[h1]Problem B: little control building roads[/h1]
-				This mod adds a "street construction" to build chunks of road with useful parameters. These chunks can be single or multiple, arranged in parallel.
+				This mod adds a "street construction" to build chunks of road with useful parameters. These chunks can be single or multiple, arranged in parallel. Lock them to keep their shape pretty and prevent other roads merging in. Unlock them to treat them like ordinary roads. You cannot relock an unlocked chunk.
 				[h1]Problem C: ugly merges[/h1]
 				This mod adds a "street construction" to build prettier merges. For example, you can merge up to four one-lane streets into a large one, perhaps for a fancy station square arrangement.
 				Merges can be reconfigured after being placed, if the street layout allows it. If a merge misbehaves after an upgrade, change its direction twice (ie reverse and restore) to update it to the latest version.
 				[h1]Problem D: ugly tight curves[/h1]
-				This mod adds a "street construction" to build prettier tight curves.
+				This mod adds a "street construction" to build prettier tight curves. Lock a curve to keep its shape pretty and prevent other roads merging in. Unlock it to treat it like ordinary roads. You cannot relock an unlocked curve.
 				[h1]Problem E: no footpaths[/h1]
 				This mod contains some thin footpaths. You can use them to perform various tricks, eg connecting stations to roads or having people walk across a park. Give them a bus lane to pedestrianise them.
 				[h1]Some handy tips:[/h1]

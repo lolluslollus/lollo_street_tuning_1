@@ -911,7 +911,7 @@ function data()
             {
                 key = 'lockLayoutCentre',
                 name = _('Lock chunks'),
-                tooltip = _('Lock chunks to keep their shape pretty and prevent other roads merging in. Unlock them to treat them like ordinary roads. You cannot relock an unlocked construction.'),
+                tooltip = _('Lock chunks to keep their shape pretty and prevent other roads merging in. Unlock them to treat them like ordinary roads. You cannot relock an unlocked chunk.'),
                 values = {
                     _('No'),
                     _('Yes')

@@ -152,7 +152,7 @@ function data()
             {
                 key = 'lockLayoutCentre',
                 name = _('Lock curve'),
-                tooltip = _('Lock a curve to keep its shape pretty and prevent other roads merging in. Unlock it to treat it like ordinary roads. You cannot relock an unlocked construction.'),
+                tooltip = _('Lock a curve to keep its shape pretty and prevent other roads merging in. Unlock it to treat it like ordinary roads. You cannot relock an unlocked curve.'),
                 values = {
                     _('No'),
                     _('Yes')
