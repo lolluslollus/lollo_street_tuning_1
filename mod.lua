@@ -16,6 +16,10 @@ function data()
                     role = 'CREATOR'
                 }
             }
-        }
+        },
+        runFn = function(_)
+            local streetChunksHelper = require('lollo_street_tuning/lolloStreetChunksHelper')
+            streetChunksHelper.setGlobalStreetData(game)
+        end
     }
 end

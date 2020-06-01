@@ -9,10 +9,29 @@ arrayUtils.arrayHasValue = function(tab, val)
 
     return false
 end
+arrayUtils.addUnique = function(tab, val)
+    if not arrayUtils.arrayHasValue(tab, val) then
+        table.insert(tab, #tab + 1, val)
+    end
+end
 arrayUtils.map = function(arr, func)
     local results = {}
     for i = 1, #arr do
         table.insert(results, #results + 1, func(arr[i]))
+    end
+    return results
+end
+
+arrayUtils.cloneOmittingFields = function(tab, fields2Omit)
+    local results = {}
+    if type(tab) ~= 'table' then return results end
+
+    if type(fields2Omit) ~= 'table' then fields2Omit = {} end
+
+    for key, value in pairs(tab) do
+        if not arrayUtils.arrayHasValue(fields2Omit, key) then
+            results[key] = value
+        end
     end
     return results
 end
@@ -60,6 +79,16 @@ arrayUtils.sort = function(table0, elementName, asc)
     )
 
     return table0
+end
+
+arrayUtils.findIndex = function(tab, fieldName, fieldValueNonNil)
+    if type(tab) ~= 'table' or type(fieldName) ~= 'string' or string.len(fieldName) < 1 or fieldValueNonNil == nil then return -1 end
+
+    for i = 1, #tab do
+        if type(tab[i]) == 'table' and tab[i][fieldName] == fieldValueNonNil then
+            return i
+        end
+    end
 end
 
 return arrayUtils

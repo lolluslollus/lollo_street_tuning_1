@@ -5,7 +5,7 @@ local streetChunksHelper = require('lollo_street_tuning/lolloStreetChunksHelper'
 local streetUtil = require('streetutil')
 local vec3 = require('vec3')
 local pitchUtil = require('lollo_street_tuning/lolloPitchUtil')
--- LOLLO TODO allow bending all roads, not only 1-way
+
 function data()
     local _minRadius = 1.0
     local _maxRadius = 12.0
@@ -110,7 +110,8 @@ function data()
         return edgeLists
     end
 
-    streetChunksHelper.setGlobalStreetDataOneWay(game)
+    local defaultStreetTypeIndex = arrayUtils.findIndex(streetChunksHelper.getGlobalStreetData(game), 'fileName', 'lollo_medium_1_way_1_lane_street.lua') - 1
+    if defaultStreetTypeIndex < 0 then defaultStreetTypeIndex = 0 end
 
     return {
         type = 'STREET_CONSTRUCTION',
@@ -127,12 +128,13 @@ function data()
                 key = 'streetType_',
                 name = _('Street type'),
                 values = arrayUtils.map(
-                    game._lolloStreetDataOneWay,
+                    streetChunksHelper.getGlobalStreetData(game),
                     function(str)
                         return str.name
                     end
                 ),
-                defaultIndex = 0
+                uiType = 'COMBOBOX',
+                defaultIndex = defaultStreetTypeIndex
                 -- yearFrom = 1925,
                 -- yearTo = 0
             },
@@ -147,7 +149,8 @@ function data()
             },
             {
                 key = 'lockLayoutCentre',
-                name = _('Lock curve to keep its shape pretty and prevent other roads merging in. You cannot relock an unlocked construction.'),
+                name = _('Lock curve'),
+                tooltip = _('Lock a curve to keep its shape pretty and prevent other roads merging in. Unlock it to treat it like ordinary roads. You cannot relock an unlocked construction.'),
                 values = {
                     _('No'),
                     _('Yes')
@@ -193,7 +196,7 @@ function data()
         skipCollision = true,
         updateFn = function(params)
             local pitch = pitchUtil.adjustParamsPitch(params)
-            local streetData = game._lolloStreetDataOneWay[params.streetType_ + 1]
+            local streetData = streetChunksHelper.getGlobalStreetData(game)[params.streetType_ + 1]
 
             local result = { cost = 0 }
             result.groundFaces = {}

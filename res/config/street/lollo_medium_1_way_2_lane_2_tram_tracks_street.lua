@@ -20,8 +20,8 @@
         speed = 50.0,
         -- priority = this crashes 4, -- LOLLO NOTE this is copied from airports, it should give priority to this street
         type = 'lollo_medium_1_way_2_lane_2_tram_tracks_street.lua',
-        name = _('Medium 1-way street - 2 lanes - 2 tram tracks'),
-        desc = _('Medium 1-way street with 2 lanes, each with a tram track. Speed limit is %2%.'),
+        name = _('Medium one-way street - 2 tram tracks'),
+        desc = _('Medium one-way street with 2 lanes, each with a tram track. Speed limit is %2%.'),
         categories = {'one-way'},
         borderGroundTex = 'street_border.lua',
         materials = {

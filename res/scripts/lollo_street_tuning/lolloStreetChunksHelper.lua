@@ -146,6 +146,62 @@ local function _getStandardStreetData(streetData) --, chunkedStreetTypes)
     -- This is also more efficient, even if less interesting.
     return {
         {
+            categories = {'urban'},
+            fileName = 'standard/town_small_new.lua',
+            name = 'Small street',
+            sidewalkWidth = 3,
+            streetWidth = 6
+        },
+        {
+            categories = {'urban'},
+            fileName = 'standard/town_medium_new.lua',
+            name = 'Medium street',
+            sidewalkWidth = 4,
+            streetWidth = 8
+        },
+        {
+            categories = {'urban'},
+            fileName = 'standard/town_large_new.lua',
+            name = 'Large street',
+            sidewalkWidth = 4,
+            streetWidth = 16
+        },
+        {
+            categories = {'urban'},
+            fileName = 'standard/town_x_large_new.lua',
+            name = 'Extra-large street',
+            sidewalkWidth = 4,
+            streetWidth = 24
+        },
+        {
+            categories = {'country'},
+            fileName = 'standard/country_small_new.lua',
+            name = 'Small country road',
+            sidewalkWidth = 3,
+            streetWidth = 6
+        },
+        {
+            categories = {'country'},
+            fileName = 'standard/country_medium_new.lua',
+            name = 'Medium country road',
+            sidewalkWidth = 4,
+            streetWidth = 8
+        },
+        {
+            categories = {'country'},
+            fileName = 'standard/country_large_new.lua',
+            name = 'Large country road',
+            sidewalkWidth = 4,
+            streetWidth = 16
+        },
+        {
+            categories = {'country'},
+            fileName = 'standard/country_x_large_new.lua',
+            name = 'Extra-large country road',
+            sidewalkWidth = 4,
+            streetWidth = 24
+        },
+        {
             categories = {'one-way'},
             fileName = 'standard/town_large_one_way_new.lua',
             name = 'Large one-way street',
@@ -200,7 +256,8 @@ local function _getStreetDataFiltered(streetData) --, chunkedStreetTypes)
         -- end
         -- print('LOLLO val1 = ')
         -- dump(true)(val1)
-        if arrayUtils.arrayHasValue(val1.categories, 'one-way') or arrayUtils.arrayHasValue(val1.categories, 'highway') then
+        if arrayUtils.arrayHasValue(val1.categories, 'country') or arrayUtils.arrayHasValue(val1.categories, 'highway')
+        or arrayUtils.arrayHasValue(val1.categories, 'one-way') or arrayUtils.arrayHasValue(val1.categories, 'urban') then
             table.insert(results, #results + 1, val1)
         end
     end
@@ -233,29 +290,27 @@ local function _getStreetDataWithDefaults(streetData) --, chunkedStreetTypes)
     end
 end
 
-helper.getGlobalStreetDataOneWay = function(game)
-    return game._lolloStreetDataOneWay
+helper.getGlobalStreetData = function(game)
+    return game._lolloStreetData
 end
 
-helper.setGlobalStreetDataOneWay = function(game) --, chunkedStreetTypes)
-    if game._lolloStreetDataOneWay == nil then
-        -- print('LOLLO street chunks reading street data')
-        game._lolloStreetDataOneWay = arrayUtils.sort(
-            _getStreetDataWithDefaults(
-                _getStreetDataFiltered(
-                    _getStreetFilesContents(
-                        _getMyStreetDirPath()
-                    )
-                )
-            ),
-            'name'
-           ) --, chunkedStreetTypes)
-        -- print('LOLLO game._lolloStreetDataOneWay has ', type(game._lolloStreetDataOneWay) == 'table' and #(game._lolloStreetDataOneWay) or 0, ' records before the concat')
-        arrayUtils.concatValues(game._lolloStreetDataOneWay, arrayUtils.sort(_getStandardStreetData(), 'name'))
+helper.setGlobalStreetData = function(game) --, chunkedStreetTypes)
+    if game._lolloStreetData ~= nil then return end
+
+    -- print('LOLLO street chunks reading street data')
+    game._lolloStreetData = _getStreetDataWithDefaults(
+        _getStreetDataFiltered(
+            _getStreetFilesContents(
+                _getMyStreetDirPath()
+            )
+        )
+    ) --, chunkedStreetTypes)
+    -- print('LOLLO game._lolloStreetData has ', type(game._lolloStreetData) == 'table' and #(game._lolloStreetData) or 0, ' records before the concat')
+    arrayUtils.concatValues(game._lolloStreetData, _getStandardStreetData())
+    arrayUtils.sort(game._lolloStreetData, 'name')
     -- print('LOLLO street chunks has read street data')
     -- print('LOLLO street data = ')
-    -- dump(true)(game._lolloStreetDataOneWay)
-    end
+    -- dump(true)(game._lolloStreetData)
 end
 
 -- --------------- utils ------------------------
