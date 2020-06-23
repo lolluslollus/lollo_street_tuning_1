@@ -60,10 +60,7 @@ local function _splitEdge(wholeEdge, nodeMid)
 
     proposal.streetProposal.edgesToAdd[1] = edge0
     proposal.streetProposal.edgesToAdd[2] = edge1
-
     proposal.streetProposal.edgesToRemove[1] = wholeEdge.id
-    -- proposal.ignoreErrors = true -- cannot set this
-    -- proposal.streetProposal.ignoreErrors = true -- cannot set this
 
     -- eo = api.type.SimpleStreetProposal.EdgeObject.new()
     -- eo.left = true
@@ -85,7 +82,7 @@ local function _splitEdge(wholeEdge, nodeMid)
 
     local context = api.type.Context:new()
     context.checkTerrainAlignment = false
-    context.cleanupStreetGraph = false -- default is false, it seems to do nothing
+    context.cleanupStreetGraph = true -- default is false, it seems to do nothing
     context.gatherBuildings = false -- buildings are destroyed anyway
     context.gatherFields = true
     context.player = api.engine.util.getPlayer() -- buildings are destroyed anyway
@@ -97,7 +94,7 @@ local function _splitEdge(wholeEdge, nodeMid)
         print(success)
     end
 
-    local cmd = api.cmd.make.buildProposal(proposal, context, true) -- true means, ignore errors
+    local cmd = api.cmd.make.buildProposal(proposal, context, true) -- true means, ignore errors. Errors are not ignored tho: wrong proposals will be discarded
     api.cmd.sendCommand(cmd, callback)
 end
 

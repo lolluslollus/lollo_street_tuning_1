@@ -17,7 +17,7 @@ function data()
         order = 2,
         busAndTramRight = true,
         -- slopeBuildSteps = 1,
-        transportModesStreet = {'TRUCK'}, -- with this, tram tracks appear on all lanes, not only on the right one
+        transportModesStreet = {'TRUCK'},
         embankmentSlopeLow  = .125,
         embankmentSlopeHigh  = 2.5,
         materials = {
