@@ -37,6 +37,11 @@ local function _splitEdge(wholeEdge, nodeMid)
     edge0.comp.tangent0 = api.type.Vec3f.new(wholeEdge.node0tangent[1], wholeEdge.node0tangent[2], wholeEdge.node0tangent[3])
     edge0.comp.tangent1 = api.type.Vec3f.new(nodeMid.tangent[1], nodeMid.tangent[2], nodeMid.tangent[3])
     edge0.comp.tangent1 = api.type.Vec3f.new(wholeEdge.node0tangent[1], wholeEdge.node0tangent[2], wholeEdge.node0tangent[3]) -- LOLLO test
+    edge0.comp.tangent1 = api.type.Vec3f.new(
+        (wholeEdge.node0tangent[1] + wholeEdge.node1tangent[1]) * 0.5,
+        (wholeEdge.node0tangent[2] + wholeEdge.node1tangent[2]) * 0.5,
+        (wholeEdge.node0tangent[3] + wholeEdge.node1tangent[3]) * 0.5
+    ) -- LOLLO test
     edge0.comp.type = 0
     edge0.comp.typeIndex = 0
     -- edge0.comp.objects = {{ -1, 1 }} --
@@ -50,6 +55,11 @@ local function _splitEdge(wholeEdge, nodeMid)
     edge1.comp.node1 = wholeEdge.node1
     edge1.comp.tangent0 = api.type.Vec3f.new(nodeMid.tangent[1], nodeMid.tangent[2], nodeMid.tangent[3])
     edge1.comp.tangent0 = api.type.Vec3f.new(wholeEdge.node1tangent[1], wholeEdge.node1tangent[2], wholeEdge.node1tangent[3]) -- LOLLO test
+    edge0.comp.tangent0 = api.type.Vec3f.new(
+        (wholeEdge.node0tangent[1] + wholeEdge.node1tangent[1]) * 0.5,
+        (wholeEdge.node0tangent[2] + wholeEdge.node1tangent[2]) * 0.5,
+        (wholeEdge.node0tangent[3] + wholeEdge.node1tangent[3]) * 0.5
+    ) -- LOLLO test
     edge1.comp.tangent1 = api.type.Vec3f.new(wholeEdge.node1tangent[1], wholeEdge.node1tangent[2], wholeEdge.node1tangent[3])
     edge1.comp.type = 0
     edge1.comp.typeIndex = 0
