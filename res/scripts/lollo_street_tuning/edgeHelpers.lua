@@ -105,7 +105,6 @@ helper.getNearbyStreetEdges = function(transf)
 
 
     local results = {}
-    debugger()
     local streetTypes = streetUtils.getGlobalStreetData()
     for _, edgeData in pairs(nearbyEdges) do
         -- discard paths and other unsuitable street types

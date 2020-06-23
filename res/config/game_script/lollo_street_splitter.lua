@@ -1,4 +1,4 @@
--- local luadump = require('lollo_street_tuning/luadump')
+local luadump = require('lollo_street_tuning/luadump')
 -- local stringUtils = require('lollo_street_tuning/lolloStringUtils')
 local debugger = require('debugger')
 local edgeUtils = require('lollo_street_tuning.edgeHelpers')
@@ -30,7 +30,6 @@ function data()
         end,
         handleEvent = function(src, id, name, param)
             if (id ~= '__lolloStreetSplitterEvent__') then return end
-            debugger()
             if name ~= 'built' then return end
             if type(param) ~= 'table' or type(param.constructionEntityId) ~= 'number' then return end
 
@@ -38,6 +37,23 @@ function data()
             if type(splitterConstruction) == 'table' and type(splitterConstruction.transf) == 'table' then
                 local nearbyEdges = edgeUtils.getNearbyStreetEdges(splitterConstruction.transf)
                 debugger()
+
+                if #nearbyEdges > 0 then
+                    local edgeMid = edgeUtils.getEdgeBetween(
+                        {
+                            nearbyEdges[1]['node0pos'],
+                            nearbyEdges[1]['node0tangent'],
+                        },
+                        {
+                            nearbyEdges[1]['node1pos'],
+                            nearbyEdges[1]['node1tangent'],
+                        }
+                    )
+                    print('LOLLO edgeMid = ')
+                    debugPrint(edgeMid)
+                    print('LOLLO nearbyEdges[1] = ')
+                    debugPrint(nearbyEdges[1])
+                end
             end
 
 
