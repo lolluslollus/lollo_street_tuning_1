@@ -126,7 +126,7 @@ helper.getYKey = function(y)
     return tostring(y)
 end
 
-helper.getEdgeBetween = function(node0, node1)
+helper.getNodeBetween = function(node0, node1)
     -- local sign = function(n)
     --     return n > 0 and 1 or n < 0 and -1 or 1 --0
     -- end
@@ -217,21 +217,21 @@ helper.getEdgeBetween = function(node0, node1)
     local theta2I = math.atan(tan2I) -- LOLLO TODO find out the quadrant or try to use atan2, which does it automagically
 
     local edge2WithAbsoluteCoordinates = {
-        {
+        position = {
             x0I + ro2 * math.cos(alpha2I - zRotation),
             y0I + ro2 * math.sin(alpha2I - zRotation),
             0
         },
-        {
+        tangent = {
             math.cos(theta2I - zRotation),
             math.sin(theta2I - zRotation),
             0
         }
     }
     -- add Z
-    local z2 = game.interface.getHeight({edge2WithAbsoluteCoordinates[1][1], edge2WithAbsoluteCoordinates[1][2]})
-    edge2WithAbsoluteCoordinates[1][3] = z2
-    edge2WithAbsoluteCoordinates[2][3] = (node0[2][3] + node1[2][3]) * 0.5
+    local z2 = game.interface.getHeight({edge2WithAbsoluteCoordinates.position[1], edge2WithAbsoluteCoordinates.position[2]})
+    edge2WithAbsoluteCoordinates.position[3] = z2
+    edge2WithAbsoluteCoordinates.tangent[3] = (node0[2][3] + node1[2][3]) * 0.5
 
     return edge2WithAbsoluteCoordinates
 end

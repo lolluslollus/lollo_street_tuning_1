@@ -16,6 +16,8 @@ function data()
         categories = { 'paths' },
         order = 3,
         busAndTramRight = true,
+        -- slopeBuildSteps = 1,
+        transportModesStreet = {'TRUCK'},
         embankmentSlopeLow  = 0.0,
         embankmentSlopeHigh  = 9.9,
         materials = {
