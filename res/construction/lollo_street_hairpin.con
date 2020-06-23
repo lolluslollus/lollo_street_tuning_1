@@ -1,11 +1,11 @@
 -- local luadump = require('lollo_street_tuning/luadump')
 -- local inspect = require('inspect')
 local arrayUtils = require('lollo_street_tuning/lolloArrayUtils')
-local edgeUtils = require('lollo_street_tuning/edgeHelpers')
+local streetUtils = require('lollo_street_tuning/lolloStreetUtils')
 local streetChunksHelper = require('lollo_street_tuning/lolloStreetChunksHelper')
 local streetUtil = require('streetutil')
 local vec3 = require('vec3')
-local pitchUtil = require('lollo_street_tuning/lolloPitchUtil')
+local pitchUtil = require('lollo_street_tuning/lolloPitchHelpers')
 
 function data()
     local function _getStreetHalfWidth(streetData)
@@ -103,7 +103,7 @@ function data()
         return edgeLists
     end
 
-    local defaultStreetTypeIndex = arrayUtils.findIndex(streetChunksHelper.getGlobalStreetData(game), 'fileName', 'lollo_medium_1_way_1_lane_street.lua') - 1
+    local defaultStreetTypeIndex = arrayUtils.findIndex(streetUtils.getGlobalStreetData(), 'fileName', 'lollo_medium_1_way_1_lane_street.lua') - 1
     if defaultStreetTypeIndex < 0 then defaultStreetTypeIndex = 0 end
 
     return {
@@ -121,7 +121,7 @@ function data()
                 key = 'streetType_',
                 name = _('Street type'),
                 values = arrayUtils.map(
-                    streetChunksHelper.getGlobalStreetData(game),
+                    streetUtils.getGlobalStreetData(),
                     function(str)
                         return str.name
                     end
@@ -182,7 +182,7 @@ function data()
         skipCollision = true,
         updateFn = function(params)
             local pitchAdjusted = pitchUtil.adjustParamsPitch(params)
-            local streetData = streetChunksHelper.getGlobalStreetData(game)[params.streetType_ + 1]
+            local streetData = streetUtils.getGlobalStreetData()[params.streetType_ + 1]
 
             local result = { cost = 0 }
             result.groundFaces = {}

@@ -17,9 +17,10 @@ function data()
                 }
             }
         },
-        runFn = function(_)
-            local streetChunksHelper = require('lollo_street_tuning/lolloStreetChunksHelper')
-            streetChunksHelper.setGlobalStreetData(game)
-        end
+        -- unlike runFn, postRunFn runs after resources have been loaded
+        -- postRunFn = function(_)
+        --     local streetUtils = require('lollo_street_tuning/lolloStreetUtils')
+        --     streetUtils.setGlobalStreetData()
+        -- end
     }
 end

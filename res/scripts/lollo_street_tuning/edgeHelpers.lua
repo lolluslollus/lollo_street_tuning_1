@@ -1,8 +1,8 @@
 local arrayUtils = require('lollo_street_tuning.lolloArrayUtils')
 local matrixUtils = require('lollo_street_tuning.matrix')
-local streetUtils = require('lollo_street_tuning.lolloStreetChunksHelper')
+local streetUtils = require('lollo_street_tuning.lolloStreetUtils')
 local transfUtils = require('lollo_street_tuning.transfUtils')
--- local debugger = require('debugger')
+local debugger = require('debugger')
 local luadump = require('lollo_street_tuning/luadump')
 
 if math.atan2 == nil then
@@ -105,7 +105,8 @@ helper.getNearbyStreetEdges = function(transf)
 
 
     local results = {}
-    local streetTypes = streetUtils.getGlobalStreetData(game)
+    debugger()
+    local streetTypes = streetUtils.getGlobalStreetData()
     for _, edgeData in pairs(nearbyEdges) do
         -- discard paths and other unsuitable street types
         if not edgeData.track and edgeData.streetType then

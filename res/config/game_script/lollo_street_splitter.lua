@@ -41,7 +41,6 @@ function data()
             end
 
 
-            
 
 
             game.interface.bulldoze(param.constructionEntityId)

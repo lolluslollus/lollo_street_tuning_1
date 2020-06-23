@@ -1,7 +1,7 @@
 local luadump = require('lollo_street_tuning/luadump')
 -- local laneutil = require('laneutil')
 local edgeUtils = require('lollo_street_tuning/edgeHelpers')
-local pitchUtil = require('lollo_street_tuning/lolloPitchUtil')
+local pitchUtil = require('lollo_street_tuning/lolloPitchHelpers')
 -- local transf = require 'transf'
 -- LOLLO TODO see if you can ease the pain when reconfiguring an existing merger. maybe skip collisions? It is not enough.
 local function _getHasBus(params)
