@@ -1,0 +1,69 @@
+-- local dump = require('lollo_street_tuning/luadump')
+local vec3 = require 'vec3'
+local transf = require 'transf'
+
+function data()
+    return {
+        type = 'STREET_CONSTRUCTION',
+        description = {
+            name = _('Street Splitter NEW'),
+            description = _(
+                'Splits a street in two sections. Place it and then remove it to create a lane switching point. Place different types of streets or roads between and outside switching points to route road vehicles on different lanes.'
+            )
+        },
+        availability = {
+            yearFrom = 0,
+            yearTo = 0
+        },
+        order = 1,
+        collider = {
+            type = 'NONE'
+        },
+        autoRemovable = true,
+        skipCollision = true,
+        skipCollisionCheck = true,
+        updateFn = function(params)
+            -- print('lollo street splitter updateFn')
+            -- dump(true)(params)
+
+            local result = {}
+            result.colliders = {}
+            result.cost = 0
+            result.edgeLists = {}
+            result.models = {}
+            --		result.groundFaces = {}
+            --		result.h0 = {}
+            --		result.h1 = {}
+            result.collider = {
+                type = 'NONE'
+            }
+            result.autoRemovable = true
+            result.skipCollision = true
+            result.skipCollisionCheck = true
+            --		result.stations = {}
+            --		result.terminalGroups = {}
+            --		result.terrainAlignmentLists = {}
+
+            table.insert(
+                result.models,
+                {
+                    --id = "asset/icon/marker_exclamation.mdl",
+                    --id = "asset/icon/mark.mdl",
+                    --id = "station/street/mark.mdl",
+                    id = 'lollo_assets/mark.mdl',
+                    collider = {
+                        type = 'NONE'
+                    },
+                    autoRemovable = true,
+                    skipCollision = true,
+                    skipCollisionCheck = true,
+                    transf = transf.transl(vec3.new(0.0, 0.0, .0))
+                }
+            )
+
+            return result
+        end,
+        upgradeFn = function(_)
+        end
+    }
+end

@@ -1,6 +1,7 @@
 -- local luadump = require('lollo_street_tuning/luadump')
 -- local stringUtils = require('lollo_street_tuning/lolloStringUtils')
 local debugger = require('debugger')
+local edgeUtils = require('lollo_street_tuning.edgeHelpers')
 
 local function _isBuildingStreetSplitter(param)
     local toAdd =
@@ -28,10 +29,20 @@ function data()
         ini = function()
         end,
         handleEvent = function(src, id, name, param)
-            if (id ~= '__splitterEvent__') then return end
+            if (id ~= '__lolloStreetSplitterEvent__') then return end
             debugger()
             if name ~= 'built' then return end
             if type(param) ~= 'table' or type(param.constructionEntityId) ~= 'number' then return end
+
+            local splitterConstruction = game.interface.getEntity(param.constructionEntityId)
+            if type(splitterConstruction) == 'table' and type(splitterConstruction.transf) == 'table' then
+                local nearbyEdges = edgeUtils.getNearbyStreetEdges(splitterConstruction.transf)
+                debugger()
+            end
+
+
+            
+
 
             game.interface.bulldoze(param.constructionEntityId)
         end,
@@ -118,7 +129,7 @@ function data()
         ]]
                     -- game.interface.bulldoze(constructionEntity.id) -- cannot call it from this thread, so I raise and call it in the worker thread
                     game.interface.sendScriptEvent(
-                        '__splitterEvent__',
+                        '__lolloStreetSplitterEvent__',
                         'built',
                         {
                             constructionEntityId = param.result[1] --constructionEntity.id

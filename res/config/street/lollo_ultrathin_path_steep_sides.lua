@@ -15,6 +15,7 @@ function data()
         desc = _("Ultrathin path with a speed limit of %2%, give it a bus lane to pedestrianise it."),
         categories = { 'paths' },
         order = 3,
+        busAndTramRight = true,
         embankmentSlopeLow  = 0.0,
         embankmentSlopeHigh  = 9.9,
         materials = {

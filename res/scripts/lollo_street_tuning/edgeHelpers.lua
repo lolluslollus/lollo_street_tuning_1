@@ -1,6 +1,7 @@
-local _constants = require('lollo_street_tuning/constants')
-local matrixUtils = require('lollo_street_tuning/matrix')
-local transfUtils = require('lollo_street_tuning/transfUtils')
+local arrayUtils = require('lollo_street_tuning.lolloArrayUtils')
+local matrixUtils = require('lollo_street_tuning.matrix')
+local streetUtils = require('lollo_street_tuning.lolloStreetChunksHelper')
+local transfUtils = require('lollo_street_tuning.transfUtils')
 -- local debugger = require('debugger')
 local luadump = require('lollo_street_tuning/luadump')
 
@@ -63,7 +64,8 @@ helper.getNearbyStreetEdges = function(transf)
     if type(transf) ~= 'table' then return {} end
 
     -- debugger()
-    local edgeSearchRadius = _constants.xMax * _constants.xTransfFactor -- * 0.7071
+    -- local edgeSearchRadius = _constants.xMax * _constants.xTransfFactor -- * 0.7071
+    local edgeSearchRadius = 0.0
     local squareCentrePosition = transfUtils.getVec123Transformed({0, 0, 0}, transf)
     local nearbyEdges = game.interface.getEntities(
         {pos = squareCentrePosition, radius = edgeSearchRadius},
@@ -103,12 +105,13 @@ helper.getNearbyStreetEdges = function(transf)
 
 
     local results = {}
-    for _, v in pairs(nearbyEdges) do
-        -- LOLLO TODO make it discard paths and other unsuitable street types
-        -- edges contain a field like:
-        -- "streetType" = "standard/country_small_new.lua",
-        if not v.track and v.streetType then
-            table.insert(results, v)
+    local streetTypes = streetUtils.getGlobalStreetData(game)
+    for _, edgeData in pairs(nearbyEdges) do
+        -- discard paths and other unsuitable street types
+        if not edgeData.track and edgeData.streetType then
+            if arrayUtils.findIndex(streetTypes, 'fileName', edgeData.streetType) > -1 then
+                table.insert(results, edgeData)
+            end
         end
     end
 

@@ -7,7 +7,7 @@ local edgeUtils = require('lollo_street_tuning/edgeHelpers')
 local fileUtils = require('lollo_street_tuning/lolloFileUtils')
 local pitchUtil = require('lollo_street_tuning/lolloPitchUtil')
 local stringUtils = require('lollo_street_tuning/lolloStringUtils')
-
+local debugger = require('debugger')
 local helper = {}
 
 -- --------------- parameters ------------------------
@@ -305,21 +305,40 @@ local function _getStreetDataWithDefaults(streetData) --, chunkedStreetTypes)
     end
 end
 
+local function _getStreetTypes()
+    local results = {}
+    local streetTypes = api.res.streetTypeRep.getAll()
+    for ii, fileName in ipairs(streetTypes) do
+        local streetParams = api.res.streetTypeRep.get(ii)
+        results[#results+1] = {
+            categories = streetParams.categories,
+            fileName = fileName,
+            icon = streetParams.icon,
+            name = streetParams.name,
+            sidewalkWidth = streetParams.sidewalkWidth,
+            streetWidth = streetParams.streetWidth
+        }
+    end
+    return results
+end
+
 helper.getGlobalStreetData = function(game)
     return game._lolloStreetData
 end
 
 helper.setGlobalStreetData = function(game) --, chunkedStreetTypes)
     if game._lolloStreetData ~= nil then return end
-
+debugger()
     -- print('LOLLO street chunks reading street data')
-    game._lolloStreetData = _getStreetDataWithDefaults(
-        _getStreetDataFiltered(
-            _getStreetFilesContents(
-                _getMyStreetDirPath()
-            )
-        )
-    ) --, chunkedStreetTypes)
+    -- game._lolloStreetData = _getStreetDataWithDefaults(
+    --     _getStreetDataFiltered(
+    --         _getStreetFilesContents(
+    --             _getMyStreetDirPath()
+    --         )
+    --     )
+    -- ) --, chunkedStreetTypes)
+
+    game._lolloStreetData = _getStreetDataFiltered(_getStreetTypes())
     -- print('LOLLO game._lolloStreetData has ', type(game._lolloStreetData) == 'table' and #(game._lolloStreetData) or 0, ' records before the concat')
     arrayUtils.concatValues(game._lolloStreetData, _getStandardStreetData())
     arrayUtils.sort(game._lolloStreetData, 'name')
