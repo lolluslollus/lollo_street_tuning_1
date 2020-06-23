@@ -1,22 +1,13 @@
 -- local luadump = require('lollo_street_tuning/luadump')
 -- local inspect = require('inspect')
 local arrayUtils = require('lollo_street_tuning/lolloArrayUtils')
+local edgeUtils = require('lollo_street_tuning/edgeHelpers')
 local streetChunksHelper = require('lollo_street_tuning/lolloStreetChunksHelper')
 local streetUtil = require('streetutil')
 local vec3 = require('vec3')
 local pitchUtil = require('lollo_street_tuning/lolloPitchUtil')
 
 function data()
-    local _minRadius = 1.0
-    local _maxRadius = 12.0
-    local function _getRadiusParamValues()
-        local result = {}
-        for i = _minRadius, _maxRadius do
-            table.insert(result, #result + 1, tostring(i))
-        end
-        return result
-    end
-
     local function _getStreetHalfWidth(streetData)
         return streetData.sidewalkWidth + streetData.streetWidth * 0.5
     end
@@ -62,8 +53,8 @@ function data()
                     {-xMax, -widthFactorBend * streetHalfWidth, 0},
                     {0, -widthFactorBend * streetHalfWidth, 0},
                     false,
-                    {1, 0, 0},
-                    {1, 0, 0}
+                    {xMax, 0, 0},
+                    {xMax, 0, 0}
                 ),
                 freeNodes = streetChunksHelper.getFreeNodesLowX(params),
                 snapNodes = streetChunksHelper.getSnapNodesLowX(params)
@@ -84,8 +75,8 @@ function data()
                     {0, widthFactorBend * streetHalfWidth, 0},
                     {-xMax, widthFactorBend * streetHalfWidth, 0},
                     false,
-                    {-1, 0, 0},
-                    {-1, 0, 0}
+                    {-xMax, 0, 0},
+                    {-xMax, 0, 0}
                 ),
                 freeNodes = streetChunksHelper.getFreeNodesHighX(params),
                 snapNodes = streetChunksHelper.getSnapNodesHighX(params)
@@ -179,13 +170,6 @@ function data()
                 },
                 defaultIndex = 2
             },
-            -- {
-            --     key = 'radius',
-            --     name = _('Radius'),
-            --     values = _getRadiusParamValues(),
-            --     defaultIndex = _minRadius,
-            --     uiType = 'SLIDER'
-            -- },
             {
                 key = 'pitch',
                 name = _('Pitch (adjust it with O and P while building)'),

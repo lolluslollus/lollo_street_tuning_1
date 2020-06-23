@@ -1,5 +1,6 @@
 local luadump = require('lollo_street_tuning/luadump')
 -- local laneutil = require('laneutil')
+local edgeUtils = require('lollo_street_tuning/edgeHelpers')
 local pitchUtil = require('lollo_street_tuning/lolloPitchUtil')
 -- local transf = require 'transf'
 -- LOLLO TODO see if you can ease the pain when reconfiguring an existing merger. maybe skip collisions? It is not enough.
@@ -13,6 +14,12 @@ local function _getTramTrackType(params)
 end
 
 local function _makeEdges(params, node0, node1, tan0, tan1)
+    if tan0 == nil or tan1 == nil then
+        local edgeLength = edgeUtils.getVectorLength({node1[1] - node0[1], node1[2] - node0[2], node1[3] - node0[3]})
+        if tan0 == nil then tan0 = {edgeLength, 0, 0} end
+        if tan1 == nil then tan1 = {edgeLength, 0, 0} end
+    end
+
     return params.direction == 0 and
         {
             {pitchUtil.getXYZPitched(params.pitch, node0), tan0}, -- node 0
@@ -77,8 +84,7 @@ local function updateFn_2_1_lane_narrow_sidewalk_to_2_lane_one_way(params)
         }
     }
 
-    -- does not pull, neither do hasBusLane, busLane or hasBus, with true or false
-    -- LOLLO TODO try hasBus with true or false, across the app, after the update has been released
+    -- LOLLO NOTE hasBus has no effect, neither do hasBusLane, busLane or hasBus, with true or false
     -- local busLaneType = params.busLane and (({'NO', 'YES'})[params.busLane + 1]) or 'NO'
     local tramTrackType = _getTramTrackType(params)
     local hasBus = _getHasBus(params)
@@ -93,7 +99,7 @@ local function updateFn_2_1_lane_narrow_sidewalk_to_2_lane_one_way(params)
                 type = 'lollo_medium_1_way_1_lane_street_narrow_sidewalk.lua',
                 tramTrackType = tramTrackType
             },
-            edges = _makeEdges(params, {-4, -2, .0}, {-2, -2, .0}, {1, .0, .0}, {1, .0, .0}),
+            edges = _makeEdges(params, {-4, -2, .0}, {-2, -2, .0}),
             -- edgeType = "BRIDGE", "TUNNEL"
             -- edgeTypeName = "cement.lua",
             --freeNodes = { 0, 1 },
@@ -112,7 +118,7 @@ local function updateFn_2_1_lane_narrow_sidewalk_to_2_lane_one_way(params)
                 type = 'lollo_medium_1_way_1_lane_street_narrow_sidewalk.lua',
                 tramTrackType = tramTrackType
             },
-            edges = _makeEdges(params, {-4, 2, 0}, {-2, 2, 0}, {1, 0, 0}, {1, 0, 0}),
+            edges = _makeEdges(params, {-4, 2, 0}, {-2, 2, 0}),
             freeNodes = params.direction == 0 and {0} or {1},
             snapNodes = params.snapNodes == 0 and {} or (params.direction == 0 and {0} or {1})
         },
@@ -124,7 +130,7 @@ local function updateFn_2_1_lane_narrow_sidewalk_to_2_lane_one_way(params)
                 type = 'lollo_internal_1_way_1_lane_street_no_sidewalk.lua',
                 tramTrackType = tramTrackType
             },
-            edges = _makeEdges(params, {-1.8, 2, 0}, {1.8, 2, 0}, {1, 0, 0}, {1, 0, 0}),
+            edges = _makeEdges(params, {-1.8, 2, 0}, {1.8, 2, 0}),
             freeNodes = {},
             snapNodes = {}
         },
@@ -136,7 +142,7 @@ local function updateFn_2_1_lane_narrow_sidewalk_to_2_lane_one_way(params)
                 type = 'lollo_internal_1_way_1_lane_street_no_sidewalk.lua',
                 tramTrackType = tramTrackType
             },
-            edges = _makeEdges(params, {-1.8, -2, 0}, {1.8, -2, 0}, {1, 0, 0}, {1, 0, 0}),
+            edges = _makeEdges(params, {-1.8, -2, 0}, {1.8, -2, 0}),
             freeNodes = {},
             snapNodes = {}
         },
@@ -148,7 +154,7 @@ local function updateFn_2_1_lane_narrow_sidewalk_to_2_lane_one_way(params)
                 type = tramTrackType == 'NO' and 'standard/town_medium_one_way_new.lua' or 'lollo_medium_1_way_2_lane_2_tram_tracks_street.lua',
                 tramTrackType = tramTrackType
             },
-            edges = _makeEdges(params, {2, 0, 0}, {6, 0, 0}, {1, 0, 0}, {1, 0, 0}),
+            edges = _makeEdges(params, {2, 0, 0}, {6, 0, 0}),
             freeNodes = params.direction == 0 and {1} or {0},
             snapNodes = params.snapNodes == 0 and {} or (params.direction == 0 and {1} or {0})
         }
@@ -206,7 +212,7 @@ local function updateFn_2_1_lane_narrow_sidewalk_to_2_lane(params)
                 type = 'lollo_medium_1_way_1_lane_street_narrow_sidewalk.lua',
                 tramTrackType = tramTrackType
             },
-            edges = _makeEdges(params, {-4, -2, .0}, {-2, -2, .0}, {1, .0, .0}, {1, .0, .0}),
+            edges = _makeEdges(params, {-4, -2, .0}, {-2, -2, .0}),
             freeNodes = params.direction == 0 and {0} or {1},
             snapNodes = params.snapNodes == 0 and {} or (params.direction == 0 and {0} or {1})
         },
@@ -217,7 +223,7 @@ local function updateFn_2_1_lane_narrow_sidewalk_to_2_lane(params)
                 type = 'lollo_medium_1_way_1_lane_street_narrow_sidewalk.lua',
                 tramTrackType = tramTrackType
             },
-            edges = _makeEdges(params, {-2, 2, 0}, {-4, 2, 0}, {-1, 0, 0}, {-1, 0, 0}),
+            edges = _makeEdges(params, {-2, 2, 0}, {-4, 2, 0}, {-2, 0, 0}, {-2, 0, 0}),
             freeNodes = params.direction == 0 and {1} or {0},
             snapNodes = params.snapNodes == 0 and {} or (params.direction == 0 and {1} or {0})
         },
@@ -228,7 +234,7 @@ local function updateFn_2_1_lane_narrow_sidewalk_to_2_lane(params)
                 type = 'lollo_internal_1_way_1_lane_street_no_sidewalk.lua',
                 tramTrackType = tramTrackType
             },
-            edges = _makeEdges(params, {-1.8, -2, 0}, {1.8, -2, 0}, {1, 0, 0}, {1, 0, 0}),
+            edges = _makeEdges(params, {-1.8, -2, 0}, {1.8, -2, 0}),
             freeNodes = {},
             snapNodes = {}
         },
@@ -239,7 +245,7 @@ local function updateFn_2_1_lane_narrow_sidewalk_to_2_lane(params)
                 type = 'lollo_internal_1_way_1_lane_street_no_sidewalk.lua',
                 tramTrackType = tramTrackType
             },
-            edges = _makeEdges(params, {1.8, 2, 0}, {-1.8, 2, 0}, {-1, 0, 0}, {-1, 0, 0}),
+            edges = _makeEdges(params, {1.8, 2, 0}, {-1.8, 2, 0}, {-3.6, 0, 0}, {-3.6, 0, 0}),
             freeNodes = {},
             snapNodes = {}
         },
@@ -251,7 +257,7 @@ local function updateFn_2_1_lane_narrow_sidewalk_to_2_lane(params)
                 type = 'standard/town_medium_new.lua',
                 tramTrackType = tramTrackType
             },
-            edges = _makeEdges(params, {2, 0, 0}, {6, 0, 0}, {1, 0, 0}, {1, 0, 0}),
+            edges = _makeEdges(params, {2, 0, 0}, {6, 0, 0}),
             freeNodes = params.direction == 0 and {1} or {0},
             snapNodes = params.snapNodes == 0 and {} or (params.direction == 0 and {1} or {0})
         }
@@ -307,7 +313,7 @@ local function updateFn_2_1_lane_medium_sidewalk_to_2_lane_one_way(params)
                 type = 'lollo_medium_1_way_1_lane_street.lua',
                 tramTrackType = tramTrackType
             },
-            edges = _makeEdges(params, {-4, -4, 0}, {-2, -4, 0}, {1, 0, 0}, {1, 0, 0}),
+            edges = _makeEdges(params, {-4, -4, 0}, {-2, -4, 0}),
             freeNodes = params.direction == 0 and {0} or {1},
             snapNodes = params.snapNodes == 0 and {} or (params.direction == 0 and {0} or {1})
         },
@@ -318,7 +324,7 @@ local function updateFn_2_1_lane_medium_sidewalk_to_2_lane_one_way(params)
                 type = 'lollo_medium_1_way_1_lane_street.lua',
                 tramTrackType = tramTrackType
             },
-            edges = _makeEdges(params, {-4, 4, 0}, {-2, 4, 0}, {1, 0, 0}, {1, 0, 0}),
+            edges = _makeEdges(params, {-4, 4, 0}, {-2, 4, 0}),
             freeNodes = params.direction == 0 and {0} or {1},
             snapNodes = params.snapNodes == 0 and {} or (params.direction == 0 and {0} or {1})
         },
@@ -352,7 +358,7 @@ local function updateFn_2_1_lane_medium_sidewalk_to_2_lane_one_way(params)
                 tramTrackType = tramTrackType
             },
             -- this could be shortened to x = 2 to x = 6, but it dumps with no messages
-            edges = _makeEdges(params, {2, 0, 0}, {8, 0, 0}, {1, 0, 0}, {1, 0, 0}),
+            edges = _makeEdges(params, {2, 0, 0}, {8, 0, 0}),
             freeNodes = params.direction == 0 and {1} or {0},
             snapNodes = params.snapNodes == 0 and {} or (params.direction == 0 and {1} or {0})
         }
@@ -410,7 +416,7 @@ local function updateFn_2_1_lane_medium_sidewalk_to_2_lane(params)
                 type = 'lollo_medium_1_way_1_lane_street.lua',
                 tramTrackType = tramTrackType
             },
-            edges = _makeEdges(params, {-4, -4, 0}, {-2, -4, 0}, {1, 0, 0}, {1, 0, 0}),
+            edges = _makeEdges(params, {-4, -4, 0}, {-2, -4, 0}),
             freeNodes = params.direction == 0 and {0} or {1},
             snapNodes = params.snapNodes == 0 and {} or (params.direction == 0 and {0} or {1})
         },
@@ -421,7 +427,7 @@ local function updateFn_2_1_lane_medium_sidewalk_to_2_lane(params)
                 type = 'lollo_medium_1_way_1_lane_street.lua',
                 tramTrackType = tramTrackType
             },
-            edges = _makeEdges(params, {-2, 4, 0}, {-4, 4, 0}, {-1, 0, 0}, {-1, 0, 0}),
+            edges = _makeEdges(params, {-2, 4, 0}, {-4, 4, 0}, {-2, 0, 0}, {-2, 0, 0}),
             freeNodes = params.direction == 0 and {1} or {0},
             snapNodes = params.snapNodes == 0 and {} or (params.direction == 0 and {1} or {0})
         },
@@ -456,7 +462,7 @@ local function updateFn_2_1_lane_medium_sidewalk_to_2_lane(params)
                 tramTrackType = tramTrackType
             },
             -- this could be shortened to x = 2 to x = 6, but it dumps with no messages
-            edges = _makeEdges(params, {2, 0, 0}, {8, 0, 0}, {1, 0, 0}, {1, 0, 0}),
+            edges = _makeEdges(params, {2, 0, 0}, {8, 0, 0}),
             freeNodes = params.direction == 0 and {1} or {0},
             snapNodes = params.snapNodes == 0 and {} or (params.direction == 0 and {1} or {0})
         }
@@ -512,7 +518,7 @@ local function updateFn_3_1_lane_narrow_sidewalk_to_3_lane_one_way(params)
                 type = 'lollo_medium_1_way_1_lane_street_narrow_sidewalk.lua',
                 tramTrackType = tramTrackType
             },
-            edges = _makeEdges(params, {-4, -4, 0}, {-2, -4, 0}, {1, 0, 0}, {1, 0, 0}),
+            edges = _makeEdges(params, {-4, -4, 0}, {-2, -4, 0}),
             freeNodes = params.direction == 0 and {0} or {1},
             snapNodes = params.snapNodes == 0 and {} or (params.direction == 0 and {0} or {1})
         },
@@ -523,7 +529,7 @@ local function updateFn_3_1_lane_narrow_sidewalk_to_3_lane_one_way(params)
                 type = 'lollo_medium_1_way_1_lane_street_narrow_sidewalk.lua',
                 tramTrackType = tramTrackType
             },
-            edges = _makeEdges(params, {-4, 0, 0}, {-2, 0, 0}, {1, 0, 0}, {1, 0, 0}),
+            edges = _makeEdges(params, {-4, 0, 0}, {-2, 0, 0}),
             freeNodes = params.direction == 0 and {0} or {1},
             snapNodes = params.snapNodes == 0 and {} or (params.direction == 0 and {0} or {1})
         },
@@ -534,7 +540,7 @@ local function updateFn_3_1_lane_narrow_sidewalk_to_3_lane_one_way(params)
                 type = 'lollo_medium_1_way_1_lane_street_narrow_sidewalk.lua',
                 tramTrackType = tramTrackType
             },
-            edges = _makeEdges(params, {-4, 4, 0}, {-2, 4, 0}, {1, 0, 0}, {1, 0, 0}),
+            edges = _makeEdges(params, {-4, 4, 0}, {-2, 4, 0}),
             freeNodes = params.direction == 0 and {0} or {1},
             snapNodes = params.snapNodes == 0 and {} or (params.direction == 0 and {0} or {1})
         },
@@ -545,7 +551,7 @@ local function updateFn_3_1_lane_narrow_sidewalk_to_3_lane_one_way(params)
                 type = 'lollo_internal_1_way_1_lane_street_no_sidewalk.lua',
                 tramTrackType = tramTrackType
             },
-            edges = _makeEdges(params, {-1.8, 4, 0}, {1.8, 4, 0}, {1, 0, 0}, {1, 0, 0}),
+            edges = _makeEdges(params, {-1.8, 4, 0}, {1.8, 4, 0}),
             freeNodes = {},
             snapNodes = {}
         },
@@ -556,7 +562,7 @@ local function updateFn_3_1_lane_narrow_sidewalk_to_3_lane_one_way(params)
                 type = 'lollo_internal_1_way_1_lane_street_no_sidewalk.lua',
                 tramTrackType = tramTrackType
             },
-            edges = _makeEdges(params, {-1.8, 0, 0}, {1.8, 0, 0}, {1, 0, 0}, {1, 0, 0}),
+            edges = _makeEdges(params, {-1.8, 0, 0}, {1.8, 0, 0}),
             freeNodes = {},
             snapNodes = {}
         },
@@ -567,7 +573,7 @@ local function updateFn_3_1_lane_narrow_sidewalk_to_3_lane_one_way(params)
                 type = 'lollo_internal_1_way_1_lane_street_no_sidewalk.lua',
                 tramTrackType = tramTrackType
             },
-            edges = _makeEdges(params, {-1.8, -4, 0}, {1.8, -4, 0}, {1, 0, 0}, {1, 0, 0}),
+            edges = _makeEdges(params, {-1.8, -4, 0}, {1.8, -4, 0}),
             freeNodes = {},
             snapNodes = {}
         },
@@ -578,7 +584,7 @@ local function updateFn_3_1_lane_narrow_sidewalk_to_3_lane_one_way(params)
                 type = tramTrackType == 'NO' and 'lollo_medium_1_way_3_lane_street.lua' or 'lollo_medium_1_way_3_lane_3_tram_tracks_street.lua',
                 tramTrackType = tramTrackType
             },
-            edges = _makeEdges(params, {2, 0, 0}, {6, 0, 0}, {1, 0, 0}, {1, 0, 0}),
+            edges = _makeEdges(params, {2, 0, 0}, {6, 0, 0}),
             freeNodes = params.direction == 0 and {1} or {0},
             snapNodes = params.snapNodes == 0 and {} or (params.direction == 0 and {1} or {0})
         }
@@ -634,7 +640,7 @@ local function updateFn_3_1_lane_medium_sidewalk_to_3_lane_one_way(params)
                 type = 'lollo_medium_1_way_1_lane_street.lua',
                 tramTrackType = tramTrackType
             },
-            edges = _makeEdges(params, {-8, -8, 0}, {-6, -8, 0}, {1, 0, 0}, {1, 0, 0}),
+            edges = _makeEdges(params, {-8, -8, 0}, {-6, -8, 0}),
             freeNodes = params.direction == 0 and {0} or {1},
             snapNodes = params.snapNodes == 0 and {} or (params.direction == 0 and {0} or {1})
         },
@@ -645,7 +651,7 @@ local function updateFn_3_1_lane_medium_sidewalk_to_3_lane_one_way(params)
                 type = 'lollo_medium_1_way_1_lane_street.lua',
                 tramTrackType = tramTrackType
             },
-            edges = _makeEdges(params, {-8, 0, 0}, {-6, 0, 0}, {1, 0, 0}, {1, 0, 0}),
+            edges = _makeEdges(params, {-8, 0, 0}, {-6, 0, 0}),
             freeNodes = params.direction == 0 and {0} or {1},
             snapNodes = params.snapNodes == 0 and {} or (params.direction == 0 and {0} or {1})
         },
@@ -656,7 +662,7 @@ local function updateFn_3_1_lane_medium_sidewalk_to_3_lane_one_way(params)
                 type = 'lollo_medium_1_way_1_lane_street.lua',
                 tramTrackType = tramTrackType
             },
-            edges = _makeEdges(params, {-8, 8, 0}, {-6, 8, 0}, {1, 0, 0}, {1, 0, 0}),
+            edges = _makeEdges(params, {-8, 8, 0}, {-6, 8, 0}),
             freeNodes = params.direction == 0 and {0} or {1},
             snapNodes = params.snapNodes == 0 and {} or (params.direction == 0 and {0} or {1})
         },
@@ -678,7 +684,7 @@ local function updateFn_3_1_lane_medium_sidewalk_to_3_lane_one_way(params)
                 type = 'lollo_internal_1_way_1_lane_street_no_sidewalk.lua',
                 tramTrackType = tramTrackType
             },
-            edges = _makeEdges(params, {-5.8, 0, 0}, {1.8, 0, 0}, {1, 0, 0}, {1, 0, 0}),
+            edges = _makeEdges(params, {-5.8, 0, 0}, {1.8, 0, 0}),
             freeNodes = {},
             snapNodes = {}
         },
@@ -701,7 +707,7 @@ local function updateFn_3_1_lane_medium_sidewalk_to_3_lane_one_way(params)
                 tramTrackType = tramTrackType
             },
             -- this could be shortened to x = 2 to x = 6, but it dumps with no messages
-            edges = _makeEdges(params, {2, 0, 0}, {8, 0, 0}, {1, 0, 0}, {1, 0, 0}),
+            edges = _makeEdges(params, {2, 0, 0}, {8, 0, 0}),
             freeNodes = params.direction == 0 and {1} or {0},
             snapNodes = params.snapNodes == 0 and {} or (params.direction == 0 and {1} or {0})
         }
@@ -757,7 +763,7 @@ local function updateFn_4_1_lane_narrow_sidewalk_to_4_lane_one_way(params)
                 type = 'lollo_medium_1_way_1_lane_street_narrow_sidewalk.lua',
                 tramTrackType = tramTrackType
             },
-            edges = _makeEdges(params, {-8, -6, 0}, {-6, -6, 0}, {1, 0, 0}, {1, 0, 0}),
+            edges = _makeEdges(params, {-8, -6, 0}, {-6, -6, 0}),
             freeNodes = params.direction == 0 and {0} or {1},
             snapNodes = params.snapNodes == 0 and {} or (params.direction == 0 and {0} or {1})
         },
@@ -768,7 +774,7 @@ local function updateFn_4_1_lane_narrow_sidewalk_to_4_lane_one_way(params)
                 type = 'lollo_medium_1_way_1_lane_street_narrow_sidewalk.lua',
                 tramTrackType = tramTrackType
             },
-            edges = _makeEdges(params, {-8, -2, 0}, {-6, -2, 0}, {1, 0, 0}, {1, 0, 0}),
+            edges = _makeEdges(params, {-8, -2, 0}, {-6, -2, 0}),
             freeNodes = params.direction == 0 and {0} or {1},
             snapNodes = params.snapNodes == 0 and {} or (params.direction == 0 and {0} or {1})
         },
@@ -779,7 +785,7 @@ local function updateFn_4_1_lane_narrow_sidewalk_to_4_lane_one_way(params)
                 type = 'lollo_medium_1_way_1_lane_street_narrow_sidewalk.lua',
                 tramTrackType = tramTrackType
             },
-            edges = _makeEdges(params, {-8, 2, 0}, {-6, 2, 0}, {1, 0, 0}, {1, 0, 0}),
+            edges = _makeEdges(params, {-8, 2, 0}, {-6, 2, 0}),
             freeNodes = params.direction == 0 and {0} or {1},
             snapNodes = params.snapNodes == 0 and {} or (params.direction == 0 and {0} or {1})
         },
@@ -790,7 +796,7 @@ local function updateFn_4_1_lane_narrow_sidewalk_to_4_lane_one_way(params)
                 type = 'lollo_medium_1_way_1_lane_street_narrow_sidewalk.lua',
                 tramTrackType = tramTrackType
             },
-            edges = _makeEdges(params, {-8, 6, 0}, {-6, 6, 0}, {1, 0, 0}, {1, 0, 0}),
+            edges = _makeEdges(params, {-8, 6, 0}, {-6, 6, 0}),
             freeNodes = params.direction == 0 and {0} or {1},
             snapNodes = params.snapNodes == 0 and {} or (params.direction == 0 and {0} or {1})
         },
@@ -846,7 +852,7 @@ local function updateFn_4_1_lane_narrow_sidewalk_to_4_lane_one_way(params)
                 tramTrackType = tramTrackType
             },
             -- this could be shortened to x = 2 to x = 6, but it dumps with no messages
-            edges = _makeEdges(params, {2, 0, 0}, {8, 0, 0}, {1, 0, 0}, {1, 0, 0}),
+            edges = _makeEdges(params, {2, 0, 0}, {8, 0, 0}),
             freeNodes = params.direction == 0 and {1} or {0},
             snapNodes = params.snapNodes == 0 and {} or (params.direction == 0 and {1} or {0})
         }
@@ -904,7 +910,7 @@ local function updateFn_4_1_lane_narrow_sidewalk_to_4_lane(params)
                 type = 'lollo_medium_1_way_1_lane_street_narrow_sidewalk.lua',
                 tramTrackType = tramTrackType
             },
-            edges = _makeEdges(params, {-8, -6, 0}, {-6, -6, 0}, {1, 0, 0}, {1, 0, 0}),
+            edges = _makeEdges(params, {-8, -6, 0}, {-6, -6, 0}),
             freeNodes = params.direction == 0 and {0} or {1},
             snapNodes = params.snapNodes == 0 and {} or (params.direction == 0 and {0} or {1})
         },
@@ -915,7 +921,7 @@ local function updateFn_4_1_lane_narrow_sidewalk_to_4_lane(params)
                 type = 'lollo_medium_1_way_1_lane_street_narrow_sidewalk.lua',
                 tramTrackType = tramTrackType
             },
-            edges = _makeEdges(params, {-8, -2, 0}, {-6, -2, 0}, {1, 0, 0}, {1, 0, 0}),
+            edges = _makeEdges(params, {-8, -2, 0}, {-6, -2, 0}),
             freeNodes = params.direction == 0 and {0} or {1},
             snapNodes = params.snapNodes == 0 and {} or (params.direction == 0 and {0} or {1})
         },
@@ -926,7 +932,7 @@ local function updateFn_4_1_lane_narrow_sidewalk_to_4_lane(params)
                 type = 'lollo_medium_1_way_1_lane_street_narrow_sidewalk.lua',
                 tramTrackType = tramTrackType
             },
-            edges = _makeEdges(params, {-6, 2, 0}, {-8, 2, 0}, {-1, 0, 0}, {-1, 0, 0}),
+            edges = _makeEdges(params, {-6, 2, 0}, {-8, 2, 0}, {-2, 0, 0}, {-2, 0, 0}),
             freeNodes = params.direction == 0 and {1} or {0},
             snapNodes = params.snapNodes == 0 and {} or (params.direction == 0 and {1} or {0})
         },
@@ -937,7 +943,7 @@ local function updateFn_4_1_lane_narrow_sidewalk_to_4_lane(params)
                 type = 'lollo_medium_1_way_1_lane_street_narrow_sidewalk.lua',
                 tramTrackType = tramTrackType
             },
-            edges = _makeEdges(params, {-6, 6, 0}, {-8, 6, 0}, {-1, 0, 0}, {-1, 0, 0}),
+            edges = _makeEdges(params, {-6, 6, 0}, {-8, 6, 0}, {-2, 0, 0}, {-2, 0, 0}),
             freeNodes = params.direction == 0 and {1} or {0},
             snapNodes = params.snapNodes == 0 and {} or (params.direction == 0 and {1} or {0})
         },
@@ -993,7 +999,7 @@ local function updateFn_4_1_lane_narrow_sidewalk_to_4_lane(params)
                 tramTrackType = tramTrackType
             },
             -- this could be shortened to x = 2 to x = 6, but it dumps with no messages
-            edges = _makeEdges(params, {2, 0, 0}, {8, 0, 0}, {1, 0, 0}, {1, 0, 0}),
+            edges = _makeEdges(params, {2, 0, 0}, {8, 0, 0}),
             freeNodes = params.direction == 0 and {1} or {0},
             snapNodes = params.snapNodes == 0 and {} or (params.direction == 0 and {1} or {0})
         }
@@ -1051,7 +1057,7 @@ local function updateFn_4_1_lane_narrow_sidewalk_to_4_lane_large(params)
                 type = 'lollo_medium_1_way_1_lane_street_narrow_sidewalk.lua',
                 tramTrackType = tramTrackType
             },
-            edges = _makeEdges(params, {-4, -6, 0}, {-2, -6, 0}, {1, 0, 0}, {1, 0, 0}),
+            edges = _makeEdges(params, {-4, -6, 0}, {-2, -6, 0}),
             freeNodes = params.direction == 0 and {0} or {1},
             snapNodes = params.snapNodes == 0 and {} or (params.direction == 0 and {0} or {1})
         },
@@ -1062,7 +1068,7 @@ local function updateFn_4_1_lane_narrow_sidewalk_to_4_lane_large(params)
                 type = 'lollo_medium_1_way_1_lane_street_narrow_sidewalk.lua',
                 tramTrackType = tramTrackType
             },
-            edges = _makeEdges(params, {-4, -2, 0}, {-2, -2, 0}, {1, 0, 0}, {1, 0, 0}),
+            edges = _makeEdges(params, {-4, -2, 0}, {-2, -2, 0}),
             freeNodes = params.direction == 0 and {0} or {1},
             snapNodes = params.snapNodes == 0 and {} or (params.direction == 0 and {0} or {1})
         },
@@ -1073,7 +1079,7 @@ local function updateFn_4_1_lane_narrow_sidewalk_to_4_lane_large(params)
                 type = 'lollo_medium_1_way_1_lane_street_narrow_sidewalk.lua',
                 tramTrackType = tramTrackType
             },
-            edges = _makeEdges(params, {-2, 2, 0}, {-4, 2, 0}, {-1, 0, 0}, {-1, 0, 0}),
+            edges = _makeEdges(params, {-2, 2, 0}, {-4, 2, 0}, {-2, 0, 0}, {-2, 0, 0}),
             freeNodes = params.direction == 0 and {1} or {0},
             snapNodes = params.snapNodes == 0 and {} or (params.direction == 0 and {1} or {0})
         },
@@ -1084,7 +1090,7 @@ local function updateFn_4_1_lane_narrow_sidewalk_to_4_lane_large(params)
                 type = 'lollo_medium_1_way_1_lane_street_narrow_sidewalk.lua',
                 tramTrackType = tramTrackType
             },
-            edges = _makeEdges(params, {-2, 6, 0}, {-4, 6, 0}, {-1, 0, 0}, {-1, 0, 0}),
+            edges = _makeEdges(params, {-2, 6, 0}, {-4, 6, 0}, {-2, 0, 0}, {-2, 0, 0}),
             freeNodes = params.direction == 0 and {1} or {0},
             snapNodes = params.snapNodes == 0 and {} or (params.direction == 0 and {1} or {0})
         },
@@ -1095,7 +1101,7 @@ local function updateFn_4_1_lane_narrow_sidewalk_to_4_lane_large(params)
                 type = 'lollo_internal_1_way_1_lane_street_no_sidewalk.lua',
                 tramTrackType = tramTrackType
             },
-            edges = _makeEdges(params, {-1.8, -6, 0}, {1.8, -6, 0}, {1, 0, 0}, {1, 0, 0}),
+            edges = _makeEdges(params, {-1.8, -6, 0}, {1.8, -6, 0}),
             freeNodes = {},
             snapNodes = {}
         },
@@ -1106,7 +1112,7 @@ local function updateFn_4_1_lane_narrow_sidewalk_to_4_lane_large(params)
                 type = 'lollo_internal_1_way_1_lane_street_no_sidewalk.lua',
                 tramTrackType = tramTrackType
             },
-            edges = _makeEdges(params, {-1.8, -2, 0}, {1.8, -2, 0}, {1, 0, 0}, {1, 0, 0}),
+            edges = _makeEdges(params, {-1.8, -2, 0}, {1.8, -2, 0}),
             freeNodes = {},
             snapNodes = {}
         },
@@ -1117,7 +1123,7 @@ local function updateFn_4_1_lane_narrow_sidewalk_to_4_lane_large(params)
                 type = 'lollo_internal_1_way_1_lane_street_no_sidewalk.lua',
                 tramTrackType = tramTrackType
             },
-            edges = _makeEdges(params, {1.8, 2, 0}, {-1.8, 2, 0}, {-1, 0, 0}, {-1, 0, 0}),
+            edges = _makeEdges(params, {1.8, 2, 0}, {-1.8, 2, 0}, {-3.6, 0, 0}, {-3.6, 0, 0}),
             freeNodes = {},
             snapNodes = {}
         },
@@ -1128,7 +1134,7 @@ local function updateFn_4_1_lane_narrow_sidewalk_to_4_lane_large(params)
                 type = 'lollo_internal_1_way_1_lane_street_no_sidewalk.lua',
                 tramTrackType = tramTrackType
             },
-            edges = _makeEdges(params, {1.8, 6, 0}, {-1.8, 6, 0}, {-1, 0, 0}, {-1, 0, 0}),
+            edges = _makeEdges(params, {1.8, 6, 0}, {-1.8, 6, 0}, {-3.6, 0, 0}, {-3.6, 0, 0}),
             freeNodes = {},
             snapNodes = {}
         },
@@ -1139,7 +1145,7 @@ local function updateFn_4_1_lane_narrow_sidewalk_to_4_lane_large(params)
                 type = tramTrackType == 'NO' and 'standard/town_large_new.lua' or 'lollo_large_4_lane_4_tram_tracks_street.lua',
                 tramTrackType = tramTrackType
             },
-            edges = _makeEdges(params, {2, 0, 0}, {8, 0, 0}, {1, 0, 0}, {1, 0, 0}),
+            edges = _makeEdges(params, {2, 0, 0}, {8, 0, 0}),
             freeNodes = params.direction == 0 and {1} or {0},
             snapNodes = params.snapNodes == 0 and {} or (params.direction == 0 and {1} or {0})
         }
@@ -1195,7 +1201,7 @@ local function updateFn_2_2_lane_one_way_medium_sidewalk_to_6_lane_x_large(param
                 type = tramTrackType == 'NO' and 'lollo_medium_1_way_2_lane_medium_sidewalk_street.lua' or 'lollo_medium_1_way_2_lane_2_tram_tracks_medium_sidewalk_street.lua',
                 tramTrackType = tramTrackType
             },
-            edges = _makeEdges(params, {-10, -8, 0}, {-6, -8, 0}, {1, 0, 0}, {1, 0, 0}),
+            edges = _makeEdges(params, {-10, -8, 0}, {-6, -8, 0}),
             freeNodes = params.direction == 0 and {0} or {1},
             snapNodes = params.snapNodes == 0 and {} or (params.direction == 0 and {0} or {1})
         },
@@ -1206,7 +1212,7 @@ local function updateFn_2_2_lane_one_way_medium_sidewalk_to_6_lane_x_large(param
                 type = tramTrackType == 'NO' and 'lollo_medium_1_way_2_lane_medium_sidewalk_street.lua' or 'lollo_medium_1_way_2_lane_2_tram_tracks_medium_sidewalk_street.lua',
                 tramTrackType = tramTrackType
             },
-            edges = _makeEdges(params, {-6, 8, 0}, {-10, 8, 0}, {-1, 0, 0}, {-1, 0, 0}),
+            edges = _makeEdges(params, {-6, 8, 0}, {-10, 8, 0}, {-4, 0, 0}, {-4, 0, 0}),
             freeNodes = params.direction == 0 and {1} or {0},
             snapNodes = params.snapNodes == 0 and {} or (params.direction == 0 and {1} or {0})
         },
@@ -1283,7 +1289,7 @@ local function updateFn_2_2_lane_one_way_medium_sidewalk_to_6_lane_x_large(param
                 type = tramTrackType == 'NO' and 'standard/town_x_large_new.lua' or 'lollo_x_large_6_tram_tracks_street.lua',
                 tramTrackType = tramTrackType
             },
-            edges = _makeEdges(params, {2, 0, 0}, {10, 0, 0}, {1, 0, 0}, {1, 0, 0}),
+            edges = _makeEdges(params, {2, 0, 0}, {10, 0, 0}),
             freeNodes = params.direction == 0 and {1} or {0},
             snapNodes = params.snapNodes == 0 and {} or (params.direction == 0 and {1} or {0})
         }
@@ -1341,7 +1347,7 @@ local function updateFn_2_2_lane_one_way_to_6_lane_x_large(params)
                 type = tramTrackType == 'NO' and 'standard/town_medium_one_way_new.lua' or 'lollo_medium_1_way_2_lane_2_tram_tracks_street.lua',
                 tramTrackType = tramTrackType
             },
-            edges = _makeEdges(params, {-6, -8, 0}, {-2, -8, 0}, {1, 0, 0}, {1, 0, 0}),
+            edges = _makeEdges(params, {-6, -8, 0}, {-2, -8, 0}),
             freeNodes = params.direction == 0 and {0} or {1},
             snapNodes = params.snapNodes == 0 and {} or (params.direction == 0 and {0} or {1})
         },
@@ -1352,7 +1358,7 @@ local function updateFn_2_2_lane_one_way_to_6_lane_x_large(params)
                 type = tramTrackType == 'NO' and 'standard/town_medium_one_way_new.lua' or 'lollo_medium_1_way_2_lane_2_tram_tracks_street.lua',
                 tramTrackType = tramTrackType
             },
-            edges = _makeEdges(params, {-2, 8, 0}, {-6, 8, 0}, {-1, 0, 0}, {-1, 0, 0}),
+            edges = _makeEdges(params, {-2, 8, 0}, {-6, 8, 0}, {-4, 0, 0}, {-4, 0, 0}),
             freeNodes = params.direction == 0 and {1} or {0},
             snapNodes = params.snapNodes == 0 and {} or (params.direction == 0 and {1} or {0})
         },
@@ -1363,7 +1369,7 @@ local function updateFn_2_2_lane_one_way_to_6_lane_x_large(params)
                 type = 'lollo_internal_1_way_1_lane_street_no_sidewalk.lua',
                 tramTrackType = tramTrackType
             },
-            edges = _makeEdges(params, {-1.8, -10, 0}, {1.8, -10, 0}, {1, 0, 0}, {1, 0, 0}),
+            edges = _makeEdges(params, {-1.8, -10, 0}, {1.8, -10, 0}),
             freeNodes = {},
             snapNodes = {}
         },
@@ -1374,7 +1380,7 @@ local function updateFn_2_2_lane_one_way_to_6_lane_x_large(params)
                 type = 'lollo_internal_1_way_1_lane_street_no_sidewalk.lua',
                 tramTrackType = tramTrackType
             },
-            edges = _makeEdges(params, {-1.8, -6, 0}, {1.8, -6, 0}, {1, 0, 0}, {1, 0, 0}),
+            edges = _makeEdges(params, {-1.8, -6, 0}, {1.8, -6, 0}),
             freeNodes = {},
             snapNodes = {}
         },
@@ -1408,7 +1414,7 @@ local function updateFn_2_2_lane_one_way_to_6_lane_x_large(params)
                 type = 'lollo_internal_1_way_1_lane_street_no_sidewalk.lua',
                 tramTrackType = tramTrackType
             },
-            edges = _makeEdges(params, {1.8, 6, 0}, {-1.8, 6, 0}, {-1, 0, 0}, {-1, 0, 0}),
+            edges = _makeEdges(params, {1.8, 6, 0}, {-1.8, 6, 0}, {-3.6, 0, 0}, {-3.6, 0, 0}),
             freeNodes = {},
             snapNodes = {}
         },
@@ -1419,7 +1425,7 @@ local function updateFn_2_2_lane_one_way_to_6_lane_x_large(params)
                 type = 'lollo_internal_1_way_1_lane_street_no_sidewalk.lua',
                 tramTrackType = tramTrackType
             },
-            edges = _makeEdges(params, {1.8, 10, 0}, {-1.8, 10, 0}, {-1, 0, 0}, {-1, 0, 0}),
+            edges = _makeEdges(params, {1.8, 10, 0}, {-1.8, 10, 0}, {-3.6, 0, 0}, {-3.6, 0, 0}),
             freeNodes = {},
             snapNodes = {}
         },
@@ -1430,7 +1436,7 @@ local function updateFn_2_2_lane_one_way_to_6_lane_x_large(params)
                 type = tramTrackType == 'NO' and 'standard/town_x_large_new.lua' or 'lollo_x_large_6_tram_tracks_street.lua',
                 tramTrackType = tramTrackType
             },
-            edges = _makeEdges(params, {2, 0, 0}, {10, 0, 0}, {1, 0, 0}, {1, 0, 0}),
+            edges = _makeEdges(params, {2, 0, 0}, {10, 0, 0}),
             freeNodes = params.direction == 0 and {1} or {0},
             snapNodes = params.snapNodes == 0 and {} or (params.direction == 0 and {1} or {0})
         }
@@ -1488,7 +1494,7 @@ local function updateFn_Motorway_2_2_lane_one_way_to_6_lane_x_large(params)
                 type = tramTrackType == 'NO' and 'standard/country_medium_one_way_new.lua' or 'lollo_medium_1_way_2_lane_2_tram_tracks_country_road.lua',
                 tramTrackType = tramTrackType
             },
-            edges = _makeEdges(params, {-6, -8, 0}, {-2, -8, 0}, {1, 0, 0}, {1, 0, 0}),
+            edges = _makeEdges(params, {-6, -8, 0}, {-2, -8, 0}),
             freeNodes = params.direction == 0 and {0} or {1},
             snapNodes = params.snapNodes == 0 and {} or (params.direction == 0 and {0} or {1})
         },
@@ -1499,7 +1505,7 @@ local function updateFn_Motorway_2_2_lane_one_way_to_6_lane_x_large(params)
                 type = tramTrackType == 'NO' and 'standard/country_medium_one_way_new.lua' or 'lollo_medium_1_way_2_lane_2_tram_tracks_country_road.lua',
                 tramTrackType = tramTrackType
             },
-            edges = _makeEdges(params, {-2, 8, 0}, {-6, 8, 0}, {-1, 0, 0}, {-1, 0, 0}),
+            edges = _makeEdges(params, {-2, 8, 0}, {-6, 8, 0}, {-4, 0, 0}, {-4, 0, 0}),
             freeNodes = params.direction == 0 and {1} or {0},
             snapNodes = params.snapNodes == 0 and {} or (params.direction == 0 and {1} or {0})
         },
@@ -1510,7 +1516,7 @@ local function updateFn_Motorway_2_2_lane_one_way_to_6_lane_x_large(params)
                 type = 'lollo_internal_1_way_1_lane_street_no_sidewalk.lua',
                 tramTrackType = tramTrackType
             },
-            edges = _makeEdges(params, {-1.8, -10, 0}, {1.8, -10, 0}, {1, 0, 0}, {1, 0, 0}),
+            edges = _makeEdges(params, {-1.8, -10, 0}, {1.8, -10, 0}),
             freeNodes = {},
             snapNodes = {}
         },
@@ -1521,7 +1527,7 @@ local function updateFn_Motorway_2_2_lane_one_way_to_6_lane_x_large(params)
                 type = 'lollo_internal_1_way_1_lane_street_no_sidewalk.lua',
                 tramTrackType = tramTrackType
             },
-            edges = _makeEdges(params, {-1.8, -6, 0}, {1.8, -6, 0}, {1, 0, 0}, {1, 0, 0}),
+            edges = _makeEdges(params, {-1.8, -6, 0}, {1.8, -6, 0}),
             freeNodes = {},
             snapNodes = {}
         },
@@ -1532,7 +1538,7 @@ local function updateFn_Motorway_2_2_lane_one_way_to_6_lane_x_large(params)
                 type = 'lollo_internal_1_way_1_lane_street_no_sidewalk.lua',
                 tramTrackType = tramTrackType
             },
-            edges = _makeEdges(params, {1.8, 6, 0}, {-1.8, 6, 0}, {-1, 0, 0}, {-1, 0, 0}),
+            edges = _makeEdges(params, {1.8, 6, 0}, {-1.8, 6, 0}, {-3.6, 0, 0}, {-3.6, 0, 0}),
             freeNodes = {},
             snapNodes = {}
         },
@@ -1543,7 +1549,7 @@ local function updateFn_Motorway_2_2_lane_one_way_to_6_lane_x_large(params)
                 type = 'lollo_internal_1_way_1_lane_street_no_sidewalk.lua',
                 tramTrackType = tramTrackType
             },
-            edges = _makeEdges(params, {1.8, 10, 0}, {-1.8, 10, 0}, {-1, 0, 0}, {-1, 0, 0}),
+            edges = _makeEdges(params, {1.8, 10, 0}, {-1.8, 10, 0}, {-3.6, 0, 0}, {-3.6, 0, 0}),
             freeNodes = {},
             snapNodes = {}
         },
@@ -1554,7 +1560,7 @@ local function updateFn_Motorway_2_2_lane_one_way_to_6_lane_x_large(params)
                 type = 'standard/country_x_large_new.lua',
                 tramTrackType = tramTrackType
             },
-            edges = _makeEdges(params, {2, 0, 0}, {10, 0, 0}, {1, 0, 0}, {1, 0, 0}),
+            edges = _makeEdges(params, {2, 0, 0}, {10, 0, 0}),
             freeNodes = params.direction == 0 and {1} or {0},
             snapNodes = params.snapNodes == 0 and {} or (params.direction == 0 and {1} or {0})
         }

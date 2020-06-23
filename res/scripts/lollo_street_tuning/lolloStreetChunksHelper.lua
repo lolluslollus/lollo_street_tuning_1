@@ -3,6 +3,7 @@
 -- local vec3 = require 'vec3'
 -- local transf = require 'transf'
 local arrayUtils = require('lollo_street_tuning/lolloArrayUtils')
+local edgeUtils = require('lollo_street_tuning/edgeHelpers')
 local fileUtils = require('lollo_street_tuning/lolloFileUtils')
 local pitchUtil = require('lollo_street_tuning/lolloPitchUtil')
 local stringUtils = require('lollo_street_tuning/lolloStringUtils')
@@ -338,8 +339,11 @@ helper.makeEdges = function(direction, pitch, node0, node1, isRightOfIsland, tan
     --         {pitchUtil.getXYZPitched(pitch, {-2, -3, .0}), {-1, .0, .0}}, -- node 0
     --         {pitchUtil.getXYZPitched(pitch, {-6, -3, .0}), {-1, .0, .0}} -- node 1
     --     }
-    if tan0 == nil then tan0 = {1, 0, 0} end
-    if tan1 == nil then tan1 = {1, 0, 0} end
+    if tan0 == nil or tan1 == nil then
+        local edgeLength = edgeUtils.getVectorLength({node1[1] - node0[1], node1[2] - node0[2], node1[3] - node0[3]})
+        if tan0 == nil then tan0 = {edgeLength, 0, 0} end
+        if tan1 == nil then tan1 = {edgeLength, 0, 0} end
+    end
 
     if direction == 0 or (direction == 2 and isRightOfIsland) then return
         {
