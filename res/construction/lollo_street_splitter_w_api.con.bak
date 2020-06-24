@@ -6,9 +6,9 @@ function data()
     return {
         type = 'STREET_CONSTRUCTION',
         description = {
-            name = _('Street Splitter NEW'),
+            name = _('Street splitter with API'),
             description = _(
-                'Splits a street in two sections. Place it and then remove it to create a lane switching point. Place different types of streets or roads between and outside switching points to route road vehicles on different lanes.'
+                'Splits a street in two sections. Place it carefully on the roadside to create a lane switching point. Help yourself with <m> and <n>. Place different types of streets or roads between and outside switching points to route road vehicles on different lanes.'
             )
         },
         availability = {

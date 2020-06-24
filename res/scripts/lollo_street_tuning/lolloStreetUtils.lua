@@ -236,18 +236,11 @@ local function _getStandardStreetData(streetData) --, chunkedStreetTypes)
     }
 end
 
-local function _getStreetDataFiltered(streetData) --, chunkedStreetTypes)
-    if type(streetData) ~= 'table' then return nil end
+local function _getStreetDataFiltered(streetData)
+    if type(streetData) ~= 'table' then return {} end
 
     local results = {}
     for _, val1 in pairs(streetData) do
-        -- for _, val2 in pairs(chunkedStreetTypes) do
-        --     if val1.type == val2 then
-        --         table.insert(results, #results + 1, val1)
-        --     end
-        -- end
-        -- print('LOLLO val1 = ')
-        -- dump(true)(val1)
         if arrayUtils.arrayHasValue(val1.categories, 'country') or arrayUtils.arrayHasValue(val1.categories, 'highway')
         or arrayUtils.arrayHasValue(val1.categories, 'one-way') or arrayUtils.arrayHasValue(val1.categories, 'urban') then
             table.insert(results, #results + 1, val1)
@@ -256,7 +249,7 @@ local function _getStreetDataFiltered(streetData) --, chunkedStreetTypes)
     return results
 end
 
-local function _getStreetDataWithDefaults(streetData) --, chunkedStreetTypes)
+local function _getStreetDataWithDefaults(streetData)
     -- print('LOLLO streetData has type = ', type(streetData))
     if type(streetData) == 'table' and #streetData > 0 then
         return streetData
@@ -289,8 +282,8 @@ local function _cloneCategories(tab)
     return results
 end
 
-local function _getStreetTypes()
-    if not api or not api.res or not api.res.streetTypeRep then return nil end
+local function _getStreetTypesWithApi()
+    if not api or not api.res or not api.res.streetTypeRep then return {} end
 
     local results = {}
     local streetTypes = api.res.streetTypeRep.getAll()
@@ -308,40 +301,35 @@ local function _getStreetTypes()
     return results
 end
 
-local function _initLolloStreetData()
+local function _initLolloStreetDataWithApi()
     if game._lolloStreetData == nil or (type(game._lolloStreetData) == 'table' and #game._lolloStreetData < 1) then
-        game._lolloStreetData = _getStreetDataFiltered(_getStreetTypes())
+        game._lolloStreetData = _getStreetDataFiltered(_getStreetTypesWithApi())
         arrayUtils.sort(game._lolloStreetData, 'name')
 
-        print('LOLLO street data initialised, it has', #(game._lolloStreetData or {}), 'records')
+        print('LOLLO street data initialised with api, it has', #(game._lolloStreetData or {}), 'records and type = ', type(game._lolloStreetData))
+    end
+end
+
+local function _initLolloStreetDataWithFiles()
+    if game._lolloStreetData == nil or (type(game._lolloStreetData) == 'table' and #game._lolloStreetData < 1) then
+        game._lolloStreetData = _getStreetDataWithDefaults(
+            _getStreetDataFiltered(
+                _getStreetFilesContents(
+                    _getMyStreetDirPath()
+                )
+            )
+        )
+
+        arrayUtils.sort(game._lolloStreetData, 'name')
+
+        print('LOLLO street data initialised with files, it has', #(game._lolloStreetData or {}), 'records and type = ', type(game._lolloStreetData))
     end
 end
 
 helper.getGlobalStreetData = function()
-    _initLolloStreetData()
+    -- _initLolloStreetDataWithApi() -- don't use it for now
+    _initLolloStreetDataWithFiles()
     return game._lolloStreetData
 end
-
--- helper.setGlobalStreetData = function() --, chunkedStreetTypes)
---     -- if _G._lolloStreetData ~= nil then return end
-
---     -- print('LOLLO street chunks reading street data')
---     -- game._lolloStreetData = _getStreetDataWithDefaults(
---     --     _getStreetDataFiltered(
---     --         _getStreetFilesContents(
---     --             _getMyStreetDirPath()
---     --         )
---     --     )
---     -- ) --, chunkedStreetTypes)
-
---     game._lolloStreetData = _getStreetDataFiltered(_getStreetTypes())
---     debugger()
---     -- print('LOLLO game._lolloStreetData has ', type(game._lolloStreetData) == 'table' and #(game._lolloStreetData) or 0, ' records before the concat')
---     -- arrayUtils.concatValues(game._lolloStreetData, _getStandardStreetData())
---     arrayUtils.sort(game._lolloStreetData, 'name')
---     -- print('LOLLO street chunks has read street data')
---     -- print('LOLLO street data = ')
---     -- dump(true)(game._lolloStreetData)
--- end
 
 return helper
