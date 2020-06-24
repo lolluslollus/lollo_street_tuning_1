@@ -6,7 +6,11 @@
             {forward = false},
             {forward = false},
             {forward = true},
-            {forward = true},
+            {
+                forward = true,
+                -- transportModes = {'TRUCK'}
+                -- transportModes = { 0, 0, 0, 1,  0, 0, 0, 0,  0, 0, 0, 0,  0, 0, 0, 0 }
+            },
             {forward = true}
         },
         transportModesStreet = {'CAR', 'BUS', 'ELECTRIC_TRAM', 'TRAM', 'TRUCK'}, -- with this, tram tracks appear on all lanes, not only on the right one
