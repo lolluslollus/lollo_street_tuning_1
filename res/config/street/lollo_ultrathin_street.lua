@@ -14,6 +14,7 @@ function data()
         --desc = _("Ultrathin street with a speed limit of %2%."),
         --categories = { "urban" },
         categories = {},
+        slopeBuildSteps = 1,
         borderGroundTex = 'street_border.lua',
         materials = {},
         assets = {},

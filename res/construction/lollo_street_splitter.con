@@ -47,9 +47,6 @@ function data()
             table.insert(
                 result.models,
                 {
-                    --id = "asset/icon/marker_exclamation.mdl",
-                    --id = "asset/icon/mark.mdl",
-                    --id = "station/street/mark.mdl",
                     id = 'lollo_assets/mark.mdl',
                     collider = {
                         type = 'NONE'
@@ -57,7 +54,7 @@ function data()
                     autoRemovable = true,
                     skipCollision = true,
                     skipCollisionCheck = true,
-                    transf = transf.transl(vec3.new(0.0, 0.0, .0))
+                    transf = transf.transl(vec3.new(0.0, 0.0, 0.0))
                 }
             )
 
@@ -83,10 +80,10 @@ function data()
                         -- { { -6, .0, .0 }, { -1.0, .0, .0 } },  -- node 1 (snap node)
                         -- {{-3, .0, .0}, {-1.0, .0, .0}}, -- node 0
                         -- {{-6, .0, .0}, {-1.0, .0, .0}} -- node 1 (snap node)
-                        {{-5, .0, .0}, {-1.0, .0, .0}}, -- node 0
-                        {{-6, .0, .0}, {-1.0, .0, .0}} -- node 1 (snap node)
+                        {{-5.0, 0.0, 0.0}, {-1.0, 0.0, 0.0}}, -- node 0
+                        {{-6.0, 0.0, 0.0}, {-1.0, 0.0, 0.0}} -- node 1 (snap node)
                     },
-                    -- edgeType = "BRIDGE",
+                    -- edgeType = "BRIDGE", "TUNNEL"
                     -- edgeTypeName = "cement.lua",
                     -- freeNodes = { 0, 1 },
                     collider = {
@@ -95,18 +92,15 @@ function data()
                     autoRemovable = true,
                     skipCollision = true, --useless
                     skipCollisionCheck = true, --useless
-                    --					snapNodes = { 0 },  -- node 0 is allowed to snap to other edges of the same type --crashes
-                    snapNodes = {1} -- node 1 is allowed to snap to other edges of the same type
-                    --					snapNodes = { 0, 1 },  -- node 0 and 1 are allowed to snap to other edges of the same type --crashes
-                    --					tag2nodes = {},
+                    snapNodes = {1}, -- node 1 is allowed to snap to other edges of the same type
+                    -- tag2nodes = {},
+                    alignTerrain = false
                 }
             )
 
             return result
         end,
-        upgradeFn = function(params)
-            -- print('lollo street splitter upgradeFn')
-            -- dump(true)(params)
+        upgradeFn = function(_)
         end
     }
 end
