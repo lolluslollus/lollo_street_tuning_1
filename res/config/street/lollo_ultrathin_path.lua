@@ -17,7 +17,7 @@ function data()
         order = 1,
         busAndTramRight = true,
         -- slopeBuildSteps = 1,
-        transportModesStreet = {'TRUCK'},
+        transportModesStreet = {'TRUCK'}, -- it dumps with an empty array or with {'PERSON'}
         embankmentSlopeLow  = .75,
         embankmentSlopeHigh  = 2.5,
         materials = {

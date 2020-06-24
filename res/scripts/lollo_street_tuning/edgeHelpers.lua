@@ -58,6 +58,21 @@ end
 --     return results
 -- end
 
+helper.getNearbyEntities = function(transf)
+    if type(transf) ~= 'table' then return {} end
+
+    -- debugger()
+    local edgeSearchRadius = 0.0
+    local squareCentrePosition = transfUtils.getVec123Transformed({0, 0, 0}, transf)
+    local results = game.interface.getEntities(
+        {pos = squareCentrePosition, radius = edgeSearchRadius},
+        {includeData = true}
+        -- {includeData = true}
+    )
+
+    return results
+end
+
 helper.getNearbyStreetEdges = function(transf)
     -- LOLLO TODO only return edges that are long enough
     -- if you want to use this, you may have to account for the transformation
@@ -127,17 +142,19 @@ helper.getYKey = function(y)
 end
 
 helper.getNodeBetween = function(node0, node1)
-    -- local sign = function(n)
-    --     return n > 0 and 1 or n < 0 and -1 or 1 --0
-    -- end
+    -- correct but useless
+    -- local node0NormalisationFactor = helper.getVectorLength(node0[2])
+    -- if node0NormalisationFactor == 0 then node0NormalisationFactor = math.huge else node0NormalisationFactor = 1.0 / node0NormalisationFactor end
+    -- local node1NormalisationFactor = helper.getVectorLength(node1[2])
+    -- if node1NormalisationFactor == 0 then node1NormalisationFactor = math.huge else node1NormalisationFactor = 1.0 / node1NormalisationFactor end
     local x0 = node0[1][1]
     local x1 = node1[1][1]
-    local cos0 = node0[2][1]
-    local cos1 = node1[2][1]
+    local cos0 = node0[2][1]-- * node0NormalisationFactor -- correct but useless
+    local cos1 = node1[2][1]-- * node1NormalisationFactor -- correct but useless
     local y0 = node0[1][2]
     local y1 = node1[1][2]
-    local sin0 = node0[2][2]
-    local sin1 = node1[2][2]
+    local sin0 = node0[2][2]-- * node0NormalisationFactor -- correct but useless
+    local sin1 = node1[2][2]-- * node1NormalisationFactor -- correct but useless
     local theta0 = math.atan2(sin0, cos0)
     local theta1 = math.atan2(sin1, cos1)
     local z0 = node0[1][3]
@@ -197,7 +214,7 @@ helper.getNodeBetween = function(node0, node1)
         {
             {y0I},
             {y0I},
-            {sin0I / cos0I},
+            {sin0I / cos0I}, -- LOLLO TODO risk of division by zero
             {sin1I / cos1I}
         }
     )
@@ -214,26 +231,26 @@ helper.getNodeBetween = function(node0, node1)
     -- Now I undo the rotation I did at the beginning
     local ro2 = math.sqrt((x2I - x0I) * (x2I - x0I) + (y2I - y0I) * (y2I - y0I))
     local alpha2I = math.atan2(y2I - y0I, x2I - x0I)
-    local theta2I = math.atan(tan2I) -- LOLLO TODO find out the quadrant or try to use atan2, which does it automagically
+    local theta2I = math.atan(tan2I)
 
-    local edge2WithAbsoluteCoordinates = {
+    local node2WithAbsoluteCoordinates = {
         position = {
             x0I + ro2 * math.cos(alpha2I - zRotation),
             y0I + ro2 * math.sin(alpha2I - zRotation),
             0
         },
         tangent = {
-            math.cos(theta2I - zRotation),
-            math.sin(theta2I - zRotation),
+            math.cos(theta2I - zRotation) * ro2,
+            math.sin(theta2I - zRotation) * ro2,
             0
         }
     }
     -- add Z
-    local z2 = game.interface.getHeight({edge2WithAbsoluteCoordinates.position[1], edge2WithAbsoluteCoordinates.position[2]})
-    edge2WithAbsoluteCoordinates.position[3] = z2
-    edge2WithAbsoluteCoordinates.tangent[3] = (node0[2][3] + node1[2][3]) * 0.5
+    node2WithAbsoluteCoordinates.position[3] = game.interface.getHeight({node2WithAbsoluteCoordinates.position[1], node2WithAbsoluteCoordinates.position[2]})
+    -- LOLLO TODO this is a crappy approximation for now
+    node2WithAbsoluteCoordinates.tangent[3] = (node0[2][3] + node1[2][3]) * 0.5
 
-    return edge2WithAbsoluteCoordinates
+    return node2WithAbsoluteCoordinates
 end
 
 return helper

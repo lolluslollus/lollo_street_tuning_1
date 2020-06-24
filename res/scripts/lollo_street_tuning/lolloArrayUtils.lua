@@ -91,6 +91,8 @@ arrayUtils.findIndex = function(tab, fieldName, fieldValueNonNil)
             return i
         end
     end
+
+    return -1
 end
 
 arrayUtils.addProps = function(baseTab, addedTab)

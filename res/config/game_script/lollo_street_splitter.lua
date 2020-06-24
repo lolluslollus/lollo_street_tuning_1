@@ -1,43 +1,41 @@
-local luadump = require('lollo_street_tuning/luadump')
 -- local stringUtils = require('lollo_street_tuning/lolloStringUtils')
 local debugger = require('debugger')
 local edgeUtils = require('lollo_street_tuning.edgeHelpers')
 
-local function _isBuildingStreetChanger(param)
+local function _isBuildingOneOfMine(param, fileName)
     local toAdd =
         type(param) == 'table' and type(param.proposal) == 'userdata' and type(param.proposal.toAdd) == 'userdata' and
         param.proposal.toAdd
 
     if toAdd and #toAdd > 0 then
         for i = 1, #toAdd do
-            if toAdd[i].fileName == [[lollo_street_changer.con]] then
+            if toAdd[i].fileName == fileName then
                 return true
             end
         end
     end
 
     return false
+end
+
+local function _isBuildingStreetChanger(param)
+    return _isBuildingOneOfMine(param, 'lollo_street_changer.con')
+end
+
+local function _isBuildingStreetGetInfo(param)
+    return _isBuildingOneOfMine(param, 'lollo_street_get_info.con')
 end
 
 local function _isBuildingStreetSplitter(param)
-    local toAdd =
-        type(param) == 'table' and type(param.proposal) == 'userdata' and type(param.proposal.toAdd) == 'userdata' and
-        param.proposal.toAdd
+    return _isBuildingOneOfMine(param, 'lollo_street_splitter.con')
+end
 
-    if toAdd and #toAdd > 0 then
-        for i = 1, #toAdd do
-            if toAdd[i].fileName == [[lollo_street_splitter.con]]
-            or toAdd[i].fileName == [[lollo_street_splitter_2.con]] then
-                return true
-            end
-        end
-    end
-
-    return false
+local function _isBuildingStreetSplitterWithApi(param)
+    return _isBuildingOneOfMine(param, 'lollo_street_splitter_w_api.con')
 end
 
 local function _myErrorHandler(err)
-    print('ERROR: ', err)
+    print('lollo street splitter ERROR: ', err)
 end
 
 local function _replaceEdge(oldEdge)
@@ -78,10 +76,8 @@ local function _replaceEdge(oldEdge)
 end
 
 local function _splitEdge(wholeEdge, nodeMid)
-    -- LOLLO TODO with the test tangents, this works somehow, However, the lanes do not intersect => the whole thing was useless?
-    -- NO! They do intersect when the road is straight, so we need to work on those tangents.
-    -- BUT: this thing destroys all buildings along the edges, which are replaced. This defies the very purpose of this mod!
-    local proposal = api.type.SimpleProposal.new() -- api.type.SimpleProposal
+    -- LOLLO NOTE this thing destroys all buildings along the edges that it replaces. This defies the very purpose of this mod!
+    local proposal = api.type.SimpleProposal.new()
 
     local edge0 = api.type.SegmentAndEntity.new()
     edge0.entity = -1
@@ -89,12 +85,6 @@ local function _splitEdge(wholeEdge, nodeMid)
     edge0.comp.node1 = -3
     edge0.comp.tangent0 = api.type.Vec3f.new(wholeEdge.node0tangent[1], wholeEdge.node0tangent[2], wholeEdge.node0tangent[3])
     edge0.comp.tangent1 = api.type.Vec3f.new(nodeMid.tangent[1], nodeMid.tangent[2], nodeMid.tangent[3])
-    edge0.comp.tangent1 = api.type.Vec3f.new(wholeEdge.node0tangent[1], wholeEdge.node0tangent[2], wholeEdge.node0tangent[3]) -- LOLLO test
-    edge0.comp.tangent1 = api.type.Vec3f.new(
-        (wholeEdge.node0tangent[1] + wholeEdge.node1tangent[1]) * 0.5,
-        (wholeEdge.node0tangent[2] + wholeEdge.node1tangent[2]) * 0.5,
-        (wholeEdge.node0tangent[3] + wholeEdge.node1tangent[3]) * 0.5
-    ) -- LOLLO test
     edge0.comp.type = 0
     edge0.comp.typeIndex = 0
     -- edge0.comp.objects = {{ -1, 1 }} --
@@ -107,12 +97,6 @@ local function _splitEdge(wholeEdge, nodeMid)
     edge1.comp.node0 = -3
     edge1.comp.node1 = wholeEdge.node1
     edge1.comp.tangent0 = api.type.Vec3f.new(nodeMid.tangent[1], nodeMid.tangent[2], nodeMid.tangent[3])
-    edge1.comp.tangent0 = api.type.Vec3f.new(wholeEdge.node1tangent[1], wholeEdge.node1tangent[2], wholeEdge.node1tangent[3]) -- LOLLO test
-    edge1.comp.tangent0 = api.type.Vec3f.new(
-        (wholeEdge.node0tangent[1] + wholeEdge.node1tangent[1]) * 0.5,
-        (wholeEdge.node0tangent[2] + wholeEdge.node1tangent[2]) * 0.5,
-        (wholeEdge.node0tangent[3] + wholeEdge.node1tangent[3]) * 0.5
-    ) -- LOLLO test
     edge1.comp.tangent1 = api.type.Vec3f.new(wholeEdge.node1tangent[1], wholeEdge.node1tangent[2], wholeEdge.node1tangent[3])
     edge1.comp.type = 0
     edge1.comp.typeIndex = 0
@@ -169,6 +153,8 @@ function data()
             if (id ~= '__lolloStreetSplitterEvent__') then return end
             if type(param) ~= 'table' or type(param.constructionEntityId) ~= 'number' then return end
             if name == 'streetSplitterBuilt' then
+                -- do nothing
+            elseif name == 'streetSplitterWithApiBuilt' then
                 local splitterConstruction = game.interface.getEntity(param.constructionEntityId)
                 if type(splitterConstruction) == 'table' and type(splitterConstruction.transf) == 'table' then
                     local nearbyEdges = edgeUtils.getNearbyStreetEdges(splitterConstruction.transf)
@@ -191,8 +177,6 @@ function data()
                         _splitEdge(nearbyEdges[1], nodeMid)
                     end
                 end
-
-                game.interface.bulldoze(param.constructionEntityId)
             elseif name == 'streetChangerBuilt' then
                 local changerConstruction = game.interface.getEntity(param.constructionEntityId)
                 if type(changerConstruction) == 'table' and type(changerConstruction.transf) == 'table' then
@@ -204,9 +188,16 @@ function data()
                         _replaceEdge(nearbyEdges[1])
                     end
                 end
-
-                game.interface.bulldoze(param.constructionEntityId)
+            elseif name == 'streetGetInfoBuilt' then
+                local getInfoConstruction = game.interface.getEntity(param.constructionEntityId)
+                if type(getInfoConstruction) == 'table' and type(getInfoConstruction.transf) == 'table' then
+                    local nearbyEntities = edgeUtils.getNearbyEntities(getInfoConstruction.transf)
+                    print('LOLLO nearbyEntities = ')
+                    debugPrint(nearbyEntities)
+                end
             end
+
+            game.interface.bulldoze(param.constructionEntityId)
         end,
         guiHandleEvent = function(id, name, param)
             -- LOLLO NOTE param can have different types, even boolean, depending on the event id and name
@@ -221,26 +212,36 @@ function data()
                     end
 
                     -- game.interface.bulldoze(constructionEntity.id) -- cannot call it from this thread, so I raise and call it in the worker thread
-                    if _isBuildingStreetSplitter(param) and param.result and param.result[1] then
+                    if _isBuildingStreetSplitter(param) then
                         game.interface.sendScriptEvent(
                             '__lolloStreetSplitterEvent__',
                             'streetSplitterBuilt',
                             {
-                                constructionEntityId = param.result[1] --constructionEntity.id
-                                -- constructionEntity = constructionEntity,
-                                -- baseEdges = baseEdges,
-                                -- baseNodes = baseNodes
+                                constructionEntityId = param.result[1]
                             }
                         )
-                    elseif _isBuildingStreetChanger(param) and param.result and param.result[1] then
+                    elseif _isBuildingStreetSplitterWithApi(param) then
+                        game.interface.sendScriptEvent(
+                            '__lolloStreetSplitterEvent__',
+                            'streetSplitterWithApiBuilt',
+                            {
+                                constructionEntityId = param.result[1]
+                            }
+                        )
+                    elseif _isBuildingStreetGetInfo(param) then
+                        game.interface.sendScriptEvent(
+                            '__lolloStreetSplitterEvent__',
+                            'streetGetInfoBuilt',
+                            {
+                                constructionEntityId = param.result[1]
+                            }
+                        )
+                    elseif _isBuildingStreetChanger(param) then
                         game.interface.sendScriptEvent(
                             '__lolloStreetSplitterEvent__',
                             'streetChangerBuilt',
                             {
-                                constructionEntityId = param.result[1] --constructionEntity.id
-                                -- constructionEntity = constructionEntity,
-                                -- baseEdges = baseEdges,
-                                -- baseNodes = baseNodes
+                                constructionEntityId = param.result[1]
                             }
                         )
                     end
