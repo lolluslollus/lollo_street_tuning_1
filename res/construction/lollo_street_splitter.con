@@ -74,18 +74,14 @@ function data()
                     },
                     edges = {
                         -- one entry refers to a position and a tangent
-                        -- { { -45, .0, .0 }, { -1.0, .0, .0 } },  -- node 0
-                        -- { { -60, .0, .0 }, { -1.0, .0, .0 } },  -- node 1 (snap node)
-                        -- { { -5, .0, .0 }, { -1.0, .0, .0 } },  -- node 0
-                        -- { { -6, .0, .0 }, { -1.0, .0, .0 } },  -- node 1 (snap node)
-                        -- {{-3, .0, .0}, {-1.0, .0, .0}}, -- node 0
-                        -- {{-6, .0, .0}, {-1.0, .0, .0}} -- node 1 (snap node)
-                        {{-5.0, 0.0, 0.0}, {-1.0, 0.0, 0.0}}, -- node 0
-                        {{-6.0, 0.0, 0.0}, {-1.0, 0.0, 0.0}} -- node 1 (snap node)
+                        -- {{-5.0, 0.0, 0.0}, {-1.0, 0.0, 0.0}}, -- node 0
+                        -- {{-6.0, 0.0, 0.0}, {-1.0, 0.0, 0.0}} -- node 1 (snap node)
+                        {{-5.0, 0.0, 0.0}, {-0.1, 0.0, 0.0}}, -- node 0
+                        {{-5.1, 0.0, 0.0}, {-0.1, 0.0, 0.0}} -- node 1 (snap node)
                     },
                     -- edgeType = "BRIDGE", "TUNNEL"
                     -- edgeTypeName = "cement.lua",
-                    -- freeNodes = { 0, 1 },
+                    freeNodes = {},
                     collider = {
                         type = 'NONE'
                     },
