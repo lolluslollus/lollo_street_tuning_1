@@ -15,8 +15,8 @@ arrayUtils.addUnique = function(tab, val)
     end
 end
 arrayUtils.map = function(arr, func)
-    if type(arr) ~= 'table' and type(arr) ~= 'userdata' then return {} end
-
+    if type(arr) ~= 'table' then return {} end
+    
     local results = {}
     for i = 1, #arr do
         table.insert(results, #results + 1, func(arr[i]))
