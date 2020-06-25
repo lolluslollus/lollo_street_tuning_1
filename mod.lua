@@ -3,6 +3,15 @@ local streetUtils = require('lollo_street_tuning/lolloStreetUtils')
 local debugger = require('debugger')
 
 function data()
+    local function _getUiTypeNumber(uiTypeStr)
+        if uiTypeStr == 'BUTTON' then return 0
+        elseif uiTypeStr == 'SLIDER' then return 1
+        elseif uiTypeStr == 'COMBOBOX' then return 2
+        elseif uiTypeStr == 'ICON_BUTTON' then return 3 -- double-check this
+        elseif uiTypeStr == 'CHECKBOX' then return 4 -- double-check this
+        else return 0
+        end
+    end
     local function _addAvailableConstruction(oldFileName, newFileName, scriptFileName, availability, params)
         local staticConIdId = api.res.constructionRep.find(oldFileName)
         local staticCon = api.res.constructionRep.get(staticConIdId)
@@ -18,17 +27,6 @@ function data()
         newCon.order = staticCon.order
         newCon.skipCollision = staticCon.skipCollision
         newCon.autoRemovable = staticCon.autoRemovable
-        -- print('LOLLO staticCon.params = ')
-        -- debugPrint(staticCon.params)
-        local function _getUiTypeNumber(uiTypeStr)
-            if uiTypeStr == 'BUTTON' then return 0
-            elseif uiTypeStr == 'SLIDER' then return 1
-            elseif uiTypeStr == 'COMBOBOX' then return 2
-            elseif uiTypeStr == 'ICON_BUTTON' then return 3 -- double-check this
-            elseif uiTypeStr == 'CHECKBOX' then return 4 -- double-check this
-            else return 0
-            end
-        end
         for _, par in pairs(params) do
             local newConParam = api.type.ScriptParam.new()
             newConParam.key = par.key
@@ -55,6 +53,7 @@ function data()
 
         api.res.constructionRep.add(newCon.fileName, newCon, true) -- fileName, resource, visible
     end
+
     return {
         info = {
             minorVersion = 16,

@@ -1,6 +1,5 @@
 local pitchUtil = require('lollo_street_tuning/lolloPitchHelpers')
 local streetChunksHelper = require('lollo_street_tuning/lolloStreetChunksHelper')
--- local streetUtils = require('lollo_street_tuning/lolloStreetUtils')
 local debugger = require('debugger')
 
 function data()
@@ -20,7 +19,6 @@ function data()
                     transf = pitchUtil.getIdTransfPitched(params.pitch)
                 }
             }
-
             -- LOLLO NOTE I cannot use KEEP here
             local tramTrackType = params.tramTrack and (({'NO', 'YES', 'ELECTRIC'})[params.tramTrack + 1]) or 'NO'
             -- LOLLO NOTE we have 3 edges for every hairpin bend. The inner nodes do not snap, the outer ones do.

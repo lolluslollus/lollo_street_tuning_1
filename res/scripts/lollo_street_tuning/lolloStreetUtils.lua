@@ -1,7 +1,3 @@
--- local dump = require('lollo_street_tuning/luadump')
--- local inspect = require('inspect')
--- local vec3 = require 'vec3'
--- local transf = require 'transf'
 local arrayUtils = require('lollo_street_tuning/lolloArrayUtils')
 local fileUtils = require('lollo_street_tuning/lolloFileUtils')
 local stringUtils = require('lollo_street_tuning/lolloStringUtils')
@@ -177,17 +173,21 @@ local function _getStreetFilesContents(streetDirPath, fileNamePrefix)
         -- print('LOLLO streetFiles[i] = ')
         -- dump(true)(streetFiles[i])
         if isOk then
-            table.insert(
-                results,
-                #results + 1,
-                {
-                    categories = fileData.categories or {},
-                    fileName = (fileNamePrefix or '') .. fileUtils.getFileNameFromPath(streetFiles[i]),
-                    name = fileData.name or '',
-                    sidewalkWidth = fileData.sidewalkWidth or 0.2,
-                    streetWidth = fileData.streetWidth or 0.2
-                }
-            )
+            local newRecord = {
+                categories = fileData.categories or {},
+                fileName = (fileNamePrefix or '') .. fileUtils.getFileNameFromPath(streetFiles[i]),
+                name = fileData.name or '',
+                sidewalkWidth = fileData.sidewalkWidth or 0.2,
+                streetWidth = fileData.streetWidth or 0.2
+            }
+            if type(newRecord.fileName) == 'string' and newRecord.fileName:len() > 0
+            and type(newRecord.name) == 'string' and newRecord.name:len() > 0 then
+                table.insert(
+                    results,
+                    #results + 1,
+                    newRecord
+                )
+            end
         end
     end
     -- print('LOLLO _getStreetFilesContents is about to return: ')

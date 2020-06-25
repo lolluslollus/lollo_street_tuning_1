@@ -1,7 +1,3 @@
--- local dump = require('lollo_street_tuning/luadump')
--- local inspect = require('inspect')
--- local vec3 = require 'vec3'
--- local transf = require 'transf'
 local arrayUtils = require('lollo_street_tuning/lolloArrayUtils')
 local edgeUtils = require('lollo_street_tuning/edgeHelpers')
 local pitchUtil = require('lollo_street_tuning/lolloPitchHelpers')
@@ -39,6 +35,9 @@ end
 local function _getStreetHalfWidth(streetData)
     return streetData.sidewalkWidth + streetData.streetWidth * 0.5
 end
+local function _getStreetFullWidth(streetData)
+    return streetData.sidewalkWidth + streetData.sidewalkWidth + streetData.streetWidth
+end
 
 local function _getWidthFactor(streetHalfWidth)
     -- this is the fruit of trial and error. In May 2020, the game does not allow really sharp curves.
@@ -59,7 +58,7 @@ local function _getWidthFactor(streetHalfWidth)
     return result
 end
 
-helper.makeEdges = function(direction, pitch, node0, node1, isRightOfIsland, tan0, tan1)
+local function _makeEdges(direction, pitch, node0, node1, isRightOfIsland, tan0, tan1)
     -- return params.direction == 0 and
     --     {
     --         {pitchUtil.getXYZPitched(pitch, {-6, -3, .0}), {1, .0, .0}}, -- node 0
@@ -88,19 +87,7 @@ helper.makeEdges = function(direction, pitch, node0, node1, isRightOfIsland, tan
     end
 end
 
-helper.getFreeNodesLowX = function(params, isRightOfIsland)
-    if params.lockLayoutCentre == 1 then
-        if params.direction == 2 and isRightOfIsland then
-            return params.direction == 0 and {1} or {0}
-        else
-            return params.direction == 0 and {0} or {1}
-        end
-    else
-        return {0, 1}
-    end
-end
-
-helper.getFreeNodesCentre = function(params, isRightOfIsland)
+local function _getFreeNodesCentre(params, isRightOfIsland)
     if params.lockLayoutCentre == 1 then
         return {}
     else
@@ -108,7 +95,7 @@ helper.getFreeNodesCentre = function(params, isRightOfIsland)
     end
 end
 
-helper.getFreeNodesHighX = function(params, isRightOfIsland)
+local function _getFreeNodesHighX(params, isRightOfIsland)
     if params.lockLayoutCentre == 1 then
         if params.direction == 2 and isRightOfIsland then
             return params.direction == 0 and {0} or {1}
@@ -117,6 +104,46 @@ helper.getFreeNodesHighX = function(params, isRightOfIsland)
         end
     else
         return {0, 1}
+    end
+end
+
+local function _getFreeNodesLowX(params, isRightOfIsland)
+    if params.lockLayoutCentre == 1 then
+        if params.direction == 2 and isRightOfIsland then
+            return params.direction == 0 and {1} or {0}
+        else
+            return params.direction == 0 and {0} or {1}
+        end
+    else
+        return {0, 1}
+    end
+end
+
+local function _getSnapNodesCentre(params, isRightOfIsland)
+    return {}
+end
+
+local function _getSnapNodesHighX(params, isRightOfIsland)
+    if params.snapNodes == 1 then
+        if params.direction == 2 and isRightOfIsland then
+            return params.direction == 0 and {0} or {1}
+        else
+            return params.direction == 0 and {1} or {0}
+        end
+    else
+        return {}
+    end
+end
+
+local function _getSnapNodesLowX(params, isRightOfIsland)
+    if params.snapNodes == 1 then
+        if params.direction == 2 and isRightOfIsland then
+            return params.direction == 0 and {1} or {0}
+        else
+            return params.direction == 0 and {0} or {1}
+        end
+    else
+        return {}
     end
 end
 
@@ -307,8 +334,8 @@ helper.getStreetHairpinParams = function()
 end
 
 helper.getStreetChunksSnapEdgeLists = function(params, pitchAdjusted, streetData, tramTrackType)
-    local streetHalfWidth = streetData.sidewalkWidth + streetData.streetWidth * 0.5
-    local streetFullWidth = streetData.sidewalkWidth + streetData.sidewalkWidth + streetData.streetWidth
+    local streetHalfWidth = _getStreetHalfWidth(streetData)
+    local streetFullWidth = _getStreetFullWidth(streetData)
 
     local distance = params.distance or 0.0
     local halfDistance = distance * 0.5
@@ -322,12 +349,6 @@ helper.getStreetChunksSnapEdgeLists = function(params, pitchAdjusted, streetData
     local x1 = - streetHalfWidth - halfExtraLength
     local x2 = - x1
     local x3 = - x0
-
-    -- print('LOLLO streetHalfWidth = ', streetHalfWidth)
-    -- print('LOLLO 2.0 * streetHalfWidth = ', 2.0 * streetHalfWidth)
-    -- print('LOLLO streetFullWidth = ', streetFullWidth)
-    -- print('LOLLO halfDistance = ', halfDistance)
-    -- print('LOLLO halfIslandWidth = ', halfIslandWidth)
     local edgeParams = {
         skipCollision = true,
         type = streetData.fileName,
@@ -340,14 +361,14 @@ helper.getStreetChunksSnapEdgeLists = function(params, pitchAdjusted, streetData
             {
                 type = 'STREET',
                 params = edgeParams,
-                edges = helper.makeEdges(
+                edges = _makeEdges(
                     params.direction,
                     pitchAdjusted,
                     {x0, 0, 0},
                     {x1, 0, 0}
                 ),
-                freeNodes = helper.getFreeNodesLowX(params),
-                snapNodes = helper.getSnapNodesLowX(params)
+                freeNodes = _getFreeNodesLowX(params),
+                snapNodes = _getSnapNodesLowX(params)
                 --					snapNodes = { 0, 1 },  -- node 0 and 1 are allowed to snap to other edges of the same type --crashes
                 --					tag2nodes = {},
             },
@@ -355,27 +376,27 @@ helper.getStreetChunksSnapEdgeLists = function(params, pitchAdjusted, streetData
             {
                 type = 'STREET',
                 params = edgeParams,
-                edges = helper.makeEdges(
+                edges = _makeEdges(
                     params.direction,
                     pitchAdjusted,
                     {x1, 0, 0},
                     {x2, 0, 0}
                 ),
-                freeNodes = helper.getFreeNodesCentre(params),
-                snapNodes = helper.getSnapNodesCentre(params)
+                freeNodes = _getFreeNodesCentre(params),
+                snapNodes = _getSnapNodesCentre(params)
             },
             -- high x
             {
                 type = 'STREET',
                 params = edgeParams,
-                edges = helper.makeEdges(
+                edges = _makeEdges(
                     params.direction,
                     pitchAdjusted,
                     {x2, 0, 0},
                     {x3, 0, 0}
                 ),
-                freeNodes = helper.getFreeNodesHighX(params),
-                snapNodes = helper.getSnapNodesHighX(params)
+                freeNodes = _getFreeNodesHighX(params),
+                snapNodes = _getSnapNodesHighX(params)
             }
         }
     elseif params.howManyStreetsBase0 == 1 then -- 2 streets
@@ -384,79 +405,79 @@ helper.getStreetChunksSnapEdgeLists = function(params, pitchAdjusted, streetData
             {
                 type = 'STREET',
                 params = edgeParams,
-                edges = helper.makeEdges(
+                edges = _makeEdges(
                     params.direction,
                     pitchAdjusted,
                     {x0, -streetHalfWidth - halfDistance - halfIslandWidth, 0},
                     {x1, -streetHalfWidth - halfDistance - halfIslandWidth, 0},
                     true
                 ),
-                freeNodes = helper.getFreeNodesLowX(params, true),
-                snapNodes = helper.getSnapNodesLowX(params, true)
+                freeNodes = _getFreeNodesLowX(params, true),
+                snapNodes = _getSnapNodesLowX(params, true)
             },
             {
                 type = 'STREET',
                 params = edgeParams,
-                edges = helper.makeEdges(
+                edges = _makeEdges(
                     params.direction,
                     pitchAdjusted,
                     {x0, streetHalfWidth + halfDistance + halfIslandWidth, 0},
                     {x1, streetHalfWidth + halfDistance + halfIslandWidth, 0}
                 ),
-                freeNodes = helper.getFreeNodesLowX(params),
-                snapNodes = helper.getSnapNodesLowX(params)
+                freeNodes = _getFreeNodesLowX(params),
+                snapNodes = _getSnapNodesLowX(params)
             },
             -- centre x
             {
                 type = 'STREET',
                 params = edgeParams,
-                edges = helper.makeEdges(
+                edges = _makeEdges(
                     params.direction,
                     pitchAdjusted,
                     {x1, -streetHalfWidth - halfDistance - halfIslandWidth, 0},
                     {x2, -streetHalfWidth - halfDistance - halfIslandWidth, 0},
                     true
                 ),
-                freeNodes = helper.getFreeNodesCentre(params, true),
-                snapNodes = helper.getSnapNodesCentre(params, true)
+                freeNodes = _getFreeNodesCentre(params, true),
+                snapNodes = _getSnapNodesCentre(params, true)
             },
             {
                 type = 'STREET',
                 params = edgeParams,
-                edges = helper.makeEdges(
+                edges = _makeEdges(
                     params.direction,
                     pitchAdjusted,
                     {x1, streetHalfWidth + halfDistance + halfIslandWidth, 0},
                     {x2, streetHalfWidth + halfDistance + halfIslandWidth, 0}
                 ),
-                freeNodes = helper.getFreeNodesCentre(params),
-                snapNodes = helper.getSnapNodesCentre(params)
+                freeNodes = _getFreeNodesCentre(params),
+                snapNodes = _getSnapNodesCentre(params)
             },
             -- high x
             {
                 type = 'STREET',
                 params = edgeParams,
-                edges = helper.makeEdges(
+                edges = _makeEdges(
                     params.direction,
                     pitchAdjusted,
                     {x2, -streetHalfWidth - halfDistance - halfIslandWidth, 0},
                     {x3, -streetHalfWidth - halfDistance - halfIslandWidth, 0},
                     true
                 ),
-                freeNodes = helper.getFreeNodesHighX(params, true),
-                snapNodes = helper.getSnapNodesHighX(params, true)
+                freeNodes = _getFreeNodesHighX(params, true),
+                snapNodes = _getSnapNodesHighX(params, true)
             },
             {
                 type = 'STREET',
                 params = edgeParams,
-                edges = helper.makeEdges(
+                edges = _makeEdges(
                     params.direction,
                     pitchAdjusted,
                     {x2, streetHalfWidth + halfDistance + halfIslandWidth, 0},
                     {x3, streetHalfWidth + halfDistance + halfIslandWidth, 0}
                 ),
-                freeNodes = helper.getFreeNodesHighX(params),
-                snapNodes = helper.getSnapNodesHighX(params)
+                freeNodes = _getFreeNodesHighX(params),
+                snapNodes = _getSnapNodesHighX(params)
             }
         }
     elseif params.howManyStreetsBase0 == 2 then -- 3 streets
@@ -465,115 +486,115 @@ helper.getStreetChunksSnapEdgeLists = function(params, pitchAdjusted, streetData
             {
                 type = 'STREET',
                 params = edgeParams,
-                edges = helper.makeEdges(
+                edges = _makeEdges(
                     params.direction,
                     pitchAdjusted,
                     {x0, -streetFullWidth - distance - halfIslandWidth, 0},
                     {x1, -streetFullWidth - distance - halfIslandWidth, 0},
                     true
                 ),
-                freeNodes = helper.getFreeNodesLowX(params, true),
-                snapNodes = helper.getSnapNodesLowX(params, true)
+                freeNodes = _getFreeNodesLowX(params, true),
+                snapNodes = _getSnapNodesLowX(params, true)
             },
             {
                 type = 'STREET',
                 params = edgeParams,
-                edges = helper.makeEdges(
+                edges = _makeEdges(
                     params.direction,
                     pitchAdjusted,
                     {x0, halfIslandWidth, 0},
                     {x1, halfIslandWidth, 0}
                 ),
-                freeNodes = helper.getFreeNodesLowX(params),
-                snapNodes = helper.getSnapNodesLowX(params)
+                freeNodes = _getFreeNodesLowX(params),
+                snapNodes = _getSnapNodesLowX(params)
             },
             {
                 type = 'STREET',
                 params = edgeParams,
-                edges = helper.makeEdges(
+                edges = _makeEdges(
                     params.direction,
                     pitchAdjusted,
                     {x0, streetFullWidth + distance + halfIslandWidth, 0},
                     {x1, streetFullWidth + distance + halfIslandWidth, 0}
                 ),
-                freeNodes = helper.getFreeNodesLowX(params),
-                snapNodes = helper.getSnapNodesLowX(params)
+                freeNodes = _getFreeNodesLowX(params),
+                snapNodes = _getSnapNodesLowX(params)
             },
             -- centre x
             {
                 type = 'STREET',
                 params = edgeParams,
-                edges = helper.makeEdges(
+                edges = _makeEdges(
                     params.direction,
                     pitchAdjusted,
                     {x1, -streetFullWidth - distance - halfIslandWidth, 0},
                     {x2, -streetFullWidth - distance - halfIslandWidth, 0},
                     true
                 ),
-                freeNodes = helper.getFreeNodesCentre(params, true),
-                snapNodes = helper.getSnapNodesCentre(params, true)
+                freeNodes = _getFreeNodesCentre(params, true),
+                snapNodes = _getSnapNodesCentre(params, true)
             },
             {
                 type = 'STREET',
                 params = edgeParams,
-                edges = helper.makeEdges(
+                edges = _makeEdges(
                     params.direction,
                     pitchAdjusted,
                     {x1, halfIslandWidth, 0},
                     {x2, halfIslandWidth, 0}
                 ),
-                freeNodes = helper.getFreeNodesCentre(params),
-                snapNodes = helper.getSnapNodesCentre(params)
+                freeNodes = _getFreeNodesCentre(params),
+                snapNodes = _getSnapNodesCentre(params)
             },
             {
                 type = 'STREET',
                 params = edgeParams,
-                edges = helper.makeEdges(
+                edges = _makeEdges(
                     params.direction,
                     pitchAdjusted,
                     {x1, streetFullWidth + distance + halfIslandWidth, 0},
                     {x2, streetFullWidth + distance + halfIslandWidth, 0}
                 ),
-                freeNodes = helper.getFreeNodesCentre(params),
-                snapNodes = helper.getSnapNodesCentre(params)
+                freeNodes = _getFreeNodesCentre(params),
+                snapNodes = _getSnapNodesCentre(params)
             },
             -- high x
             {
                 type = 'STREET',
                 params = edgeParams,
-                edges = helper.makeEdges(
+                edges = _makeEdges(
                     params.direction,
                     pitchAdjusted,
                     {x2, -streetFullWidth - distance - halfIslandWidth, 0},
                     {x3, -streetFullWidth - distance - halfIslandWidth, 0},
                     true
                 ),
-                freeNodes = helper.getFreeNodesHighX(params, true),
-                snapNodes = helper.getSnapNodesHighX(params, true)
+                freeNodes = _getFreeNodesHighX(params, true),
+                snapNodes = _getSnapNodesHighX(params, true)
             },
             {
                 type = 'STREET',
                 params = edgeParams,
-                edges = helper.makeEdges(
+                edges = _makeEdges(
                     params.direction,
                     pitchAdjusted,
                     {x2, halfIslandWidth, 0},
                     {x3, halfIslandWidth, 0}
                 ),
-                freeNodes = helper.getFreeNodesHighX(params),
-                snapNodes = helper.getSnapNodesHighX(params)
+                freeNodes = _getFreeNodesHighX(params),
+                snapNodes = _getSnapNodesHighX(params)
             },
             {
                 type = 'STREET',
                 params = edgeParams,
-                edges = helper.makeEdges(
+                edges = _makeEdges(
                     params.direction,
                     pitchAdjusted,
                     {x2, streetFullWidth + distance + halfIslandWidth, 0},
                     {x3, streetFullWidth + distance + halfIslandWidth, 0}
                 ),
-                freeNodes = helper.getFreeNodesHighX(params),
-                snapNodes = helper.getSnapNodesHighX(params)
+                freeNodes = _getFreeNodesHighX(params),
+                snapNodes = _getSnapNodesHighX(params)
             }
         }
     elseif params.howManyStreetsBase0 == 3 then -- 4 streets
@@ -582,154 +603,154 @@ helper.getStreetChunksSnapEdgeLists = function(params, pitchAdjusted, streetData
             {
                 type = 'STREET',
                 params = edgeParams,
-                edges = helper.makeEdges(
+                edges = _makeEdges(
                     params.direction,
                     pitchAdjusted,
                     {x0, -3.0 * streetHalfWidth - 3.0 * halfDistance - halfIslandWidth, 0},
                     {- streetHalfWidth, -3.0 * streetHalfWidth - 3.0 * halfDistance - halfIslandWidth, 0},
                     true
                 ),
-                freeNodes = helper.getFreeNodesLowX(params, true),
-                snapNodes = helper.getSnapNodesLowX(params, true)
+                freeNodes = _getFreeNodesLowX(params, true),
+                snapNodes = _getSnapNodesLowX(params, true)
             },
             {
                 type = 'STREET',
                 params = edgeParams,
-                edges = helper.makeEdges(
+                edges = _makeEdges(
                     params.direction,
                     pitchAdjusted,
                     {x0, -streetHalfWidth - halfDistance - halfIslandWidth, 0},
                     {x1, -streetHalfWidth - halfDistance - halfIslandWidth, 0},
                     true
                 ),
-                freeNodes = helper.getFreeNodesLowX(params, true),
-                snapNodes = helper.getSnapNodesLowX(params, true)
+                freeNodes = _getFreeNodesLowX(params, true),
+                snapNodes = _getSnapNodesLowX(params, true)
             },
             {
                 type = 'STREET',
                 params = edgeParams,
-                edges = helper.makeEdges(
+                edges = _makeEdges(
                     params.direction,
                     pitchAdjusted,
                     {x0, streetHalfWidth + halfDistance + halfIslandWidth, 0},
                     {x1, streetHalfWidth + halfDistance + halfIslandWidth, 0}
                 ),
-                freeNodes = helper.getFreeNodesLowX(params),
-                snapNodes = helper.getSnapNodesLowX(params)
+                freeNodes = _getFreeNodesLowX(params),
+                snapNodes = _getSnapNodesLowX(params)
             },
             {
                 type = 'STREET',
                 params = edgeParams,
-                edges = helper.makeEdges(
+                edges = _makeEdges(
                     params.direction,
                     pitchAdjusted,
                     {x0, 3.0 * streetHalfWidth + 3.0 * halfDistance + halfIslandWidth, 0},
                     {x1, 3.0 * streetHalfWidth + 3.0 * halfDistance + halfIslandWidth, 0}
                 ),
-                freeNodes = helper.getFreeNodesLowX(params),
-                snapNodes = helper.getSnapNodesLowX(params)
+                freeNodes = _getFreeNodesLowX(params),
+                snapNodes = _getSnapNodesLowX(params)
             },
             -- centre x
             {
                 type = 'STREET',
                 params = edgeParams,
-                edges = helper.makeEdges(
+                edges = _makeEdges(
                     params.direction,
                     pitchAdjusted,
                     {x1, -3.0 * streetHalfWidth - 3.0 * halfDistance - halfIslandWidth, 0},
                     {x2, -3.0 * streetHalfWidth - 3.0 * halfDistance - halfIslandWidth, 0},
                     true
                 ),
-                freeNodes = helper.getFreeNodesCentre(params, true),
-                snapNodes = helper.getSnapNodesCentre(params, true)
+                freeNodes = _getFreeNodesCentre(params, true),
+                snapNodes = _getSnapNodesCentre(params, true)
             },
             {
                 type = 'STREET',
                 params = edgeParams,
-                edges = helper.makeEdges(
+                edges = _makeEdges(
                     params.direction,
                     pitchAdjusted,
                     {x1, -streetHalfWidth - halfDistance - halfIslandWidth, 0},
                     {x2, -streetHalfWidth - halfDistance - halfIslandWidth, 0},
                     true
                 ),
-                freeNodes = helper.getFreeNodesCentre(params, true),
-                snapNodes = helper.getSnapNodesCentre(params, true)
+                freeNodes = _getFreeNodesCentre(params, true),
+                snapNodes = _getSnapNodesCentre(params, true)
             },
             {
                 type = 'STREET',
                 params = edgeParams,
-                edges = helper.makeEdges(
+                edges = _makeEdges(
                     params.direction,
                     pitchAdjusted,
                     {x1, streetHalfWidth + halfDistance + halfIslandWidth, 0},
                     {x2, streetHalfWidth + halfDistance + halfIslandWidth, 0}
                 ),
-                freeNodes = helper.getFreeNodesCentre(params),
-                snapNodes = helper.getSnapNodesCentre(params)
+                freeNodes = _getFreeNodesCentre(params),
+                snapNodes = _getSnapNodesCentre(params)
             },
             {
                 type = 'STREET',
                 params = edgeParams,
-                edges = helper.makeEdges(
+                edges = _makeEdges(
                     params.direction,
                     pitchAdjusted,
                     {x1, 3.0 * streetHalfWidth + 3.0 * halfDistance + halfIslandWidth, 0},
                     {x2, 3.0 * streetHalfWidth + 3.0 * halfDistance + halfIslandWidth, 0}
                 ),
-                freeNodes = helper.getFreeNodesCentre(params),
-                snapNodes = helper.getSnapNodesCentre(params)
+                freeNodes = _getFreeNodesCentre(params),
+                snapNodes = _getSnapNodesCentre(params)
             },
             -- high x
             {
                 type = 'STREET',
                 params = edgeParams,
-                edges = helper.makeEdges(
+                edges = _makeEdges(
                     params.direction,
                     pitchAdjusted,
                     {x2, -3.0 * streetHalfWidth - 3.0 * halfDistance - halfIslandWidth, 0},
                     {x3, -3.0 * streetHalfWidth - 3.0 * halfDistance - halfIslandWidth, 0},
                     true
                 ),
-                freeNodes = helper.getFreeNodesHighX(params, true),
-                snapNodes = helper.getSnapNodesHighX(params, true)
+                freeNodes = _getFreeNodesHighX(params, true),
+                snapNodes = _getSnapNodesHighX(params, true)
             },
             {
                 type = 'STREET',
                 params = edgeParams,
-                edges = helper.makeEdges(
+                edges = _makeEdges(
                     params.direction,
                     pitchAdjusted,
                     {x2, -streetHalfWidth - halfDistance - halfIslandWidth, 0},
                     {x3, -streetHalfWidth - halfDistance - halfIslandWidth, 0},
                     true
                 ),
-                freeNodes = helper.getFreeNodesHighX(params, true),
-                snapNodes = helper.getSnapNodesHighX(params, true)
+                freeNodes = _getFreeNodesHighX(params, true),
+                snapNodes = _getSnapNodesHighX(params, true)
             },
             {
                 type = 'STREET',
                 params = edgeParams,
-                edges = helper.makeEdges(
+                edges = _makeEdges(
                     params.direction,
                     pitchAdjusted,
                     {x2, streetHalfWidth + halfDistance + halfIslandWidth, 0},
                     {x3, streetHalfWidth + halfDistance + halfIslandWidth, 0}
                 ),
-                freeNodes = helper.getFreeNodesHighX(params),
-                snapNodes = helper.getSnapNodesHighX(params)
+                freeNodes = _getFreeNodesHighX(params),
+                snapNodes = _getSnapNodesHighX(params)
             },
             {
                 type = 'STREET',
                 params = edgeParams,
-                edges = helper.makeEdges(
+                edges = _makeEdges(
                     params.direction,
                     pitchAdjusted,
                     {x2, 3.0 * streetHalfWidth + 3.0 * halfDistance + halfIslandWidth, 0},
                     {x3, 3.0 * streetHalfWidth + 3.0 * halfDistance + halfIslandWidth, 0}
                 ),
-                freeNodes = helper.getFreeNodesHighX(params),
-                snapNodes = helper.getSnapNodesHighX(params)
+                freeNodes = _getFreeNodesHighX(params),
+                snapNodes = _getSnapNodesHighX(params)
             }
         }
     elseif params.howManyStreetsBase0 == 4 then -- 5 streets
@@ -738,190 +759,190 @@ helper.getStreetChunksSnapEdgeLists = function(params, pitchAdjusted, streetData
             {
                 type = 'STREET',
                 params = edgeParams,
-                edges = helper.makeEdges(
+                edges = _makeEdges(
                     params.direction,
                     pitchAdjusted,
                     {x0, - 2.0 * streetFullWidth - 2.0 * distance - halfIslandWidth, 0},
                     {x1, - 2.0 * streetFullWidth - 2.0 * distance - halfIslandWidth, 0},
                     true
                 ),
-                freeNodes = helper.getFreeNodesLowX(params, true),
-                snapNodes = helper.getSnapNodesLowX(params, true)
+                freeNodes = _getFreeNodesLowX(params, true),
+                snapNodes = _getSnapNodesLowX(params, true)
             },
             {
                 type = 'STREET',
                 params = edgeParams,
-                edges = helper.makeEdges(
+                edges = _makeEdges(
                     params.direction,
                     pitchAdjusted,
                     {x0, -streetFullWidth - distance - halfIslandWidth, 0},
                     {x1, -streetFullWidth - distance - halfIslandWidth, 0},
                     true
                 ),
-                freeNodes = helper.getFreeNodesLowX(params, true),
-                snapNodes = helper.getSnapNodesLowX(params, true)
+                freeNodes = _getFreeNodesLowX(params, true),
+                snapNodes = _getSnapNodesLowX(params, true)
             },
             {
                 type = 'STREET',
                 params = edgeParams,
-                edges = helper.makeEdges(
+                edges = _makeEdges(
                     params.direction,
                     pitchAdjusted,
                     {x0, halfIslandWidth, 0},
                     {x1, halfIslandWidth, 0}
                 ),
-                freeNodes = helper.getFreeNodesLowX(params),
-                snapNodes = helper.getSnapNodesLowX(params)
+                freeNodes = _getFreeNodesLowX(params),
+                snapNodes = _getSnapNodesLowX(params)
             },
             {
                 type = 'STREET',
                 params = edgeParams,
-                edges = helper.makeEdges(
+                edges = _makeEdges(
                     params.direction,
                     pitchAdjusted,
                     {x0, streetFullWidth + distance + halfIslandWidth, 0},
                     {x1, streetFullWidth + distance + halfIslandWidth, 0}
                 ),
-                freeNodes = helper.getFreeNodesLowX(params),
-                snapNodes = helper.getSnapNodesLowX(params)
+                freeNodes = _getFreeNodesLowX(params),
+                snapNodes = _getSnapNodesLowX(params)
             },
             {
                 type = 'STREET',
                 params = edgeParams,
-                edges = helper.makeEdges(
+                edges = _makeEdges(
                     params.direction,
                     pitchAdjusted,
                     {x0, 2.0 * streetFullWidth + 2.0 * distance + halfIslandWidth, 0},
                     {x1, 2.0 * streetFullWidth + 2.0 * distance + halfIslandWidth, 0}
                 ),
-                freeNodes = helper.getFreeNodesLowX(params),
-                snapNodes = helper.getSnapNodesLowX(params)
+                freeNodes = _getFreeNodesLowX(params),
+                snapNodes = _getSnapNodesLowX(params)
             },
             -- centre x
             {
                 type = 'STREET',
                 params = edgeParams,
-                edges = helper.makeEdges(
+                edges = _makeEdges(
                     params.direction,
                     pitchAdjusted,
                     {x1, - 2.0 * streetFullWidth - 2.0 * distance - halfIslandWidth, 0},
                     {x2, - 2.0 * streetFullWidth - 2.0 * distance - halfIslandWidth, 0},
                     true
                 ),
-                freeNodes = helper.getFreeNodesCentre(params, true),
-                snapNodes = helper.getSnapNodesCentre(params, true)
+                freeNodes = _getFreeNodesCentre(params, true),
+                snapNodes = _getSnapNodesCentre(params, true)
             },
             {
                 type = 'STREET',
                 params = edgeParams,
-                edges = helper.makeEdges(
+                edges = _makeEdges(
                     params.direction,
                     pitchAdjusted,
                     {x1, -streetFullWidth - distance - halfIslandWidth, 0},
                     {x2, -streetFullWidth - distance - halfIslandWidth, 0},
                     true
                 ),
-                freeNodes = helper.getFreeNodesCentre(params, true),
-                snapNodes = helper.getSnapNodesCentre(params, true)
+                freeNodes = _getFreeNodesCentre(params, true),
+                snapNodes = _getSnapNodesCentre(params, true)
             },
             {
                 type = 'STREET',
                 params = edgeParams,
-                edges = helper.makeEdges(
+                edges = _makeEdges(
                     params.direction,
                     pitchAdjusted,
                     {x1, halfIslandWidth, 0},
                     {x2, halfIslandWidth, 0}
                 ),
-                freeNodes = helper.getFreeNodesCentre(params),
-                snapNodes = helper.getSnapNodesCentre(params)
+                freeNodes = _getFreeNodesCentre(params),
+                snapNodes = _getSnapNodesCentre(params)
             },
             {
                 type = 'STREET',
                 params = edgeParams,
-                edges = helper.makeEdges(
+                edges = _makeEdges(
                     params.direction,
                     pitchAdjusted,
                     {x1, streetFullWidth + distance + halfIslandWidth, 0},
                     {x2, streetFullWidth + distance + halfIslandWidth, 0}
                 ),
-                freeNodes = helper.getFreeNodesCentre(params),
-                snapNodes = helper.getSnapNodesCentre(params)
+                freeNodes = _getFreeNodesCentre(params),
+                snapNodes = _getSnapNodesCentre(params)
             },
             {
                 type = 'STREET',
                 params = edgeParams,
-                edges = helper.makeEdges(
+                edges = _makeEdges(
                     params.direction,
                     pitchAdjusted,
                     {x1, 2.0 * streetFullWidth + 2.0 * distance + halfIslandWidth, 0},
                     {x2, 2.0 * streetFullWidth + 2.0 * distance + halfIslandWidth, 0}
                 ),
-                freeNodes = helper.getFreeNodesCentre(params),
-                snapNodes = helper.getSnapNodesCentre(params)
+                freeNodes = _getFreeNodesCentre(params),
+                snapNodes = _getSnapNodesCentre(params)
             },
             -- high x
             {
                 type = 'STREET',
                 params = edgeParams,
-                edges = helper.makeEdges(
+                edges = _makeEdges(
                     params.direction,
                     pitchAdjusted,
                     {x2, - 2.0 * streetFullWidth - 2.0 * distance - halfIslandWidth, 0},
                     {x3, - 2.0 * streetFullWidth - 2.0 * distance - halfIslandWidth, 0},
                     true
                 ),
-                freeNodes = helper.getFreeNodesHighX(params, true),
-                snapNodes = helper.getSnapNodesHighX(params, true)
+                freeNodes = _getFreeNodesHighX(params, true),
+                snapNodes = _getSnapNodesHighX(params, true)
             },
             {
                 type = 'STREET',
                 params = edgeParams,
-                edges = helper.makeEdges(
+                edges = _makeEdges(
                     params.direction,
                     pitchAdjusted,
                     {x2, -streetFullWidth - distance - halfIslandWidth, 0},
                     {x3, -streetFullWidth - distance - halfIslandWidth, 0},
                     true
                 ),
-                freeNodes = helper.getFreeNodesHighX(params, true),
-                snapNodes = helper.getSnapNodesHighX(params, true)
+                freeNodes = _getFreeNodesHighX(params, true),
+                snapNodes = _getSnapNodesHighX(params, true)
             },
             {
                 type = 'STREET',
                 params = edgeParams,
-                edges = helper.makeEdges(
+                edges = _makeEdges(
                     params.direction,
                     pitchAdjusted,
                     {x2, halfIslandWidth, 0},
                     {x3, halfIslandWidth, 0}
                 ),
-                freeNodes = helper.getFreeNodesHighX(params),
-                snapNodes = helper.getSnapNodesHighX(params)
+                freeNodes = _getFreeNodesHighX(params),
+                snapNodes = _getSnapNodesHighX(params)
             },
             {
                 type = 'STREET',
                 params = edgeParams,
-                edges = helper.makeEdges(
+                edges = _makeEdges(
                     params.direction,
                     pitchAdjusted,
                     {x2, streetFullWidth + distance + halfIslandWidth, 0},
                     {x3, streetFullWidth + distance + halfIslandWidth, 0}
                 ),
-                freeNodes = helper.getFreeNodesHighX(params),
-                snapNodes = helper.getSnapNodesHighX(params)
+                freeNodes = _getFreeNodesHighX(params),
+                snapNodes = _getSnapNodesHighX(params)
             },
             {
                 type = 'STREET',
                 params = edgeParams,
-                edges = helper.makeEdges(
+                edges = _makeEdges(
                     params.direction,
                     pitchAdjusted,
                     {x2, 2.0 * streetFullWidth + 2.0 * distance + halfIslandWidth, 0},
                     {x3, 2.0 * streetFullWidth + 2.0 * distance + halfIslandWidth, 0}
                 ),
-                freeNodes = helper.getFreeNodesHighX(params),
-                snapNodes = helper.getSnapNodesHighX(params)
+                freeNodes = _getFreeNodesHighX(params),
+                snapNodes = _getSnapNodesHighX(params)
             }
         }
     else -- if params.howManyStreetsBase0 == 5 then -- 6 streets -- fallback
@@ -930,229 +951,229 @@ helper.getStreetChunksSnapEdgeLists = function(params, pitchAdjusted, streetData
             {
                 type = 'STREET',
                 params = edgeParams,
-                edges = helper.makeEdges(
+                edges = _makeEdges(
                     params.direction,
                     pitchAdjusted,
                     {x0, - 5.0 * streetHalfWidth - 5.0 * halfDistance - halfIslandWidth, 0},
                     {x1, - 5.0 * streetHalfWidth - 5.0 * halfDistance - halfIslandWidth, 0},
                     true
                 ),
-                freeNodes = helper.getFreeNodesLowX(params, true),
-                snapNodes = helper.getSnapNodesLowX(params, true)
+                freeNodes = _getFreeNodesLowX(params, true),
+                snapNodes = _getSnapNodesLowX(params, true)
             },
             {
                 type = 'STREET',
                 params = edgeParams,
-                edges = helper.makeEdges(
+                edges = _makeEdges(
                     params.direction,
                     pitchAdjusted,
                     {x0, - 3.0 * streetHalfWidth - 3.0 * halfDistance - halfIslandWidth, 0},
                     {x1, - 3.0 * streetHalfWidth - 3.0 * halfDistance - halfIslandWidth, 0},
                     true
                 ),
-                freeNodes = helper.getFreeNodesLowX(params, true),
-                snapNodes = helper.getSnapNodesLowX(params, true)
+                freeNodes = _getFreeNodesLowX(params, true),
+                snapNodes = _getSnapNodesLowX(params, true)
             },
             {
                 type = 'STREET',
                 params = edgeParams,
-                edges = helper.makeEdges(
+                edges = _makeEdges(
                     params.direction,
                     pitchAdjusted,
                     {x0, -streetHalfWidth - halfDistance - halfIslandWidth, 0},
                     {x1, -streetHalfWidth - halfDistance - halfIslandWidth, 0},
                     true
                 ),
-                freeNodes = helper.getFreeNodesLowX(params, true),
-                snapNodes = helper.getSnapNodesLowX(params, true)
+                freeNodes = _getFreeNodesLowX(params, true),
+                snapNodes = _getSnapNodesLowX(params, true)
             },
             {
                 type = 'STREET',
                 params = edgeParams,
-                edges = helper.makeEdges(
+                edges = _makeEdges(
                     params.direction,
                     pitchAdjusted,
                     {x0, streetHalfWidth + halfDistance + halfIslandWidth, 0},
                     {x1, streetHalfWidth + halfDistance + halfIslandWidth, 0}
                 ),
-                freeNodes = helper.getFreeNodesLowX(params),
-                snapNodes = helper.getSnapNodesLowX(params)
+                freeNodes = _getFreeNodesLowX(params),
+                snapNodes = _getSnapNodesLowX(params)
             },
             {
                 type = 'STREET',
                 params = edgeParams,
-                edges = helper.makeEdges(
+                edges = _makeEdges(
                     params.direction,
                     pitchAdjusted,
                     {x0, 3.0 * streetHalfWidth + 3.0 * halfDistance + halfIslandWidth, 0},
                     {x1, 3.0 * streetHalfWidth + 3.0 * halfDistance + halfIslandWidth, 0}
                 ),
-                freeNodes = helper.getFreeNodesLowX(params),
-                snapNodes = helper.getSnapNodesLowX(params)
+                freeNodes = _getFreeNodesLowX(params),
+                snapNodes = _getSnapNodesLowX(params)
             },
             {
                 type = 'STREET',
                 params = edgeParams,
-                edges = helper.makeEdges(
+                edges = _makeEdges(
                     params.direction,
                     pitchAdjusted,
                     {x0, 5.0 * streetHalfWidth + 5.0 * halfDistance + halfIslandWidth, 0},
                     {x1, 5.0 * streetHalfWidth + 5.0 * halfDistance + halfIslandWidth, 0}
                 ),
-                freeNodes = helper.getFreeNodesLowX(params),
-                snapNodes = helper.getSnapNodesLowX(params)
+                freeNodes = _getFreeNodesLowX(params),
+                snapNodes = _getSnapNodesLowX(params)
             },
             -- centre x
             {
                 type = 'STREET',
                 params = edgeParams,
-                edges = helper.makeEdges(
+                edges = _makeEdges(
                     params.direction,
                     pitchAdjusted,
                     {x1, - 5.0 * streetHalfWidth - 5.0 * halfDistance - halfIslandWidth, 0},
                     {x2, - 5.0 * streetHalfWidth - 5.0 * halfDistance - halfIslandWidth, 0},
                     true
                 ),
-                freeNodes = helper.getFreeNodesCentre(params, true),
-                snapNodes = helper.getSnapNodesCentre(params, true)
+                freeNodes = _getFreeNodesCentre(params, true),
+                snapNodes = _getSnapNodesCentre(params, true)
             },
             {
                 type = 'STREET',
                 params = edgeParams,
-                edges = helper.makeEdges(
+                edges = _makeEdges(
                     params.direction,
                     pitchAdjusted,
                     {x1, - 3.0 * streetHalfWidth - 3.0 * halfDistance - halfIslandWidth, 0},
                     {x2, - 3.0 * streetHalfWidth - 3.0 * halfDistance - halfIslandWidth, 0},
                     true
                 ),
-                freeNodes = helper.getFreeNodesCentre(params, true),
-                snapNodes = helper.getSnapNodesCentre(params, true)
+                freeNodes = _getFreeNodesCentre(params, true),
+                snapNodes = _getSnapNodesCentre(params, true)
             },
             {
                 type = 'STREET',
                 params = edgeParams,
-                edges = helper.makeEdges(
+                edges = _makeEdges(
                     params.direction,
                     pitchAdjusted,
                     {x1, -streetHalfWidth - halfDistance - halfIslandWidth, 0},
                     {x2, -streetHalfWidth - halfDistance - halfIslandWidth, 0},
                     true
                 ),
-                freeNodes = helper.getFreeNodesCentre(params, true),
-                snapNodes = helper.getSnapNodesCentre(params, true)
+                freeNodes = _getFreeNodesCentre(params, true),
+                snapNodes = _getSnapNodesCentre(params, true)
             },
             {
                 type = 'STREET',
                 params = edgeParams,
-                edges = helper.makeEdges(
+                edges = _makeEdges(
                     params.direction,
                     pitchAdjusted,
                     {x1, streetHalfWidth + halfDistance + halfIslandWidth, 0},
                     {x2, streetHalfWidth + halfDistance + halfIslandWidth, 0}
                 ),
-                freeNodes = helper.getFreeNodesCentre(params),
-                snapNodes = helper.getSnapNodesCentre(params)
+                freeNodes = _getFreeNodesCentre(params),
+                snapNodes = _getSnapNodesCentre(params)
             },
             {
                 type = 'STREET',
                 params = edgeParams,
-                edges = helper.makeEdges(
+                edges = _makeEdges(
                     params.direction,
                     pitchAdjusted,
                     {x1, 3.0 * streetHalfWidth + 3.0 * halfDistance + halfIslandWidth, 0},
                     {x2, 3.0 * streetHalfWidth + 3.0 * halfDistance + halfIslandWidth, 0}
                 ),
-                freeNodes = helper.getFreeNodesCentre(params),
-                snapNodes = helper.getSnapNodesCentre(params)
+                freeNodes = _getFreeNodesCentre(params),
+                snapNodes = _getSnapNodesCentre(params)
             },
             {
                 type = 'STREET',
                 params = edgeParams,
-                edges = helper.makeEdges(
+                edges = _makeEdges(
                     params.direction,
                     pitchAdjusted,
                     {x1, 5.0 * streetHalfWidth + 5.0 * halfDistance + halfIslandWidth, 0},
                     {x2, 5.0 * streetHalfWidth + 5.0 * halfDistance + halfIslandWidth, 0}
                 ),
-                freeNodes = helper.getFreeNodesCentre(params),
-                snapNodes = helper.getSnapNodesCentre(params)
+                freeNodes = _getFreeNodesCentre(params),
+                snapNodes = _getSnapNodesCentre(params)
             },
             -- high x
             {
                 type = 'STREET',
                 params = edgeParams,
-                edges = helper.makeEdges(
+                edges = _makeEdges(
                     params.direction,
                     pitchAdjusted,
                     {x2, - 5.0 * streetHalfWidth - 5.0 * halfDistance - halfIslandWidth, 0},
                     {x3, - 5.0 * streetHalfWidth - 5.0 * halfDistance - halfIslandWidth, 0},
                     true
                 ),
-                freeNodes = helper.getFreeNodesHighX(params, true),
-                snapNodes = helper.getSnapNodesHighX(params, true)
+                freeNodes = _getFreeNodesHighX(params, true),
+                snapNodes = _getSnapNodesHighX(params, true)
             },
             {
                 type = 'STREET',
                 params = edgeParams,
-                edges = helper.makeEdges(
+                edges = _makeEdges(
                     params.direction,
                     pitchAdjusted,
                     {x2, - 3.0 * streetHalfWidth - 3.0 * halfDistance - halfIslandWidth, 0},
                     {x3, - 3.0 * streetHalfWidth - 3.0 * halfDistance - halfIslandWidth, 0},
                     true
                 ),
-                freeNodes = helper.getFreeNodesHighX(params, true),
-                snapNodes = helper.getSnapNodesHighX(params, true)
+                freeNodes = _getFreeNodesHighX(params, true),
+                snapNodes = _getSnapNodesHighX(params, true)
             },
             {
                 type = 'STREET',
                 params = edgeParams,
-                edges = helper.makeEdges(
+                edges = _makeEdges(
                     params.direction,
                     pitchAdjusted,
                     {x2, -streetHalfWidth - halfDistance - halfIslandWidth, 0},
                     {x3, -streetHalfWidth - halfDistance - halfIslandWidth, 0},
                     true
                 ),
-                freeNodes = helper.getFreeNodesHighX(params, true),
-                snapNodes = helper.getSnapNodesHighX(params, true)
+                freeNodes = _getFreeNodesHighX(params, true),
+                snapNodes = _getSnapNodesHighX(params, true)
             },
             {
                 type = 'STREET',
                 params = edgeParams,
-                edges = helper.makeEdges(
+                edges = _makeEdges(
                     params.direction,
                     pitchAdjusted,
                     {x2, streetHalfWidth + halfDistance + halfIslandWidth, 0},
                     {x3, streetHalfWidth + halfDistance + halfIslandWidth, 0}
                 ),
-                freeNodes = helper.getFreeNodesHighX(params),
-                snapNodes = helper.getSnapNodesHighX(params)
+                freeNodes = _getFreeNodesHighX(params),
+                snapNodes = _getSnapNodesHighX(params)
             },
             {
                 type = 'STREET',
                 params = edgeParams,
-                edges = helper.makeEdges(
+                edges = _makeEdges(
                     params.direction,
                     pitchAdjusted,
                     {x2, 3.0 * streetHalfWidth + 3.0 * halfDistance + halfIslandWidth, 0},
                     {x3, 3.0 * streetHalfWidth + 3.0 * halfDistance + halfIslandWidth, 0}
                 ),
-                freeNodes = helper.getFreeNodesHighX(params),
-                snapNodes = helper.getSnapNodesHighX(params)
+                freeNodes = _getFreeNodesHighX(params),
+                snapNodes = _getSnapNodesHighX(params)
             },
             {
                 type = 'STREET',
                 params = edgeParams,
-                edges = helper.makeEdges(
+                edges = _makeEdges(
                     params.direction,
                     pitchAdjusted,
                     {x2, 5.0 * streetHalfWidth + 5.0 * halfDistance + halfIslandWidth, 0},
                     {x3, 5.0 * streetHalfWidth + 5.0 * halfDistance + halfIslandWidth, 0}
                 ),
-                freeNodes = helper.getFreeNodesHighX(params),
-                snapNodes = helper.getSnapNodesHighX(params)
+                freeNodes = _getFreeNodesHighX(params),
+                snapNodes = _getSnapNodesHighX(params)
             }
         }
     end
@@ -1175,7 +1196,7 @@ helper.getStreetHairpinSnapEdgeLists = function(params, pitchAdjusted, streetDat
         {
             type = 'STREET',
             params = edgeParams,
-            edges = helper.makeEdges(
+            edges = _makeEdges(
                 params.direction,
                 pitchAdjusted,
                 {-xMax, -widthFactorBend * streetHalfWidth, 0},
@@ -1184,20 +1205,20 @@ helper.getStreetHairpinSnapEdgeLists = function(params, pitchAdjusted, streetDat
                 {xMax, 0, 0},
                 {xMax, 0, 0}
             ),
-            freeNodes = helper.getFreeNodesLowX(params),
-            snapNodes = helper.getSnapNodesLowX(params)
+            freeNodes = _getFreeNodesLowX(params),
+            snapNodes = _getSnapNodesLowX(params)
         },
         {
             type = 'STREET',
             params = edgeParams,
             edges = {},
-            freeNodes = helper.getFreeNodesCentre(params),
-            snapNodes = helper.getSnapNodesCentre(params),
+            freeNodes = _getFreeNodesCentre(params),
+            snapNodes = _getSnapNodesCentre(params),
         },
         {
             type = 'STREET',
             params = edgeParams,
-            edges = helper.makeEdges(
+            edges = _makeEdges(
                 params.direction,
                 pitchAdjusted,
                 {0, widthFactorBend * streetHalfWidth, 0},
@@ -1206,8 +1227,8 @@ helper.getStreetHairpinSnapEdgeLists = function(params, pitchAdjusted, streetDat
                 {-xMax, 0, 0},
                 {-xMax, 0, 0}
             ),
-            freeNodes = helper.getFreeNodesHighX(params),
-            snapNodes = helper.getSnapNodesHighX(params)
+            freeNodes = _getFreeNodesHighX(params),
+            snapNodes = _getSnapNodesHighX(params)
         }
     }
     -- the pitch plays no part in the bend as long as it is centred on x = 0
@@ -1229,34 +1250,6 @@ helper.getStreetHairpinSnapEdgeLists = function(params, pitchAdjusted, streetDat
         )
     end
     return edgeLists
-end
-
-helper.getSnapNodesLowX = function(params, isRightOfIsland)
-    if params.snapNodes == 1 then
-        if params.direction == 2 and isRightOfIsland then
-            return params.direction == 0 and {1} or {0}
-        else
-            return params.direction == 0 and {0} or {1}
-        end
-    else
-        return {}
-    end
-end
-
-helper.getSnapNodesCentre = function(params, isRightOfIsland)
-    return {}
-end
-
-helper.getSnapNodesHighX = function(params, isRightOfIsland)
-    if params.snapNodes == 1 then
-        if params.direction == 2 and isRightOfIsland then
-            return params.direction == 0 and {0} or {1}
-        else
-            return params.direction == 0 and {1} or {0}
-        end
-    else
-        return {}
-    end
 end
 
 return helper
