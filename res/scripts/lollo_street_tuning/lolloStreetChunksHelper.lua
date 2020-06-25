@@ -40,7 +40,7 @@ local function _getStreetFullWidth(streetData)
 end
 
 local function _getWidthFactor(streetHalfWidth)
-    -- this is the fruit of trial and error. In May 2020, the game does not allow really sharp curves.
+    -- this is the fruit of trial and error. On 2020-06-25, the game does not allow really sharp curves.
     local result = 0.0
     if streetHalfWidth <= 2.01 then
         -- print('LOLLO very narrow')
