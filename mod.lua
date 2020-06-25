@@ -50,28 +50,24 @@ function data()
                 else return 0
                 end
             end
-            local newConParams = {} --arrayUtils.map(
             for _, par in pairs(streetChunksHelper.getParams()) do
-                local apiPar = api.type.ScriptParam.new()
-                apiPar.key = par.key
-                apiPar.name = par.name
-                apiPar.tooltip = par.tooltip or ''
-                apiPar.values = par.values
-                apiPar.defaultIndex = par.defaultIndex or 0
-                apiPar.uiType = _getUiTypeNumber(par.uiType)
-                if par.yearFrom ~= nil then apiPar.yearFrom = par.yearFrom end
-                if par.yearTo ~= nil then apiPar.yearTo = par.yearTo end
-                newConParams[#newConParams + 1] = apiPar
+                local newConParam = api.type.ScriptParam.new()
+                newConParam.key = par.key
+                newConParam.name = par.name
+                newConParam.tooltip = par.tooltip or ''
+                newConParam.values = par.values
+                newConParam.defaultIndex = par.defaultIndex or 0
+                newConParam.uiType = _getUiTypeNumber(par.uiType)
+                if par.yearFrom ~= nil then newConParam.yearFrom = par.yearFrom end
+                if par.yearTo ~= nil then newConParam.yearTo = par.yearTo end
+                newCon.params[#newCon.params + 1] = newConParam
             end
 
             print('LOLLO dynamicCon.params = ')
-            debugPrint(newConParams)
+            debugPrint(newCon.params)
             debugger()
-            newCon.params = newConParams -- LOLLO TODO check this once UG fixes or explains it, it dumps atm with
-            -- expected userdata, received sol.ScriptParam: value at this index does not properly reflect the desired type
 
             newCon.updateScript.fileName = 'construction/lollo_street_chunks.updateFn'
-            -- newCon.updateScript.params = streetChunksHelper.getParams()
             newCon.preProcessScript.fileName = 'construction/lollo_street_chunks.preProcessFn'
             newCon.upgradeScript.fileName = 'construction/lollo_street_chunks.upgradeFn'
             newCon.createTemplateScript.fileName = 'construction/lollo_street_chunks.createTemplateFn'
