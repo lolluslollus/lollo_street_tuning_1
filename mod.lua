@@ -70,7 +70,9 @@ function data()
                 globalStreetData = streetUtils.getGlobalStreetData,
                 state = {
                     globalStreetData = streetUtils.getGlobalStreetData
-                }
+                },
+                -- state = streetUtils.getGlobalStreetData,
+                streetUtils.getGlobalStreetData
             }
             newCon.preProcessScript.fileName = 'construction/lollo_street_chunks.preProcessFn'
             newCon.upgradeScript.fileName = 'construction/lollo_street_chunks.upgradeFn'

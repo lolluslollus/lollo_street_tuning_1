@@ -5,9 +5,15 @@ local debugger = require('debugger')
 
 function data()
     return {
-        updateFn = function(params)
+        updateFn = function(params, two)
             print('LOLLO updateFn, params = ')
             debugPrint(params)
+            print('LOLLO updateFn, two = ')
+            debugPrint(two) -- it should contain the params I added in postRunFn, but it only contains 
+            -- {
+            --     state = { },
+            -- }
+
             local result = { cost = 0 }
             result.groundFaces = {}
             -- result.colliders = {}
