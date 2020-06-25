@@ -25,7 +25,7 @@ function data()
         },
         -- unlike runFn, postRunFn runs after resources have been loaded
         postRunFn = function(settings, params)
-            if true then return end
+            -- if true then return end
             print('LOLLO postRunFn starting')
             local staticConIdId = api.res.constructionRep.find('lollo_street_chunks.con')
             local staticCon = api.res.constructionRep.get(staticConIdId)
