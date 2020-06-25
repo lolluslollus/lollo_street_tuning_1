@@ -67,7 +67,7 @@ function data()
             print('LOLLO dynamicCon.params = ')
             debugPrint(newConParams)
             debugger()
-            newCon.params = newConParams -- LOLLO TODO check this once UG releases a fix, it dumps atm with
+            newCon.params = newConParams -- LOLLO TODO check this once UG fixes or explains it, it dumps atm with
             -- expected userdata, received sol.ScriptParam: value at this index does not properly reflect the desired type
 
             newCon.updateScript.fileName = 'construction/lollo_street_chunks.updateFn'
