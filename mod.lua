@@ -66,11 +66,12 @@ function data()
             end
 
             newCon.updateScript.fileName = 'construction/lollo_street_chunks.updateFn'
-            -- newCon.updateScript.params = { -- useless, it is discarded
-            --     state = {
-            --         globalStreetData = streetUtils.getGlobalStreetData
-            --     }
-            -- }
+            newCon.updateScript.params = { -- useless, it is discarded
+                globalStreetData = streetUtils.getGlobalStreetData,
+                state = {
+                    globalStreetData = streetUtils.getGlobalStreetData
+                }
+            }
             newCon.preProcessScript.fileName = 'construction/lollo_street_chunks.preProcessFn'
             newCon.upgradeScript.fileName = 'construction/lollo_street_chunks.upgradeFn'
             newCon.createTemplateScript.fileName = 'construction/lollo_street_chunks.createTemplateFn'
