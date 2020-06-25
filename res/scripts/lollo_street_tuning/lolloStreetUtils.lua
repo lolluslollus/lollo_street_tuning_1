@@ -48,90 +48,8 @@ local function _getMyStreetDirPath()
     return streetDirPath, ''
 end
 
-local function _getStreetFilesContents(streetDirPath, fileNamePrefix)
-    -- print('LOLLO current path = ')
-    -- dump(true)(fileUtils.getCurrentPath())
-    -- print('LOLLO package.loaded = ')
-    -- --dump(true)(package.loaded) huge
-    -- for key, value in pairs(package.loaded) do
-    --     print(key, value)
-    -- end
-    -- print('LOLLO streetDirPath = ', streetDirPath)
-    local results = {}
 
-    local streetFiles = fileUtils.getFilesInDirWithExtension(streetDirPath, 'lua')
-    -- print('LOLLO streetfiles are')
-    -- dump(true)(streetFiles)
-    if type(streetFiles) ~= 'table' then
-        return results
-    end
-
-    for i = 1, #streetFiles do
-        local isOk, fileData = fileUtils.readGameDataFile(streetFiles[i])
-        -- print('LOLLO streetFiles[i] = ')
-        -- dump(true)(streetFiles[i])
-        if isOk then
-            table.insert(
-                results,
-                #results + 1,
-                {
-                    categories = fileData.categories or {},
-                    fileName = fileNamePrefix .. fileUtils.getFileNameFromPath(streetFiles[i]),
-                    name = fileData.name or '',
-                    sidewalkWidth = fileData.sidewalkWidth or 0.2,
-                    streetWidth = fileData.streetWidth or 0.2
-                }
-            )
-        end
-    end
-    -- print('LOLLO _getStreetFilesContents is about to return: ')
-    -- for i = 1, #results do
-    --     dump(true)(results[i])
-    -- end
-
-    return results
-
-    -- LOLLO NOTE very useful to see what is going on
-    -- print('LOLLO debug.getregistry() = ')
-    -- print(inspect(debug.getregistry()))
-
-    -- LOLLO NOTE you can save the global var in game or in _G
-    -- print('LOLLO game.config = ')
-    -- -- dump(true)(game)
-    -- for key, value in pairs(game.config) do
-    --     print(key, value)
-    -- end
-    -- print('LOLLO game.res = ')
-    -- for key, value in pairs(game.res) do
-    --     print(key, value)
-    -- end
-    -- this fails coz game.interface is not on this thread, and it has probably nothing to do with file paths anyway
-    -- local func = function()
-    --     return game.interface.findPath('lollo_medium_4_lane_street')
-    -- end
-    -- local ok, fc = pcall(func)
-    -- if ok then
-    --     print('LOLLO test 4 findPath succeeded')
-    --     dump(true)(fc)
-    --     dump(true)(fc())
-    -- else
-    --     print('Execution error:', fc)
-    -- end
-
-    -- You can change package.path (not with ?.lua but with the whole file name) and then require a street file,
-    -- but the required file does not return anything,
-    -- because this is how street files are designed. So I need to read the file and parse it somehow.
-    -- local modPath
-    -- if string.ends(info.source, 'mod.lua') then
-    --     modPath = string.gsub(info.source, "@(.*/)mod[.]lua", "%1")
-    -- elseif string.ends(info.source, '.mdl') then
-    --     modPath = string.gsub(info.source, "@(.*/)res/models/model/.+[.]mdl", "%1")
-    -- elseif string.ends(info.source, '.lua') then
-    --     modPath = string.gsub(info.source, "@(.*/)res/config/street/.+[.]lua", "%1")
-    -- end
-end
-
-local function _getStandardStreetData(streetData) --, chunkedStreetTypes)
+local function _getStandardStreetData()
     -- I could read this from the files, but Linux won't allow it.
     -- This is also more efficient, even if less interesting.
     return {
@@ -236,6 +154,93 @@ local function _getStandardStreetData(streetData) --, chunkedStreetTypes)
     }
 end
 
+local function _getStreetFilesContents(streetDirPath, fileNamePrefix)
+    -- print('LOLLO current path = ')
+    -- dump(true)(fileUtils.getCurrentPath())
+    -- print('LOLLO package.loaded = ')
+    -- --dump(true)(package.loaded) huge
+    -- for key, value in pairs(package.loaded) do
+    --     print(key, value)
+    -- end
+    -- print('LOLLO streetDirPath = ', streetDirPath)
+    local results = {}
+
+    local streetFiles = fileUtils.getFilesInDirWithExtension(streetDirPath, 'lua')
+    -- print('LOLLO streetfiles are')
+    -- dump(true)(streetFiles)
+    if type(streetFiles) ~= 'table' then
+        return results
+    end
+
+    for i = 1, #streetFiles do
+        local isOk, fileData = fileUtils.readGameDataFile(streetFiles[i])
+        -- print('LOLLO streetFiles[i] = ')
+        -- dump(true)(streetFiles[i])
+        if isOk then
+            table.insert(
+                results,
+                #results + 1,
+                {
+                    categories = fileData.categories or {},
+                    fileName = (fileNamePrefix or '') .. fileUtils.getFileNameFromPath(streetFiles[i]),
+                    name = fileData.name or '',
+                    sidewalkWidth = fileData.sidewalkWidth or 0.2,
+                    streetWidth = fileData.streetWidth or 0.2
+                }
+            )
+        end
+    end
+    -- print('LOLLO _getStreetFilesContents is about to return: ')
+    -- for i = 1, #results do
+    --     dump(true)(results[i])
+    -- end
+
+    if #results > 0 then
+        arrayUtils.concatValues(results, _getStandardStreetData())
+    end
+
+    return results
+
+    -- LOLLO NOTE very useful to see what is going on
+    -- print('LOLLO debug.getregistry() = ')
+    -- print(inspect(debug.getregistry()))
+
+    -- LOLLO NOTE you can save the global var in game or in _G
+    -- print('LOLLO game.config = ')
+    -- -- dump(true)(game)
+    -- for key, value in pairs(game.config) do
+    --     print(key, value)
+    -- end
+    -- print('LOLLO game.res = ')
+    -- for key, value in pairs(game.res) do
+    --     print(key, value)
+    -- end
+    -- this fails coz game.interface is not on this thread, and it has probably nothing to do with file paths anyway
+    -- local func = function()
+    --     return game.interface.findPath('lollo_medium_4_lane_street')
+    -- end
+    -- local ok, fc = pcall(func)
+    -- if ok then
+    --     print('LOLLO test 4 findPath succeeded')
+    --     dump(true)(fc)
+    --     dump(true)(fc())
+    -- else
+    --     print('Execution error:', fc)
+    -- end
+
+    -- You can change package.path (not with ?.lua but with the whole file name) and then require a street file,
+    -- but the required file does not return anything,
+    -- because this is how street files are designed. So I need to read the file and parse it somehow.
+    -- local modPath
+    -- if string.ends(info.source, 'mod.lua') then
+    --     modPath = string.gsub(info.source, "@(.*/)mod[.]lua", "%1")
+    -- elseif string.ends(info.source, '.mdl') then
+    --     modPath = string.gsub(info.source, "@(.*/)res/models/model/.+[.]mdl", "%1")
+    -- elseif string.ends(info.source, '.lua') then
+    --     modPath = string.gsub(info.source, "@(.*/)res/config/street/.+[.]lua", "%1")
+    -- end
+end
+
 local function _getStreetDataFiltered(streetData)
     if type(streetData) ~= 'table' then return {} end
 
@@ -249,31 +254,31 @@ local function _getStreetDataFiltered(streetData)
     return results
 end
 
-local function _getStreetDataWithDefaults(streetData)
-    -- print('LOLLO streetData has type = ', type(streetData))
-    if type(streetData) == 'table' and #streetData > 0 then
-        return streetData
-    else
-        print('LOLLO falling back to the default street data')
-        -- provide a default value coz the game will dump if it finds no parameter values
-        return {
-            {
-                categories = {'one-way'},
-                fileName = 'lollo_medium_1_way_1_lane_street.lua',
-                name = 'Narrow 1-way street with 1 lane',
-                sidewalkWidth = 2,
-                streetWidth = 4
-            },
-            {
-                categories = {'one-way'},
-                fileName = 'lollo_medium_1_way_1_lane_street_narrow_sidewalk.lua',
-                name = 'Narrow 1-way street with 1 lane and .8 m pavement',
-                sidewalkWidth = 0.8,
-                streetWidth = 2.4
-            }
-        }
-    end
-end
+-- local function _getStreetDataWithDefaults(streetData)
+--     -- print('LOLLO streetData has type = ', type(streetData))
+--     if type(streetData) == 'table' and #streetData > 0 then
+--         return streetData
+--     else
+--         print('LOLLO falling back to the default street data')
+--         -- provide a default value coz the game will dump if it finds no parameter values
+--         return {
+--             {
+--                 categories = {'one-way'},
+--                 fileName = 'lollo_medium_1_way_1_lane_street.lua',
+--                 name = 'Narrow 1-way street with 1 lane',
+--                 sidewalkWidth = 2,
+--                 streetWidth = 4
+--             },
+--             {
+--                 categories = {'one-way'},
+--                 fileName = 'lollo_medium_1_way_1_lane_street_narrow_sidewalk.lua',
+--                 name = 'Narrow 1-way street with 1 lane and .8 m pavement',
+--                 sidewalkWidth = 0.8,
+--                 streetWidth = 2.4
+--             }
+--         }
+--     end
+-- end
 local function _cloneCategories(tab)
     local results = {}
     for i, v in pairs(tab) do
@@ -312,14 +317,7 @@ end
 
 local function _initLolloStreetDataWithFiles()
     if game._lolloStreetData == nil or (type(game._lolloStreetData) == 'table' and #game._lolloStreetData < 1) then
-        game._lolloStreetData = _getStreetDataWithDefaults(
-            _getStreetDataFiltered(
-                _getStreetFilesContents(
-                    _getMyStreetDirPath()
-                )
-            )
-        )
-
+        game._lolloStreetData = _getStreetDataFiltered(_getStreetFilesContents(_getMyStreetDirPath()))
         arrayUtils.sort(game._lolloStreetData, 'name')
 
         print('LOLLO street data initialised with files, it has', #(game._lolloStreetData or {}), 'records and type = ', type(game._lolloStreetData))

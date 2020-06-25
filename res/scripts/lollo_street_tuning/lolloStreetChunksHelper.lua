@@ -98,7 +98,7 @@ end
 helper.getParams = function()
     local defaultStreetTypeIndex = arrayUtils.findIndex(streetUtils.getGlobalStreetData(), 'fileName', 'lollo_medium_1_way_1_lane_street.lua') - 1
     if defaultStreetTypeIndex < 0 then defaultStreetTypeIndex = 0 end
-
+print('LOLLO getting params for street chunk')
     return {
         {
             key = 'streetType_',

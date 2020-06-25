@@ -43,8 +43,8 @@ arrayUtils.concatValues = function(table1, table2)
         return
     end
 
-    for _, v in pairs(table2) do
-        table.insert(table1, #table1 + 1, v)
+    for _, v2 in pairs(table2) do
+        table.insert(table1, #table1 + 1, v2)
     end
 end
 
@@ -53,8 +53,8 @@ arrayUtils.concatKeysValues = function(table1, table2)
         return
     end
 
-    for k, v in pairs(table2) do
-        table1[k] = v
+    for k2, v2 in pairs(table2) do
+        table1[k2] = v2
     end
 end
 
@@ -88,6 +88,8 @@ arrayUtils.findIndex = function(tab, fieldName, fieldValueNonNil)
 
     for i = 1, #tab do
         if type(tab[i]) == 'table' and tab[i][fieldName] == fieldValueNonNil then
+            print('LOLLO findIndex found index =', i, 'tab[i][fieldName] =', tab[i][fieldName], 'fieldValueNonNil =', fieldValueNonNil, 'content =')
+            debugPrint(tab[i])
             return i
         end
     end
