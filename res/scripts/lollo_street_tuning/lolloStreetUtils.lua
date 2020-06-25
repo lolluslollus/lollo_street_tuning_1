@@ -325,8 +325,8 @@ local function _initLolloStreetDataWithFiles()
 end
 
 helper.getGlobalStreetData = function()
-    -- _initLolloStreetDataWithApi() -- don't use it for now
-    _initLolloStreetDataWithFiles()
+    _initLolloStreetDataWithApi() -- don't use it for now
+    -- _initLolloStreetDataWithFiles()
     return game._lolloStreetData
 end
 

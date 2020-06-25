@@ -2,10 +2,9 @@ local luadump = require('lollo_street_tuning/luadump')
 local debugger = require('debugger')
 -- local inspect = require('inspect')
 -- LOLLO NOTE we free all edges, so they can be converted freely. We couls also make a lot of combinations and upgrade them with the construction params, but that might look messy inm the end.
-local arrayUtils = require('lollo_street_tuning/lolloArrayUtils')
-local pitchUtil = require('lollo_street_tuning/lolloPitchHelpers')
-local streetChunksHelper = require('lollo_street_tuning/lolloStreetChunksHelper')
-local streetUtils = require('lollo_street_tuning/lolloStreetUtils')
+-- local pitchUtil = require('lollo_street_tuning/lolloPitchHelpers')
+-- local streetChunksHelper = require('lollo_street_tuning/lolloStreetChunksHelper')
+-- local streetUtils = require('lollo_street_tuning/lolloStreetUtils')
 function data()
     return {
         type = 'STREET_CONSTRUCTION',
@@ -14,10 +13,10 @@ function data()
             description = _('Lays chunks of street, single or multiple in parallel. Use O and P to adjust the pitch.')
         },
         availability = {
-            yearFrom = 1925,
-            yearTo = 0
+            yearFrom = -1, --1925,
+            yearTo = -1
         },
-        params = streetChunksHelper.getParams(),
+        -- params = streetChunksHelper.getParams(),
         order = 1240,
         -- collider = {
         --     type = 'NONE'
@@ -25,7 +24,7 @@ function data()
         -- autoRemovable = true,
         skipCollision = true,
         --skipCollisionCheck = true,
-        preProcessFn = function(one, two, three) -- useless
+        --[[ preProcessFn = function(one, two, three) -- useless
             print('LOLLO preProcessFn')
             debugPrint(one)
             debugPrint(two)
@@ -72,6 +71,6 @@ function data()
             -- If you leave it out, adding and removing tram tracks won't work.
             -- (Bus lanes don't work anyway.)
             return {}
-        end
+        end ]]
     }
 end

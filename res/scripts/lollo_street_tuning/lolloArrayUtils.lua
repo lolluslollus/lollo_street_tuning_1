@@ -88,8 +88,8 @@ arrayUtils.findIndex = function(tab, fieldName, fieldValueNonNil)
 
     for i = 1, #tab do
         if type(tab[i]) == 'table' and tab[i][fieldName] == fieldValueNonNil then
-            print('LOLLO findIndex found index =', i, 'tab[i][fieldName] =', tab[i][fieldName], 'fieldValueNonNil =', fieldValueNonNil, 'content =')
-            debugPrint(tab[i])
+            -- print('LOLLO findIndex found index =', i, 'tab[i][fieldName] =', tab[i][fieldName], 'fieldValueNonNil =', fieldValueNonNil, 'content =')
+            -- debugPrint(tab[i])
             return i
         end
     end

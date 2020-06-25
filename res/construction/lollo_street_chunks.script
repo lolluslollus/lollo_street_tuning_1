@@ -6,11 +6,8 @@ local debugger = require('debugger')
 function data()
     return {
         updateFn = function(params)
-            print('LOLLO updateFn')
-            local pitchAdjusted = pitchUtil.adjustParamsPitch(params)
-            debugger()
-            local streetData = streetUtils.getGlobalStreetData()[params.streetType_ + 1]
-
+            print('LOLLO updateFn, params = ')
+            debugPrint(params)
             local result = { cost = 0 }
             result.groundFaces = {}
             -- result.colliders = {}
@@ -32,6 +29,11 @@ function data()
             -- This is required if we want to make them snappable at all, to avoid crashes.
             -- We free all edges, so they can be freely converted to whatever one needs.
             -- We could make a lot of combinations and upgrade them with the construction params instead, but that would be a mess to use.
+            print('LOLLO api = ')
+            debugPrint(api)
+            local pitchAdjusted = pitchUtil.adjustParamsPitch(params)
+            local streetData = streetUtils.getGlobalStreetData()[params.streetType_ + 1] -- this calls the api, which is not available here!
+            -- local streetData = params.globalStreetData[params.streetType_ + 1] -- cannot pass the global street data with the params
             result.edgeLists = streetChunksHelper.getSnapEdgeLists(params, pitchAdjusted, streetData, tramTrackType)
 
             -- print('LOLLO edgeLists = ')
@@ -44,24 +46,29 @@ function data()
             return result
         end,
         getModelsFn = function(variant, closureParams)
-            print('LOLLO getModelsFn')
+            print('LOLLO getModelsFn') -- never fires
+            debugPrint(variant)
+            debugPrint(closureParams)
             return {}
         end,
         preProcessFn = function(one, two, three)
-            print('LOLLO preProcessFn')
+            print('LOLLO preProcessFn') -- never fires
+            debugger()
             debugPrint(one)
             debugPrint(two)
             debugPrint(three)
         end,
         upgradeFn = function(_)
-            print('LOLLO upgradeFn')
+            print('LOLLO upgradeFn') -- never fires
+            debugger()
             -- LOLLO NOTE the game wants this function to be defined, even if it returns an empty table.
             -- If you leave it out, adding and removing tram tracks won't work.
             -- (Bus lanes don't work anyway.)
             return {}
         end,
         createTemplateFn = function(one, two, three)
-            print('LOLLO createTemplateFn')
+            print('LOLLO createTemplateFn') -- never fires
+            debugger()
             debugPrint(one)
             debugPrint(two)
             debugPrint(three)

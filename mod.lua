@@ -1,7 +1,7 @@
-local arrayUtils = require('lollo_street_tuning/lolloArrayUtils')
+-- local arrayUtils = require('lollo_street_tuning/lolloArrayUtils')
 local streetChunksHelper = require('lollo_street_tuning/lolloStreetChunksHelper')
 local streetUtils = require('lollo_street_tuning/lolloStreetUtils')
-local stringUtils = require('lollo_street_tuning.lolloStringUtils')
+-- local stringUtils = require('lollo_street_tuning.lolloStringUtils')
 local debugger = require('debugger')
 
 function data()
@@ -33,14 +33,16 @@ function data()
             newCon.fileName = 'lollo_street_chunks_2.con' -- staticCon.fileName -- 'lollo_street_chunks_2.con'
             newCon.type = staticCon.type
             newCon.description = staticCon.description
-            newCon.availability = staticCon.availability
+            -- newCon.availability = { yearFrom = 1925, yearTo = 0 } -- this dumps, the api wants it different
+            newCon.availability.yearFrom = 1925
+            newCon.availability.yearTo = 0
             newCon.buildMode = staticCon.buildMode
             newCon.categories = staticCon.categories
             newCon.order = staticCon.order
             newCon.skipCollision = staticCon.skipCollision
             newCon.autoRemovable = staticCon.autoRemovable
-            print('LOLLO staticCon.params = ')
-            debugPrint(staticCon.params)
+            -- print('LOLLO staticCon.params = ')
+            -- debugPrint(staticCon.params)
             local function _getUiTypeNumber(uiTypeStr)
                 if uiTypeStr == 'BUTTON' then return 0
                 elseif uiTypeStr == 'SLIDER' then return 1
@@ -60,23 +62,23 @@ function data()
                 newConParam.uiType = _getUiTypeNumber(par.uiType)
                 if par.yearFrom ~= nil then newConParam.yearFrom = par.yearFrom end
                 if par.yearTo ~= nil then newConParam.yearTo = par.yearTo end
-                newCon.params[#newCon.params + 1] = newConParam
+                newCon.params[#newCon.params + 1] = newConParam -- the api wants it this way, all the table at once dumps
             end
 
-            print('LOLLO dynamicCon.params = ')
-            debugPrint(newCon.params)
-            debugger()
-
             newCon.updateScript.fileName = 'construction/lollo_street_chunks.updateFn'
+            -- newCon.updateScript.params = { -- useless, it is discarded
+            --     state = {
+            --         globalStreetData = streetUtils.getGlobalStreetData
+            --     }
+            -- }
             newCon.preProcessScript.fileName = 'construction/lollo_street_chunks.preProcessFn'
             newCon.upgradeScript.fileName = 'construction/lollo_street_chunks.upgradeFn'
             newCon.createTemplateScript.fileName = 'construction/lollo_street_chunks.createTemplateFn'
 
-            print('LOLLO newCon = ')
-            debugPrint(newCon)
+            -- print('LOLLO newCon = ')
+            -- debugPrint(newCon)
 
-            -- api.res.moduleRep.add(mod.fileName, mod, true)
-            api.res.constructionRep.add(newCon.fileName, newCon, true)
+            api.res.constructionRep.add(newCon.fileName, newCon, true) -- fileName, resource, visible
         end
     }
 end
