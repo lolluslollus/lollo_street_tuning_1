@@ -1,4 +1,4 @@
-local pitchUtil = {}
+local helper = {}
 
 local _maxPitch4Slider = 100 -- I need a high value coz the arrow key bumps it by 10 at every click
 local _maxAngleAbs = 0.4 --0.36 -- More or less where the game starts complaining coz there is too much slope
@@ -22,12 +22,12 @@ local _getXYZPitched = function(pitch, x, y, z, xMin, xMax)
     return result
 end
 
-pitchUtil.getXYZPitched = function(pitch, tbl)
+helper.getXYZPitched = function(pitch, tbl)
     local result = _getXYZPitched(pitch, tbl[1], tbl[2], tbl[3], -1, 1)
     return result
 end
 
-pitchUtil.getIdTransfPitched = function(pitch)
+helper.getIdTransfPitched = function(pitch)
     local pitchAdjusted = _getPitchAdjusted(pitch)
     local result = {1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1}
     result[1] = math.cos(pitchAdjusted)
@@ -41,7 +41,7 @@ end
 local function _getMiddlePitchParamValue()
     return _maxPitch4Slider
 end
-pitchUtil.adjustParamsPitch = function(params)
+helper.adjustParamsPitch = function(params)
     params.paramX = params.paramX or 0
     params.pitch = params.pitch or _getMiddlePitchParamValue()
 
@@ -57,15 +57,15 @@ pitchUtil.adjustParamsPitch = function(params)
 
     return params.pitch
 end
-pitchUtil.getPitchParamValues = function()
+helper.getPitchParamValues = function()
     local result = {}
     for i = -_maxPitch4Slider, _maxPitch4Slider do
         table.insert(result, #result + 1, tostring(i))
     end
     return result
 end
-pitchUtil.getDefaultPitchParamValue = function()
+helper.getDefaultPitchParamValue = function()
     return _getMiddlePitchParamValue()
 end
 
-return pitchUtil
+return helper

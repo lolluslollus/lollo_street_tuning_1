@@ -1,4 +1,4 @@
-local pitchUtil = require('lollo_street_tuning/lolloPitchHelpers')
+local pitchUtil = require('lollo_street_tuning/lolloPitchHelper')
 local streetChunksHelper = require('lollo_street_tuning/lolloStreetChunksHelper')
 local debugger = require('debugger')
 
