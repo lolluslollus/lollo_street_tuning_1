@@ -17,7 +17,7 @@ function data()
         order = 3,
         busAndTramRight = true,
         -- slopeBuildSteps = 1,
-        transportModesStreet = {'TRUCK'}, -- it dumps with an empty array or with {'PERSON'}
+        -- transportModesStreet = {'TRUCK'}, -- it dumps with an empty array or with {'PERSON'}; savegames dump with {'TRUCK'}
         embankmentSlopeLow  = 0.0,
         embankmentSlopeHigh  = 9.9,
         materials = {
