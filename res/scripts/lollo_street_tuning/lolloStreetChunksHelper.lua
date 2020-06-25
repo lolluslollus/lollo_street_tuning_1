@@ -5,7 +5,9 @@
 local arrayUtils = require('lollo_street_tuning/lolloArrayUtils')
 local edgeUtils = require('lollo_street_tuning/edgeHelpers')
 local pitchUtil = require('lollo_street_tuning/lolloPitchHelpers')
+local streetUtil = require('streetutil')
 local streetUtils = require('lollo_street_tuning/lolloStreetUtils')
+local vec3 = require('vec3')
 local debugger = require('debugger')
 local helper = {}
 
@@ -34,6 +36,29 @@ helper.getLengths = function()
 end
 
 -- --------------- utils -----------------------------------
+local function _getStreetHalfWidth(streetData)
+    return streetData.sidewalkWidth + streetData.streetWidth * 0.5
+end
+
+local function _getWidthFactor(streetHalfWidth)
+    -- this is the fruit of trial and error. In May 2020, the game does not allow really sharp curves.
+    local result = 0.0
+    if streetHalfWidth <= 2.01 then
+        -- print('LOLLO very narrow')
+        result = 1.60
+    elseif streetHalfWidth <= 4.01 then
+        -- print('LOLLO narrow')
+        result = 1.32
+    elseif streetHalfWidth <= 4.51 then
+        -- print('LOLLO medium')
+        result = 1.30
+    else
+        -- print('LOLLO wide')
+        result = 1.20
+    end
+    return result
+end
+
 helper.makeEdges = function(direction, pitch, node0, node1, isRightOfIsland, tan0, tan1)
     -- return params.direction == 0 and
     --     {
@@ -95,10 +120,10 @@ helper.getFreeNodesHighX = function(params, isRightOfIsland)
     end
 end
 
-helper.getParams = function()
+helper.getStreetChunksParams = function()
     local defaultStreetTypeIndex = arrayUtils.findIndex(streetUtils.getGlobalStreetData(), 'fileName', 'lollo_medium_1_way_1_lane_street.lua') - 1
     if defaultStreetTypeIndex < 0 then defaultStreetTypeIndex = 0 end
-print('LOLLO getting params for street chunk')
+-- print('LOLLO getting params for street chunk')
     return {
         {
             key = 'streetType_',
@@ -213,7 +238,75 @@ print('LOLLO getting params for street chunk')
     }
 end
 
-helper.getSnapEdgeLists = function(params, pitchAdjusted, streetData, tramTrackType)
+helper.getStreetHairpinParams = function()
+    local defaultStreetTypeIndex = arrayUtils.findIndex(streetUtils.getGlobalStreetData(), 'fileName', 'lollo_medium_1_way_1_lane_street.lua') - 1
+    if defaultStreetTypeIndex < 0 then defaultStreetTypeIndex = 0 end
+-- print('LOLLO getting params for street hairpin')
+    return {
+        {
+            key = 'streetType_',
+            name = _('Street type'),
+            values = arrayUtils.map(
+                streetUtils.getGlobalStreetData(),
+                function(str)
+                    return str.name
+                end
+            ),
+            uiType = 'COMBOBOX',
+            defaultIndex = defaultStreetTypeIndex
+            -- yearFrom = 1925,
+            -- yearTo = 0
+        },
+        {
+            key = 'snapNodes',
+            name = _('Snap to neighbours'),
+            values = {
+                _('No'),
+                _('Yes')
+            },
+            defaultIndex = 0
+        },
+        {
+            key = 'lockLayoutCentre',
+            name = _('Lock curve'),
+            tooltip = _('Lock a curve to keep its shape pretty and prevent other roads merging in. Unlock it to treat it like ordinary roads. You cannot relock an unlocked curve.'),
+            values = {
+                _('No'),
+                _('Yes')
+            },
+            defaultIndex = 0
+        },
+        {
+            key = 'direction',
+            name = _('Direction'),
+            values = {
+                _('↑'),
+                _('↓')
+            },
+            defaultIndex = 0
+        },
+        {
+            key = 'tramTrack',
+            name = _('Tram track type'),
+            values = {
+                -- must be in this sequence
+                _('NO'),
+                _('YES'),
+                _('ELECTRIC')
+            },
+            defaultIndex = 2
+        },
+        {
+            key = 'pitch',
+            name = _('Pitch (adjust it with O and P while building)'),
+            values = pitchUtil.getPitchParamValues(),
+            defaultIndex = pitchUtil.getDefaultPitchParamValue(),
+            uiType = 'SLIDER'
+        }
+    }
+end
+
+helper.getStreetChunksSnapEdgeLists = function(params, pitchAdjusted, streetData, tramTrackType)
     local streetHalfWidth = streetData.sidewalkWidth + streetData.streetWidth * 0.5
     local streetFullWidth = streetData.sidewalkWidth + streetData.sidewalkWidth + streetData.streetWidth
 
@@ -1062,6 +1155,78 @@ helper.getSnapEdgeLists = function(params, pitchAdjusted, streetData, tramTrackT
                 snapNodes = helper.getSnapNodesHighX(params)
             }
         }
+    end
+    return edgeLists
+end
+
+helper.getStreetHairpinSnapEdgeLists = function(params, pitchAdjusted, streetData, tramTrackType)
+    local streetHalfWidth = _getStreetHalfWidth(streetData)
+    local widthFactorBend = _getWidthFactor(streetHalfWidth)
+
+    -- this is the fruit of trial and error, see the notes
+    -- local xMax = math.max(9.0, streetHalfWidth + 1.0)
+    local xMax = streetHalfWidth + 1.0 -- LOLLO TODO check this, it might need extending
+    local edgeParams = {
+        skipCollision = true,
+        type = streetData.fileName,
+        tramTrackType = tramTrackType
+    }
+    local edgeLists = {
+        {
+            type = 'STREET',
+            params = edgeParams,
+            edges = helper.makeEdges(
+                params.direction,
+                pitchAdjusted,
+                {-xMax, -widthFactorBend * streetHalfWidth, 0},
+                {0, -widthFactorBend * streetHalfWidth, 0},
+                false,
+                {xMax, 0, 0},
+                {xMax, 0, 0}
+            ),
+            freeNodes = helper.getFreeNodesLowX(params),
+            snapNodes = helper.getSnapNodesLowX(params)
+        },
+        {
+            type = 'STREET',
+            params = edgeParams,
+            edges = {},
+            freeNodes = helper.getFreeNodesCentre(params),
+            snapNodes = helper.getSnapNodesCentre(params),
+        },
+        {
+            type = 'STREET',
+            params = edgeParams,
+            edges = helper.makeEdges(
+                params.direction,
+                pitchAdjusted,
+                {0, widthFactorBend * streetHalfWidth, 0},
+                {-xMax, widthFactorBend * streetHalfWidth, 0},
+                false,
+                {-xMax, 0, 0},
+                {-xMax, 0, 0}
+            ),
+            freeNodes = helper.getFreeNodesHighX(params),
+            snapNodes = helper.getSnapNodesHighX(params)
+        }
+    }
+    -- the pitch plays no part in the bend as long as it is centred on x = 0
+    if params.direction == 0 then
+        streetUtil.addEdgeAutoTangents(
+            edgeLists[2].edges,
+            vec3.new(0, -widthFactorBend * streetHalfWidth, 0),
+            vec3.new(0, widthFactorBend * streetHalfWidth, 0),
+            vec3.new(1, 0, 0),
+            vec3.new(-1, 0, 0)
+        )
+    else
+        streetUtil.addEdgeAutoTangents(
+            edgeLists[2].edges,
+            vec3.new(0, widthFactorBend * streetHalfWidth, 0),
+            vec3.new(0, -widthFactorBend * streetHalfWidth, 0),
+            vec3.new(1, 0, 0),
+            vec3.new(-1, 0, 0)
+        )
     end
     return edgeLists
 end

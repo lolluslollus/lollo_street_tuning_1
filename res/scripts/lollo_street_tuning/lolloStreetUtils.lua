@@ -311,7 +311,7 @@ local function _initLolloStreetDataWithApi()
         game._lolloStreetData = _getStreetDataFiltered(_getStreetTypesWithApi())
         arrayUtils.sort(game._lolloStreetData, 'name')
 
-        print('LOLLO street data initialised with api, it has', #(game._lolloStreetData or {}), 'records and type = ', type(game._lolloStreetData))
+        -- print('LOLLO street data initialised with api, it has', #(game._lolloStreetData or {}), 'records and type = ', type(game._lolloStreetData))
     end
 end
 
@@ -320,7 +320,7 @@ local function _initLolloStreetDataWithFiles()
         game._lolloStreetData = _getStreetDataFiltered(_getStreetFilesContents(_getMyStreetDirPath()))
         arrayUtils.sort(game._lolloStreetData, 'name')
 
-        print('LOLLO street data initialised with files, it has', #(game._lolloStreetData or {}), 'records and type = ', type(game._lolloStreetData))
+        -- print('LOLLO street data initialised with files, it has', #(game._lolloStreetData or {}), 'records and type = ', type(game._lolloStreetData))
     end
 end
 
