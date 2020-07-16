@@ -287,11 +287,11 @@ local function _splitEdge(wholeEdge, nodeMid)
     proposal.streetProposal.nodesToAdd[1] = node1
 
     local context = api.type.Context:new()
-    context.checkTerrainAlignment = false
+    context.checkTerrainAlignment = true -- default is false
     context.cleanupStreetGraph = true -- default is false, it seems to do nothing
-    context.gatherBuildings = false -- buildings are destroyed anyway
-    context.gatherFields = true
-    context.player = api.engine.util.getPlayer() -- buildings are destroyed anyway
+    context.gatherBuildings = true  -- default is false
+    context.gatherFields = true -- default is true
+    context.player = api.engine.util.getPlayer() -- default is -1
 
     local callback = function(res, success)
         -- print('LOLLO street splitter callback returned res = ')
@@ -301,7 +301,7 @@ local function _splitEdge(wholeEdge, nodeMid)
         print(success)
     end
 
-    local cmd = api.cmd.make.buildProposal(proposal, context, true) -- true means, ignore errors. Errors are not ignored tho: wrong proposals will be discarded
+    local cmd = api.cmd.make.buildProposal(proposal, context, false) -- the third param means, ignore errors. Errors are not ignored tho: wrong proposals will be discarded
     api.cmd.sendCommand(cmd, callback)
 end
 

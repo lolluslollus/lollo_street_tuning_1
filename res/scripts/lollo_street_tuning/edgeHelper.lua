@@ -191,7 +191,6 @@ helper.getNodeBetween = function(node0, node1, midPosition)
     }
     local edge1Rotated = {
         {
-            -- x0 + sign(x1 - x0) * math.sqrt((x1 - x0) * (x1 - x0) + (y1 - y0) * (y1 - y0)),
             x0 + math.sqrt((x1 - x0) * (x1 - x0) + (y1 - y0) * (y1 - y0)),
             y0,
             0
@@ -262,9 +261,13 @@ helper.getNodeBetween = function(node0, node1, midPosition)
         }
     }
     -- add Z
-    node2WithAbsoluteCoordinates.position[3] = game.interface.getHeight({node2WithAbsoluteCoordinates.position[1], node2WithAbsoluteCoordinates.position[2]})
+    if type(midPosition) == 'table' then
+        node2WithAbsoluteCoordinates.position[3] = midPosition[3]
+    else
+        node2WithAbsoluteCoordinates.position[3] = game.interface.getHeight({node2WithAbsoluteCoordinates.position[1], node2WithAbsoluteCoordinates.position[2]})
+    end
     -- LOLLO TODO this is a crappy approximation for now
-    node2WithAbsoluteCoordinates.tangent[3] = (node0[2][3] + node1[2][3]) * 0.5
+    -- node2WithAbsoluteCoordinates.tangent[3] = (node0[2][3] + node1[2][3]) * 0.5
 
     return node2WithAbsoluteCoordinates
 end
