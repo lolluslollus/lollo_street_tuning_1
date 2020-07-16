@@ -9,9 +9,15 @@
             {
                 forward = true,
                 -- transportModes = {'TRUCK'}
-                -- transportModes = { 0, 0, 0, 1,  0, 0, 0, 0,  0, 0, 0, 0,  0, 0, 0, 0 }
+                -- transportModes = { 0, 0, 0, 1,  0, 0, 0, 0,  0, 0, 0, 0,  0, 0, 0, 0 }, -- LOLLO NOTE has no effect, sadly
+                -- speed,
+                -- width,
+                -- height
             },
-            {forward = true}
+            {
+                forward = true,
+                -- transportModes = { 1, 0, 0, 0,  0, 0, 0, 0,  0, 0, 0, 0,  0, 0, 0, 0 }, -- LOLLO NOTE has no effect, sadly
+            }
         },
         transportModesStreet = {'CAR', 'BUS', 'ELECTRIC_TRAM', 'TRAM', 'TRUCK'}, -- with this, tram tracks appear on all lanes, not only on the right one
         --transportModesSidewalk = { "PERSON", "TRUCK" }, --crashes
