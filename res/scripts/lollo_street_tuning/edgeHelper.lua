@@ -141,7 +141,23 @@ helper.getYKey = function(y)
     return tostring(y)
 end
 
-helper.getNodeBetween = function(node0, node1)
+helper.getNodeBetween = function(node0, node1, midPosition)
+    local x20Shift = 0.5
+    if type(midPosition) == 'table' then
+        print('LOLLO node0[1] =')
+        debugPrint(node0[1])
+        print('LOLLO midPosition =')
+        debugPrint(midPosition)
+        print('LOLLO node1[1] =')
+        debugPrint(node1[1])
+        local den = (node1[1][1] - node0[1][1]) * (node1[1][1] - node0[1][1]) + (node1[1][2] - node0[1][2]) * (node1[1][2] - node0[1][2])
+        if den ~= 0 then
+            local num = (midPosition[1] - node0[1][1]) * (midPosition[1] - node0[1][1]) + (midPosition[2] - node0[1][2]) * (midPosition[2] - node0[1][2])
+            x20Shift = math.sqrt(num / den)
+        end
+    end
+    print('LOLLO x20Shift =')
+    debugPrint(x20Shift)
     -- correct but useless
     -- local node0NormalisationFactor = helper.getVectorLength(node0[2])
     -- if node0NormalisationFactor == 0 then node0NormalisationFactor = math.huge else node0NormalisationFactor = 1.0 / node0NormalisationFactor end
@@ -191,11 +207,11 @@ helper.getNodeBetween = function(node0, node1)
     local cos0I = edge0Rotated[2][1]
     local cos1I = edge1Rotated[2][1]
     local y0I = edge0Rotated[1][2]
-    local y1I = edge1Rotated[1][2]
+    -- local y1I = edge1Rotated[1][2]
     local sin0I = edge0Rotated[2][2]
     local sin1I = edge1Rotated[2][2]
-    local theta0I = math.atan2(sin0I, cos0I)
-    local theta1I = math.atan2(sin1I, cos1I)
+    -- local theta0I = math.atan2(sin0I, cos0I)
+    -- local theta1I = math.atan2(sin1I, cos1I)
 
     -- Now I can solve the system:
     -- a + b x0' + c x0'^2 + d x0'^3 = y0'
@@ -224,7 +240,7 @@ helper.getNodeBetween = function(node0, node1)
     local c = abcd[3][1]
     local d = abcd[4][1]
     -- Now I take the x2' halfway between x0' and x1',
-    local x2I = x0I + (x1I - x0I) * 0.5
+    local x2I = x0I + (x1I - x0I) * x20Shift
     local y2I = a + b * x2I + c * x2I * x2I + d * x2I * x2I * x2I
     -- calculate its y derivative:
     local tan2I = b + 2 * c * x2I + 3 * d * x2I * x2I

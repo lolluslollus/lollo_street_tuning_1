@@ -297,8 +297,8 @@ local function _splitEdge(wholeEdge, nodeMid)
         -- print('LOLLO street splitter callback returned res = ')
         -- debugPrint(res)
         --for _, v in pairs(res.entities) do print(v) end
-        -- print('LOLLO street splitter callback returned success = ')
-        -- print(success)
+        print('LOLLO street splitter callback returned success = ')
+        print(success)
     end
 
     local cmd = api.cmd.make.buildProposal(proposal, context, true) -- true means, ignore errors. Errors are not ignored tho: wrong proposals will be discarded
@@ -327,7 +327,8 @@ function data()
                             {
                                 nearbyEdges[1]['node1pos'],
                                 nearbyEdges[1]['node1tangent'],
-                            }
+                            },
+                            splitterConstruction.position
                         )
                         -- print('LOLLO edgeMid = ')
                         -- debugPrint(nodeMid)
