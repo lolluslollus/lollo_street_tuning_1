@@ -38,7 +38,8 @@ local function _myErrorHandler(err)
     print('lollo street splitter ERROR: ', err)
 end
 
-local function _replaceEdge(oldEdge)
+local function _replaceEdgeDestroyingBuildings(oldEdge)
+    -- LOLLO NOTE this thing destroys all buildings along the edges that it replaces.
     local proposal = api.type.SimpleProposal.new()
 
     local newEdge = api.type.SegmentAndEntity.new()
@@ -73,6 +74,37 @@ local function _replaceEdge(oldEdge)
 
     local cmd = api.cmd.make.buildProposal(proposal, context, true) -- true means, ignore errors. Errors are not ignored tho: wrong proposals will be discarded
     api.cmd.sendCommand(cmd, callback)
+end
+
+local function _replaceEdge(streetEdgeEntity)
+    -- LOLLO NOTE this replaces the street without destroying the buildings
+    if type(streetEdgeEntity) ~= 'table' then return end
+
+	local proposal = api.type.SimpleProposal.new()
+	proposal.streetProposal.edgesToRemove[1] = streetEdgeEntity.id
+
+	local baseEdge = api.engine.getComponent(streetEdgeEntity.id, api.type.ComponentType.BASE_EDGE)
+	local baseEdgeStreet = api.engine.getComponent(streetEdgeEntity.id, api.type.ComponentType.BASE_EDGE_STREET)
+
+	local eo = api.type.SegmentAndEntity.new()
+	eo.entity = -1
+	eo.type = 0
+	eo.comp = baseEdge
+	eo.streetEdge = baseEdgeStreet
+	eo.streetEdge.streetType = api.res.streetTypeRep.find(streetEdgeEntity.streetType)
+
+	proposal.streetProposal.edgesToAdd[1] = eo
+
+    local callback = function(res, success)
+        print('LOLLO res = ')
+		debugPrint(res)
+        --for _, v in pairs(res.entities) do print(v) end
+        print('LOLLO success = ')
+		debugPrint(success)
+	end
+
+	local cmd = api.cmd.make.buildProposal(proposal, nil, false)
+	api.cmd.sendCommand(cmd, callback)
 end
 
 local function _splitEdge(wholeEdge, nodeMid)
