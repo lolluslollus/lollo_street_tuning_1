@@ -222,9 +222,13 @@ end
 
 local function _splitEdge(wholeEdge, nodeMid)
     -- LOLLO NOTE this thing destroys all buildings along the edges that it replaces. This defies the very purpose of this mod!
+    if type(wholeEdge) ~= 'table' then return end
+
     local proposal = api.type.SimpleProposal.new()
 
+    local baseEdge = api.engine.getComponent(wholeEdge.id, api.type.ComponentType.BASE_EDGE)
     local baseEdgeStreet = api.engine.getComponent(wholeEdge.id, api.type.ComponentType.BASE_EDGE_STREET)
+
     local edge0 = api.type.SegmentAndEntity.new()
     edge0.entity = -1
     edge0.type = 0
@@ -233,8 +237,7 @@ local function _splitEdge(wholeEdge, nodeMid)
     edge0.comp.tangent0 = api.type.Vec3f.new(wholeEdge.node0tangent[1], wholeEdge.node0tangent[2], wholeEdge.node0tangent[3])
     edge0.comp.tangent1 = api.type.Vec3f.new(nodeMid.tangent[1], nodeMid.tangent[2], nodeMid.tangent[3])
     edge0.comp.type = 0
-    -- edge0.comp.typeIndex = 0
-    -- edge0.comp.objects = {{ -1, 1 }} --
+    edge0.comp.typeIndex = -1
     edge0.streetEdge = baseEdgeStreet
 
     local edge1 = api.type.SegmentAndEntity.new()
@@ -245,31 +248,43 @@ local function _splitEdge(wholeEdge, nodeMid)
     edge1.comp.tangent0 = api.type.Vec3f.new(nodeMid.tangent[1], nodeMid.tangent[2], nodeMid.tangent[3])
     edge1.comp.tangent1 = api.type.Vec3f.new(wholeEdge.node1tangent[1], wholeEdge.node1tangent[2], wholeEdge.node1tangent[3])
     edge1.comp.type = 0
-    -- edge1.comp.typeIndex = 0
-    --edge1.comp.objects = {{ -1, 1 }}
+    edge1.comp.typeIndex = -1
     edge1.streetEdge = baseEdgeStreet
+
+    if type(baseEdge.objects) == 'table' then
+        local edge0Objects = {}
+        local edge1Objects = {}
+        for _, vv in pairs(baseEdge.objects) do
+            local entity = game.interface.getEntity(vv[1])
+            if type(entity) == 'table' and type(entity.position) == 'table' then
+                local position = entity.position
+                -- LOLLO NOTE this is a rough estimator to find out which edge gets which objects
+                local node0Distance = math.sqrt((position[1] - wholeEdge.node0pos[1]) * (position[1] - wholeEdge.node0pos[1])
+                    + (position[2] - wholeEdge.node0pos[2]) * (position[2] - wholeEdge.node0pos[2]))
+                -- local nodeMidDistance = math.sqrt((position[1] - nodeMid.position[1]) * (position[1] - nodeMid.position[1])
+                --     + (position[2] - nodeMid.position[2]) * (position[2] - nodeMid.position[2]))
+                local node1Distance = math.sqrt((position[1] - wholeEdge.node1pos[1]) * (position[1] - wholeEdge.node1pos[1])
+                + (position[2] - wholeEdge.node1pos[2]) * (position[2] - wholeEdge.node1pos[2]))
+                if node0Distance < node1Distance then
+                    table.insert(edge0Objects, { vv[1], vv[2] })
+                else
+                    table.insert(edge1Objects, { vv[1], vv[2] })
+                end
+            end
+        end
+        edge0.comp.objects = edge0Objects -- LOLLO NOTE cannot insert directly into edge0.comp.objects
+        edge1.comp.objects = edge1Objects
+    end
 
     proposal.streetProposal.edgesToAdd[1] = edge0
     proposal.streetProposal.edgesToAdd[2] = edge1
     proposal.streetProposal.edgesToRemove[1] = wholeEdge.id
-
-    -- eo = api.type.SimpleStreetProposal.EdgeObject.new()
-    -- eo.left = true
-    -- eo.model = "street/signal_waypoint.mdl"
-    -- eo.playerEntity = game.interface.getPlayer()
-    -- eo.oneWay = false
-    -- eo.param = 0.5
-    -- eo.edgeEntity = -1
-    -- eo.name = "MY Beautiful Signal"
-
-    -- proposal.streetProposal.edgeObjectsToAdd[1] = eo
 
     local node1 = api.type.NodeAndEntity.new()
     node1.entity = -3
     node1.comp.position = api.type.Vec3f.new(nodeMid.position[1], nodeMid.position[2], nodeMid.position[3]) --api.type.Vec3f.new(40.0, 0.0, 0.0)
 
     proposal.streetProposal.nodesToAdd[1] = node1
-
 
     local context = api.type.Context:new()
     context.checkTerrainAlignment = false
@@ -279,10 +294,11 @@ local function _splitEdge(wholeEdge, nodeMid)
     context.player = api.engine.util.getPlayer() -- buildings are destroyed anyway
 
     local callback = function(res, success)
-        print('LOLLO street splitter callback returned res = ')
-        debugPrint(res)
+        -- print('LOLLO street splitter callback returned res = ')
+        -- debugPrint(res)
         --for _, v in pairs(res.entities) do print(v) end
-        print(success)
+        -- print('LOLLO street splitter callback returned success = ')
+        -- print(success)
     end
 
     local cmd = api.cmd.make.buildProposal(proposal, context, true) -- true means, ignore errors. Errors are not ignored tho: wrong proposals will be discarded
@@ -313,10 +329,10 @@ function data()
                                 nearbyEdges[1]['node1tangent'],
                             }
                         )
-                        print('LOLLO edgeMid = ')
-                        debugPrint(nodeMid)
-                        print('LOLLO nearbyEdges[1] = ')
-                        debugPrint(nearbyEdges[1])
+                        -- print('LOLLO edgeMid = ')
+                        -- debugPrint(nodeMid)
+                        -- print('LOLLO nearbyEdges[1] = ')
+                        -- debugPrint(nearbyEdges[1])
 
                         _splitEdge(nearbyEdges[1], nodeMid)
                     end
