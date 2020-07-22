@@ -89,7 +89,8 @@ local function _replaceEdge(oldEdge)
 	local newEdge = api.type.SegmentAndEntity.new()
 	newEdge.entity = -1
 	newEdge.type = 0
-	newEdge.comp = baseEdge
+    newEdge.comp = baseEdge
+    newEdge.playerOwned = {player = api.engine.util.getPlayer()}
 	newEdge.streetEdge = baseEdgeStreet
 	-- eo.streetEdge.streetType = api.res.streetTypeRep.find(streetEdgeEntity.streetType)
 
@@ -237,6 +238,7 @@ local function _spliceEdge(edge0, edge1)
     splicedEdge.comp.tangent1 = api.type.Vec3f.new(edge1.node1tangent[1], edge1.node1tangent[2], edge1.node1tangent[3])
     splicedEdge.comp.type = 0
     splicedEdge.comp.typeIndex = -1
+    splicedEdge.playerOwned = {player = api.engine.util.getPlayer()}
     splicedEdge.streetEdge = baseEdgeStreet
 
     local splicedEdgeObjects = {}
@@ -299,6 +301,7 @@ local function _splitEdge(wholeEdge, nodeMid)
     edge0.comp.tangent1 = api.type.Vec3f.new(nodeMid.tangent[1], nodeMid.tangent[2], nodeMid.tangent[3])
     edge0.comp.type = 0
     edge0.comp.typeIndex = -1
+    edge0.playerOwned = {player = api.engine.util.getPlayer()}
     edge0.streetEdge = baseEdgeStreet
 
     local edge1 = api.type.SegmentAndEntity.new()
@@ -310,6 +313,7 @@ local function _splitEdge(wholeEdge, nodeMid)
     edge1.comp.tangent1 = api.type.Vec3f.new(wholeEdge.node1tangent[1], wholeEdge.node1tangent[2], wholeEdge.node1tangent[3])
     edge1.comp.type = 0
     edge1.comp.typeIndex = -1
+    edge1.playerOwned = {player = api.engine.util.getPlayer()}
     edge1.streetEdge = baseEdgeStreet
 
     if type(baseEdge.objects) == 'table' then
@@ -370,11 +374,12 @@ local function _splitEdge(wholeEdge, nodeMid)
         --for _, v in pairs(res.entities) do print(v) end
         print('LOLLO street splitter callback returned success = ')
         print(success)
+        -- debugger()
     end
 
     local cmd = api.cmd.make.buildProposal(proposal, context, false) -- the third param means, ignore errors. Errors are not ignored tho: wrong proposals will be discarded
     api.cmd.sendCommand(cmd, callback)
-    debugger()
+    -- debugger()
 end
 
 function data()
