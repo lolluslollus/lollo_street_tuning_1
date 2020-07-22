@@ -150,27 +150,22 @@ helper.getNodeBetween = function(node0, node1, betweenPosition)
     debugPrint(betweenPosition)
     print('LOLLO node1[1] =')
     debugPrint(node1[1])
-    local node01DistancePower2 =
-        (node1[1][1] - node0[1][1]) * (node1[1][1] - node0[1][1])
-        +
-        (node1[1][2] - node0[1][2]) * (node1[1][2] - node0[1][2])
-        +
-        (node1[1][3] - node0[1][3]) * (node1[1][3] - node0[1][3])
-    local x20Shift = node01DistancePower2 == 0
+    local node01Distance = helper.getVectorLength({
+        node1[1][1] - node0[1][1],
+        node1[1][2] - node0[1][2],
+        node1[1][3] - node0[1][3]
+    })
+    local x20Shift = node01Distance == 0
         and
             0.5
         or
-            math.sqrt(
-                (
-                    (betweenPosition[1] - node0[1][1]) * (betweenPosition[1] - node0[1][1])
-                    +
-                    (betweenPosition[2] - node0[1][2]) * (betweenPosition[2] - node0[1][2])
-                    +
-                    (betweenPosition[3] - node0[1][3]) * (betweenPosition[3] - node0[1][3])
-                )
-                /
-                node01DistancePower2
-            )
+            helper.getVectorLength({
+                betweenPosition[1] - node0[1][1],
+                betweenPosition[2] - node0[1][2],
+                betweenPosition[3] - node0[1][3]
+            })
+            /
+            node01Distance
     print('LOLLO x20Shift =')
     debugPrint(x20Shift)
     -- correct but useless
@@ -193,7 +188,7 @@ helper.getNodeBetween = function(node0, node1, betweenPosition)
     -- rotate the edges around the Z axis so that y0 = y1
     local zRotation = -math.atan2(y1 - y0, x1 - x0)
     local x0I = x0
-    local x1I = x0 + math.sqrt((x1 - x0) * (x1 - x0) + (y1 - y0) * (y1 - y0))
+    local x1I = x0 + helper.getVectorLength({x1 - x0, y1 - y0, 0})
     -- local cos0I = math.cos(theta0 + zRotation)
     -- local cos1I = math.cos(theta1 + zRotation)
     local y0I = y0
@@ -208,7 +203,7 @@ helper.getNodeBetween = function(node0, node1, betweenPosition)
     -- a + b x1' + c x1'^2 + d x1'^3 = y0'
     -- b + 2 c x0' + 3 d x0'^2 = sin0' / cos0'
     -- b + 2 c x1' + 3 d x1'^2 = sin1' / cos1'
-    local abcd = matrixUtils.mul(
+    local abcdY = matrixUtils.mul(
         matrixUtils.invert(
             {
                 {1, x0I, x0I * x0I, x0I * x0I * x0I},
@@ -225,21 +220,21 @@ helper.getNodeBetween = function(node0, node1, betweenPosition)
         }
     )
 
-    local a = abcd[1][1]
-    local b = abcd[2][1]
-    local c = abcd[3][1]
-    local d = abcd[4][1]
+    local aY = abcdY[1][1]
+    local bY = abcdY[2][1]
+    local cY = abcdY[3][1]
+    local dY = abcdY[4][1]
     -- Now I take x2' between x0' and x1',
     local x2I = x0I + (x1I - x0I) * x20Shift
-    local y2I = a + b * x2I + c * x2I * x2I + d * x2I * x2I * x2I
+    local y2I = aY + bY * x2I + cY * x2I * x2I + dY * x2I * x2I * x2I
     -- calculate its y derivative:
-    local tan2I = b + 2 * c * x2I + 3 * d * x2I * x2I
+    local tan2I = bY + 2 * cY * x2I + 3 * dY * x2I * x2I
     -- Now I undo the rotation I did at the beginning
-    local ro2 = math.sqrt((x2I - x0I) * (x2I - x0I) + (y2I - y0I) * (y2I - y0I))
+    local ro2 = helper.getVectorLength({x2I - x0I, y2I - y0I, 0})
     local alpha2I = math.atan2(y2I - y0I, x2I - x0I)
     local theta2I = math.atan(tan2I)
 
-    local node2WithAbsoluteCoordinates = {
+    local nodeBetween = {
         position = {
             x0I + ro2 * math.cos(alpha2I - zRotation),
             y0I + ro2 * math.sin(alpha2I - zRotation),
@@ -252,15 +247,23 @@ helper.getNodeBetween = function(node0, node1, betweenPosition)
         }
     }
     -- add Z
-    node2WithAbsoluteCoordinates.position[3] = betweenPosition[3]
-    -- add Z tan -- LOLLO NOTE this is a linear interpolation, the game uses a 3rd degree polynom
-    node2WithAbsoluteCoordinates.tangent[3] = node01DistancePower2 ~= 0
+    nodeBetween.position[3] = betweenPosition[3]
+    -- add Z tan -- LOLLO TODO this is a linear interpolation, the game uses a 3rd degree polynom: use one for smoother gradients if needed
+    nodeBetween.tangent[3] = node01Distance ~= 0
     and
-        (node0[2][3] + (node1[2][3] - node0[2][3]) * x20Shift) / math.sqrt(node01DistancePower2)
+        (node0[2][3] + (node1[2][3] - node0[2][3]) * x20Shift) / node01Distance
     or
         0
 
-    return node2WithAbsoluteCoordinates
+    local tangentLength = helper.getVectorLength(nodeBetween.tangent)
+    if tangentLength ~= 0 and tangentLength ~= 1 then
+        nodeBetween.tangent[1] = nodeBetween.tangent[1] / tangentLength
+        nodeBetween.tangent[2] = nodeBetween.tangent[2] / tangentLength
+        nodeBetween.tangent[3] = nodeBetween.tangent[3] / tangentLength
+    end
+print('LOLLO nodeBetween =')
+debugPrint(nodeBetween)
+    return nodeBetween
 end
 
 return helper

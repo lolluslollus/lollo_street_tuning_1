@@ -287,34 +287,31 @@ end
 local function _splitEdge(wholeEdge, nodeBetween)
     if type(wholeEdge) ~= 'table' or type(nodeBetween) ~= 'table' then return end
 
-    local node0TangentLength = math.sqrt(
-        wholeEdge.node0tangent[1] * wholeEdge.node0tangent[1]
-        +
-        wholeEdge.node0tangent[2] * wholeEdge.node0tangent[2]
-        -- +
-        -- wholeEdge.node0tangent[3] * wholeEdge.node0tangent[3]
-    )
-    local node1TangentLength = math.sqrt(
-        wholeEdge.node1tangent[1] * wholeEdge.node1tangent[1]
-        +
-        wholeEdge.node1tangent[2] * wholeEdge.node1tangent[2]
-        -- +
-        -- wholeEdge.node1tangent[3] * wholeEdge.node1tangent[3]
-    )
-    local edge0Length = math.sqrt(
-        (nodeBetween.position[1] - wholeEdge.node0pos[1]) * (nodeBetween.position[1] - wholeEdge.node0pos[1])
-        +
-        (nodeBetween.position[2] - wholeEdge.node0pos[2]) * (nodeBetween.position[2] - wholeEdge.node0pos[2])
-        +
-        (nodeBetween.position[3] - wholeEdge.node0pos[3]) * (nodeBetween.position[3] - wholeEdge.node0pos[3])
-    )
-    local edge1Length = math.sqrt(
-        (nodeBetween.position[1] - wholeEdge.node1pos[1]) * (nodeBetween.position[1] - wholeEdge.node1pos[1])
-        +
-        (nodeBetween.position[2] - wholeEdge.node1pos[2]) * (nodeBetween.position[2] - wholeEdge.node1pos[2])
-        +
-        (nodeBetween.position[3] - wholeEdge.node1pos[3]) * (nodeBetween.position[3] - wholeEdge.node1pos[3])
-    )
+    local node0TangentLength = edgeUtils.getVectorLength({
+        wholeEdge.node0tangent[1],
+        wholeEdge.node0tangent[2],
+        -- wholeEdge.node0tangent[3]
+        0
+    })
+    local node1TangentLength = edgeUtils.getVectorLength({
+        wholeEdge.node1tangent[1],
+        wholeEdge.node1tangent[2],
+        -- wholeEdge.node1tangent[3]
+        0
+    })
+    local edge0Length = edgeUtils.getVectorLength({
+        nodeBetween.position[1] - wholeEdge.node0pos[1],
+        nodeBetween.position[2] - wholeEdge.node0pos[2],
+        0
+        -- nodeBetween.position[3] - wholeEdge.node0pos[3]
+    })
+    local edge1Length = edgeUtils.getVectorLength({
+        nodeBetween.position[1] - wholeEdge.node1pos[1],
+        nodeBetween.position[2] - wholeEdge.node1pos[2],
+        0
+        -- nodeBetween.position[3] - wholeEdge.node1pos[3]
+    })
+
     local proposal = api.type.SimpleProposal.new()
 
     local baseEdge = api.engine.getComponent(wholeEdge.id, api.type.ComponentType.BASE_EDGE)
@@ -372,12 +369,14 @@ local function _splitEdge(wholeEdge, nodeBetween)
             if type(entity) == 'table' and type(entity.position) == 'table' then
                 local position = entity.position
                 -- LOLLO NOTE this is a rough estimator to find out which edge gets which objects
-                local node0Distance = math.sqrt((position[1] - wholeEdge.node0pos[1]) * (position[1] - wholeEdge.node0pos[1])
-                    + (position[2] - wholeEdge.node0pos[2]) * (position[2] - wholeEdge.node0pos[2]))
-                -- local nodeMidDistance = math.sqrt((position[1] - nodeMid.position[1]) * (position[1] - nodeMid.position[1])
-                --     + (position[2] - nodeMid.position[2]) * (position[2] - nodeMid.position[2]))
-                local node1Distance = math.sqrt((position[1] - wholeEdge.node1pos[1]) * (position[1] - wholeEdge.node1pos[1])
-                + (position[2] - wholeEdge.node1pos[2]) * (position[2] - wholeEdge.node1pos[2]))
+                local node0Distance = edgeUtils.getVectorLength({
+                    position[1] - wholeEdge.node0pos[1],
+                    position[2] - wholeEdge.node0pos[2]
+                })
+                local node1Distance = edgeUtils.getVectorLength({
+                    position[1] - wholeEdge.node1pos[1],
+                    position[2] - wholeEdge.node1pos[2]
+                })
                 if node0Distance < node1Distance then
                     table.insert(edge0Objects, { vv[1], vv[2] })
                 else
@@ -395,7 +394,7 @@ local function _splitEdge(wholeEdge, nodeBetween)
     proposal.streetProposal.nodesToAdd[1] = newNodeBetween
 
     local context = api.type.Context:new()
-    -- context.checkTerrainAlignment = true -- default is false
+    context.checkTerrainAlignment = true -- default is false, true gives smoother Z
     -- context.cleanupStreetGraph = true -- default is false, it seems to do nothing
     -- context.gatherBuildings = true  -- default is false
     -- context.gatherFields = true -- default is true
