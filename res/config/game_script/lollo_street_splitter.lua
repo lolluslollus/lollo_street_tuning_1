@@ -291,15 +291,15 @@ local function _splitEdge(wholeEdge, nodeBetween)
         wholeEdge.node0tangent[1] * wholeEdge.node0tangent[1]
         +
         wholeEdge.node0tangent[2] * wholeEdge.node0tangent[2]
-        +
-        wholeEdge.node0tangent[3] * wholeEdge.node0tangent[3]
+        -- +
+        -- wholeEdge.node0tangent[3] * wholeEdge.node0tangent[3]
     )
     local node1TangentLength = math.sqrt(
         wholeEdge.node1tangent[1] * wholeEdge.node1tangent[1]
         +
         wholeEdge.node1tangent[2] * wholeEdge.node1tangent[2]
-        +
-        wholeEdge.node1tangent[3] * wholeEdge.node1tangent[3]
+        -- +
+        -- wholeEdge.node1tangent[3] * wholeEdge.node1tangent[3]
     )
     local edge0Length = math.sqrt(
         (nodeBetween.position[1] - wholeEdge.node0pos[1]) * (nodeBetween.position[1] - wholeEdge.node0pos[1])

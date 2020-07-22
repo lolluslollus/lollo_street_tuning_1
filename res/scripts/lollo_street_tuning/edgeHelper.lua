@@ -142,20 +142,35 @@ helper.getYKey = function(y)
 end
 
 helper.getNodeBetween = function(node0, node1, betweenPosition)
-    local x20Shift = 0.5
-    if type(betweenPosition) == 'table' then
-        print('LOLLO node0[1] =')
-        debugPrint(node0[1])
-        print('LOLLO midPosition =')
-        debugPrint(betweenPosition)
-        print('LOLLO node1[1] =')
-        debugPrint(node1[1])
-        local den = (node1[1][1] - node0[1][1]) * (node1[1][1] - node0[1][1]) + (node1[1][2] - node0[1][2]) * (node1[1][2] - node0[1][2])
-        if den ~= 0 then
-            local num = (betweenPosition[1] - node0[1][1]) * (betweenPosition[1] - node0[1][1]) + (betweenPosition[2] - node0[1][2]) * (betweenPosition[2] - node0[1][2])
-            x20Shift = math.sqrt(num / den)
-        end
-    end
+    if type(node0) ~= 'table' or type(node1) ~= 'table' or type(betweenPosition) ~= 'table' then return nil end
+
+    print('LOLLO node0[1] =')
+    debugPrint(node0[1])
+    print('LOLLO midPosition =')
+    debugPrint(betweenPosition)
+    print('LOLLO node1[1] =')
+    debugPrint(node1[1])
+    local node01DistancePower2 =
+        (node1[1][1] - node0[1][1]) * (node1[1][1] - node0[1][1])
+        +
+        (node1[1][2] - node0[1][2]) * (node1[1][2] - node0[1][2])
+        +
+        (node1[1][3] - node0[1][3]) * (node1[1][3] - node0[1][3])
+    local x20Shift = node01DistancePower2 == 0
+        and
+            0.5
+        or
+            math.sqrt(
+                (
+                    (betweenPosition[1] - node0[1][1]) * (betweenPosition[1] - node0[1][1])
+                    +
+                    (betweenPosition[2] - node0[1][2]) * (betweenPosition[2] - node0[1][2])
+                    +
+                    (betweenPosition[3] - node0[1][3]) * (betweenPosition[3] - node0[1][3])
+                )
+                /
+                node01DistancePower2
+            )
     print('LOLLO x20Shift =')
     debugPrint(x20Shift)
     -- correct but useless
@@ -237,13 +252,13 @@ helper.getNodeBetween = function(node0, node1, betweenPosition)
         }
     }
     -- add Z
-    if type(betweenPosition) == 'table' then
-        node2WithAbsoluteCoordinates.position[3] = betweenPosition[3]
-    else
-        node2WithAbsoluteCoordinates.position[3] = game.interface.getHeight({node2WithAbsoluteCoordinates.position[1], node2WithAbsoluteCoordinates.position[2]})
-    end
-    -- LOLLO TODO this is a crappy approximation for now
-    -- node2WithAbsoluteCoordinates.tangent[3] = (node0[2][3] + node1[2][3]) * 0.5
+    node2WithAbsoluteCoordinates.position[3] = betweenPosition[3]
+    -- add Z tan -- LOLLO NOTE this is a linear interpolation, the game uses a 3rd degree polynom
+    node2WithAbsoluteCoordinates.tangent[3] = node01DistancePower2 ~= 0
+    and
+        (node0[2][3] + (node1[2][3] - node0[2][3]) * x20Shift) / math.sqrt(node01DistancePower2)
+    or
+        0
 
     return node2WithAbsoluteCoordinates
 end
