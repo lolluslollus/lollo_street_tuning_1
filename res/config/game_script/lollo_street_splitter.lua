@@ -220,9 +220,70 @@ local function _splitEdgeBak(wholeEdge, nodeMid)
     api.cmd.sendCommand(cmd, callback)
 end
 
+local function _spliceEdge(edge0, edge1)
+    -- LOLLO NOTE untested function, difficult to use coz it requires two selected objects
+    local proposal = api.type.SimpleProposal.new()
+
+    local baseEdge0 = api.engine.getComponent(edge0.id, api.type.ComponentType.BASE_EDGE)
+    local baseEdge1 = api.engine.getComponent(edge1.id, api.type.ComponentType.BASE_EDGE)
+    local baseEdgeStreet = api.engine.getComponent(edge0.id, api.type.ComponentType.BASE_EDGE_STREET)
+
+    local splicedEdge = api.type.SegmentAndEntity.new()
+    splicedEdge.entity = -1
+    splicedEdge.type = 0
+    splicedEdge.comp.node0 = edge0.node0
+    splicedEdge.comp.node1 = edge1.node1
+    splicedEdge.comp.tangent0 = api.type.Vec3f.new(edge0.node0tangent[1], edge0.node0tangent[2], edge0.node0tangent[3])
+    splicedEdge.comp.tangent1 = api.type.Vec3f.new(edge1.node1tangent[1], edge1.node1tangent[2], edge1.node1tangent[3])
+    splicedEdge.comp.type = 0
+    splicedEdge.comp.typeIndex = -1
+    splicedEdge.streetEdge = baseEdgeStreet
+
+    local splicedEdgeObjects = {}
+    if type(baseEdge0.objects) == 'table' then
+        for _, vv in pairs(baseEdge0.objects) do
+            local entity = game.interface.getEntity(vv[1])
+            if type(entity) == 'table' and type(entity.position) == 'table' then
+                table.insert(splicedEdgeObjects, { vv[1], vv[2] })
+            end
+        end
+    end
+    if type(baseEdge1.objects) == 'table' then
+        for _, vv in pairs(baseEdge1.objects) do
+            local entity = game.interface.getEntity(vv[1])
+            if type(entity) == 'table' and type(entity.position) == 'table' then
+                table.insert(splicedEdgeObjects, { vv[1], vv[2] })
+            end
+        end
+    end
+    splicedEdge.comp.objects = splicedEdgeObjects -- LOLLO NOTE cannot insert directly into edge0.comp.objects
+
+    proposal.streetProposal.edgesToAdd[1] = splicedEdge
+    proposal.streetProposal.edgesToRemove[1] = edge0.id
+    proposal.streetProposal.edgesToRemove[2] = edge1.id
+    proposal.streetProposal.nodesToRemove[1] = edge1.node0.id
+
+    local context = api.type.Context:new()
+    -- context.checkTerrainAlignment = true -- default is false
+    -- context.cleanupStreetGraph = true -- default is false, it seems to do nothing
+    -- context.gatherBuildings = true  -- default is false
+    -- context.gatherFields = true -- default is true
+    context.player = api.engine.util.getPlayer() -- default is -1
+
+    local callback = function(res, success)
+        print('LOLLO street splicer callback returned res = ')
+        debugPrint(res)
+        --for _, v in pairs(res.entities) do print(v) end
+        print('LOLLO street splicer callback returned success = ')
+        print(success)
+    end
+
+    local cmd = api.cmd.make.buildProposal(proposal, context, false) -- the third param means, ignore errors. Errors are not ignored tho: wrong proposals will be discarded
+    api.cmd.sendCommand(cmd, callback)
+end
+
 local function _splitEdge(wholeEdge, nodeMid)
-    -- LOLLO NOTE this thing destroys all buildings along the edges that it replaces. This defies the very purpose of this mod!
-    if type(wholeEdge) ~= 'table' then return end
+    if type(wholeEdge) ~= 'table' or type(nodeMid) ~= 'table' then return end
 
     local proposal = api.type.SimpleProposal.new()
 
@@ -287,15 +348,25 @@ local function _splitEdge(wholeEdge, nodeMid)
     proposal.streetProposal.nodesToAdd[1] = node1
 
     local context = api.type.Context:new()
-    context.checkTerrainAlignment = true -- default is false
-    context.cleanupStreetGraph = true -- default is false, it seems to do nothing
-    context.gatherBuildings = true  -- default is false
-    context.gatherFields = true -- default is true
+    -- context.checkTerrainAlignment = true -- default is false
+    -- context.cleanupStreetGraph = true -- default is false, it seems to do nothing
+    -- context.gatherBuildings = true  -- default is false
+    -- context.gatherFields = true -- default is true
     context.player = api.engine.util.getPlayer() -- default is -1
 
     local callback = function(res, success)
-        -- print('LOLLO street splitter callback returned res = ')
-        -- debugPrint(res)
+        print('LOLLO street splitter callback returned res = ')
+        debugPrint(res)
+        if success == true
+        and res
+        and res.resultProposalData
+        and res.resultProposalData.tpNetLinkProposal
+        and res.resultProposalData.tpNetLinkProposal.toAdd
+        and #res.resultProposalData.tpNetLinkProposal.toAdd > 0 then
+            print('LOLLO new tpNetLinkProposals', #res.resultProposalData.tpNetLinkProposal.toAdd)
+            -- LOLLO TODO undo
+            -- _spliceEdge(edge0, edge1)
+        end
         --for _, v in pairs(res.entities) do print(v) end
         print('LOLLO street splitter callback returned success = ')
         print(success)
@@ -303,6 +374,7 @@ local function _splitEdge(wholeEdge, nodeMid)
 
     local cmd = api.cmd.make.buildProposal(proposal, context, false) -- the third param means, ignore errors. Errors are not ignored tho: wrong proposals will be discarded
     api.cmd.sendCommand(cmd, callback)
+    debugger()
 end
 
 function data()
