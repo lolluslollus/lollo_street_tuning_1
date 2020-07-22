@@ -401,8 +401,8 @@ local function _splitEdge(wholeEdge, nodeBetween)
     context.player = api.engine.util.getPlayer() -- default is -1
 
     local callback = function(res, success)
-        print('LOLLO street splitter callback returned res = ')
-        debugPrint(res)
+        -- print('LOLLO street splitter callback returned res = ')
+        -- debugPrint(res)
         if success == true
         and res
         and res.resultProposalData
@@ -436,6 +436,8 @@ function data()
             elseif name == 'streetSplitterWithApiBuilt' then
                 local splitterConstruction = game.interface.getEntity(param.constructionEntityId)
                 if type(splitterConstruction) == 'table' and type(splitterConstruction.transf) == 'table' then
+                    print('LOLLO splitterConstruction =')
+                    debugPrint(splitterConstruction)
                     local nearbyEdges = edgeUtils.getNearbyStreetEdges(splitterConstruction.transf)
                     if #nearbyEdges > 0 then
                         local nodeBetween = edgeUtils.getNodeBetween(
@@ -447,10 +449,16 @@ function data()
                                 nearbyEdges[1]['node1pos'],
                                 nearbyEdges[1]['node1tangent'],
                             },
+                            -- LOLLO TODO decide between passing position and transf, they are always very similar
+                            -- {
+                            --     splitterConstruction.transf[13],
+                            --     splitterConstruction.transf[14],
+                            --     splitterConstruction.transf[15],
+                            -- },
                             splitterConstruction.position
                         )
-                        -- print('LOLLO nodeBetween = ')
-                        -- debugPrint(nodeBetween)
+                        print('LOLLO nodeBetween = ')
+                        debugPrint(nodeBetween)
                         -- print('LOLLO nearbyEdges[1] = ')
                         -- debugPrint(nearbyEdges[1])
 

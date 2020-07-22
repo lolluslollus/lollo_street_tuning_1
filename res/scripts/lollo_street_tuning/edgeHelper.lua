@@ -261,8 +261,7 @@ helper.getNodeBetween = function(node0, node1, betweenPosition)
         nodeBetween.tangent[2] = nodeBetween.tangent[2] / tangentLength
         nodeBetween.tangent[3] = nodeBetween.tangent[3] / tangentLength
     end
-print('LOLLO nodeBetween =')
-debugPrint(nodeBetween)
+
     return nodeBetween
 end
 
