@@ -141,27 +141,27 @@ helper.getYKey = function(y)
     return tostring(y)
 end
 
-helper.getNodeBetween = function(node0, node1, midPosition)
+helper.getNodeBetween = function(node0, node1, betweenPosition)
     local x20Shift = 0.5
-    if type(midPosition) == 'table' then
+    if type(betweenPosition) == 'table' then
         print('LOLLO node0[1] =')
         debugPrint(node0[1])
         print('LOLLO midPosition =')
-        debugPrint(midPosition)
+        debugPrint(betweenPosition)
         print('LOLLO node1[1] =')
         debugPrint(node1[1])
         local den = (node1[1][1] - node0[1][1]) * (node1[1][1] - node0[1][1]) + (node1[1][2] - node0[1][2]) * (node1[1][2] - node0[1][2])
         if den ~= 0 then
-            local num = (midPosition[1] - node0[1][1]) * (midPosition[1] - node0[1][1]) + (midPosition[2] - node0[1][2]) * (midPosition[2] - node0[1][2])
+            local num = (betweenPosition[1] - node0[1][1]) * (betweenPosition[1] - node0[1][1]) + (betweenPosition[2] - node0[1][2]) * (betweenPosition[2] - node0[1][2])
             x20Shift = math.sqrt(num / den)
         end
     end
     print('LOLLO x20Shift =')
     debugPrint(x20Shift)
     -- correct but useless
-    -- local node0NormalisationFactor = helper.getVectorLength(node0[2])
+    -- local node0NormalisationFactor = helper.getVectorLength(node0[1])
     -- if node0NormalisationFactor == 0 then node0NormalisationFactor = math.huge else node0NormalisationFactor = 1.0 / node0NormalisationFactor end
-    -- local node1NormalisationFactor = helper.getVectorLength(node1[2])
+    -- local node1NormalisationFactor = helper.getVectorLength(node1[1])
     -- if node1NormalisationFactor == 0 then node1NormalisationFactor = math.huge else node1NormalisationFactor = 1.0 / node1NormalisationFactor end
     local x0 = node0[1][1]
     local x1 = node1[1][1]
@@ -177,38 +177,14 @@ helper.getNodeBetween = function(node0, node1, midPosition)
     local z1 = node1[1][3]
     -- rotate the edges around the Z axis so that y0 = y1
     local zRotation = -math.atan2(y1 - y0, x1 - x0)
-    local edge0Rotated = {
-        {
-            x0,
-            y0,
-            0
-        },
-        {
-            math.cos(theta0 + zRotation),
-            math.sin(theta0 + zRotation),
-            0
-        }
-    }
-    local edge1Rotated = {
-        {
-            x0 + math.sqrt((x1 - x0) * (x1 - x0) + (y1 - y0) * (y1 - y0)),
-            y0,
-            0
-        },
-        {
-            math.cos(theta1 + zRotation),
-            math.sin(theta1 + zRotation),
-            0
-        }
-    }
-    local x0I = edge0Rotated[1][1]
-    local x1I = edge1Rotated[1][1]
-    local cos0I = edge0Rotated[2][1]
-    local cos1I = edge1Rotated[2][1]
-    local y0I = edge0Rotated[1][2]
-    -- local y1I = edge1Rotated[1][2]
-    local sin0I = edge0Rotated[2][2]
-    local sin1I = edge1Rotated[2][2]
+    local x0I = x0
+    local x1I = x0 + math.sqrt((x1 - x0) * (x1 - x0) + (y1 - y0) * (y1 - y0))
+    -- local cos0I = math.cos(theta0 + zRotation)
+    -- local cos1I = math.cos(theta1 + zRotation)
+    local y0I = y0
+    -- local y1I = y0
+    -- local sin0I = math.sin(theta0 + zRotation)
+    -- local sin1I = math.sin(theta1 + zRotation)
     -- local theta0I = math.atan2(sin0I, cos0I)
     -- local theta1I = math.atan2(sin1I, cos1I)
 
@@ -229,8 +205,8 @@ helper.getNodeBetween = function(node0, node1, midPosition)
         {
             {y0I},
             {y0I},
-            {sin0I / cos0I}, -- LOLLO TODO risk of division by zero
-            {sin1I / cos1I}
+            {math.tan(theta0 + zRotation)}, -- {sin0I / cos0I}, -- LOLLO TODO risk of division by zero
+            {math.tan(theta1 + zRotation)}, -- {sin1I / cos1I}
         }
     )
 
@@ -238,7 +214,7 @@ helper.getNodeBetween = function(node0, node1, midPosition)
     local b = abcd[2][1]
     local c = abcd[3][1]
     local d = abcd[4][1]
-    -- Now I take the x2' halfway between x0' and x1',
+    -- Now I take x2' between x0' and x1',
     local x2I = x0I + (x1I - x0I) * x20Shift
     local y2I = a + b * x2I + c * x2I * x2I + d * x2I * x2I * x2I
     -- calculate its y derivative:
@@ -255,14 +231,14 @@ helper.getNodeBetween = function(node0, node1, midPosition)
             0
         },
         tangent = {
-            math.cos(theta2I - zRotation) * ro2,
-            math.sin(theta2I - zRotation) * ro2,
+            math.cos(theta2I - zRotation), -- * ro2,
+            math.sin(theta2I - zRotation), -- * ro2,
             0
         }
     }
     -- add Z
-    if type(midPosition) == 'table' then
-        node2WithAbsoluteCoordinates.position[3] = midPosition[3]
+    if type(betweenPosition) == 'table' then
+        node2WithAbsoluteCoordinates.position[3] = betweenPosition[3]
     else
         node2WithAbsoluteCoordinates.position[3] = game.interface.getHeight({node2WithAbsoluteCoordinates.position[1], node2WithAbsoluteCoordinates.position[2]})
     end

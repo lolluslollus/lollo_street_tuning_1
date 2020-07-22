@@ -284,37 +284,85 @@ local function _spliceEdge(edge0, edge1)
     api.cmd.sendCommand(cmd, callback)
 end
 
-local function _splitEdge(wholeEdge, nodeMid)
-    if type(wholeEdge) ~= 'table' or type(nodeMid) ~= 'table' then return end
+local function _splitEdge(wholeEdge, nodeBetween)
+    if type(wholeEdge) ~= 'table' or type(nodeBetween) ~= 'table' then return end
 
+    local node0TangentLength = math.sqrt(
+        wholeEdge.node0tangent[1] * wholeEdge.node0tangent[1]
+        +
+        wholeEdge.node0tangent[2] * wholeEdge.node0tangent[2]
+        +
+        wholeEdge.node0tangent[3] * wholeEdge.node0tangent[3]
+    )
+    local node1TangentLength = math.sqrt(
+        wholeEdge.node1tangent[1] * wholeEdge.node1tangent[1]
+        +
+        wholeEdge.node1tangent[2] * wholeEdge.node1tangent[2]
+        +
+        wholeEdge.node1tangent[3] * wholeEdge.node1tangent[3]
+    )
+    local edge0Length = math.sqrt(
+        (nodeBetween.position[1] - wholeEdge.node0pos[1]) * (nodeBetween.position[1] - wholeEdge.node0pos[1])
+        +
+        (nodeBetween.position[2] - wholeEdge.node0pos[2]) * (nodeBetween.position[2] - wholeEdge.node0pos[2])
+        +
+        (nodeBetween.position[3] - wholeEdge.node0pos[3]) * (nodeBetween.position[3] - wholeEdge.node0pos[3])
+    )
+    local edge1Length = math.sqrt(
+        (nodeBetween.position[1] - wholeEdge.node1pos[1]) * (nodeBetween.position[1] - wholeEdge.node1pos[1])
+        +
+        (nodeBetween.position[2] - wholeEdge.node1pos[2]) * (nodeBetween.position[2] - wholeEdge.node1pos[2])
+        +
+        (nodeBetween.position[3] - wholeEdge.node1pos[3]) * (nodeBetween.position[3] - wholeEdge.node1pos[3])
+    )
     local proposal = api.type.SimpleProposal.new()
 
     local baseEdge = api.engine.getComponent(wholeEdge.id, api.type.ComponentType.BASE_EDGE)
     local baseEdgeStreet = api.engine.getComponent(wholeEdge.id, api.type.ComponentType.BASE_EDGE_STREET)
 
-    local edge0 = api.type.SegmentAndEntity.new()
-    edge0.entity = -1
-    edge0.type = 0
-    edge0.comp.node0 = wholeEdge.node0
-    edge0.comp.node1 = -3
-    edge0.comp.tangent0 = api.type.Vec3f.new(wholeEdge.node0tangent[1], wholeEdge.node0tangent[2], wholeEdge.node0tangent[3])
-    edge0.comp.tangent1 = api.type.Vec3f.new(nodeMid.tangent[1], nodeMid.tangent[2], nodeMid.tangent[3])
-    edge0.comp.type = 0
-    edge0.comp.typeIndex = -1
-    edge0.playerOwned = {player = api.engine.util.getPlayer()}
-    edge0.streetEdge = baseEdgeStreet
+    local newNodeBetween = api.type.NodeAndEntity.new()
+    newNodeBetween.entity = -3
+    newNodeBetween.comp.position = api.type.Vec3f.new(nodeBetween.position[1], nodeBetween.position[2], nodeBetween.position[3]) --api.type.Vec3f.new(40.0, 0.0, 0.0)
 
-    local edge1 = api.type.SegmentAndEntity.new()
-    edge1.entity = -2
-    edge1.type = 0
-    edge1.comp.node0 = -3
-    edge1.comp.node1 = wholeEdge.node1
-    edge1.comp.tangent0 = api.type.Vec3f.new(nodeMid.tangent[1], nodeMid.tangent[2], nodeMid.tangent[3])
-    edge1.comp.tangent1 = api.type.Vec3f.new(wholeEdge.node1tangent[1], wholeEdge.node1tangent[2], wholeEdge.node1tangent[3])
-    edge1.comp.type = 0
-    edge1.comp.typeIndex = -1
-    edge1.playerOwned = {player = api.engine.util.getPlayer()}
-    edge1.streetEdge = baseEdgeStreet
+    local newEdge0 = api.type.SegmentAndEntity.new()
+    newEdge0.entity = -1
+    newEdge0.type = 0
+    newEdge0.comp.node0 = wholeEdge.node0
+    newEdge0.comp.node1 = -3
+    newEdge0.comp.tangent0 = api.type.Vec3f.new(
+        wholeEdge.node0tangent[1] * edge0Length / node0TangentLength,
+        wholeEdge.node0tangent[2] * edge0Length / node0TangentLength,
+        wholeEdge.node0tangent[3] * edge0Length / node0TangentLength
+    )
+    newEdge0.comp.tangent1 = api.type.Vec3f.new(
+        nodeBetween.tangent[1] * edge0Length,
+        nodeBetween.tangent[2] * edge0Length,
+        nodeBetween.tangent[3] * edge0Length
+    )
+    newEdge0.comp.type = 0
+    newEdge0.comp.typeIndex = -1
+    newEdge0.playerOwned = {player = api.engine.util.getPlayer()}
+    newEdge0.streetEdge = baseEdgeStreet
+
+    local newEdge1 = api.type.SegmentAndEntity.new()
+    newEdge1.entity = -2
+    newEdge1.type = 0
+    newEdge1.comp.node0 = -3
+    newEdge1.comp.node1 = wholeEdge.node1
+    newEdge1.comp.tangent0 = api.type.Vec3f.new(
+        nodeBetween.tangent[1] * edge1Length,
+        nodeBetween.tangent[2] * edge1Length,
+        nodeBetween.tangent[3] * edge1Length
+    )
+    newEdge1.comp.tangent1 = api.type.Vec3f.new(
+        wholeEdge.node1tangent[1] * edge1Length / node1TangentLength,
+        wholeEdge.node1tangent[2] * edge1Length / node1TangentLength,
+        wholeEdge.node1tangent[3] * edge1Length / node1TangentLength
+    )
+    newEdge1.comp.type = 0
+    newEdge1.comp.typeIndex = -1
+    newEdge1.playerOwned = {player = api.engine.util.getPlayer()}
+    newEdge1.streetEdge = baseEdgeStreet
 
     if type(baseEdge.objects) == 'table' then
         local edge0Objects = {}
@@ -337,19 +385,14 @@ local function _splitEdge(wholeEdge, nodeMid)
                 end
             end
         end
-        edge0.comp.objects = edge0Objects -- LOLLO NOTE cannot insert directly into edge0.comp.objects
-        edge1.comp.objects = edge1Objects
+        newEdge0.comp.objects = edge0Objects -- LOLLO NOTE cannot insert directly into edge0.comp.objects
+        newEdge1.comp.objects = edge1Objects
     end
 
-    proposal.streetProposal.edgesToAdd[1] = edge0
-    proposal.streetProposal.edgesToAdd[2] = edge1
+    proposal.streetProposal.edgesToAdd[1] = newEdge0
+    proposal.streetProposal.edgesToAdd[2] = newEdge1
     proposal.streetProposal.edgesToRemove[1] = wholeEdge.id
-
-    local node1 = api.type.NodeAndEntity.new()
-    node1.entity = -3
-    node1.comp.position = api.type.Vec3f.new(nodeMid.position[1], nodeMid.position[2], nodeMid.position[3]) --api.type.Vec3f.new(40.0, 0.0, 0.0)
-
-    proposal.streetProposal.nodesToAdd[1] = node1
+    proposal.streetProposal.nodesToAdd[1] = newNodeBetween
 
     local context = api.type.Context:new()
     -- context.checkTerrainAlignment = true -- default is false
@@ -396,7 +439,7 @@ function data()
                 if type(splitterConstruction) == 'table' and type(splitterConstruction.transf) == 'table' then
                     local nearbyEdges = edgeUtils.getNearbyStreetEdges(splitterConstruction.transf)
                     if #nearbyEdges > 0 then
-                        local nodeMid = edgeUtils.getNodeBetween(
+                        local nodeBetween = edgeUtils.getNodeBetween(
                             {
                                 nearbyEdges[1]['node0pos'],
                                 nearbyEdges[1]['node0tangent'],
@@ -407,12 +450,12 @@ function data()
                             },
                             splitterConstruction.position
                         )
-                        -- print('LOLLO edgeMid = ')
-                        -- debugPrint(nodeMid)
+                        -- print('LOLLO nodeBetween = ')
+                        -- debugPrint(nodeBetween)
                         -- print('LOLLO nearbyEdges[1] = ')
                         -- debugPrint(nearbyEdges[1])
 
-                        _splitEdge(nearbyEdges[1], nodeMid)
+                        _splitEdge(nearbyEdges[1], nodeBetween)
                     end
                 end
             elseif name == 'streetChangerBuilt' then
