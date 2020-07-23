@@ -423,7 +423,7 @@ local function _splitEdge(wholeEdge, nodeBetween)
     api.cmd.sendCommand(cmd, callback)
     -- debugger()
 end
-
+-- LOLLO TODO maybe add an "auto height" parameter for use outside bridges and tunnels?
 function data()
     return {
         ini = function()
