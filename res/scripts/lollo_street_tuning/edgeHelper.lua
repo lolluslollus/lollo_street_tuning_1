@@ -276,7 +276,7 @@ helper.getNodeBetween = function(node0, node1, betweenPosition)
         tangent = {
             math.cos(ypsilon2I - zRotation), -- * ro2,
             math.sin(ypsilon2I - zRotation), -- * ro2,
-            math.sin(zeta2I)
+            math.sin(zeta2I) * math.cos(ypsilon2I - zRotation) / math.cos(zeta2I)
         }
     }
 
