@@ -265,7 +265,7 @@ helper.getNodeBetween = function(node0, node1, betweenPosition)
     local z2I = aZ + bZ * x2I + cZ * x2I * x2I + dZ * x2I * x2I * x2I
     -- calculate its y derivative:
     local zOnX2I = bZ + 2 * cZ * x2I + 3 * dZ * x2I * x2I
-    local zeta2I = math.atan(zOnX2I)
+    local zeta2I = math.atan2(zOnX2I)
 
     local nodeBetween = {
         position = {
