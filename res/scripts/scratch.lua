@@ -19,10 +19,10 @@ local node0 = {
     {1, 0, 0}
 }
 local node1 = {
-    {2000, 0, 50},
+    {0, 1000, 50},
     {1, 0, 0}
 }
-local betweenPosition = {1500, 0, 50}
-local nodeBetween = edgeUtils.getNodeBetween(node0, node1, betweenPosition)
-
+local betweenPosition = {500, 500, 55}
+local nodeBetween1 = edgeUtils.getNodeBetween(node0, node1, betweenPosition)
+local nodeBetween2 = edgeUtils.getNodeBetween(node0, node1)
 local dummy = 'AAA'

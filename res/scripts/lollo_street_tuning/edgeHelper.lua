@@ -142,7 +142,7 @@ helper.getYKey = function(y)
 end
 
 helper.getNodeBetween = function(node0, node1, betweenPosition)
-    if type(node0) ~= 'table' or type(node1) ~= 'table' or type(betweenPosition) ~= 'table' then return nil end
+    if type(node0) ~= 'table' or type(node1) ~= 'table' then return nil end
 
     print('LOLLO node0[1] =')
     debugPrint(node0[1])
@@ -155,14 +155,16 @@ helper.getNodeBetween = function(node0, node1, betweenPosition)
         node1[1][2] - node0[1][2],
         node1[1][3] - node0[1][3]
     })
-    local x20Shift = node01Distance == 0
+    if node01Distance == 0 then return nil end
+
+    local x20Shift = type(betweenPosition) ~= 'table'
         and
             0.5
         or
             helper.getVectorLength({
                 betweenPosition[1] - node0[1][1],
                 betweenPosition[2] - node0[1][2],
-                betweenPosition[3] - node0[1][3]
+                -- betweenPosition[3] - node0[1][3]
                 -- 0.0
             })
             /
