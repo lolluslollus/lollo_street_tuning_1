@@ -163,6 +163,7 @@ helper.getNodeBetween = function(node0, node1, betweenPosition)
                 betweenPosition[1] - node0[1][1],
                 betweenPosition[2] - node0[1][2],
                 betweenPosition[3] - node0[1][3]
+                -- 0.0
             })
             /
             node01Distance
@@ -185,12 +186,12 @@ helper.getNodeBetween = function(node0, node1, betweenPosition)
     local ypsilon1 = math.atan2(node1[2][2], node1[2][1])
     local z0 = node0[1][3]
     local z1 = node1[1][3]
-    local zeta0 = math.atan2(node0[2][3], node0[2][1])
-    local zeta1 = math.atan2(node1[2][3], node1[2][1])
+    -- local zeta0 = math.atan2(node0[2][3], node0[2][1])
+    -- local zeta1 = math.atan2(node1[2][3], node1[2][1])
     -- rotate the edges around the Z axis so that y0 = y1
     local zRotation = -math.atan2(y1 - y0, x1 - x0)
     local x0I = x0
-    local x1I = x0 + helper.getVectorLength({x1 - x0, y1 - y0, 0})
+    local x1I = x0 + helper.getVectorLength({x1 - x0, y1 - y0, 0.0})
     -- local cos0I = math.cos(ypsilon0 + zRotation)
     -- local cos1I = math.cos(ypsilon1 + zRotation)
     local y0I = y0
@@ -201,9 +202,8 @@ helper.getNodeBetween = function(node0, node1, betweenPosition)
     -- local ypsilon1I = math.atan2(sin1I, cos1I)
     local z0I = z0
     local z1I = z1
-    -- LOLLO TODO check if you can use the previous zetas or you'd better use the rotated nodeN[2][1]
-    -- local zeta0I = math.atan2(node0[2][3], node0[2][1])
-    -- local zeta1I = math.atan2(node1[2][3], node1[2][1])
+    -- local zeta0I = math.atan2(node0[2][3], helper.getVectorLength({node0[2][1], node0[2][2], 0.0}))
+    -- local zeta1I = math.atan2(node1[2][3], helper.getVectorLength({node1[2][1], node1[2][2], 0.0}))
 
     local invertedXMatrix = matrixUtils.invert(
         {
@@ -216,7 +216,7 @@ helper.getNodeBetween = function(node0, node1, betweenPosition)
 
     -- Now I solve the system for y:
     -- a + b x0' + c x0'^2 + d x0'^3 = y0'
-    -- a + b x1' + c x1'^2 + d x1'^3 = y0'
+    -- a + b x1' + c x1'^2 + d x1'^3 = y0' .. y0' == y1' by construction
     -- b + 2 c x0' + 3 d x0'^2 = sin0' / cos0'
     -- b + 2 c x1' + 3 d x1'^2 = sin1' / cos1'
     local abcdY = matrixUtils.mul(
@@ -224,24 +224,14 @@ helper.getNodeBetween = function(node0, node1, betweenPosition)
         {
             {y0I},
             {y0I},
-            {math.tan(ypsilon0 + zRotation)}, -- {sin0I / cos0I}, -- LOLLO TODO risk of division by zero
-            {math.tan(ypsilon1 + zRotation)}, -- {sin1I / cos1I}
+            {math.tan(ypsilon0 + zRotation)}, -- {sin0I / cos0I}, -- risk of division by zero
+            {math.tan(ypsilon1 + zRotation)}, -- {sin1I / cos1I}, -- risk of division by zero
         }
     )
-
     local aY = abcdY[1][1]
     local bY = abcdY[2][1]
     local cY = abcdY[3][1]
     local dY = abcdY[4][1]
-    -- Now I take x2' between x0' and x1',
-    local x2I = x0I + (x1I - x0I) * x20Shift
-    local y2I = aY + bY * x2I + cY * x2I * x2I + dY * x2I * x2I * x2I
-    -- calculate its y derivative:
-    local yOnX2I = bY + 2 * cY * x2I + 3 * dY * x2I * x2I
-    -- Now I undo the rotation I did at the beginning
-    local ro2 = helper.getVectorLength({x2I - x0I, y2I - y0I, 0})
-    local alpha2I = math.atan2(y2I - y0I, x2I - x0I)
-    local ypsilon2I = math.atan(yOnX2I)
 
     -- Now I solve the system for z:
     -- a + b x0' + c x0'^2 + d x0'^3 = z0'
@@ -253,19 +243,29 @@ helper.getNodeBetween = function(node0, node1, betweenPosition)
         {
             {z0I},
             {z1I},
-            {math.tan(zeta0)},
-            {math.tan(zeta1)},
+            {node0[2][3] / helper.getVectorLength({node0[2][1], node0[2][2], 0.0})},
+            {node1[2][3] / helper.getVectorLength({node1[2][1], node1[2][2], 0.0})},
         }
     )
     local aZ = abcdZ[1][1]
     local bZ = abcdZ[2][1]
     local cZ = abcdZ[3][1]
     local dZ = abcdZ[4][1]
+
     -- Now I take x2' between x0' and x1',
+    local x2I = x0I + (x1I - x0I) * x20Shift
+    local y2I = aY + bY * x2I + cY * x2I * x2I + dY * x2I * x2I * x2I
     local z2I = aZ + bZ * x2I + cZ * x2I * x2I + dZ * x2I * x2I * x2I
     -- calculate its y derivative:
+    local yOnX2I = bY + 2 * cY * x2I + 3 * dY * x2I * x2I
+    local ypsilon2I = math.atan(yOnX2I)
+    -- calculate its z derivative:
     local zOnX2I = bZ + 2 * cZ * x2I + 3 * dZ * x2I * x2I
     local zeta2I = math.atan(zOnX2I)
+
+    -- Now I undo the rotation I did at the beginning
+    local ro2 = helper.getVectorLength({x2I - x0I, y2I - y0I, 0.0})
+    local alpha2I = math.atan2(y2I - y0I, x2I - x0I)
 
     local nodeBetween = {
         position = {
@@ -276,7 +276,8 @@ helper.getNodeBetween = function(node0, node1, betweenPosition)
         tangent = {
             math.cos(ypsilon2I - zRotation), -- * ro2,
             math.sin(ypsilon2I - zRotation), -- * ro2,
-            math.sin(zeta2I) * math.cos(ypsilon2I - zRotation) / math.cos(zeta2I)
+            -- math.sin(zeta2I) * math.cos(ypsilon2I - zRotation) / math.cos(zeta2I)
+            math.sin(zeta2I)
         }
     }
 

@@ -290,26 +290,26 @@ local function _splitEdge(wholeEdge, nodeBetween)
     local node0TangentLength = edgeUtils.getVectorLength({
         wholeEdge.node0tangent[1],
         wholeEdge.node0tangent[2],
-        -- wholeEdge.node0tangent[3]
-        0
+        wholeEdge.node0tangent[3]
+        -- 0
     })
     local node1TangentLength = edgeUtils.getVectorLength({
         wholeEdge.node1tangent[1],
         wholeEdge.node1tangent[2],
-        -- wholeEdge.node1tangent[3]
-        0
+        wholeEdge.node1tangent[3]
+        -- 0
     })
     local edge0Length = edgeUtils.getVectorLength({
         nodeBetween.position[1] - wholeEdge.node0pos[1],
         nodeBetween.position[2] - wholeEdge.node0pos[2],
-        0
-        -- nodeBetween.position[3] - wholeEdge.node0pos[3]
+        -- 0
+        nodeBetween.position[3] - wholeEdge.node0pos[3]
     })
     local edge1Length = edgeUtils.getVectorLength({
         nodeBetween.position[1] - wholeEdge.node1pos[1],
         nodeBetween.position[2] - wholeEdge.node1pos[2],
-        0
-        -- nodeBetween.position[3] - wholeEdge.node1pos[3]
+        -- 0
+        nodeBetween.position[3] - wholeEdge.node1pos[3]
     })
 
     local proposal = api.type.SimpleProposal.new()
@@ -394,7 +394,8 @@ local function _splitEdge(wholeEdge, nodeBetween)
     proposal.streetProposal.nodesToAdd[1] = newNodeBetween
 
     local context = api.type.Context:new()
-    context.checkTerrainAlignment = true -- default is false, true gives smoother Z
+    -- LOLLO TODO the bridge is replaced with a terrapin, the following does not matter
+    -- context.checkTerrainAlignment = true -- default is false, true gives smoother Z
     -- context.cleanupStreetGraph = true -- default is false, it seems to do nothing
     -- context.gatherBuildings = true  -- default is false
     -- context.gatherFields = true -- default is true
