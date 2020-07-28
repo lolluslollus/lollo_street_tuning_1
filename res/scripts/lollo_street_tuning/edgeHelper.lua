@@ -144,12 +144,6 @@ end
 helper.getNodeBetween = function(node0, node1, betweenPosition)
     if type(node0) ~= 'table' or type(node1) ~= 'table' then return nil end
 
-    -- print('LOLLO node0[1] =')
-    -- debugPrint(node0[1])
-    -- print('LOLLO midPosition =')
-    -- debugPrint(betweenPosition)
-    -- print('LOLLO node1[1] =')
-    -- debugPrint(node1[1])
     local node01Distance = helper.getVectorLength({
         node1[1][1] - node0[1][1],
         node1[1][2] - node0[1][2],
@@ -169,8 +163,6 @@ helper.getNodeBetween = function(node0, node1, betweenPosition)
             })
             /
             node01Distance
-    -- print('LOLLO x20Shift =')
-    -- debugPrint(x20Shift)
     -- correct but useless
     -- local node0NormalisationFactor = helper.getVectorLength(node0[1])
     -- if node0NormalisationFactor == 0 then node0NormalisationFactor = math.huge else node0NormalisationFactor = 1.0 / node0NormalisationFactor end
