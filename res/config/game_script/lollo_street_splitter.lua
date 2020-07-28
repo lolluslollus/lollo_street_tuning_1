@@ -399,6 +399,7 @@ local function _splitEdge(wholeEdge, nodeBetween)
     -- context.cleanupStreetGraph = true -- default is false, it seems to do nothing
     -- context.gatherBuildings = true  -- default is false
     -- context.gatherFields = true -- default is true
+    -- LOLLO TODO I cannot make the user own the new edges
     context.player = api.engine.util.getPlayer() -- default is -1
 
     local callback = function(res, success)
@@ -411,7 +412,7 @@ local function _splitEdge(wholeEdge, nodeBetween)
         and res.resultProposalData.tpNetLinkProposal.toAdd
         and #res.resultProposalData.tpNetLinkProposal.toAdd > 0 then
             print('LOLLO new tpNetLinkProposals', #res.resultProposalData.tpNetLinkProposal.toAdd)
-            -- LOLLO TODO undo
+            -- LOLLO TODO MAYBE undo
             -- _spliceEdge(edge0, edge1)
         end
         --for _, v in pairs(res.entities) do print(v) end
@@ -424,7 +425,7 @@ local function _splitEdge(wholeEdge, nodeBetween)
     api.cmd.sendCommand(cmd, callback)
     -- debugger()
 end
--- LOLLO TODO maybe add an "auto height" parameter for use outside bridges and tunnels?
+
 function data()
     return {
         ini = function()
@@ -450,7 +451,7 @@ function data()
                                 nearbyEdges[1]['node1pos'],
                                 nearbyEdges[1]['node1tangent'],
                             },
-                            -- LOLLO TODO decide between passing position and transf, they are always very similar
+                            -- LOLLO NOTE position and transf are always very similar
                             -- {
                             --     splitterConstruction.transf[13],
                             --     splitterConstruction.transf[14],

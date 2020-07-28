@@ -2,7 +2,7 @@ local arrayUtils = require('lollo_street_tuning.lolloArrayUtils')
 local matrixUtils = require('lollo_street_tuning.matrix')
 local streetUtils = require('lollo_street_tuning.lolloStreetUtils')
 local transfUtils = require('lollo_street_tuning.transfUtils')
-local debugger = require('debugger')
+-- local debugger = require('debugger')
 local luadump = require('lollo_street_tuning/luadump')
 
 if math.atan2 == nil then
@@ -257,11 +257,11 @@ helper.getNodeBetween = function(node0, node1, betweenPosition)
     local y2I = aY + bY * x2I + cY * x2I * x2I + dY * x2I * x2I * x2I
     local z2I = aZ + bZ * x2I + cZ * x2I * x2I + dZ * x2I * x2I * x2I
     -- calculate its y derivative:
-    local yOnX2I = bY + 2 * cY * x2I + 3 * dY * x2I * x2I
-    local ypsilon2I = math.atan(yOnX2I)
+    local DYOnDX2I = bY + 2 * cY * x2I + 3 * dY * x2I * x2I
+    local ypsilon2I = math.atan(DYOnDX2I)
     -- calculate its z derivative:
-    local zOnX2I = bZ + 2 * cZ * x2I + 3 * dZ * x2I * x2I
-    local zeta2I = math.atan(zOnX2I)
+    local DZOnDX2I = bZ + 2 * cZ * x2I + 3 * dZ * x2I * x2I
+    local zeta2I = math.atan(DZOnDX2I)
 
     -- Now I undo the rotation I did at the beginning
     local ro2 = helper.getVectorLength({x2I - x0I, y2I - y0I, 0.0})
@@ -278,6 +278,8 @@ helper.getNodeBetween = function(node0, node1, betweenPosition)
             math.sin(ypsilon2I - zRotation), -- * ro2,
             -- math.sin(zeta2I) * math.cos(ypsilon2I - zRotation) / math.cos(zeta2I)
             math.sin(zeta2I)
+            -- math.sin(zeta2I) * math.cos(ypsilon2I - zRotation)
+            -- math.sin(zeta2I) * math.cos(- zRotation)
         }
     }
 
