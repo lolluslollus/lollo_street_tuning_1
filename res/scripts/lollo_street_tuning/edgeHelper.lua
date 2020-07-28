@@ -33,9 +33,9 @@ local helper = {}
 
 helper.getVectorLength = function(xyz)
     if type(xyz) ~= 'table' then return nil end
-    local x = xyz.x or xyz[1]
-    local y = xyz.y or xyz[2]
-    local z = xyz.z or xyz[3]
+    local x = xyz.x or xyz[1] or 0.0
+    local y = xyz.y or xyz[2] or 0.0
+    local z = xyz.z or xyz[3] or 0.0
     return math.sqrt(x * x + y * y + z * z)
 end
 -- helper.getNearbyStreetEdges = function(position, edgeSearchRadius)
