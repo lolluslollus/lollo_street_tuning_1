@@ -95,8 +95,8 @@ local function _replaceEdge(oldEdge)
 	-- eo.streetEdge.streetType = api.res.streetTypeRep.find(streetEdgeEntity.streetType)
 
     proposal.streetProposal.edgesToAdd[1] = newEdge
-    print('LOLLO eo = ')
-    debugPrint(newEdge)
+    -- print('LOLLO eo = ')
+    -- debugPrint(newEdge)
     --[[ local sampleNewEdge =
     {
       entity = -1,
@@ -140,11 +140,11 @@ local function _replaceEdge(oldEdge)
     } ]]
 
     local callback = function(res, success)
-        print('LOLLO res = ')
-		debugPrint(res)
+        -- print('LOLLO res = ')
+		-- debugPrint(res)
         --for _, v in pairs(res.entities) do print(v) end
-        print('LOLLO success = ')
-		debugPrint(success)
+        -- print('LOLLO success = ')
+		-- debugPrint(success)
 	end
 
 	local cmd = api.cmd.make.buildProposal(proposal, nil, false)
@@ -290,32 +290,39 @@ local function _splitEdge(wholeEdge, nodeBetween)
     local node0TangentLength = edgeUtils.getVectorLength({
         wholeEdge.node0tangent[1],
         wholeEdge.node0tangent[2],
-        -- wholeEdge.node0tangent[3]
-        0
+        wholeEdge.node0tangent[3]
+        -- 0
     })
     local node1TangentLength = edgeUtils.getVectorLength({
         wholeEdge.node1tangent[1],
         wholeEdge.node1tangent[2],
-        -- wholeEdge.node1tangent[3]
-        0
+        wholeEdge.node1tangent[3]
+        -- 0
     })
     local edge0Length = edgeUtils.getVectorLength({
         nodeBetween.position[1] - wholeEdge.node0pos[1],
         nodeBetween.position[2] - wholeEdge.node0pos[2],
-        0
-        -- nodeBetween.position[3] - wholeEdge.node0pos[3]
+        -- 0
+        nodeBetween.position[3] - wholeEdge.node0pos[3]
     })
     local edge1Length = edgeUtils.getVectorLength({
         nodeBetween.position[1] - wholeEdge.node1pos[1],
         nodeBetween.position[2] - wholeEdge.node1pos[2],
-        0
-        -- nodeBetween.position[3] - wholeEdge.node1pos[3]
+        -- 0
+        nodeBetween.position[3] - wholeEdge.node1pos[3]
     })
 
     local proposal = api.type.SimpleProposal.new()
 
+    -- LOLLO NOTE api.engine.getComponent gets more properties than game.interface.getEntity()
     local baseEdge = api.engine.getComponent(wholeEdge.id, api.type.ComponentType.BASE_EDGE)
     local baseEdgeStreet = api.engine.getComponent(wholeEdge.id, api.type.ComponentType.BASE_EDGE_STREET)
+    -- print('LOLLO baseEdge = ')
+    -- debugPrint(baseEdge)
+    -- print('LOLLO baseEdgeStreet = ')
+    -- debugPrint(baseEdgeStreet)
+    local playerOwned = api.type.PlayerOwned.new()
+    playerOwned.player = api.engine.util.getPlayer()
 
     local newNodeBetween = api.type.NodeAndEntity.new()
     newNodeBetween.entity = -3
@@ -336,9 +343,9 @@ local function _splitEdge(wholeEdge, nodeBetween)
         nodeBetween.tangent[2] * edge0Length,
         nodeBetween.tangent[3] * edge0Length
     )
-    newEdge0.comp.type = 0
-    newEdge0.comp.typeIndex = -1
-    newEdge0.playerOwned = {player = api.engine.util.getPlayer()}
+    newEdge0.comp.type = baseEdge.type -- 0 -- respect bridge or tunnel
+    newEdge0.comp.typeIndex = baseEdge.typeIndex -- -1 -- respect bridge or tunnel
+    newEdge0.playerOwned = playerOwned
     newEdge0.streetEdge = baseEdgeStreet
 
     local newEdge1 = api.type.SegmentAndEntity.new()
@@ -356,9 +363,9 @@ local function _splitEdge(wholeEdge, nodeBetween)
         wholeEdge.node1tangent[2] * edge1Length / node1TangentLength,
         wholeEdge.node1tangent[3] * edge1Length / node1TangentLength
     )
-    newEdge1.comp.type = 0
-    newEdge1.comp.typeIndex = -1
-    newEdge1.playerOwned = {player = api.engine.util.getPlayer()}
+    newEdge1.comp.type = baseEdge.type -- 0
+    newEdge1.comp.typeIndex = baseEdge.typeIndex -- -1
+    newEdge1.playerOwned = playerOwned
     newEdge1.streetEdge = baseEdgeStreet
 
     if type(baseEdge.objects) == 'table' then
@@ -410,20 +417,18 @@ local function _splitEdge(wholeEdge, nodeBetween)
         and res.resultProposalData.tpNetLinkProposal.toAdd
         and #res.resultProposalData.tpNetLinkProposal.toAdd > 0 then
             print('LOLLO new tpNetLinkProposals', #res.resultProposalData.tpNetLinkProposal.toAdd)
-            -- LOLLO TODO undo
+            -- LOLLO TODO MAYBE undo
             -- _spliceEdge(edge0, edge1)
         end
         --for _, v in pairs(res.entities) do print(v) end
-        print('LOLLO street splitter callback returned success = ')
-        print(success)
-        -- debugger()
+        -- print('LOLLO street splitter callback returned success = ')
+        -- print(success)
     end
 
     local cmd = api.cmd.make.buildProposal(proposal, context, false) -- the third param means, ignore errors. Errors are not ignored tho: wrong proposals will be discarded
     api.cmd.sendCommand(cmd, callback)
-    -- debugger()
 end
--- LOLLO TODO maybe add an "auto height" parameter for use outside bridges and tunnels?
+
 function data()
     return {
         ini = function()
@@ -436,8 +441,6 @@ function data()
             elseif name == 'streetSplitterWithApiBuilt' then
                 local splitterConstruction = game.interface.getEntity(param.constructionEntityId)
                 if type(splitterConstruction) == 'table' and type(splitterConstruction.transf) == 'table' then
-                    print('LOLLO splitterConstruction =')
-                    debugPrint(splitterConstruction)
                     local nearbyEdges = edgeUtils.getNearbyStreetEdges(splitterConstruction.transf)
                     if #nearbyEdges > 0 then
                         local nodeBetween = edgeUtils.getNodeBetween(
@@ -449,7 +452,7 @@ function data()
                                 nearbyEdges[1]['node1pos'],
                                 nearbyEdges[1]['node1tangent'],
                             },
-                            -- LOLLO TODO decide between passing position and transf, they are always very similar
+                            -- LOLLO NOTE position and transf are always very similar
                             -- {
                             --     splitterConstruction.transf[13],
                             --     splitterConstruction.transf[14],
@@ -457,8 +460,8 @@ function data()
                             -- },
                             splitterConstruction.position
                         )
-                        print('LOLLO nodeBetween = ')
-                        debugPrint(nodeBetween)
+                        -- print('LOLLO nodeBetween = ')
+                        -- debugPrint(nodeBetween)
                         -- print('LOLLO nearbyEdges[1] = ')
                         -- debugPrint(nearbyEdges[1])
 
