@@ -33,9 +33,9 @@ local helper = {}
 
 helper.getVectorLength = function(xyz)
     if type(xyz) ~= 'table' then return nil end
-    local x = xyz.x or xyz[1]
-    local y = xyz.y or xyz[2]
-    local z = xyz.z or xyz[3]
+    local x = xyz.x or xyz[1] or 0.0
+    local y = xyz.y or xyz[2] or 0.0
+    local z = xyz.z or xyz[3] or 0.0
     return math.sqrt(x * x + y * y + z * z)
 end
 -- helper.getNearbyStreetEdges = function(position, edgeSearchRadius)
@@ -241,7 +241,7 @@ helper.getNodeBetween = function(node0, node1, betweenPosition)
     -- Now I undo the rotation I did at the beginning
     local ro2 = helper.getVectorLength({x2I - x0I, y2I - y0I, 0})
     local alpha2I = math.atan2(y2I - y0I, x2I - x0I)
-    local ypsilon2I = math.atan2(yOnX2I)
+    local ypsilon2I = math.atan(yOnX2I)
 
     -- Now I solve the system for z:
     -- a + b x0' + c x0'^2 + d x0'^3 = z0'
@@ -265,7 +265,7 @@ helper.getNodeBetween = function(node0, node1, betweenPosition)
     local z2I = aZ + bZ * x2I + cZ * x2I * x2I + dZ * x2I * x2I * x2I
     -- calculate its y derivative:
     local zOnX2I = bZ + 2 * cZ * x2I + 3 * dZ * x2I * x2I
-    local zeta2I = math.atan2(zOnX2I)
+    local zeta2I = math.atan(zOnX2I)
 
     local nodeBetween = {
         position = {
