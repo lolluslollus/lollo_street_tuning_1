@@ -316,6 +316,8 @@ local function _splitEdge(wholeEdge, nodeBetween)
 
     local baseEdge = api.engine.getComponent(wholeEdge.id, api.type.ComponentType.BASE_EDGE)
     local baseEdgeStreet = api.engine.getComponent(wholeEdge.id, api.type.ComponentType.BASE_EDGE_STREET)
+    local playerOwned = api.type.PlayerOwned.new()
+    playerOwned.player = api.engine.util.getPlayer()
 
     local newNodeBetween = api.type.NodeAndEntity.new()
     newNodeBetween.entity = -3
@@ -338,7 +340,7 @@ local function _splitEdge(wholeEdge, nodeBetween)
     )
     newEdge0.comp.type = 0
     newEdge0.comp.typeIndex = -1
-    newEdge0.playerOwned = {player = api.engine.util.getPlayer()}
+    newEdge0.playerOwned = playerOwned
     newEdge0.streetEdge = baseEdgeStreet
 
     local newEdge1 = api.type.SegmentAndEntity.new()
@@ -358,7 +360,7 @@ local function _splitEdge(wholeEdge, nodeBetween)
     )
     newEdge1.comp.type = 0
     newEdge1.comp.typeIndex = -1
-    newEdge1.playerOwned = {player = api.engine.util.getPlayer()}
+    newEdge1.playerOwned = playerOwned
     newEdge1.streetEdge = baseEdgeStreet
 
     if type(baseEdge.objects) == 'table' then
@@ -393,14 +395,19 @@ local function _splitEdge(wholeEdge, nodeBetween)
     proposal.streetProposal.edgesToRemove[1] = wholeEdge.id
     proposal.streetProposal.nodesToAdd[1] = newNodeBetween
 
+    print('LOLLO wholeEdge =')
+    debugPrint(wholeEdge)
+    print('LOLLO newEdge0 =')
+    debugPrint(newEdge0)
     local context = api.type.Context:new()
     -- LOLLO TODO the bridge is replaced with a terrapin, the following does not matter
     -- context.checkTerrainAlignment = true -- default is false, true gives smoother Z
     -- context.cleanupStreetGraph = true -- default is false, it seems to do nothing
     -- context.gatherBuildings = true  -- default is false
     -- context.gatherFields = true -- default is true
-    -- LOLLO TODO I cannot make the user own the new edges
     context.player = api.engine.util.getPlayer() -- default is -1
+    print('LOLLO context = ')
+    debugPrint(context)
 
     local callback = function(res, success)
         -- print('LOLLO street splitter callback returned res = ')
@@ -416,8 +423,8 @@ local function _splitEdge(wholeEdge, nodeBetween)
             -- _spliceEdge(edge0, edge1)
         end
         --for _, v in pairs(res.entities) do print(v) end
-        print('LOLLO street splitter callback returned success = ')
-        print(success)
+        -- print('LOLLO street splitter callback returned success = ')
+        -- print(success)
         -- debugger()
     end
 
@@ -438,8 +445,8 @@ function data()
             elseif name == 'streetSplitterWithApiBuilt' then
                 local splitterConstruction = game.interface.getEntity(param.constructionEntityId)
                 if type(splitterConstruction) == 'table' and type(splitterConstruction.transf) == 'table' then
-                    print('LOLLO splitterConstruction =')
-                    debugPrint(splitterConstruction)
+                    -- print('LOLLO splitterConstruction =')
+                    -- debugPrint(splitterConstruction)
                     local nearbyEdges = edgeUtils.getNearbyStreetEdges(splitterConstruction.transf)
                     if #nearbyEdges > 0 then
                         local nodeBetween = edgeUtils.getNodeBetween(
@@ -459,8 +466,8 @@ function data()
                             -- },
                             splitterConstruction.position
                         )
-                        print('LOLLO nodeBetween = ')
-                        debugPrint(nodeBetween)
+                        -- print('LOLLO nodeBetween = ')
+                        -- debugPrint(nodeBetween)
                         -- print('LOLLO nearbyEdges[1] = ')
                         -- debugPrint(nearbyEdges[1])
 

@@ -15,12 +15,12 @@ end
 -- sumneko lua assist
 
 local node0 = {
-    {1000, 0, 50},
-    {1, 0, 0}
+    {0, 1000, 50},
+    {0, 1000, 100}
 }
 local node1 = {
-    {0, 1000, 50},
-    {1, 0, 0}
+    {1000, 0, 100},
+    {1000, 0, 0}
 }
 local betweenPosition = {500, 500, 55}
 local nodeBetween1 = edgeUtils.getNodeBetween(node0, node1, betweenPosition)
