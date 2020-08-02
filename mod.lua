@@ -84,7 +84,8 @@ function data()
     local function _getIsStreetToBeExtended(street)
         return street ~= nil
         and street.laneConfigs ~= nil
-        and #street.laneConfigs > 4
+        -- and #street.laneConfigs > 4
+        and #street.laneConfigs > 2
         and not(street.upgrade)
     end
 
@@ -94,47 +95,6 @@ function data()
 
     local function _getTargetLaneConfig4Passengers()
         return {0, 0, 0, 1,  0, 1, 1, 0,  0, 0, 0, 0,  0, 0, 0, 0}
-    end
-
-    local function _replaceRightLanesBAK(newStreet)
-        print('LOLLO newStreet =')
-        debugPrint(newStreet)
-
-        -- LOLLO NOTE test: remove cars
-        for key1, oldLaneConfig in pairs(newStreet.laneConfigs) do
-            print('LOLLO key1 = ', key1)
-
-            -- the following fails coz the transport modes are read-only
-            print('LOLLO newStreet.laneConfigs[key1].transportModes[3] =', newStreet.laneConfigs[key1].transportModes[3])
-            newStreet.laneConfigs[key1].transportModes[3] = 0
-            print('LOLLO newStreet.laneConfigs[key1].transportModes[3] =', newStreet.laneConfigs[key1].transportModes[3])
-            print('LOLLO newStreet.laneConfigs[key1].transportModes[9] =', newStreet.laneConfigs[key1].transportModes[9])
-            newStreet.laneConfigs[key1].transportModes[9] = 1
-            print('LOLLO newStreet.laneConfigs[key1].transportModes[9] =', newStreet.laneConfigs[key1].transportModes[9])
-
-            if key1 == 1 or key1 == #newStreet.laneConfigs then
-            else
-                -- test: only allow trucks on central lanes of streets with 4 or more traffic lanes
-                if #newStreet.laneConfigs >= 6 then
-                    local newLaneConfig = api.type.LaneConfig.new()
-                    newLaneConfig.speed = oldLaneConfig.speed
-                    newLaneConfig.width = oldLaneConfig.width
-                    newLaneConfig.height = oldLaneConfig.height
-                    newLaneConfig.forward = oldLaneConfig.forward
-
-                    if key1 == math.floor(#newStreet.laneConfigs / 2) or key1 == math.floor(#newStreet.laneConfigs / 2) + 1 then
-                        newLaneConfig.transportModes = {0, 0, 0, 1,  1, 1, 1, 0,  0, 0, 0, 0,  0, 0, 0, 0}
-                    else
-                        newLaneConfig.transportModes = {0, 0, 0, 1,  0, 1, 1, 0,  0, 0, 0, 0,  0, 0, 0, 0}
-                    end
-
-                    newStreet.laneConfigs[key1] = newLaneConfig
-                end
-            end
-        end
-
-        print('LOLLO newStreet =')
-        debugPrint(newStreet)
     end
 
     local function _setOneTransportMode(newLaneConfig, targetLaneConfig, index)
@@ -148,8 +108,8 @@ function data()
     end
 
     local function _replaceRightLanes(newStreet, targetLaneConfig)
-        print('LOLLO newStreet before change =')
-        debugPrint(newStreet)
+        -- print('LOLLO newStreet before change =')
+        -- debugPrint(newStreet)
         if not(_getIsStreetToBeExtended(newStreet)) then return end
 
         for key1, oldLaneConfig in pairs(newStreet.laneConfigs) do
@@ -184,9 +144,6 @@ function data()
         -- newStreet.fileName = 'lollo_large_4_lane_4_tram_tracks_street_2.lua' -- dumps
         newStreet.type = string.sub(fileName, 1, string.len(fileName) - string.len('.lua')) .. '-' .. _getConfigToString(targetLaneConfig) .. '.lua'
         newStreet.categories = oldStreet.categories
-        print('LOLLO newStreet.categories =')
-        debugPrint(type(newStreet.categories))
-        debugPrint(type(newStreet.categories))
         local newCategories = {}
         for _, value in pairs(newStreet.categories) do
             if value == 'urban' then
@@ -216,7 +173,11 @@ function data()
         newStreet.upgrade = false -- false makes it visible in the construction menu
         newStreet.country = oldStreet.country
         newStreet.busAndTramRight = oldStreet.busAndTramRight
-        newStreet.materials = oldStreet.materials
+        newStreet.materials = oldStreet.materials -- LOLLO TODO this is not accessible, so we must displkay the different lanes with some other system
+        -- print('LOLLO materials = ')
+        -- debugPrint(newStreet.materials)
+        -- print('LOLLO materials.streetBorder = ')
+        -- debugPrint(newStreet.materials.streetBorder) -- dumps
         newStreet.assets = oldStreet.assets
         newStreet.signalAssetName = oldStreet.signalAssetName
         newStreet.cost = oldStreet.cost
