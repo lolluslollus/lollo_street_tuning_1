@@ -93,7 +93,7 @@ function data()
         return {0, 0, 0, 0,  1, 0, 0, 0,  0, 0, 0, 0,  0, 0, 0, 0}
     end
 
-    local function _getTargetLaneConfig4Passengers()
+    local function _getTargetLaneConfig4Person()
         return {0, 0, 0, 1,  0, 1, 1, 0,  0, 0, 0, 0,  0, 0, 0, 0}
     end
 
@@ -204,15 +204,15 @@ function data()
         for key, fileName in pairs(streetFilenames) do
             local oldStreet = api.res.streetTypeRep.get(key)
             if _getIsStreetToBeExtended(oldStreet) then
-                _addOneStreetWithSpecialLanes(oldStreet, fileName, _getTargetLaneConfig4Cargo(), 'cargo right lane', 'cargoRight')
-                _addOneStreetWithSpecialLanes(oldStreet, fileName, _getTargetLaneConfig4Passengers(), 'passengers right lane', 'passengersRight')
+                _addOneStreetWithSpecialLanes(oldStreet, fileName, _getTargetLaneConfig4Cargo(), 'cargo right lane', 'cargo-right')
+                _addOneStreetWithSpecialLanes(oldStreet, fileName, _getTargetLaneConfig4Person(), 'passengers right lane', 'person-right')
             end
         end
     end
 
     return {
         info = {
-            minorVersion = 17,
+            minorVersion = 18,
             severityAdd = 'NONE',
             severityRemove = 'WARNING',
             name = _('_NAME'),
