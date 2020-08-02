@@ -208,10 +208,8 @@ function data()
         for key, fileName in pairs(streetFilenames) do
             local oldStreet = api.res.streetTypeRep.get(key)
             if _getIsStreetToBeExtended(oldStreet) then
-                if fileName == 'lollo_large_6_lane_street.lua' then -- LOLLO TODO remove after testing
                 _addOneStreetWithReservedLanes(oldStreet, fileName, _getTargetTransportModes4Cargo(), 'cargo right lane', 'cargo-right')
                 _addOneStreetWithReservedLanes(oldStreet, fileName, _getTargetTransportModes4Person(), 'passengers right lane', 'person-right')
-                end
             end
         end
     end
