@@ -179,7 +179,9 @@ local function _getStreetFilesContents(streetDirPath, fileNamePrefix)
                 fileName = (fileNamePrefix or '') .. fileUtils.getFileNameFromPath(streetFiles[i]),
                 name = fileData.name or '',
                 sidewalkWidth = fileData.sidewalkWidth or 0.2,
-                streetWidth = fileData.streetWidth or 0.2
+                streetWidth = fileData.streetWidth or 0.2,
+                upgrade = fileData.upgrade or true, -- true means, do not show this street in the menu
+                yearTo = fileData.yearTo or 1925
             }
             if type(newRecord.fileName) == 'string' and newRecord.fileName:len() > 0
             and type(newRecord.name) == 'string' and newRecord.name:len() > 0 then
@@ -242,14 +244,16 @@ local function _getStreetFilesContents(streetDirPath, fileNamePrefix)
     -- end
 end
 
-local function _getStreetDataFiltered(streetData)
-    if type(streetData) ~= 'table' then return {} end
+local function _getStreetDataFiltered(streetDataTable)
+    if type(streetDataTable) ~= 'table' then return {} end
 
     local results = {}
-    for _, val1 in pairs(streetData) do
-        if arrayUtils.arrayHasValue(val1.categories, 'country') or arrayUtils.arrayHasValue(val1.categories, 'highway')
-        or arrayUtils.arrayHasValue(val1.categories, 'one-way') or arrayUtils.arrayHasValue(val1.categories, 'urban') then
-            table.insert(results, #results + 1, val1)
+    for _, strDataRecord in pairs(streetDataTable) do
+        if strDataRecord.upgrade == false and strDataRecord.yearTo == 0 then
+            if arrayUtils.arrayHasValue(strDataRecord.categories, 'country') or arrayUtils.arrayHasValue(strDataRecord.categories, 'highway')
+            or arrayUtils.arrayHasValue(strDataRecord.categories, 'one-way') or arrayUtils.arrayHasValue(strDataRecord.categories, 'urban') then
+                table.insert(results, #results + 1, strDataRecord)
+            end
         end
     end
     return results
@@ -301,7 +305,9 @@ local function _getStreetTypesWithApi()
             icon = streetParams.icon,
             name = streetParams.name,
             sidewalkWidth = streetParams.sidewalkWidth,
-            streetWidth = streetParams.streetWidth
+            streetWidth = streetParams.streetWidth,
+            upgrade = streetParams.upgrade,
+            yearTo = streetParams.yearTo
         }
     end
     return results
