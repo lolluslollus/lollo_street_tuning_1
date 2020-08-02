@@ -26,3 +26,15 @@ local betweenPosition = {500, 500, 55}
 local nodeBetween1 = edgeUtils.getNodeBetween(node0, node1, betweenPosition)
 local nodeBetween2 = edgeUtils.getNodeBetween(node0, node1)
 local dummy = 'AAA'
+
+local fileName = 'LOLLO.lua'
+local targetLaneConfig = {0, 0, 0, 1}
+local function _getConfigToString(config)
+    local result = ''
+    for key, value in pairs(config) do
+        result = result .. tostring(value)
+    end
+    return result
+end
+local newFileName = string.sub(fileName, 1, string.len(fileName) - string.len('.lua')) .. '-' .. _getConfigToString(targetLaneConfig) .. '.lua'
+local dummy = 'AAA'
