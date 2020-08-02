@@ -1,5 +1,6 @@
 local streetChunksHelper = require('lollo_street_tuning/lolloStreetChunksHelper')
 local streetUtils = require('lollo_street_tuning/lolloStreetUtils')
+local stringUtils = require('lollo_street_tuning.lolloStringUtils')
 -- local debugger = require('debugger')
 
 function data()
@@ -87,6 +88,7 @@ function data()
         -- and #street.laneConfigs > 4
         and #street.laneConfigs > 2
         and not(street.upgrade)
+        and not(stringUtils.arrayHasValue(street.categories, 'paths'))
     end
 
     local function _getTargetLaneConfig4Cargo()
@@ -135,7 +137,7 @@ function data()
         -- debugPrint(newStreet)
     end
 
-    local function _addOneStreetWithSpecialLanes(oldStreet, fileName, targetLaneConfig, descSuffix, categorySuffix)
+    local function _addOneStreetWithReservedLanes(oldStreet, fileName, targetLaneConfig, descSuffix, categorySuffix)
         local newStreet = api.type.StreetType.new()
 
         -- for key, value in pairs(streetData) do -- dumps
@@ -199,13 +201,13 @@ function data()
         api.res.streetTypeRep.add(newStreet.type, newStreet, true)
     end
 
-    local function _addStreetsWithSpecialLanes()
+    local function _addStreetsWithReservedLanes()
         local streetFilenames = api.res.streetTypeRep.getAll()
         for key, fileName in pairs(streetFilenames) do
             local oldStreet = api.res.streetTypeRep.get(key)
             if _getIsStreetToBeExtended(oldStreet) then
-                _addOneStreetWithSpecialLanes(oldStreet, fileName, _getTargetLaneConfig4Cargo(), 'cargo right lane', 'cargo-right')
-                _addOneStreetWithSpecialLanes(oldStreet, fileName, _getTargetLaneConfig4Person(), 'passengers right lane', 'person-right')
+                _addOneStreetWithReservedLanes(oldStreet, fileName, _getTargetLaneConfig4Cargo(), 'cargo right lane', 'cargo-right')
+                _addOneStreetWithReservedLanes(oldStreet, fileName, _getTargetLaneConfig4Person(), 'passengers right lane', 'person-right')
             end
         end
     end
@@ -248,7 +250,7 @@ function data()
                 {yearFrom = 1925, yearTo = 0},
                 streetChunksHelper.getStreetHairpinParams()
             )
-            _addStreetsWithSpecialLanes()
+            _addStreetsWithReservedLanes()
         end
     }
 end
