@@ -103,20 +103,17 @@ function data()
     end
 
     local function _setOneTransportMode(newLaneConfig, targetLaneConfig, index)
-        if newLaneConfig.transportModes[index] == 1 then
-            if targetLaneConfig[index] then
-                newLaneConfig.transportModes[index] = 1
-            else
-                newLaneConfig.transportModes[index] = 0
-            end
+        if newLaneConfig.transportModes[index] ~= 1 then return end
+        if targetLaneConfig[index] then
+            newLaneConfig.transportModes[index] = 1
+        else
+            newLaneConfig.transportModes[index] = 0
         end
     end
 
     local function _replaceRightLanes(newStreet, targetLaneConfig)
-        -- print('LOLLO newStreet before change =')
-        -- debugPrint(newStreet)
-        if not(_getIsStreetToBeExtended(newStreet)) then return end
-
+        print('LOLLO newStreet before change =')
+        debugPrint(newStreet)
         for key1, oldLaneConfig in pairs(newStreet.laneConfigs) do
             if key1 == 2 or key1 == #newStreet.laneConfigs - 1 then
                 local newLaneConfig = api.type.LaneConfig.new()
@@ -125,7 +122,7 @@ function data()
                 newLaneConfig.height = oldLaneConfig.height
                 newLaneConfig.forward = oldLaneConfig.forward
                 newLaneConfig.transportModes = oldLaneConfig.transportModes
-
+print('LOLLO about to call _setOneTransportMode')
                 _setOneTransportMode(newLaneConfig, targetLaneConfig, api.type.enum.TransportMode.BUS + 1)
                 _setOneTransportMode(newLaneConfig, targetLaneConfig, api.type.enum.TransportMode.CAR + 1)
                 _setOneTransportMode(newLaneConfig, targetLaneConfig, api.type.enum.TransportMode.ELECTRIC_TRAM + 1)
@@ -136,8 +133,8 @@ function data()
             end
         end
 
-        -- print('LOLLO newStreet after change =')
-        -- debugPrint(newStreet)
+        print('LOLLO newStreet after change =')
+        debugPrint(newStreet)
     end
 
     local function _addOneStreetWithReservedLanes(oldStreet, fileName, targetLaneConfig, descSuffix, categorySuffix)
@@ -198,7 +195,6 @@ function data()
         newStreet.maintenanceCost = oldStreet.maintenanceCost
 
         newStreet.laneConfigs = oldStreet.laneConfigs
-
         _replaceRightLanes(newStreet, targetLaneConfig)
 
         api.res.streetTypeRep.add(newStreet.type, newStreet, true)
