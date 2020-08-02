@@ -88,7 +88,10 @@ function data()
         -- and #street.laneConfigs > 4
         and #street.laneConfigs > 2
         and not(street.upgrade)
-        and not(stringUtils.arrayHasValue(street.categories, 'paths'))
+        and (stringUtils.arrayHasValue(street.categories, 'urban')
+            or stringUtils.arrayHasValue(street.categories, 'one-way')
+            or stringUtils.arrayHasValue(street.categories, 'country')
+            or stringUtils.arrayHasValue(street.categories, 'highway'))
     end
 
     local function _getTargetLaneConfig4Cargo()
