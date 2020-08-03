@@ -43,6 +43,7 @@ local stringUtils = require('lollo_street_tuning/lolloStringUtils')
     ---------------------------
     There seems to be confusion between allowed transport modes (why are buses so important?),
     the presence of a bus lane and the variable busAndTramRight (which seems useless).
+    Why do I need to allow buses if I want the bus lane, which is in fact a magical lane?
     Besides, with buses allowed, the bus lane is drawn (wrong) but is in fact not active (check the upgrade tool).
     In the same way, with trams allowed, the tracks are drawn (correct) but they are not active (check the upgrade tool)
  ]]
