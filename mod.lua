@@ -93,7 +93,7 @@ function data()
         api.res.constructionRep.add(newCon.fileName, newCon, true) -- fileName, resource, visible
     end
 
-    local function _getConfigToString(config)
+    local function _getLaneConfigToString(config)
         local result = ''
         for _, value in pairs(config) do
             result = result .. tostring(value)
@@ -170,7 +170,7 @@ function data()
         newStreet.name = oldStreet.name .. ' - ' .. descSuffix -- 'LOLLO test'
         newStreet.desc = oldStreet.desc .. ' - ' .. descSuffix
         -- newStreet.fileName = 'lollo_large_4_lane_4_tram_tracks_street_2.lua' -- dumps
-        newStreet.type = string.sub(fileName, 1, string.len(fileName) - string.len('.lua')) .. '-' .. _getConfigToString(targetTransportModes) .. '.lua'
+        newStreet.type = string.sub(fileName, 1, string.len(fileName) - string.len('.lua')) .. '-' .. _getLaneConfigToString(targetTransportModes) .. '.lua'
         newStreet.categories = oldStreet.categories
         local newCategories = {}
         for _, value in pairs(newStreet.categories) do
