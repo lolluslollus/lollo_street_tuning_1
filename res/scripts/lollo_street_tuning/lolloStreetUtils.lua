@@ -3,9 +3,12 @@ local fileUtils = require('lollo_street_tuning/lolloFileUtils')
 local stringUtils = require('lollo_street_tuning/lolloStringUtils')
 -- local debugger = require('debugger')
 -- local inspect = require('lollo_street_tuning/inspect')
+
+local _lolloStreetDataBuffer = {
+    data = {},
+    filterId = nil
+}
 local helper = {}
-
-
 -- --------------- global street data ------------------------
 local function _getGameStreetDirPath()
     local gamePath = fileUtils.getGamePath()
@@ -244,14 +247,16 @@ local function _getStreetFilesContents(streetDirPath, fileNamePrefix)
     -- end
 end
 
-local function _getStreetDataFiltered(streetDataTable)
+local function _getStreetDataFiltered_Stock(streetDataTable)
     if type(streetDataTable) ~= 'table' then return {} end
 
     local results = {}
     for _, strDataRecord in pairs(streetDataTable) do
         if strDataRecord.upgrade == false and strDataRecord.yearTo == 0 then
-            if arrayUtils.arrayHasValue(strDataRecord.categories, 'country') or arrayUtils.arrayHasValue(strDataRecord.categories, 'highway')
-            or arrayUtils.arrayHasValue(strDataRecord.categories, 'one-way') or arrayUtils.arrayHasValue(strDataRecord.categories, 'urban') then
+            if arrayUtils.arrayHasValue(strDataRecord.categories, helper.getStreetCategories().COUNTRY)
+            or arrayUtils.arrayHasValue(strDataRecord.categories, helper.getStreetCategories().HIGHWAY)
+            or arrayUtils.arrayHasValue(strDataRecord.categories, helper.getStreetCategories().ONE_WAY)
+            or arrayUtils.arrayHasValue(strDataRecord.categories, helper.getStreetCategories().URBAN) then
                 table.insert(results, #results + 1, strDataRecord)
             end
         end
@@ -259,31 +264,36 @@ local function _getStreetDataFiltered(streetDataTable)
     return results
 end
 
--- local function _getStreetDataWithDefaults(streetData)
---     -- print('LOLLO streetData has type = ', type(streetData))
---     if type(streetData) == 'table' and #streetData > 0 then
---         return streetData
---     else
---         print('LOLLO falling back to the default street data')
---         -- provide a default value coz the game will dump if it finds no parameter values
---         return {
---             {
---                 categories = {'one-way'},
---                 fileName = 'lollo_medium_1_way_1_lane_street.lua',
---                 name = 'Narrow 1-way street with 1 lane',
---                 sidewalkWidth = 2,
---                 streetWidth = 4
---             },
---             {
---                 categories = {'one-way'},
---                 fileName = 'lollo_medium_1_way_1_lane_street_narrow_sidewalk.lua',
---                 name = 'Narrow 1-way street with 1 lane and .8 m pavement',
---                 sidewalkWidth = 0.8,
---                 streetWidth = 2.4
---             }
---         }
---     end
--- end
+local function _getStreetDataFiltered_StockAndReservedLanes(streetDataTable)
+    if type(streetDataTable) ~= 'table' then return {} end
+
+    local results = {}
+    for _, strDataRecord in pairs(streetDataTable) do
+        if strDataRecord.upgrade == false and strDataRecord.yearTo == 0 then
+            if arrayUtils.arrayHasValue(strDataRecord.categories, helper.getStreetCategories().COUNTRY)
+            or arrayUtils.arrayHasValue(strDataRecord.categories, helper.getStreetCategories().COUNTRY_CARGO_RIGHT)
+            or arrayUtils.arrayHasValue(strDataRecord.categories, helper.getStreetCategories().COUNTRY_PERSON_RIGHT)
+            or arrayUtils.arrayHasValue(strDataRecord.categories, helper.getStreetCategories().COUNTRY_TRAM_RIGHT)
+            or arrayUtils.arrayHasValue(strDataRecord.categories, helper.getStreetCategories().HIGHWAY)
+            or arrayUtils.arrayHasValue(strDataRecord.categories, helper.getStreetCategories().HIGHWAY_CARGO_RIGHT)
+            or arrayUtils.arrayHasValue(strDataRecord.categories, helper.getStreetCategories().HIGHWAY_PERSON_RIGHT)
+            or arrayUtils.arrayHasValue(strDataRecord.categories, helper.getStreetCategories().HIGHWAY_TRAM_RIGHT)
+            or arrayUtils.arrayHasValue(strDataRecord.categories, helper.getStreetCategories().ONE_WAY)
+            or arrayUtils.arrayHasValue(strDataRecord.categories, helper.getStreetCategories().ONE_WAY_CARGO_RIGHT)
+            or arrayUtils.arrayHasValue(strDataRecord.categories, helper.getStreetCategories().ONE_WAY_PERSON_RIGHT)
+            or arrayUtils.arrayHasValue(strDataRecord.categories, helper.getStreetCategories().ONE_WAY_TRAM_RIGHT)
+            or arrayUtils.arrayHasValue(strDataRecord.categories, helper.getStreetCategories().URBAN)
+            or arrayUtils.arrayHasValue(strDataRecord.categories, helper.getStreetCategories().URBAN_CARGO_RIGHT)
+            or arrayUtils.arrayHasValue(strDataRecord.categories, helper.getStreetCategories().URBAN_PERSON_RIGHT)
+            or arrayUtils.arrayHasValue(strDataRecord.categories, helper.getStreetCategories().URBAN_TRAM_RIGHT)
+            then
+                table.insert(results, #results + 1, strDataRecord)
+            end
+        end
+    end
+    return results
+end
+
 local function _cloneCategories(tab)
     local results = {}
     for i, v in pairs(tab) do
@@ -313,28 +323,69 @@ local function _getStreetTypesWithApi()
     return results
 end
 
-local function _initLolloStreetDataWithApi()
-    if game._lolloStreetData == nil or (type(game._lolloStreetData) == 'table' and #game._lolloStreetData < 1) then
-        game._lolloStreetData = _getStreetDataFiltered(_getStreetTypesWithApi())
-        arrayUtils.sort(game._lolloStreetData, 'name')
+local function _initLolloStreetDataWithApi(filter)
+    if _lolloStreetDataBuffer.filterId ~= filter.id
+    or type(_lolloStreetDataBuffer.data) ~= 'table'
+    or #_lolloStreetDataBuffer.data < 1 then
+        _lolloStreetDataBuffer.data = filter.func(_getStreetTypesWithApi())
+        arrayUtils.sort(_lolloStreetDataBuffer.data, 'name')
 
-        -- print('LOLLO street data initialised with api, it has', #(game._lolloStreetData or {}), 'records and type = ', type(game._lolloStreetData))
+        -- print('LOLLO street data initialised with api, it has', #(_lolloStreetData.data or {}), 'records and type = ', type(_lolloStreetData.data))
     end
 end
 
-local function _initLolloStreetDataWithFiles()
-    if game._lolloStreetData == nil or (type(game._lolloStreetData) == 'table' and #game._lolloStreetData < 1) then
-        game._lolloStreetData = _getStreetDataFiltered(_getStreetFilesContents(_getMyStreetDirPath()))
-        arrayUtils.sort(game._lolloStreetData, 'name')
+local function _initLolloStreetDataWithFiles(filter)
+    if _lolloStreetDataBuffer.filterId ~= filter.id
+    or type(_lolloStreetDataBuffer.data) ~= 'table'
+    or #_lolloStreetDataBuffer.data < 1 then
+        _lolloStreetDataBuffer.data = filter.func(_getStreetFilesContents(_getMyStreetDirPath()))
+        arrayUtils.sort(_lolloStreetDataBuffer.data, 'name')
 
-        -- print('LOLLO street data initialised with files, it has', #(game._lolloStreetData or {}), 'records and type = ', type(game._lolloStreetData))
+        -- print('LOLLO street data initialised with files, it has', #(_lolloStreetData.data or {}), 'records and type = ', type(_lolloStreetData.data))
     end
 end
 
-helper.getGlobalStreetData = function()
-    _initLolloStreetDataWithApi() -- don't use it for now
-    -- _initLolloStreetDataWithFiles()
-    return game._lolloStreetData
+helper.getStreetCategories = function()
+    return {
+        COUNTRY = 'country',
+        COUNTRY_CARGO_RIGHT = 'country-cargo-right',
+        COUNTRY_PERSON_RIGHT = 'country-person-right',
+        COUNTRY_TRAM_RIGHT = 'country-tram-right',
+        HIGHWAY = 'highway',
+        HIGHWAY_CARGO_RIGHT = 'highway-cargo-right',
+        HIGHWAY_PERSON_RIGHT = 'highway-person-right',
+        HIGHWAY_TRAM_RIGHT = 'highway-tram-right',
+        ONE_WAY = 'one-way',
+        ONE_WAY_CARGO_RIGHT = 'one-way-cargo-right',
+        ONE_WAY_PERSON_RIGHT = 'one-way-person-right',
+        ONE_WAY_TRAM_RIGHT = 'one-way-tram-right',
+        URBAN = 'urban',
+        URBAN_CARGO_RIGHT = 'urban-cargo-right',
+        URBAN_PERSON_RIGHT = 'urban-person-right',
+        URBAN_TRAM_RIGHT = 'urban-tram-right',
+    }
+end
+
+helper.getStreetCategorySuffixes = function()
+    return {
+        CARGO_RIGHT = '-cargo-right',
+        PERSON_RIGHT = '-person-right',
+        TRAM_RIGHT = '-tram-right',
+    }
+end
+
+helper.getStreetDataFilters = function()
+    return {
+        STOCK = { id = 'stock', func = _getStreetDataFiltered_Stock },
+        STOCK_AND_RESERVED_LANES = { id = 'stock-and-reserved-lanes', func = _getStreetDataFiltered_StockAndReservedLanes },
+    }
+end
+
+helper.getGlobalStreetData = function(filter)
+    if filter == nil then filter = helper.getStreetDataFilters().STOCK end
+    _initLolloStreetDataWithApi(filter)
+    -- _initLolloStreetDataWithFiles(filter)
+    return _lolloStreetDataBuffer.data
 end
 
 return helper

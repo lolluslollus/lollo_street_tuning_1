@@ -1,6 +1,6 @@
--- local arrayUtils = require('lollo_street_tuning.lolloArrayUtils')
+local arrayUtils = require('lollo_street_tuning.lolloArrayUtils')
 local matrixUtils = require('lollo_street_tuning.matrix')
--- local streetUtils = require('lollo_street_tuning.lolloStreetUtils')
+local streetUtils = require('lollo_street_tuning.lolloStreetUtils')
 local stringUtils = require('lollo_street_tuning.lolloStringUtils')
 local transfUtils = require('lollo_street_tuning.transfUtils')
 -- local debugger = require('debugger')
@@ -120,29 +120,13 @@ helper.getNearbyStreetEdges = function(transf)
     }
 
     local results = {}
+    local streetData = streetUtils.getGlobalStreetData(streetUtils.getStreetDataFilters().STOCK_AND_RESERVED_LANES)
     for _, edgeData in pairs(nearbyEdges) do
-        -- discard paths and other unsuitable street types
-        if not edgeData.track and edgeData.streetType then
-            local streetTypeId = api.res.streetTypeRep.find(edgeData.streetType)
-            if streetTypeId then
-                local streetTypeProps = api.res.streetTypeRep.get(streetTypeId)
-                if streetTypeProps and streetTypeProps.categories then
-                    if stringUtils.arrayHasValue(streetTypeProps.categories, 'urban')
-                    or stringUtils.arrayHasValue(streetTypeProps.categories, 'urban-person-right')
-                    or stringUtils.arrayHasValue(streetTypeProps.categories, 'urban-cargo-right')
-                    or stringUtils.arrayHasValue(streetTypeProps.categories, 'one-way')
-                    or stringUtils.arrayHasValue(streetTypeProps.categories, 'one-way-person-right')
-                    or stringUtils.arrayHasValue(streetTypeProps.categories, 'one-way-cargo-right')
-                    or stringUtils.arrayHasValue(streetTypeProps.categories, 'country')
-                    or stringUtils.arrayHasValue(streetTypeProps.categories, 'country-person-right')
-                    or stringUtils.arrayHasValue(streetTypeProps.categories, 'country-cargo-right')
-                    or stringUtils.arrayHasValue(streetTypeProps.categories, 'highway')
-                    or stringUtils.arrayHasValue(streetTypeProps.categories, 'highway-person-right')
-                    or stringUtils.arrayHasValue(streetTypeProps.categories, 'highway-cargo-right') then
-                        table.insert(results, edgeData)
-                    end
-                end
-            end
+        if edgeData ~= nil
+        and not edgeData.track
+        and not(stringUtils.isNullOrEmptyString(edgeData.streetType))
+        and arrayUtils.findIndex(streetData, 'fileName', edgeData.streetType) >= 0 then
+            table.insert(results, edgeData)
         end
     end
 

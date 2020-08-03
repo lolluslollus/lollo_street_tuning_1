@@ -37,4 +37,6 @@ local function _getConfigToString(config)
     return result
 end
 local newFileName = string.sub(fileName, 1, string.len(fileName) - string.len('.lua')) .. '-' .. _getConfigToString(targetLaneConfig) .. '.lua'
+local newFileName = string.gsub('aaa/bbb/ccc', '%/', '-')
+local ddd = not(nil)
 local dummy = 'AAA'
