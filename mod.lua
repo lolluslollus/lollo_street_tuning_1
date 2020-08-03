@@ -161,6 +161,47 @@ function data()
         return success
     end
 
+    local function _replaceAllLanesForcingTram(newStreet, targetTransportModes)
+        -- print('LOLLO newStreet before change =')
+        -- debugPrint(newStreet)
+        local success = false
+        for index, oldLaneConfig in pairs(newStreet.laneConfigs) do
+            if (index > 1 and index < #newStreet.laneConfigs) then
+                local newLaneConfig = api.type.LaneConfig.new()
+                newLaneConfig.speed = oldLaneConfig.speed
+                newLaneConfig.width = oldLaneConfig.width
+                newLaneConfig.height = oldLaneConfig.height
+                newLaneConfig.forward = oldLaneConfig.forward
+
+                local newTransportModes = arrayUtils.cloneOmittingFields(targetTransportModes)
+                -- do not allow a transport mode that is disallowed in the original street type
+                if oldLaneConfig.transportModes[api.type.enum.TransportMode.BUS + 1] == 0 then
+                    newTransportModes[api.type.enum.TransportMode.BUS + 1] = 0
+                end
+                if oldLaneConfig.transportModes[api.type.enum.TransportMode.CAR + 1] == 0 then
+                    newTransportModes[api.type.enum.TransportMode.CAR + 1] = 0
+                end
+                -- if oldLaneConfig.transportModes[api.type.enum.TransportMode.ELECTRIC_TRAM + 1] == 0 then
+                --     newTransportModes[api.type.enum.TransportMode.ELECTRIC_TRAM + 1] = 0
+                -- end
+                -- if oldLaneConfig.transportModes[api.type.enum.TransportMode.TRAM + 1] == 0 then
+                --     newTransportModes[api.type.enum.TransportMode.TRAM + 1] = 0
+                -- end
+                if oldLaneConfig.transportModes[api.type.enum.TransportMode.TRUCK + 1] == 0 then
+                    newTransportModes[api.type.enum.TransportMode.TRUCK + 1] = 0
+                end
+
+                newLaneConfig.transportModes = newTransportModes
+                newStreet.laneConfigs[index] = newLaneConfig
+
+                success = true
+            end
+        end
+        -- print('LOLLO newStreet after change =')
+        -- debugPrint(newStreet)
+        return success
+    end
+
     local function _addOneStreetWithReservedLanes(oldStreet, fileName, targetTransportModes, descSuffix, categorySuffix)
         local newStreet = api.type.StreetType.new()
 
@@ -219,7 +260,8 @@ function data()
         newStreet.maintenanceCost = oldStreet.maintenanceCost
 
         newStreet.laneConfigs = oldStreet.laneConfigs
-        if _replaceRightLanes(newStreet, targetTransportModes) == true then
+        if _replaceAllLanesForcingTram(newStreet, targetTransportModes) == true then
+        -- if _replaceRightLanes(newStreet, targetTransportModes) == true then
             api.res.streetTypeRep.add(newStreet.type, newStreet, true)
             return true
         end
@@ -232,8 +274,8 @@ function data()
         for key, fileName in pairs(streetFilenames) do
             local oldStreet = api.res.streetTypeRep.get(key)
             if _getIsStreetToBeExtended(oldStreet) then
-                _addOneStreetWithReservedLanes(oldStreet, fileName, _getTargetTransportModes4Cargo(), 'cargo right lane', 'cargo-right')
-                _addOneStreetWithReservedLanes(oldStreet, fileName, _getTargetTransportModes4Person(), 'passengers right lane', 'person-right')
+                -- _addOneStreetWithReservedLanes(oldStreet, fileName, _getTargetTransportModes4Cargo(), 'cargo right lane', 'cargo-right')
+                _addOneStreetWithReservedLanes(oldStreet, fileName, {0, 0, 1, 1, 1, 1, 1, 0,  0, 0, 0, 0,  0, 0, 0, 0}, 'passengers right lane', 'person-right')
             end
         end
     end

@@ -17,7 +17,7 @@ return {
 	sidewalkHeight = .3,
 	yearFrom = 1925,
 	yearTo = 0,
-	upgrade = false,
+	upgrade = true,
 	country = false,
 	speed = 50.0,
 	type = "lollo_medium_3_lane_3_tram_tracks_street_1.lua",
