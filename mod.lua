@@ -106,8 +106,10 @@ function data()
     local function _replaceRightLanes(newStreet, targetTransportModes)
         -- print('LOLLO newStreet before change =')
         -- debugPrint(newStreet)
-        for key1, oldLaneConfig in pairs(newStreet.laneConfigs) do
-            if key1 == 2 or key1 == #newStreet.laneConfigs - 1 then
+        local success = false
+        for index, oldLaneConfig in pairs(newStreet.laneConfigs) do
+            if (index == 2 and index < #newStreet.laneConfigs) -- rightmost lane
+            or (index == #newStreet.laneConfigs - 1 and oldLaneConfig.forward == false) then -- leftmost lane, discarding one-way streets
                 local newLaneConfig = api.type.LaneConfig.new()
                 newLaneConfig.speed = oldLaneConfig.speed
                 newLaneConfig.width = oldLaneConfig.width
@@ -133,11 +135,14 @@ function data()
                 end
 
                 newLaneConfig.transportModes = newTransportModes
-                newStreet.laneConfigs[key1] = newLaneConfig
+                newStreet.laneConfigs[index] = newLaneConfig
+
+                success = true
             end
         end
         -- print('LOLLO newStreet after change =')
         -- debugPrint(newStreet)
+        return success
     end
 
     local function _addOneStreetWithReservedLanes(oldStreet, fileName, targetTransportModes, descSuffix, categorySuffix)
@@ -172,12 +177,12 @@ function data()
         newStreet.transportModesSidewalk = oldStreet.transportModesSidewalk
         newStreet.speed = oldStreet.speed
 
-        newStreet.yearFrom = oldStreet.yearFrom
-        newStreet.yearTo = oldStreet.yearTo
+        newStreet.yearFrom = oldStreet.yearFrom or 0
+        newStreet.yearTo = oldStreet.yearTo or 0
         newStreet.priority = oldStreet.priority
         newStreet.upgrade = false -- false makes it visible in the construction menu
-        newStreet.country = oldStreet.country
-        newStreet.busAndTramRight = oldStreet.busAndTramRight
+        newStreet.country = oldStreet.country or false
+        newStreet.busAndTramRight = oldStreet.busAndTramRight or false
         newStreet.materials = oldStreet.materials -- LOLLO TODO this is not accessible, so we must displkay the different lanes with some other system
         -- print('LOLLO materials = ')
         -- debugPrint(newStreet.materials)
@@ -185,7 +190,7 @@ function data()
         -- debugPrint(newStreet.materials.streetBorder) -- dumps
         newStreet.assets = oldStreet.assets
         newStreet.signalAssetName = oldStreet.signalAssetName
-        newStreet.cost = oldStreet.cost
+        newStreet.cost = oldStreet.cost or 0
         newStreet.catenary = oldStreet.catenary
         newStreet.lodDistFrom = oldStreet.lodDistFrom
         newStreet.lodDistTo = oldStreet.lodDistTo
@@ -198,9 +203,9 @@ function data()
         newStreet.maintenanceCost = oldStreet.maintenanceCost
 
         newStreet.laneConfigs = oldStreet.laneConfigs
-        _replaceRightLanes(newStreet, targetTransportModes)
-
-        api.res.streetTypeRep.add(newStreet.type, newStreet, true)
+        if _replaceRightLanes(newStreet, targetTransportModes) == true then
+            api.res.streetTypeRep.add(newStreet.type, newStreet, true)
+        end
     end
 
     local function _addStreetsWithReservedLanes()
