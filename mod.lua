@@ -22,6 +22,14 @@ local stringUtils = require('lollo_street_tuning.lolloStringUtils')
 
     Apparently, replacing a piece of bus-laned road with a similar one, which only allows lorries, is not expected.
  ]]
+
+ -- LOLLO TODO this branch attempts to lay tram tracks more individually.
+ -- Unfortunately, the game always draws the tram track on the right lane,
+ -- even if it is meant to be in the centre lane only.
+ -- Given this, there is no real benefit versus using our predefined streets with many tram tracks.
+ -- On top of it, the game draws the bus lane in the 2, 4, 5 and 7 lane (large street)
+ -- The error with the tram tracks being drawn but the tram being disabled also persists.
+ -- The only plus would be, fewer objects in the street menu.
 function data()
     local function _getUiTypeNumber(uiTypeStr)
         if uiTypeStr == 'BUTTON' then return 0
@@ -121,13 +129,15 @@ function data()
         return {0, 0, 0, 1,  0, 1, 1, 0,  0, 0, 0, 0,  0, 0, 0, 0}
     end
 
-    local function _replaceRightLanes(newStreet, targetTransportModes)
+    local function _replaceRightLanesForcingTram(newStreet, targetTransportModes)
         -- print('LOLLO newStreet before change =')
         -- debugPrint(newStreet)
         local success = false
         for index, oldLaneConfig in pairs(newStreet.laneConfigs) do
-            if (index == 2 and index < #newStreet.laneConfigs) -- rightmost lane
-            or (index == #newStreet.laneConfigs - 1 and oldLaneConfig.forward == false) then -- leftmost lane, discarding one-way streets
+            -- if (index == 2 and index < #newStreet.laneConfigs) -- rightmost lane
+            -- or (index == #newStreet.laneConfigs - 1 and oldLaneConfig.forward == false) -- leftmost lane, discarding one-way streets
+            if index == 2 or index == 7
+            then
                 local newLaneConfig = api.type.LaneConfig.new()
                 newLaneConfig.speed = oldLaneConfig.speed
                 newLaneConfig.width = oldLaneConfig.width
@@ -142,12 +152,56 @@ function data()
                 if oldLaneConfig.transportModes[api.type.enum.TransportMode.CAR + 1] == 0 then
                     newTransportModes[api.type.enum.TransportMode.CAR + 1] = 0
                 end
-                if oldLaneConfig.transportModes[api.type.enum.TransportMode.ELECTRIC_TRAM + 1] == 0 then
-                    newTransportModes[api.type.enum.TransportMode.ELECTRIC_TRAM + 1] = 0
+                -- if oldLaneConfig.transportModes[api.type.enum.TransportMode.ELECTRIC_TRAM + 1] == 0 then
+                --     newTransportModes[api.type.enum.TransportMode.ELECTRIC_TRAM + 1] = 0
+                -- end
+                -- if oldLaneConfig.transportModes[api.type.enum.TransportMode.TRAM + 1] == 0 then
+                --     newTransportModes[api.type.enum.TransportMode.TRAM + 1] = 0
+                -- end
+                if oldLaneConfig.transportModes[api.type.enum.TransportMode.TRUCK + 1] == 0 then
+                    newTransportModes[api.type.enum.TransportMode.TRUCK + 1] = 0
                 end
-                if oldLaneConfig.transportModes[api.type.enum.TransportMode.TRAM + 1] == 0 then
-                    newTransportModes[api.type.enum.TransportMode.TRAM + 1] = 0
+
+                newLaneConfig.transportModes = newTransportModes
+                newStreet.laneConfigs[index] = newLaneConfig
+
+                success = true
+            end
+        end
+        -- print('LOLLO newStreet after change =')
+        -- debugPrint(newStreet)
+        return success
+    end
+
+    local function _replaceLeftLanesForcingTram(newStreet, targetTransportModes)
+        -- print('LOLLO newStreet before change =')
+        -- debugPrint(newStreet)
+        local success = false
+        for index, oldLaneConfig in pairs(newStreet.laneConfigs) do
+            -- if (index > 1 and index == math.floor(#newStreet.laneConfigs / 2) and index < #newStreet.laneConfigs) -- rightmost lane
+            -- or (index == math.floor(#newStreet.laneConfigs / 2) + 1 and oldLaneConfig.forward == false) -- leftmost lane, discarding one-way streets
+            if index == 4 or index == 5
+            then
+                local newLaneConfig = api.type.LaneConfig.new()
+                newLaneConfig.speed = oldLaneConfig.speed
+                newLaneConfig.width = oldLaneConfig.width
+                newLaneConfig.height = oldLaneConfig.height
+                newLaneConfig.forward = oldLaneConfig.forward
+
+                local newTransportModes = arrayUtils.cloneOmittingFields(targetTransportModes)
+                -- do not allow a transport mode that is disallowed in the original street type
+                if oldLaneConfig.transportModes[api.type.enum.TransportMode.BUS + 1] == 0 then
+                    newTransportModes[api.type.enum.TransportMode.BUS + 1] = 0
                 end
+                if oldLaneConfig.transportModes[api.type.enum.TransportMode.CAR + 1] == 0 then
+                    newTransportModes[api.type.enum.TransportMode.CAR + 1] = 0
+                end
+                -- if oldLaneConfig.transportModes[api.type.enum.TransportMode.ELECTRIC_TRAM + 1] == 0 then
+                --     newTransportModes[api.type.enum.TransportMode.ELECTRIC_TRAM + 1] = 0
+                -- end
+                -- if oldLaneConfig.transportModes[api.type.enum.TransportMode.TRAM + 1] == 0 then
+                --     newTransportModes[api.type.enum.TransportMode.TRAM + 1] = 0
+                -- end
                 if oldLaneConfig.transportModes[api.type.enum.TransportMode.TRUCK + 1] == 0 then
                     newTransportModes[api.type.enum.TransportMode.TRUCK + 1] = 0
                 end
@@ -204,14 +258,15 @@ function data()
         return success
     end
 
-    local function _addOneStreetWithReservedLanes(oldStreet, fileName, targetTransportModes, descSuffix, categorySuffix)
+    local function _addOneStreetWithReservedLanes(oldStreet, fileName, targetTransportModes, descSuffix, categorySuffix, func)
         local newStreet = api.type.StreetType.new()
 
         -- for key, value in pairs(streetData) do -- dumps
-        newStreet.name = oldStreet.name .. ' - ' .. descSuffix -- 'LOLLO test'
+        newStreet.name = oldStreet.name .. ' - ' .. descSuffix
         newStreet.desc = oldStreet.desc .. ' - ' .. descSuffix
         -- newStreet.fileName = 'lollo_large_4_lane_4_tram_tracks_street_2.lua' -- dumps
-        newStreet.type = string.sub(fileName, 1, string.len(fileName) - string.len('.lua')) .. '-' .. _getConfigToString(targetTransportModes) .. '.lua'
+        newStreet.type = string.sub(fileName, 1, string.len(fileName) - string.len('.lua'))
+            .. '-' .. _getConfigToString(targetTransportModes) .. '.lua'
         newStreet.categories = oldStreet.categories
         local newCategories = {}
         for _, value in pairs(newStreet.categories) do
@@ -262,13 +317,13 @@ function data()
         newStreet.maintenanceCost = oldStreet.maintenanceCost
 
         newStreet.laneConfigs = oldStreet.laneConfigs
-        if _replaceAllLanesForcingTram(newStreet, targetTransportModes) == true then
+        -- if _replaceAllLanesForcingTram(newStreet, targetTransportModes) == true then
         -- if _replaceRightLanes(newStreet, targetTransportModes) == true then
+        if func(newStreet, targetTransportModes) == true then
             api.res.streetTypeRep.add(newStreet.type, newStreet, true)
-            return true
+            print('LOLLO newStreet =')
+            debugPrint(newStreet)
         end
-
-        return false
     end
 
     local function _addStreetsWithReservedLanes()
@@ -276,8 +331,11 @@ function data()
         for key, fileName in pairs(streetFilenames) do
             local oldStreet = api.res.streetTypeRep.get(key)
             if _getIsStreetToBeExtended(oldStreet) then
-                -- _addOneStreetWithReservedLanes(oldStreet, fileName, _getTargetTransportModes4Cargo(), 'cargo right lane', 'cargo-right')
-                _addOneStreetWithReservedLanes(oldStreet, fileName, {0, 0, 1, 1, 1, 1, 1, 0,  0, 0, 0, 0,  0, 0, 0, 0}, 'passengers right lane', 'person-right')
+                if fileName == 'lollo_large_6_lane_street.lua' then
+                    -- _addOneStreetWithReservedLanes(oldStreet, fileName, _getTargetTransportModes4Cargo(), 'cargo right lane', 'cargo-right')
+                    _addOneStreetWithReservedLanes(oldStreet, fileName, {0, 0, 1, 1, 1, 1, 1, 0,  0, 0, 0, 0,  0, 0, 0, 0}, 'passengers right lane', 'person-right', _replaceRightLanesForcingTram)
+                    _addOneStreetWithReservedLanes(oldStreet, fileName, {0, 0, 0, 1, 1, 1, 1, 0,  0, 0, 0, 0,  0, 0, 0, 0}, 'cargo right lane', 'cargo-right', _replaceLeftLanesForcingTram)
+                end
             end
         end
     end
