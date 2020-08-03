@@ -21,7 +21,38 @@ function data()
         },
         autoRemovable = true,
         skipCollision = true,
-        skipCollisionCheck = true,
+        -- skipCollisionCheck = true,
+        params = {
+            {
+                key = 'tramTrackWhere',
+                name = _('Tram Track'),
+                values = {
+                    'None', -- 0
+                    'Left', -- 1
+                    'Right', -- 2
+                    'All lanes', -- 3
+                },
+                defaultIndex = 0
+            },
+            {
+                key = 'personLaneRight',
+                name = _('Passenger lane right'),
+                values = {
+                    _('No'),
+                    _('Yes')
+                },
+                defaultIndex = 0
+            },
+            {
+                key = 'cargoLaneRight',
+                name = _('Cargo lane right'),
+                values = {
+                    _('No'),
+                    _('Yes')
+                },
+                defaultIndex = 0
+            },
+        },
         updateFn = function(params)
             -- print('lollo street changer updateFn')
             -- dump(true)(params)
@@ -39,7 +70,7 @@ function data()
             }
             result.autoRemovable = true
             result.skipCollision = true
-            result.skipCollisionCheck = true
+            -- result.skipCollisionCheck = true
             --		result.stations = {}
             --		result.terminalGroups = {}
             --		result.terrainAlignmentLists = {}
