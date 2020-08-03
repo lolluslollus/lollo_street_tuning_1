@@ -7,10 +7,10 @@ local stringUtils = require('lollo_street_tuning.lolloStringUtils')
 -- LOLLO TODO
 --[[
     Make a four-lane street of any sort, with a bus lane.
-    In the street menu, select street replacement mode
-    In the street menu, select the urban - cargo right filter
-    Hover on the piece of street you created
-    Watch the dump
+    In the street menu, select street replacement mode.
+    In the street menu, select the urban - cargo right filter.
+    Hover on the piece of street you created.
+    Watch the dump.
 
     Workaround 1: after selecting the street replacement mode, make sure you have bus lane != keep
     Workaround 2: in the following, use
@@ -19,6 +19,8 @@ local stringUtils = require('lollo_street_tuning.lolloStringUtils')
         1, -- add bus
         1, 0, 0, 0,  0, 0, 0, 0,  0, 0, 0, 0}
     end
+
+    Apparently, replacing a piece of bus-laned road with a similar one, which only allows lorries, is not expected.
  ]]
 function data()
     local function _getUiTypeNumber(uiTypeStr)
