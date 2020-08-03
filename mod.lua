@@ -131,7 +131,7 @@ function data()
         return {0, 0, 0, 1,  0, 1, 1, 0,  0, 0, 0, 0,  0, 0, 0, 0}
     end
 
-    local function _replaceRightLanesForcingTram(newStreet, targetTransportModes)
+    local function _replaceOuterLanesForcingTram(newStreet, targetTransportModes)
         -- print('LOLLO newStreet before change =')
         -- debugPrint(newStreet)
         local success = false
@@ -175,7 +175,7 @@ function data()
         return success
     end
 
-    local function _replaceLeftLanesForcingTram(newStreet, targetTransportModes)
+    local function _replaceInnerLanesForcingTram(newStreet, targetTransportModes)
         -- print('LOLLO newStreet before change =')
         -- debugPrint(newStreet)
         local success = false
@@ -335,8 +335,8 @@ function data()
             if _getIsStreetToBeExtended(oldStreet) then
                 if fileName == 'lollo_large_6_lane_street.lua' then
                     -- _addOneStreetWithReservedLanes(oldStreet, fileName, _getTargetTransportModes4Cargo(), 'cargo right lane', 'cargo-right')
-                    _addOneStreetWithReservedLanes(oldStreet, fileName, {0, 0, 1, 1, 1, 1, 1, 0,  0, 0, 0, 0,  0, 0, 0, 0}, 'passengers right lane', 'person-right', _replaceRightLanesForcingTram)
-                    _addOneStreetWithReservedLanes(oldStreet, fileName, {0, 0, 0, 1, 1, 1, 1, 0,  0, 0, 0, 0,  0, 0, 0, 0}, 'cargo right lane', 'cargo-right', _replaceLeftLanesForcingTram)
+                    _addOneStreetWithReservedLanes(oldStreet, fileName, {0, 0, 1, 1, 1, 1, 1, 0,  0, 0, 0, 0,  0, 0, 0, 0}, 'passengers right lane', 'person-right', _replaceOuterLanesForcingTram)
+                    _addOneStreetWithReservedLanes(oldStreet, fileName, {0, 0, 0, 1, 1, 1, 1, 0,  0, 0, 0, 0,  0, 0, 0, 0}, 'cargo right lane', 'cargo-right', _replaceInnerLanesForcingTram)
                 end
             end
         end
