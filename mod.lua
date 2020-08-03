@@ -121,7 +121,7 @@ function data()
         return {0, 0, 0, 1,  0, 1, 1, 0,  0, 0, 0, 0,  0, 0, 0, 0}
     end
 
-    local function _replaceRightLanes(newStreet, targetTransportModes)
+    local function _replaceOuterLanes(newStreet, targetTransportModes)
         -- print('LOLLO newStreet before change =')
         -- debugPrint(newStreet)
         local success = false
@@ -221,7 +221,7 @@ function data()
         newStreet.maintenanceCost = oldStreet.maintenanceCost
 
         newStreet.laneConfigs = oldStreet.laneConfigs
-        if _replaceRightLanes(newStreet, targetTransportModes) == true then
+        if _replaceOuterLanes(newStreet, targetTransportModes) == true then
             api.res.streetTypeRep.add(newStreet.type, newStreet, true)
             return true
         end
