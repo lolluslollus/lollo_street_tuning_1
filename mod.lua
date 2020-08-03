@@ -4,6 +4,15 @@ local streetUtils = require('lollo_street_tuning/lolloStreetUtils')
 local stringUtils = require('lollo_street_tuning.lolloStringUtils')
 -- local debugger = require('debugger')
 
+-- LOLLO TODO
+--[[
+    Make a four-lane medium street with a bus lane.
+    Select street replacement mode
+    Select the urban - cargo right filter
+    Hover on the piece of street you created
+    Watch the dump
+    Workaround: after selecting the street replacement mode, make sure you have "bus lane != keep"
+ ]]
 function data()
     local function _getUiTypeNumber(uiTypeStr)
         if uiTypeStr == 'BUTTON' then return 0
@@ -205,7 +214,10 @@ function data()
         newStreet.laneConfigs = oldStreet.laneConfigs
         if _replaceRightLanes(newStreet, targetTransportModes) == true then
             api.res.streetTypeRep.add(newStreet.type, newStreet, true)
+            return true
         end
+
+        return false
     end
 
     local function _addStreetsWithReservedLanes()
