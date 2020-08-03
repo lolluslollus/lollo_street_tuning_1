@@ -26,10 +26,12 @@ local stringUtils = require('lollo_street_tuning.lolloStringUtils')
  -- LOLLO TODO this branch attempts to lay tram tracks more individually.
  -- Unfortunately, the game always draws the tram track on the right lane,
  -- even if it is meant to be in the centre lane only.
- -- Given this, there is no real benefit versus using our predefined streets with many tram tracks.
- -- On top of it, the game draws the bus lane in the 2, 4, 5 and 7 lane (large street)
+ -- The game draws the bus lane in the 2, 4, 5 and 7 lane (large street)
  -- The error with the tram tracks being drawn but the tram being disabled also persists.
+ -- A road with a tram track in the middle followed by a road with the track on the side does not join the pieces of track.
+ -- Given these issues, there is no real benefit versus using our predefined streets with many tram tracks.
  -- The only plus would be, fewer objects in the street menu.
+
 function data()
     local function _getUiTypeNumber(uiTypeStr)
         if uiTypeStr == 'BUTTON' then return 0
