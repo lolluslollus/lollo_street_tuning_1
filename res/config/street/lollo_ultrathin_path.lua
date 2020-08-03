@@ -2,6 +2,7 @@ function data()
     return {
         numLanes = 2,
         -- transportModesStreet = {'PERSON'}, -- dumps
+        -- transportModesStreet = {'TRUCK'}, -- it dumps with an empty array or with {'PERSON'}; savegames dump with {'TRUCK'}
         sidewalkWidth = 0.2,
         sidewalkHeight = .0,
         streetWidth = 0.1,
@@ -17,7 +18,6 @@ function data()
         order = 1,
         busAndTramRight = true,
         -- slopeBuildSteps = 1,
-        -- transportModesStreet = {'TRUCK'}, -- it dumps with an empty array or with {'PERSON'}; savegames dump with {'TRUCK'}
         embankmentSlopeLow  = .75,
         embankmentSlopeHigh  = 2.5,
         materials = {
