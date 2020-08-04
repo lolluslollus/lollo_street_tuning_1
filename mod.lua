@@ -6,7 +6,9 @@ local stringUtils = require('lollo_street_tuning/lolloStringUtils')
 
 -- LOLLO TODO
 --[[
-    In the street menu, select the urban - cargo right filter.
+    Build 29596
+
+    In the street menu, select the "urban - cargo in right lane" filter.
     Select any street type.
     In the properties, select bus lane = yes
     Lay the street.
@@ -34,7 +36,7 @@ local stringUtils = require('lollo_street_tuning/lolloStringUtils')
 
     --------------------------
     There is a twin error: make a street with only trams allowed in the right lane.
-    In the street menu, select the urban - tram right filter.
+    In the street menu, select the "urban - tram in right lane" filter.
     Build a piece of road.
     Watch the dump.
 
