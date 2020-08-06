@@ -72,24 +72,6 @@ function data()
         else return 0
         end
     end
-    local function _getTransportModes()
-        -- api.type.enum.TransportMode.PERSON
-        return {
-            "PERSON",
-            "CARGO",
-            "CAR",
-            "BUS",
-            "TRUCK",
-            "TRAM",
-            "ELECTRIC_TRAM",
-            "TRAIN",
-            "ELECTRIC_TRAIN",
-            "AIRCRAFT",
-            "SHIP",
-            "SMALL_AIRCRAFT",
-            "SMALL_SHIP"
-        }
-    end
 
     local function _addAvailableConstruction(oldFileName, newFileName, scriptFileName, availability, params)
         local staticConIdId = api.res.constructionRep.find(oldFileName)
@@ -141,6 +123,22 @@ function data()
         return result
     end
 
+    --[[
+            Transport modes:
+            "PERSON", 1
+            "CARGO", 2
+            "CAR", 3 -- if set to 0, the bus lane will appear and attempt to prevent cars
+            "BUS", 4
+            "TRUCK", 5
+            "TRAM", 6
+            "ELECTRIC_TRAM", 7
+            "TRAIN", 8
+            "ELECTRIC_TRAIN", 9
+            "AIRCRAFT", 10
+            "SHIP", 11
+            "SMALL_AIRCRAFT", 12
+            "SMALL_SHIP", 12
+     ]]
     local function _getTargetTransportModes4Bus()
         return {0, 0, 0, 1,  0, 0, 0, 0,  0, 0, 0, 0,  0, 0, 0, 0}
     end
@@ -262,8 +260,10 @@ function data()
         newStreet.priority = oldStreet.priority
         newStreet.upgrade = false -- false makes it visible in the construction menu
         newStreet.country = oldStreet.country or false
-        newStreet.busAndTramRight = oldStreet.busAndTramRight or false
-        -- newStreet.busAndTramRight = false
+        -- LOLLO NOTE this has no effect: as soon as buses are allowed in one lane, the bus lane is drawn,
+        -- irrespectively of the upgrade status
+        -- newStreet.busAndTramRight = oldStreet.busAndTramRight or false
+        newStreet.busAndTramRight = false
         -- newStreet.busAndTramRight = true
         newStreet.materials = oldStreet.materials -- LOLLO TODO this is not accessible, so we must displkay the different lanes with some other system
         -- print('LOLLO materials = ')
