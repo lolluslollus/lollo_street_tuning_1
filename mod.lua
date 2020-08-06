@@ -311,13 +311,13 @@ function data()
                         'bus right lane',
                         streetUtils.getStreetCategorySuffixes().BUS_RIGHT
                     )
-                    -- _addOneStreetWithOuterReservedLanes( -- dumps
-                    --     streetDataRecordFull,
-                    --     streetDataRecordSmall.fileName,
-                    --     _getTargetTransportModes4Cargo(),
-                    --     'cargo right lane',
-                    --     streetUtils.getStreetCategorySuffixes().CARGO_RIGHT
-                    -- )
+                    _addOneStreetWithOuterReservedLanes( -- dumps
+                        streetDataRecordFull,
+                        streetDataRecordSmall.fileName,
+                        _getTargetTransportModes4Cargo(),
+                        'cargo right lane',
+                        streetUtils.getStreetCategorySuffixes().CARGO_RIGHT
+                    )
                     _addOneStreetWithOuterReservedLanes(
                         streetDataRecordFull,
                         streetDataRecordSmall.fileName,
@@ -325,13 +325,13 @@ function data()
                         'passengers right lane',
                         streetUtils.getStreetCategorySuffixes().PERSON_RIGHT
                     )
-                    -- _addOneStreetWithOuterReservedLanes( -- dumps
-                    --     streetDataRecordFull,
-                    --     streetDataRecordSmall.fileName,
-                    --     _getTargetTransportModes4Tram(),
-                    --     'tram right lane',
-                    --     streetUtils.getStreetCategorySuffixes().TRAM_RIGHT
-                    -- )
+                    _addOneStreetWithOuterReservedLanes( -- dumps
+                        streetDataRecordFull,
+                        streetDataRecordSmall.fileName,
+                        _getTargetTransportModes4Tram(),
+                        'tram right lane',
+                        streetUtils.getStreetCategorySuffixes().TRAM_RIGHT
+                    )
                     _addOneStreetWithOuterReservedLanes(
                         streetDataRecordFull,
                         streetDataRecordSmall.fileName,
