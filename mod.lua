@@ -238,6 +238,7 @@ function data()
         newStreet.country = oldStreet.country or false
         -- newStreet.busAndTramRight = oldStreet.busAndTramRight or false
         -- newStreet.busAndTramRight = false
+        -- newStreet.busAndTramRight = true
         newStreet.materials = oldStreet.materials -- LOLLO TODO this is not accessible, so we must displkay the different lanes with some other system
         -- print('LOLLO materials = ')
         -- debugPrint(newStreet.materials)
@@ -276,13 +277,13 @@ function data()
                 and streetDataRecordFull.laneConfigs ~= nil
                 -- and #streetDataRecordFull.laneConfigs > 4
                 and #streetDataRecordFull.laneConfigs > 2 then
-                    _addOneStreetWithOuterReservedLanes(
-                        streetDataRecordFull,
-                        streetDataRecordSmall.fileName,
-                        _getTargetTransportModes4Cargo(),
-                        'cargo right lane',
-                        streetUtils.getStreetCategorySuffixes().CARGO_RIGHT
-                    )
+                    -- _addOneStreetWithOuterReservedLanes(
+                    --     streetDataRecordFull,
+                    --     streetDataRecordSmall.fileName,
+                    --     _getTargetTransportModes4Cargo(),
+                    --     'cargo right lane',
+                    --     streetUtils.getStreetCategorySuffixes().CARGO_RIGHT
+                    -- )
                     _addOneStreetWithOuterReservedLanes(
                         streetDataRecordFull,
                         streetDataRecordSmall.fileName,
@@ -290,13 +291,13 @@ function data()
                         'passengers right lane',
                         streetUtils.getStreetCategorySuffixes().PERSON_RIGHT
                     )
-                    _addOneStreetWithOuterReservedLanes(
-                        streetDataRecordFull,
-                        streetDataRecordSmall.fileName,
-                        _getTargetTransportModes4Tram(),
-                        'tram right lane',
-                        streetUtils.getStreetCategorySuffixes().TRAM_RIGHT
-                    )
+                    -- _addOneStreetWithOuterReservedLanes(
+                    --     streetDataRecordFull,
+                    --     streetDataRecordSmall.fileName,
+                    --     _getTargetTransportModes4Tram(),
+                    --     'tram right lane',
+                    --     streetUtils.getStreetCategorySuffixes().TRAM_RIGHT
+                    -- )
                     _addOneStreetWithOuterReservedLanes(
                         streetDataRecordFull,
                         streetDataRecordSmall.fileName,
