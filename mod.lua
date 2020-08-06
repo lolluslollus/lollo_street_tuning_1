@@ -127,11 +127,11 @@ function data()
             Transport modes:
             "PERSON", 1
             "CARGO", 2
-            "CAR", 3 -- if set to 0, the bus lane will appear and attempt to prevent cars
+            "CAR", 3 -- if set to 0, the bus lane will appear and attempt to prevent cars, never mind the upgrade state
             "BUS", 4
             "TRUCK", 5
-            "TRAM", 6
-            "ELECTRIC_TRAM", 7
+            "TRAM", 6 -- if set to 1, the tram track will appear and work, never mind the upgrade state
+            "ELECTRIC_TRAM", 7 -- like above
             "TRAIN", 8
             "ELECTRIC_TRAIN", 9
             "AIRCRAFT", 10
@@ -311,21 +311,21 @@ function data()
                         'bus right lane',
                         streetUtils.getStreetCategorySuffixes().BUS_RIGHT
                     )
-                    -- _addOneStreetWithOuterReservedLanes(
+                    -- _addOneStreetWithOuterReservedLanes( -- dumps
                     --     streetDataRecordFull,
                     --     streetDataRecordSmall.fileName,
                     --     _getTargetTransportModes4Cargo(),
                     --     'cargo right lane',
                     --     streetUtils.getStreetCategorySuffixes().CARGO_RIGHT
                     -- )
-                    _addOneStreetWithOuterReservedLanes(
-                        streetDataRecordFull,
-                        streetDataRecordSmall.fileName,
-                        _getTargetTransportModes4Person(),
-                        'passengers right lane',
-                        streetUtils.getStreetCategorySuffixes().PERSON_RIGHT
-                    )
-                    -- _addOneStreetWithOuterReservedLanes(
+                    -- _addOneStreetWithOuterReservedLanes( -- useless
+                    --     streetDataRecordFull,
+                    --     streetDataRecordSmall.fileName,
+                    --     _getTargetTransportModes4Person(),
+                    --     'passengers right lane',
+                    --     streetUtils.getStreetCategorySuffixes().PERSON_RIGHT
+                    -- )
+                    -- _addOneStreetWithOuterReservedLanes( -- dumps
                     --     streetDataRecordFull,
                     --     streetDataRecordSmall.fileName,
                     --     _getTargetTransportModes4Tram(),
