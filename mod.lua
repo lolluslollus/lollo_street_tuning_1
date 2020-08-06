@@ -260,11 +260,11 @@ function data()
         newStreet.priority = oldStreet.priority
         newStreet.upgrade = false -- false makes it visible in the construction menu
         newStreet.country = oldStreet.country or false
-        -- LOLLO NOTE this has no effect: as soon as buses are allowed in one lane, the bus lane is drawn,
-        -- irrespectively of the upgrade status
+        -- LOLLO NOTE this has no effect if cars are not allowed
+        -- the upgrade status may show false, but the lane is blocked for cars,
+        -- as long as they have an alternative route, as usual
         -- newStreet.busAndTramRight = oldStreet.busAndTramRight or false
         newStreet.busAndTramRight = false
-        -- newStreet.busAndTramRight = true
         newStreet.materials = oldStreet.materials -- LOLLO TODO this is not accessible, so we must displkay the different lanes with some other system
         -- print('LOLLO materials = ')
         -- debugPrint(newStreet.materials)
