@@ -1,6 +1,6 @@
 function data()
 	return {
-		name = _("Highway - tyres in right lane"),
-		order = 34,
+		name = _("Highway - only tyres in right lane"),
+		order = 35,
 	}
 end

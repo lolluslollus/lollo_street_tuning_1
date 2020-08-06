@@ -141,6 +141,10 @@ function data()
         return result
     end
 
+    local function _getTargetTransportModes4Bus()
+        return {0, 0, 0, 1,  0, 0, 0, 0,  0, 0, 0, 0,  0, 0, 0, 0}
+    end
+
     local function _getTargetTransportModes4Cargo()
         return {0, 0, 0, 0,  1, 0, 0, 0,  0, 0, 0, 0,  0, 0, 0, 0}
     end
@@ -157,16 +161,30 @@ function data()
         return {0, 0, 0, 1,  1, 0, 0, 0,  0, 0, 0, 0,  0, 0, 0, 0}
     end
 
-    local function _replaceOuterLanes(newStreet, targetTransportModes)
-        -- print('LOLLO newStreet before change =')
-        -- debugPrint(newStreet)
-        local success = false
-        local forwardInLane2 = nil
-        for index, oldLaneConfig in pairs(newStreet.laneConfigs) do
-            if (index == 2 and index < #newStreet.laneConfigs) -- rightmost lane
-            or (index > 2 and index == #newStreet.laneConfigs - 1 and oldLaneConfig.forward == not(forwardInLane2)) then -- leftmost lane, discarding one-way streets
-                forwardInLane2 = oldLaneConfig.forward
+    local function _getIsOneWay(laneConfigs)
+        if #laneConfigs < 2 then return false end
 
+        local lastForward = laneConfigs[2].forward
+        for index, laneConfig in pairs(laneConfigs) do
+            if index > 2 and index < #laneConfigs then
+                if laneConfig.forward ~= lastForward then
+                    return false
+                end
+            end
+        end
+
+        return true
+    end
+
+    local function _replaceOuterLanes(newStreet, targetTransportModes)
+        print('LOLLO newStreet before change =')
+        debugPrint(newStreet)
+        local success = false
+        local isOneWay = _getIsOneWay(newStreet.laneConfigs)
+        -- print('LOLLO isOneWay =', isOneWay)
+        for index, oldLaneConfig in pairs(newStreet.laneConfigs) do
+            if (index == 2 and index < #newStreet.laneConfigs and not(isOneWay)) -- rightmost lane in 2-way roads, leftmost in 1-way roads
+            or (index > 1 and index == #newStreet.laneConfigs - 1) then -- leftmost lane in 2-way roads, rightmost in 1-way
                 local newLaneConfig = api.type.LaneConfig.new()
                 newLaneConfig.speed = oldLaneConfig.speed
                 newLaneConfig.width = oldLaneConfig.width
@@ -197,8 +215,8 @@ function data()
                 success = true
             end
         end
-        -- print('LOLLO newStreet after change =')
-        -- debugPrint(newStreet)
+        print('LOLLO newStreet after change =')
+        debugPrint(newStreet)
         return success
     end
 
@@ -237,7 +255,7 @@ function data()
         newStreet.upgrade = false -- false makes it visible in the construction menu
         newStreet.country = oldStreet.country or false
         -- newStreet.busAndTramRight = oldStreet.busAndTramRight or false
-        -- newStreet.busAndTramRight = false
+        newStreet.busAndTramRight = false
         -- newStreet.busAndTramRight = true
         newStreet.materials = oldStreet.materials -- LOLLO TODO this is not accessible, so we must displkay the different lanes with some other system
         -- print('LOLLO materials = ')
@@ -259,6 +277,7 @@ function data()
         newStreet.maintenanceCost = oldStreet.maintenanceCost
 
         newStreet.laneConfigs = oldStreet.laneConfigs
+        print('LOLLO fileName=', fileName)
         if _replaceOuterLanes(newStreet, targetTransportModes) == true then
             api.res.streetTypeRep.add(newStreet.type, newStreet, true)
             -- print('LOLLO added', newStreet.type)
@@ -277,6 +296,13 @@ function data()
                 and streetDataRecordFull.laneConfigs ~= nil
                 -- and #streetDataRecordFull.laneConfigs > 4
                 and #streetDataRecordFull.laneConfigs > 2 then
+                    _addOneStreetWithOuterReservedLanes(
+                        streetDataRecordFull,
+                        streetDataRecordSmall.fileName,
+                        _getTargetTransportModes4Bus(),
+                        'bus right lane',
+                        streetUtils.getStreetCategorySuffixes().BUS_RIGHT
+                    )
                     -- _addOneStreetWithOuterReservedLanes(
                     --     streetDataRecordFull,
                     --     streetDataRecordSmall.fileName,

@@ -1,6 +1,6 @@
 function data()
 	return {
-		name = _("Country - cargo in right lane"),
-		order = 22,
+		name = _("Country - only cargo in right lane"),
+		order = 24,
 	}
 end
