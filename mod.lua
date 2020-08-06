@@ -318,13 +318,13 @@ function data()
                     --     'cargo right lane',
                     --     streetUtils.getStreetCategorySuffixes().CARGO_RIGHT
                     -- )
-                    -- _addOneStreetWithOuterReservedLanes( -- useless
-                    --     streetDataRecordFull,
-                    --     streetDataRecordSmall.fileName,
-                    --     _getTargetTransportModes4Person(),
-                    --     'passengers right lane',
-                    --     streetUtils.getStreetCategorySuffixes().PERSON_RIGHT
-                    -- )
+                    _addOneStreetWithOuterReservedLanes(
+                        streetDataRecordFull,
+                        streetDataRecordSmall.fileName,
+                        _getTargetTransportModes4Person(),
+                        'passengers right lane',
+                        streetUtils.getStreetCategorySuffixes().PERSON_RIGHT
+                    )
                     -- _addOneStreetWithOuterReservedLanes( -- dumps
                     --     streetDataRecordFull,
                     --     streetDataRecordSmall.fileName,
