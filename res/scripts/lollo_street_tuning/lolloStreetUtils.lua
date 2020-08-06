@@ -274,18 +274,22 @@ local function _getStreetDataFiltered_StockAndReservedLanes(streetDataTable)
             or arrayUtils.arrayHasValue(strDataRecord.categories, helper.getStreetCategories().COUNTRY_CARGO_RIGHT)
             or arrayUtils.arrayHasValue(strDataRecord.categories, helper.getStreetCategories().COUNTRY_PERSON_RIGHT)
             or arrayUtils.arrayHasValue(strDataRecord.categories, helper.getStreetCategories().COUNTRY_TRAM_RIGHT)
+            or arrayUtils.arrayHasValue(strDataRecord.categories, helper.getStreetCategories().COUNTRY_TYRES_RIGHT)
             or arrayUtils.arrayHasValue(strDataRecord.categories, helper.getStreetCategories().HIGHWAY)
             or arrayUtils.arrayHasValue(strDataRecord.categories, helper.getStreetCategories().HIGHWAY_CARGO_RIGHT)
             or arrayUtils.arrayHasValue(strDataRecord.categories, helper.getStreetCategories().HIGHWAY_PERSON_RIGHT)
             or arrayUtils.arrayHasValue(strDataRecord.categories, helper.getStreetCategories().HIGHWAY_TRAM_RIGHT)
+            or arrayUtils.arrayHasValue(strDataRecord.categories, helper.getStreetCategories().HIGHWAY_TYRES_RIGHT)
             or arrayUtils.arrayHasValue(strDataRecord.categories, helper.getStreetCategories().ONE_WAY)
             or arrayUtils.arrayHasValue(strDataRecord.categories, helper.getStreetCategories().ONE_WAY_CARGO_RIGHT)
             or arrayUtils.arrayHasValue(strDataRecord.categories, helper.getStreetCategories().ONE_WAY_PERSON_RIGHT)
             or arrayUtils.arrayHasValue(strDataRecord.categories, helper.getStreetCategories().ONE_WAY_TRAM_RIGHT)
+            or arrayUtils.arrayHasValue(strDataRecord.categories, helper.getStreetCategories().ONE_WAY_TYRES_RIGHT)
             or arrayUtils.arrayHasValue(strDataRecord.categories, helper.getStreetCategories().URBAN)
             or arrayUtils.arrayHasValue(strDataRecord.categories, helper.getStreetCategories().URBAN_CARGO_RIGHT)
             or arrayUtils.arrayHasValue(strDataRecord.categories, helper.getStreetCategories().URBAN_PERSON_RIGHT)
             or arrayUtils.arrayHasValue(strDataRecord.categories, helper.getStreetCategories().URBAN_TRAM_RIGHT)
+            or arrayUtils.arrayHasValue(strDataRecord.categories, helper.getStreetCategories().URBAN_TYRES_RIGHT)
             then
                 table.insert(results, #results + 1, strDataRecord)
             end
@@ -351,18 +355,22 @@ helper.getStreetCategories = function()
         COUNTRY_CARGO_RIGHT = 'country-cargo-right',
         COUNTRY_PERSON_RIGHT = 'country-person-right',
         COUNTRY_TRAM_RIGHT = 'country-tram-right',
+        COUNTRY_TYRES_RIGHT = 'country-tyres-right',
         HIGHWAY = 'highway',
         HIGHWAY_CARGO_RIGHT = 'highway-cargo-right',
         HIGHWAY_PERSON_RIGHT = 'highway-person-right',
         HIGHWAY_TRAM_RIGHT = 'highway-tram-right',
+        HIGHWAY_TYRES_RIGHT = 'highway-tyres-right',
         ONE_WAY = 'one-way',
         ONE_WAY_CARGO_RIGHT = 'one-way-cargo-right',
         ONE_WAY_PERSON_RIGHT = 'one-way-person-right',
         ONE_WAY_TRAM_RIGHT = 'one-way-tram-right',
+        ONE_WAY_TYRES_RIGHT = 'one-way-tyres-right',
         URBAN = 'urban',
         URBAN_CARGO_RIGHT = 'urban-cargo-right',
         URBAN_PERSON_RIGHT = 'urban-person-right',
         URBAN_TRAM_RIGHT = 'urban-tram-right',
+        URBAN_TYRES_RIGHT = 'urban-tyres-right',
     }
 end
 
@@ -371,6 +379,7 @@ helper.getStreetCategorySuffixes = function()
         CARGO_RIGHT = '-cargo-right',
         PERSON_RIGHT = '-person-right',
         TRAM_RIGHT = '-tram-right',
+        TYRES_RIGHT = '-tyres-right',
     }
 end
 

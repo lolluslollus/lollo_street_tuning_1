@@ -1,6 +1,6 @@
 function data()
 	return {
 		name = _("Country - passengers in right lane"),
-		order = 5,
+		order = 21,
 	}
 end

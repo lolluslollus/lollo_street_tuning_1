@@ -153,6 +153,10 @@ function data()
         return {0, 0, 0, 0,  0, 1, 1, 0,  0, 0, 0, 0,  0, 0, 0, 0}
     end
 
+    local function _getTargetTransportModes4Tyres()
+        return {0, 0, 0, 1,  1, 0, 0, 0,  0, 0, 0, 0,  0, 0, 0, 0}
+    end
+
     local function _replaceOuterLanes(newStreet, targetTransportModes)
         -- print('LOLLO newStreet before change =')
         -- debugPrint(newStreet)
@@ -292,6 +296,13 @@ function data()
                         _getTargetTransportModes4Tram(),
                         'tram right lane',
                         streetUtils.getStreetCategorySuffixes().TRAM_RIGHT
+                    )
+                    _addOneStreetWithOuterReservedLanes(
+                        streetDataRecordFull,
+                        streetDataRecordSmall.fileName,
+                        _getTargetTransportModes4Tyres(),
+                        'tyres right lane',
+                        streetUtils.getStreetCategorySuffixes().TYRES_RIGHT
                     )
                 end
             end
