@@ -254,8 +254,8 @@ function data()
         newStreet.priority = oldStreet.priority
         newStreet.upgrade = false -- false makes it visible in the construction menu
         newStreet.country = oldStreet.country or false
-        -- newStreet.busAndTramRight = oldStreet.busAndTramRight or false
-        newStreet.busAndTramRight = false
+        newStreet.busAndTramRight = oldStreet.busAndTramRight or false
+        -- newStreet.busAndTramRight = false
         -- newStreet.busAndTramRight = true
         newStreet.materials = oldStreet.materials -- LOLLO TODO this is not accessible, so we must displkay the different lanes with some other system
         -- print('LOLLO materials = ')
