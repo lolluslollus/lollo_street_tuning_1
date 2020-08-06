@@ -7,9 +7,9 @@ function data()
 				[h1]Problem A: vehicles queue up[/h1]
 				When you build a long enough piece of road, the game splits it into seamless chunks. The joints between these chunks allow vehicles to change lanes. The trouble is, these chunks are fairly long, and crossings do not allow switching lanes. As a result, vehicles will queue up more than required.
 				[h2]Solution step 1: add lane switchers[/h2]
-				You can create an extra lane switcher by adding an intersecting street and deleting it, but this often involves destroying several buildings. To keep the carnage down, this mod adds two street slicers into the street construction menu. The automatic slicer preserves all buildings, just plop it where you want. The manual slicer allows more fine control. Place it on the roadside and rotate it with <m>, <shift> + <m>, <n> or <shift> + <n>, carefully adjusting its location. Both slicers destroy themselves after placement, leaving your new lane switcher in place. Debug mode and AltGr + L will reveal it.
+				You can create an extra lane switcher by adding an intersecting street and deleting it, but this often involves destroying several buildings. To keep the carnage down, this mod adds two street slicers into the street construction menu. The automatic slicer preserves all buildings, just plop it where you want. The manual slicer allows finer control. Place it on the roadside and rotate it with <m>, <shift> + <m>, <n> or <shift> + <n>, carefully adjusting its location. Both slicers destroy themselves after placement, leaving your new lane switcher in place. Debug mode and AltGr + L will reveal the effect.
 				[h2]Solution step 2: add lanes[/h2]
-				Once you have a few lane switchers, you can change the road segments between them. This mod adds a selection of streets with multiple lanes, to allow overtaking, but with the same width, so you can try different road types without destroying your buildings. Some road types reserve the right lane for passenger or cargo vehicles; they look the same as the others, for now. The game does not offer lane-bound waypoints, so routing the vehicles can involve a fair amount of trial and error.
+				Once you have a few lane switchers, you can change the road segments between them. This mod adds a selection of streets with multiple lanes, to allow overtaking, but with the same width, so you can try different road types without destroying your buildings. Some road types reserve the right lane for passenger or cargo vehicles. The game does not offer lane-bound waypoints, so routing the vehicles might involve some trial and error.
 				[h2]The easiest way to have lorries overtake stopping trams, or viceversa[/h2]
 				- Add two lane switchers before and after your roadside stop, with no crossings in between.
 				- Replace the road between them with one of the same width, but an extra lane and maybe extra tram lanes. Use a road type that reserves the right lane for passenger or cargo vehicles.
@@ -28,7 +28,8 @@ function data()
 				- Select street - upgrade and right-click a one-way road to reverse its direction.
 				
 				[b]This mod may break your game if you use it and then remove it.[/b]
-				[b]Thanks to Enzojz for luadump![/b][h2]Word of warning[/h2]
+				[b]Thanks to Enzojz for luadump![/b]
+				[h2]Word of warning[/h2]
 				The game won't allow changing or removing a piece of road, whose parameters have changed in a mod update.
 				This affects the "Medium 1-way street with 1 lane and extra narrow pavement" and the "Medium 1-way street with 1 lane".
 				To fix this:
