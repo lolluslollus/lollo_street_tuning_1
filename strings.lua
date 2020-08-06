@@ -30,6 +30,7 @@ function data()
 				
 				[b]This mod may break your game if you use it and then remove it.[/b]
 				[b]Thanks to Enzojz for luadump![/b]
+				[b]I would love lorry-only or tram-only lanes, but the game does not allow this for now.[/b]
 				[h2]Word of warning[/h2]
 				The game won't allow changing or removing a piece of road, whose parameters have changed in a mod update.
 				This affects the "Medium 1-way street with 1 lane and extra narrow pavement" and the "Medium 1-way street with 1 lane".
