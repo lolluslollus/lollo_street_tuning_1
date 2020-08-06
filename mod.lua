@@ -177,20 +177,26 @@ function data()
     end
 
     local function _replaceOuterLanes(newStreet, targetTransportModes)
-        print('LOLLO newStreet before change =')
-        debugPrint(newStreet)
+        -- print('LOLLO newStreet before change =')
+        -- debugPrint(newStreet)
         local success = false
         local isOneWay = _getIsOneWay(newStreet.laneConfigs)
         -- print('LOLLO isOneWay =', isOneWay)
         for index, oldLaneConfig in pairs(newStreet.laneConfigs) do
-            if (index == 2 and index < #newStreet.laneConfigs and not(isOneWay)) -- rightmost lane in 2-way roads, leftmost in 1-way roads
-            or (index > 1 and index == #newStreet.laneConfigs - 1) then -- leftmost lane in 2-way roads, rightmost in 1-way
-                local newLaneConfig = api.type.LaneConfig.new()
-                newLaneConfig.speed = oldLaneConfig.speed
-                newLaneConfig.width = oldLaneConfig.width
-                newLaneConfig.height = oldLaneConfig.height
+            local newLaneConfig = api.type.LaneConfig.new()
+            newLaneConfig.speed = oldLaneConfig.speed
+            newLaneConfig.width = oldLaneConfig.width
+            newLaneConfig.height = oldLaneConfig.height
+            if isOneWay and index > 1 and index < #newStreet.laneConfigs then
+                -- invert one-way lanes so the bus lane and the tram track appear on the right
+                newLaneConfig.forward = true --false --not(oldLaneConfig.forward)
+            else
                 newLaneConfig.forward = oldLaneConfig.forward
+            end
 
+            -- change the transport modes of the rightmost lane
+            if (index == 2 and index < #newStreet.laneConfigs and not(isOneWay)) -- rightmost lane in 2-way roads, leftmost in 1-way
+            or (index > 1 and index == #newStreet.laneConfigs - 1) then -- leftmost lane in 2-way roads, rightmost in 1-way
                 local newTransportModes = arrayUtils.cloneOmittingFields(targetTransportModes)
                 -- do not allow a transport mode that is disallowed in the original street type
                 -- if oldLaneConfig.transportModes[api.type.enum.TransportMode.BUS + 1] == 0 then
@@ -210,13 +216,15 @@ function data()
                 -- end
 
                 newLaneConfig.transportModes = newTransportModes
-                newStreet.laneConfigs[index] = newLaneConfig
-
                 success = true
+            else
+                newLaneConfig.transportModes = oldLaneConfig.transportModes
             end
+
+            newStreet.laneConfigs[index] = newLaneConfig
         end
-        print('LOLLO newStreet after change =')
-        debugPrint(newStreet)
+        -- print('LOLLO newStreet after change =')
+        -- debugPrint(newStreet)
         return success
     end
 
@@ -277,7 +285,7 @@ function data()
         newStreet.maintenanceCost = oldStreet.maintenanceCost
 
         newStreet.laneConfigs = oldStreet.laneConfigs
-        print('LOLLO fileName=', fileName)
+        -- print('LOLLO fileName=', fileName)
         if _replaceOuterLanes(newStreet, targetTransportModes) == true then
             api.res.streetTypeRep.add(newStreet.type, newStreet, true)
             -- print('LOLLO added', newStreet.type)
