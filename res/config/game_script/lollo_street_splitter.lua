@@ -1,6 +1,6 @@
--- local stringUtils = require('lollo_street_tuning/lolloStringUtils')
-local debugger = require('debugger')
+-- local debugger = require('debugger')
 local edgeUtils = require('lollo_street_tuning.edgeHelper')
+local stringUtils = require('lollo_street_tuning/lolloStringUtils')
 
 local function _isBuildingOneOfMine(param, fileName)
     local toAdd =
@@ -483,8 +483,17 @@ function data()
                 local getInfoConstruction = game.interface.getEntity(param.constructionEntityId)
                 if type(getInfoConstruction) == 'table' and type(getInfoConstruction.transf) == 'table' then
                     local nearbyEntities = edgeUtils.getNearbyEntities(getInfoConstruction.transf)
-                    print('LOLLO nearbyEntities = ')
-                    debugPrint(nearbyEntities)
+                    if type(nearbyEntities) == 'table' then
+                        print('LOLLO GET INFO found nearby entities = ')
+                        for _, entity in pairs(nearbyEntities) do
+                            debugPrint(entity)
+                            if entity.type == 'BASE_EDGE' and not(stringUtils.isNullOrEmptyString(entity.streetType)) then
+                                print('street properties =')
+                                debugPrint(api.res.streetTypeRep.get(api.res.streetTypeRep.find(entity.streetType)))
+                            end
+                            debugPrint('--------')
+                        end
+                    end
                 end
             end
 

@@ -47,9 +47,6 @@ function data()
             table.insert(
                 result.models,
                 {
-                    --id = "asset/icon/marker_exclamation.mdl",
-                    --id = "asset/icon/mark.mdl",
-                    --id = "station/street/mark.mdl",
                     id = 'lollo_assets/mark.mdl',
                     collider = {
                         type = 'NONE'

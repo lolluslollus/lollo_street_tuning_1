@@ -8,14 +8,14 @@ function data()
         description = {
             name = _('Manual Street Splitter'),
             description = _(
-                'Splits a street in two sections. Place it carefully on the roadside to create a lane switching point. Help yourself with <m> and <n>. Place different types of streets or roads between and outside switching points to route road vehicles on different lanes.'
+                'Splits a street in two sections. Place it carefully on the roadside to create a lane switching point. Help yourself with <m> and <n>. Place different types of streets or roads between and outside splits to route road vehicles on different lanes.'
             )
         },
         availability = {
             yearFrom = 0,
             yearTo = 0
         },
-        order = 1,
+        order = 1103,
         collider = {
             type = 'NONE'
         },
@@ -47,7 +47,7 @@ function data()
             table.insert(
                 result.models,
                 {
-                    id = 'lollo_assets/mark.mdl',
+                    id = 'lollo_assets/exclamation_mark.mdl',
                     collider = {
                         type = 'NONE'
                     },
