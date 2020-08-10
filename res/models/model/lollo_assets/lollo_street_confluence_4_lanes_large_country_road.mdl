@@ -1,0 +1,23 @@
+local myUtil = require('lollo_street_tuning/mdlHelpers/lollo_street_confluence_4_lanes_large')
+
+function data()
+    return {
+        boundingInfo = myUtil.getBoundingInfo(),
+        collider = myUtil.getCollider(),
+        lods = myUtil.getCountryRoadLods(),
+        metadata = {
+            availability = {
+                yearFrom = 0,
+                yearTo = 0
+            },
+            cost = {
+                price = 0
+            },
+            --autoRemovable = true,
+            skipCollision = true,
+            --skipCollisionCheck = true,
+            transportNetworkProvider = myUtil.getTransportNetworkProvider()
+        },
+        version = 1
+    }
+end
