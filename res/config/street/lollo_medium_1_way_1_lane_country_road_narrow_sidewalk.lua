@@ -38,7 +38,8 @@
     
             },
             streetBus = {
-            
+                name = 'street/new_medium_bus.mtl',
+                size = {12, 2.7}
             },
             streetTram = {
                 name = "street/new_medium_tram_paving.mtl",
