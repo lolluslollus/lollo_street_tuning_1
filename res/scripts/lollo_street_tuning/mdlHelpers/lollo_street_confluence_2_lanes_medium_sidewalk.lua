@@ -56,46 +56,25 @@ results.getLods = function()
                         transf = {1, 0, 0, 0, 0, -1, 0, 0, 0, 0, 1, 0, 0, 7.5, 0, 1}
                     },
                     -- ground
-                    {
-                        materials = {'street/country_new_medium_paving.mtl'},
-                        mesh = 'station/rail/era_c/station_1_main/station_1_main_perron_lod0.msh',
-                        transf = {.26, 0, 0, 0, 0, .99, 0, 0, 0, 0, 1, 0, 0.0, 9.8, -.795, 1}
-                    },
-                    {
-                        materials = {'street/country_new_medium_paving.mtl'},
-                        mesh = 'station/rail/era_c/station_1_main/station_1_main_perron_lod0.msh',
-                        transf = {.26, 0, 0, 0, 0, .99, 0, 0, 0, 0, 1, 0, 0.0, 4.9, -.795, 1}
-                    },
-                    {
-                        materials = {'street/country_new_medium_paving.mtl'},
-                        mesh = 'station/rail/era_c/station_1_main/station_1_main_perron_lod0.msh',
-                        transf = {.26, 0, 0, 0, 0, .99, 0, 0, 0, 0, 1, 0, 0.0, 0, -.795, 1}
-                    },
-                    {
-                        materials = {'street/country_new_medium_paving.mtl'},
-                        mesh = 'station/rail/era_c/station_1_main/station_1_main_perron_lod0.msh',
-                        transf = {.26, 0, 0, 0, 0, .99, 0, 0, 0, 0, 1, 0, 0.0, -4.9, -.795, 1}
-                    },
-                    -- straight tram tracks to plaster the gaps
                     -- {
-                    --     materials = { "station/station_tram_small_new_track_1.mtl", },
-                    --     mesh = "station/road/streetstation/lod_0_tram_rail_extend_left.msh",
-                    --     transf = { .1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 1.8, 5, 0, 1, },
+                    --     materials = {'street/country_new_medium_paving.mtl'},
+                    --     mesh = 'station/rail/era_c/station_1_main/station_1_main_perron_lod0.msh',
+                    --     transf = {.26, 0, 0, 0, 0, .99, 0, 0, 0, 0, 1, 0, 0.0, 9.8, -.795, 1}
                     -- },
                     -- {
-                    --     materials = { "station/station_tram_small_new_track_1.mtl", },
-                    --     mesh = "station/road/streetstation/lod_0_tram_rail_extend_left.msh",
-                    --     transf = { .1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 1.8, 0, 0, 1, },
+                    --     materials = {'street/country_new_medium_paving.mtl'},
+                    --     mesh = 'station/rail/era_c/station_1_main/station_1_main_perron_lod0.msh',
+                    --     transf = {.26, 0, 0, 0, 0, .99, 0, 0, 0, 0, 1, 0, 0.0, 4.9, -.795, 1}
                     -- },
                     -- {
-                    --     materials = { "station/station_tram_small_new_track_1.mtl", },
-                    --     mesh = "station/road/streetstation/lod_0_tram_rail_extend_left.msh",
-                    --     transf = { .05, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, -3, 7.5, 0, 1, },
+                    --     materials = {'street/country_new_medium_paving.mtl'},
+                    --     mesh = 'station/rail/era_c/station_1_main/station_1_main_perron_lod0.msh',
+                    --     transf = {.26, 0, 0, 0, 0, .99, 0, 0, 0, 0, 1, 0, 0.0, 0, -.795, 1}
                     -- },
                     -- {
-                    --     materials = { "station/station_tram_small_new_track_1.mtl", },
-                    --     mesh = "station/road/streetstation/lod_0_tram_rail_extend_left.msh",
-                    --     transf = { .05, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, -3, -2.5, 0, 1, },
+                    --     materials = {'street/country_new_medium_paving.mtl'},
+                    --     mesh = 'station/rail/era_c/station_1_main/station_1_main_perron_lod0.msh',
+                    --     transf = {.26, 0, 0, 0, 0, .99, 0, 0, 0, 0, 1, 0, 0.0, -4.9, -.795, 1}
                     -- },
                 },
                 transf = {.8, 0, 0, 0, 0, .8, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1}
@@ -185,14 +164,6 @@ results.getTransportNetworkProvider_AllowReversal = function()
             laneutil.createLanes(
                 {
                     curves = {
-                        -- ['right_lane'] = {
-                        --     -- right with | | below and || above
-                        --     {{-2.00000, -4.00000, 0.00000}, {-1.00000, -3.900000, 0.00000}, {1.00000, -2.10000, 0.00000}, {2.00000, -2.00000, 0.00000}}
-                        -- },
-                        -- ['left_lane'] = {
-                        --     -- left with | | below and || above
-                        --     {{-2.00000, 4.00000, 0.00000}, {-1.00000, 3.900000, 0.00000}, {1.00000, 2.10000, 0.00000}, {2.00000, 2.00000, 0.00000}}
-                        -- }
                         ['reversal_lane'] = {
                             -- right with | | below and || above
                             {{-2, -4, 0.00000}, {6, 0, 0.00000}, {-2, 4, 0.00000}}

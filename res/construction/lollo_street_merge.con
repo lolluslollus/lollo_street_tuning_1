@@ -4,6 +4,29 @@ local edgeUtils = require('lollo_street_tuning/edgeHelper')
 local pitchUtil = require('lollo_street_tuning/lolloPitchHelper')
 -- local transf = require 'transf'
 -- LOLLO TODO see if you can ease the pain when reconfiguring an existing merger. maybe skip collisions? It is not enough.
+local function _getGroundFaces(face)
+    return {
+        {
+            face = face,
+            modes = {
+                {
+                    type = 'FILL',
+                    key = 'asphalt_like_street.lua', -- 'shared/asphalt_01.gtex.lua' --'shared/gravel_03.gtex.lua'
+                }
+            }
+        },
+        {
+            face = face,
+            modes = {
+                {
+                    type = 'STROKE_OUTER',
+                    key = 'shared/asphalt_01.gtex.lua' --'shared/gravel_03.gtex.lua'
+                }
+            }
+        },
+    }
+end
+
 local function _getHasBus(params)
     return params.hasBus == 1
 end
@@ -37,20 +60,10 @@ local function updateFn_2_1_lane_narrow_sidewalk_to_2_lane_one_way(params)
     local connectorFace = {
         {2, -8.0, 0.0, 1.0},
         {2, 8.0, 0.0, 1.0},
-        {-2, 8.0, 0.0, 1.0},
-        {-2, -8.0, 0.0, 1.0}
+        {-2, 6.0, 0.0, 1.0},
+        {-2, -6.0, 0.0, 1.0},
     }
-    result.groundFaces = {
-        {
-            face = connectorFace,
-            modes = {
-                {
-                    type = 'FILL',
-                    key = 'shared/asphalt_01.gtex.lua' --'shared/gravel_03.gtex.lua'
-                }
-            }
-        }
-    }
+    result.groundFaces = _getGroundFaces(connectorFace)
 
     result.colliders = {
         {
@@ -171,20 +184,10 @@ local function updateFn_2_1_lane_narrow_sidewalk_to_2_lane(params)
     local connectorFace = {
         {2, -8.0, 0.0, 1.0},
         {2, 8.0, 0.0, 1.0},
-        {-2, 8.0, 0.0, 1.0},
-        {-2, -8.0, 0.0, 1.0}
+        {-2, 6.0, 0.0, 1.0},
+        {-2, -6.0, 0.0, 1.0},
     }
-    result.groundFaces = {
-        {
-            face = connectorFace,
-            modes = {
-                {
-                    type = 'FILL',
-                    key = 'shared/asphalt_01.gtex.lua' --'shared/gravel_03.gtex.lua'
-                }
-            }
-        }
-    }
+    result.groundFaces = _getGroundFaces(connectorFace)
 
     result.colliders = {
         {
@@ -275,17 +278,7 @@ local function updateFn_2_1_lane_medium_sidewalk_to_2_lane_one_way(params)
         {-2, 8.0, 0.0, 1.0},
         {-2, -8.0, 0.0, 1.0}
     }
-    result.groundFaces = {
-        {
-            face = connectorFace,
-            modes = {
-                {
-                    type = 'FILL',
-                    key = 'shared/asphalt_01.gtex.lua' --'shared/gravel_03.gtex.lua'
-                }
-            }
-        }
-    }
+    result.groundFaces = _getGroundFaces(connectorFace)
 
     result.colliders = {
         {
@@ -378,17 +371,7 @@ local function updateFn_2_1_lane_medium_sidewalk_to_2_lane(params)
         {-2, 8.0, 0.0, 1.0},
         {-2, -8.0, 0.0, 1.0}
     }
-    result.groundFaces = {
-        {
-            face = connectorFace,
-            modes = {
-                {
-                    type = 'FILL',
-                    key = 'shared/asphalt_01.gtex.lua' --'shared/gravel_03.gtex.lua'
-                }
-            }
-        }
-    }
+    result.groundFaces = _getGroundFaces(connectorFace)
 
     result.colliders = {
         {
@@ -480,17 +463,7 @@ local function updateFn_3_1_lane_narrow_sidewalk_to_3_lane_one_way(params)
         {-2, 8.0, 0.0, 1.0},
         {-2, -8.0, 0.0, 1.0}
     }
-    result.groundFaces = {
-        {
-            face = connectorFace,
-            modes = {
-                {
-                    type = 'FILL',
-                    key = 'shared/asphalt_01.gtex.lua' --'shared/gravel_03.gtex.lua'
-                }
-            }
-        }
-    }
+    result.groundFaces = _getGroundFaces(connectorFace)
 
     result.colliders = {
         {
@@ -602,17 +575,7 @@ local function updateFn_3_1_lane_medium_sidewalk_to_3_lane_one_way(params)
         {-10, 12.0, 0.0, 1.0},
         {-10, -12.0, 0.0, 1.0}
     }
-    result.groundFaces = {
-        {
-            face = connectorFace,
-            modes = {
-                {
-                    type = 'FILL',
-                    key = 'shared/asphalt_01.gtex.lua' --'shared/gravel_03.gtex.lua'
-                }
-            }
-        }
-    }
+    result.groundFaces = _getGroundFaces(connectorFace)
 
     result.colliders = {
         {
@@ -725,17 +688,7 @@ local function updateFn_4_1_lane_narrow_sidewalk_to_4_lane_one_way(params)
         {-6, 8.0, 0.0, 1.0},
         {-6, -8.0, 0.0, 1.0}
     }
-    result.groundFaces = {
-        {
-            face = connectorFace,
-            modes = {
-                {
-                    type = 'FILL',
-                    key = 'shared/asphalt_01.gtex.lua' --'shared/gravel_03.gtex.lua'
-                }
-            }
-        }
-    }
+    result.groundFaces = _getGroundFaces(connectorFace)
 
     result.colliders = {
         {
@@ -872,17 +825,7 @@ local function updateFn_4_1_lane_narrow_sidewalk_to_4_lane(params)
         {-6, 8.0, 0.0, 1.0},
         {-6, -8.0, 0.0, 1.0}
     }
-    result.groundFaces = {
-        {
-            face = connectorFace,
-            modes = {
-                {
-                    type = 'FILL',
-                    key = 'shared/asphalt_01.gtex.lua' --'shared/gravel_03.gtex.lua'
-                }
-            }
-        }
-    }
+    result.groundFaces = _getGroundFaces(connectorFace)
 
     result.colliders = {
         {
@@ -1016,20 +959,10 @@ local function updateFn_4_1_lane_narrow_sidewalk_to_4_lane_large(params)
     local connectorFace = {
         {2, -12.0, 0.0, 1.0},
         {2, 12.0, 0.0, 1.0},
-        {-2, 12.0, 0.0, 1.0},
-        {-2, -12.0, 0.0, 1.0}
+        {-2, 8.0, 0.0, 1.0},
+        {-2, -8.0, 0.0, 1.0}
     }
-    result.groundFaces = {
-        {
-            face = connectorFace,
-            modes = {
-                {
-                    type = 'FILL',
-                    key = 'shared/asphalt_01.gtex.lua' --'shared/gravel_03.gtex.lua'
-                }
-            }
-        }
-    }
+    result.groundFaces = _getGroundFaces(connectorFace)
 
     result.colliders = {
         {
@@ -1163,17 +1096,7 @@ local function updateFn_2_2_lane_one_way_medium_sidewalk_to_6_lane_x_large(param
         {-6, 16.0, 0.0, 1.0},
         {-6, -16.0, 0.0, 1.0}
     }
-    result.groundFaces = {
-        {
-            face = connectorFace,
-            modes = {
-                {
-                    type = 'FILL',
-                    key = 'shared/asphalt_01.gtex.lua' --'shared/gravel_03.gtex.lua'
-                }
-            }
-        }
-    }
+    result.groundFaces = _getGroundFaces(connectorFace)
 
     result.colliders = {
         {
@@ -1309,17 +1232,7 @@ local function updateFn_2_2_lane_one_way_to_6_lane_x_large(params)
         {-2, 16.0, 0.0, 1.0},
         {-2, -16.0, 0.0, 1.0}
     }
-    result.groundFaces = {
-        {
-            face = connectorFace,
-            modes = {
-                {
-                    type = 'FILL',
-                    key = 'shared/asphalt_01.gtex.lua' --'shared/gravel_03.gtex.lua'
-                }
-            }
-        }
-    }
+    result.groundFaces = _getGroundFaces(connectorFace)
 
     result.colliders = {
         {
@@ -1451,22 +1364,12 @@ local function updateFn_Motorway_2_2_lane_one_way_to_6_lane_x_large(params)
     local result = { cost = 0, skipCollision = true, }
 
     local connectorFace = {
-        {2, -16.0, 0.0, 1.0},
-        {2, 16.0, 0.0, 1.0},
-        {-2, 16.0, 0.0, 1.0},
-        {-2, -16.0, 0.0, 1.0}
+        {2, -12.0, 0.0, 1.0},
+        {2, 12.0, 0.0, 1.0},
+        {-2, 12.0, 0.0, 1.0},
+        {-2, -12.0, 0.0, 1.0}
     }
-    result.groundFaces = {
-        {
-            face = connectorFace,
-            modes = {
-                {
-                    type = 'FILL',
-                    key = 'shared/asphalt_01.gtex.lua' --'shared/gravel_03.gtex.lua'
-                }
-            }
-        }
-    }
+    result.groundFaces = _getGroundFaces(connectorFace)
 
     result.colliders = {
         {
@@ -1575,22 +1478,12 @@ local function updateFn_Motorway_4_1_lane_one_way_to_4_lane_large(params)
     local result = { cost = 0, skipCollision = true, }
 
     local connectorFace = {
-        {2, -12.0, 0.0, 1.0},
-        {2, 12.0, 0.0, 1.0},
-        {-2, 12.0, 0.0, 1.0},
-        {-2, -12.0, 0.0, 1.0}
+        {2, -8.0, 0.0, 1.0},
+        {2, 8.0, 0.0, 1.0},
+        {-2, 6.0, 0.0, 1.0},
+        {-2, -6.0, 0.0, 1.0}
     }
-    result.groundFaces = {
-        {
-            face = connectorFace,
-            modes = {
-                {
-                    type = 'FILL',
-                    key = 'shared/asphalt_01.gtex.lua' --'shared/gravel_03.gtex.lua'
-                }
-            }
-        }
-    }
+    result.groundFaces = _getGroundFaces(connectorFace)
 
     result.colliders = {
         {
@@ -1721,28 +1614,18 @@ local function updateFn_Motorway_2_1_lane_narrow_sidewalk_to_2_lane(params)
     local result = { cost = 0, skipCollision = true, }
 
     local connectorFace = {
-        {2, -8.0, 0.0, 1.0},
-        {2, 8.0, 0.0, 1.0},
-        {-2, 8.0, 0.0, 1.0},
-        {-2, -8.0, 0.0, 1.0}
+        {2, -4.0, 0.0, 1.0},
+        {2, 4.0, 0.0, 1.0},
+        {-2, 4.0, 0.0, 1.0},
+        {-2, -4.0, 0.0, 1.0}
     }
-    result.groundFaces = {
-        {
-            face = connectorFace,
-            modes = {
-                {
-                    type = 'FILL',
-                    key = 'shared/asphalt_01.gtex.lua' --'shared/gravel_03.gtex.lua'
-                }
-            }
-        }
-    }
+    result.groundFaces = _getGroundFaces(connectorFace)
 
     result.colliders = {
         {
             type = 'BOX',
             params = {
-                halfExtents = {2, 8.0, 0.15}
+                halfExtents = {2, 4.0, 0.15}
             }
         }
     }
@@ -1822,28 +1705,18 @@ local function updateFn_Motorway_2_1_lane_narrow_sidewalk_to_2_lane_one_way(para
     local result = { cost = 0, skipCollision = true, }
 
     local connectorFace = {
-        {2, -8.0, 0.0, 1.0},
-        {2, 8.0, 0.0, 1.0},
-        {-2, 8.0, 0.0, 1.0},
-        {-2, -8.0, 0.0, 1.0}
+        {2, -4.0, 0.0, 1.0},
+        {2, 4.0, 0.0, 1.0},
+        {-2, 4.0, 0.0, 1.0},
+        {-2, -4.0, 0.0, 1.0}
     }
-    result.groundFaces = {
-        {
-            face = connectorFace,
-            modes = {
-                {
-                    type = 'FILL',
-                    key = 'shared/asphalt_01.gtex.lua' --'shared/gravel_03.gtex.lua'
-                }
-            }
-        }
-    }
+    result.groundFaces = _getGroundFaces(connectorFace)
 
     result.colliders = {
         {
             type = 'BOX',
             params = {
-                halfExtents = {2, 8.0, 0.15}
+                halfExtents = {2, 4.0, 0.15}
             }
         }
     }
@@ -2010,9 +1883,8 @@ function data()
         skipCollision = true,
         --skipCollisionCheck = true,
         updateFn = function(params)
-            --luadump(true)(package.config) 
-            print('LOLLO updateFn, params = ')
-            debugPrint(params)
+            -- print('LOLLO updateFn, params = ')
+            -- debugPrint(params)
             -- LOLLO NOTE I can use O and P instead of that slider, they affect params.paramX,
             -- but only when building, not when editing a completed construction.
             -- params.upgrade = true tells me that I am upgrading an existing construction
