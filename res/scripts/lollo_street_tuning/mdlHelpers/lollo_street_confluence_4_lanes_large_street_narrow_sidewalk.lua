@@ -19,7 +19,7 @@ results.getCollider = function()
     }
 end
 
-results.getLods = function()
+results.getStreetLods = function()
     return {
         {
             node = {
@@ -137,7 +137,8 @@ results.getCountryRoadLods = function()
     }
 end
 
-results.getTransportNetworkProvider_AllowReversal = function()
+results.getTransportNetworkProvider_AllowReversal = function(isSidewalkRaised)
+    local sidewalkHeight = isSidewalkRaised and 0.3 or 0.0
     return {
         laneLists = {
             -- vehicles
@@ -205,18 +206,18 @@ results.getTransportNetworkProvider_AllowReversal = function()
                     curves = {
                         -- ['right_lane'] = {
                         --     -- right with | | below and || above
-                        --     {{10.00000, -6.00000, 0.30000}, {2.00000, -6.00000, 0.30000}, {-2.00000, -7.00000, 0.30000}, {-6.00000, -7.00000, 0.30000}}
+                        --     {{10.00000, -6.00000, sidewalkHeight}, {2.00000, -6.00000, sidewalkHeight}, {-2.00000, -7.00000, sidewalkHeight}, {-6.00000, -7.00000, sidewalkHeight}}
                         -- },
                         ['shorter_right_lane'] = {
                             -- right with | | below and || above
-                            {{2.00000, -10.00000, 0.30000}, {-2.00000, -7.60000, 0.30000}}
+                            {{2.00000, -10.00000, sidewalkHeight}, {-2.00000, -7.60000, sidewalkHeight}}
                         },
                         -- ['left_lane'] = { -- left with | | below and || above
-                        --     {{10.00000, 6.00000, 0.30000}, {2.00000, 6.00000, 0.30000}, {-2.00000, 7.00000, 0.30000}, {-6.00000, 7.00000, 0.30000}}
+                        --     {{10.00000, 6.00000, sidewalkHeight}, {2.00000, 6.00000, sidewalkHeight}, {-2.00000, 7.00000, sidewalkHeight}, {-6.00000, 7.00000, sidewalkHeight}}
                         -- }
                         ['shorter_left_lane'] = {
                             -- left with | | below and || above
-                            {{2.00000, 10.00000, 0.30000}, {-2.00000, 7.60000, 0.30000}}
+                            {{2.00000, 10.00000, sidewalkHeight}, {-2.00000, 7.60000, sidewalkHeight}}
                         }
                     }
                 },

@@ -1,10 +1,10 @@
-local myUtil = require('lollo_street_tuning/mdlHelpers/lollo_street_confluence_2_lanes_medium_sidewalk')
+local myUtil = require('lollo_street_tuning/mdlHelpers/lollo_street_confluence_3_lanes_narrow_sidewalk')
 
 function data()
     return {
         boundingInfo = myUtil.getBoundingInfo(),
         collider = myUtil.getCollider(),
-        lods = myUtil.getStreetLods(),
+        lods = myUtil.getCountryRoadLods(),
         metadata = {
             availability = {
                 yearFrom = 0,
@@ -16,7 +16,7 @@ function data()
             --autoRemovable = true,
             skipCollision = true,
             --skipCollisionCheck = true,
-            transportNetworkProvider = myUtil.getTransportNetworkProvider_AllowReversal(true)
+            transportNetworkProvider = myUtil.getTransportNetworkProvider()
         },
         version = 1
     }

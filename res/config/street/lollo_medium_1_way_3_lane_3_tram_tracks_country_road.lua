@@ -4,12 +4,12 @@
         laneConfig = {
             {forward = true},
             {forward = true},
-            --	{forward = true },
-            {forward = true},
+            --		{forward = true },
+            {forward = true, },
             {forward = true},
             {forward = false}
         },
-        --transportModesStreet = { "CAR", "BUS", "ELECTRIC_TRAM", "TRAM", 'TRUCK' }, -- with this, tram tracks appear on all lanes, not only on the right one
+        transportModesStreet = {'CAR', 'BUS', 'ELECTRIC_TRAM', 'TRAM', 'TRUCK'}, -- with this, tram tracks appear on all lanes, not only on the right one
         --transportModesSidewalk = { "PERSON", "TRUCK" }, --crashes
         --transportModesSidewalk = { "PERSON" }, --crashes
         streetWidth = 12.0,
@@ -20,10 +20,10 @@
         upgrade = false,
         country = true,
         speed = 80.0,
-        -- priority = this crashes 5, -- LOLLO NOTE this is copied from airports, it should give priority to this street
-        type = 'lollo_medium_1_way_3_lane_country_road.lua',
-        name = _('Medium highway - 3 lanes'),
-        desc = _('Medium highway with 3 lanes crammed in. Speed limit is %2%.'),
+        -- priority = this crashes 4, -- LOLLO NOTE this is copied from airports, it should give priority to this street
+        type = 'lollo_medium_1_way_3_lane_3_tram_tracks_country_road.lua',
+        name = _('Medium highway - 3 tram tracks'),
+        desc = _('Medium highway with 3 lanes, each with a tram track. Speed limit is %2%.'),
         categories = {'highway'},
         borderGroundTex = 'street_border.lua',
         materials = {
@@ -71,9 +71,6 @@
                 name = 'street/new_medium_lane.mtl',
                 size = {4.0, 4.0}
             },
-            crossingBus = {
-                name = ''
-            },
             crossingTram = {
                 name = 'street/new_medium_tram_paving.mtl',
                 size = {2.0, 2.0}
@@ -86,6 +83,7 @@
             sidewalkBorderInner = {}
         },
         assets = {},
+        sidewalkFillGroundTex = 'country_sidewalk.lua',
         cost = 50.0
     }
 end

@@ -31,6 +31,14 @@
                 name = 'street/country_new_large_border.mtl',
                 size = {24, 0.459}
             },
+            -- junctionBorder = {
+            --     name = "street/country_new_small_street_border.mtl",
+            --     size = { 9.0, 0.56 }
+            -- },
+            junctionBorder = {
+                name = 'street/country_new_large_border.mtl',
+                size = {24, 0.459}
+            },
             streetLane = {
                 name = "street/country_new_medium_lane.mtl",
                 size = { 2.5, 2.5 }
@@ -56,14 +64,6 @@
             streetTramTrack = {
                 name = "street/new_medium_tram_track.mtl",
                 size = { 2.0, 2.0 }
-            },
-            -- junctionBorder = {
-            --     name = "street/country_new_small_street_border.mtl",
-            --     size = { 9.0, 0.56 }
-            -- },
-            junctionBorder = {
-                name = 'street/country_new_large_border.mtl',
-                size = {24, 0.459}
             },
             crossingLane = {
                 name = "street/country_new_medium_lane.mtl",

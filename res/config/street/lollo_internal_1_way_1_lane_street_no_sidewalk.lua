@@ -32,6 +32,14 @@
             --     name = 'street/new_medium_border.mtl',
             --     size = {2.0, .3}
             -- },
+            -- streetBorder = {
+            --     name = 'street/country_new_large_border.mtl',
+            --     size = {24, 0.459}
+            -- },
+            -- junctionBorder = {
+            --     name = 'street/country_new_large_border.mtl',
+            --     size = {24, 0.459}
+            -- },
             streetLane = {
                 name = 'street/new_medium_lane.mtl',
                 size = {4.0, 4.0}
