@@ -122,6 +122,42 @@ results.getLods = function()
     }
 end
 
+results.getCountryRoadLods = function()
+    return {
+        {
+            node = {
+                children = {
+                    -- ground
+                    {
+                        materials = {'street/country_new_medium_paving.mtl'},
+                        mesh = 'station/rail/era_c/station_1_main/station_1_main_perron_lod0.msh',
+                        transf = {.26, 0, 0, 0, 0, 1.0, 0, 0, 0, 0, 1, 0, 0, 10.0, -.795, 1}
+                    },
+                    {
+                        materials = {'street/country_new_medium_paving.mtl'},
+                        mesh = 'station/rail/era_c/station_1_main/station_1_main_perron_lod0.msh',
+                        transf = {.26, 0, 0, 0, 0, 1.0, 0, 0, 0, 0, 1, 0, 0, 5.0, -.795, 1}
+                    },
+                    {
+                        materials = {'street/country_new_medium_paving.mtl'},
+                        mesh = 'station/rail/era_c/station_1_main/station_1_main_perron_lod0.msh',
+                        transf = {.26, 0, 0, 0, 0, 1.0, 0, 0, 0, 0, 1, 0, 0, 0, -.795, 1}
+                    },
+                    {
+                        materials = {'street/country_new_medium_paving.mtl'},
+                        mesh = 'station/rail/era_c/station_1_main/station_1_main_perron_lod0.msh',
+                        transf = {.26, 0, 0, 0, 0, 1.0, 0, 0, 0, 0, 1, 0, 0, -5, -.795, 1}
+                    },
+                },
+                transf = {.8, 0, 0, 0, 0, .8, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1}
+            },
+            static = false,
+            visibleFrom = 0,
+            visibleTo = 1000
+        }
+    }
+end
+
 results.getTransportNetworkProvider_AllowReversal = function()
     return {
         laneLists = {

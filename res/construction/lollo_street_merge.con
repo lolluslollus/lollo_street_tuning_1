@@ -1569,7 +1569,7 @@ local function updateFn_Motorway_2_2_lane_one_way_to_6_lane_x_large(params)
     return result
 end
 
-local function updateFn_Motorway_2_1_lane_one_way_to_4_lane_large(params)
+local function updateFn_Motorway_4_1_lane_one_way_to_4_lane_large(params)
     params.direction = 0 -- 2-way streets cannot be reversed, the game is like that
 
     local result = { cost = 0, skipCollision = true, }
@@ -1603,7 +1603,7 @@ local function updateFn_Motorway_2_1_lane_one_way_to_4_lane_large(params)
 
     result.models = {
         {
-            id = 'lollo_assets/lollo_street_confluence_4_lanes_large_country_road.mdl',
+            id = 'lollo_assets/lollo_street_confluence_4_lanes_large_country_road_narrow_sidewalk.mdl',
             skipCollision = true,
             transf = pitchUtil.getIdTransfPitched(params.pitch)
         }
@@ -1703,7 +1703,7 @@ local function updateFn_Motorway_2_1_lane_one_way_to_4_lane_large(params)
             type = 'STREET',
             params = {
                 skipCollision = true,
-                type = 'standard/country_large_new.lua',
+                type = tramTrackType == 'NO' and 'standard/country_large_new.lua' or 'lollo_large_4_lane_4_tram_tracks_country_road.lua',
                 tramTrackType = tramTrackType
             },
             edges = _makeEdges(params, {2, 0, 0}, {10, 0, 0}),
@@ -1749,7 +1749,7 @@ local function updateFn_Motorway_2_1_lane_narrow_sidewalk_to_2_lane(params)
 
     result.models = {
         {
-            id = 'lollo_assets/lollo_street_confluence_2_lanes_narrow_sidewalk_country_road_allow_reversal.mdl',
+            id = 'lollo_assets/lollo_street_confluence_2_lanes_country_road_narrow_sidewalk_allow_reversal.mdl',
             skipCollision = true,
             transf = pitchUtil.getIdTransfPitched(params.pitch)
         }
@@ -1850,7 +1850,7 @@ local function updateFn_Motorway_2_1_lane_narrow_sidewalk_to_2_lane_one_way(para
 
     result.models = {
         {
-            id = 'lollo_assets/lollo_street_confluence_2_lanes_narrow_sidewalk_country_road.mdl',
+            id = 'lollo_assets/lollo_street_confluence_2_lanes_country_road_narrow_sidewalk.mdl',
             skipCollision = true,
             transf = pitchUtil.getIdTransfPitched(params.pitch)
         }
@@ -2060,7 +2060,7 @@ function data()
             elseif params.mergingType == 10 then
                 return updateFn_Motorway_2_2_lane_one_way_to_6_lane_x_large(params)
             elseif params.mergingType == 11 then
-                return updateFn_Motorway_2_1_lane_one_way_to_4_lane_large(params)
+                return updateFn_Motorway_4_1_lane_one_way_to_4_lane_large(params)
             elseif params.mergingType == 12 then
                 return updateFn_Motorway_2_1_lane_narrow_sidewalk_to_2_lane(params)
             else
