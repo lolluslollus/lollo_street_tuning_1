@@ -263,8 +263,13 @@ function data()
         -- LOLLO NOTE this has no effect if cars are not allowed
         -- the upgrade status may show false, but the lane is blocked for cars,
         -- as long as they have an alternative route, as usual
+        -- Message from Filippo:
+        -- At the moment, bus upgrades are enforced on the outermost lane (there, cars are forbidden), 
+        -- and tram upgrades automatically appear on the outermost lane with the tool. 
+        -- The "outermost" lane depends on the "busAndtramRight" only for one way streets, 
+        -- meaning that it's on both sides if not one way, and only on one side depending on "busAndTramRight"
         -- newStreet.busAndTramRight = oldStreet.busAndTramRight or false
-        newStreet.busAndTramRight = false
+        newStreet.busAndTramRight = true
         newStreet.materials = oldStreet.materials -- LOLLO TODO this is not accessible, so we must displkay the different lanes with some other system
         -- print('LOLLO materials = ')
         -- debugPrint(newStreet.materials)
