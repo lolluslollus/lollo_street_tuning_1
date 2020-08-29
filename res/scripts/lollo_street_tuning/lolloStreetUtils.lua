@@ -13,7 +13,7 @@ local helper = {}
 local function _getGameStreetDirPath()
     local gamePath = fileUtils.getGamePath()
     -- print('LOLLO gamePath is')
-    -- dump(true)(gamePath)
+    -- debugPrint(gamePath)
 
     if stringUtils.isNullOrEmptyString(gamePath) then
         return '', ''
@@ -29,21 +29,21 @@ end
 local function _getMyStreetDirPath()
     local currPath = fileUtils.getCurrentPath()
     -- print('LOLLO currPath is')
-    -- dump(true)(currPath)
+    -- debugPrint(currPath)
     if stringUtils.isNullOrEmptyString(currPath) then
         return '', ''
     end
 
     local resDir = fileUtils.getResDirFromPath(currPath)
     -- print('LOLLO resDir is')
-    -- dump(true)(resDir)
+    -- debugPrint(resDir)
     if stringUtils.isNullOrEmptyString(resDir) then
         return '', ''
     end
 
     local streetDirPath = resDir .. '/config/street'
     -- print('LOLLO streetDirPath is')
-    -- dump(true)(streetDirPath)
+    -- debugPrint(streetDirPath)
 
     return streetDirPath, ''
 end
@@ -156,9 +156,9 @@ end
 
 local function _getStreetFilesContents(streetDirPath, fileNamePrefix)
     -- print('LOLLO current path = ')
-    -- dump(true)(fileUtils.getCurrentPath())
+    -- debugPrint(fileUtils.getCurrentPath())
     -- print('LOLLO package.loaded = ')
-    -- --dump(true)(package.loaded) huge
+    -- --debugPrint(package.loaded) huge
     -- for key, value in pairs(package.loaded) do
     --     print(key, value)
     -- end
@@ -167,7 +167,7 @@ local function _getStreetFilesContents(streetDirPath, fileNamePrefix)
 
     local streetFiles = fileUtils.getFilesInDirWithExtension(streetDirPath, 'lua')
     -- print('LOLLO streetfiles are')
-    -- dump(true)(streetFiles)
+    -- debugPrint(streetFiles)
     if type(streetFiles) ~= 'table' then
         return results
     end
@@ -175,7 +175,7 @@ local function _getStreetFilesContents(streetDirPath, fileNamePrefix)
     for i = 1, #streetFiles do
         local isOk, fileData = fileUtils.readGameDataFile(streetFiles[i])
         -- print('LOLLO streetFiles[i] = ')
-        -- dump(true)(streetFiles[i])
+        -- debugPrint(streetFiles[i])
         if isOk then
             local newRecord = {
                 categories = fileData.categories or {},
@@ -198,7 +198,7 @@ local function _getStreetFilesContents(streetDirPath, fileNamePrefix)
     end
     -- print('LOLLO _getStreetFilesContents is about to return: ')
     -- for i = 1, #results do
-    --     dump(true)(results[i])
+    --     debugPrint(results[i])
     -- end
 
     if #results > 0 then
@@ -213,7 +213,7 @@ local function _getStreetFilesContents(streetDirPath, fileNamePrefix)
 
     -- LOLLO NOTE you can save the global var in game or in _G
     -- print('LOLLO game.config = ')
-    -- -- dump(true)(game)
+    -- -- debugPrint(game)
     -- for key, value in pairs(game.config) do
     --     print(key, value)
     -- end
@@ -228,8 +228,8 @@ local function _getStreetFilesContents(streetDirPath, fileNamePrefix)
     -- local ok, fc = pcall(func)
     -- if ok then
     --     print('LOLLO test 4 findPath succeeded')
-    --     dump(true)(fc)
-    --     dump(true)(fc())
+    --     debugPrint(fc)
+    --     debugPrint(fc())
     -- else
     --     print('Execution error:', fc)
     -- end
