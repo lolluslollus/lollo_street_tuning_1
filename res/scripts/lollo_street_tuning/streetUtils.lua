@@ -1,8 +1,6 @@
-local arrayUtils = require('lollo_street_tuning/lolloArrayUtils')
-local fileUtils = require('lollo_street_tuning/lolloFileUtils')
-local stringUtils = require('lollo_street_tuning/lolloStringUtils')
--- local debugger = require('debugger')
--- local inspect = require('lollo_street_tuning/inspect')
+local arrayUtils = require('lollo_street_tuning/arrayUtils')
+local fileUtils = require('lollo_street_tuning/fileUtils')
+local stringUtils = require('lollo_street_tuning/stringUtils')
 
 local _lolloStreetDataBuffer = {
     data = {},
@@ -321,7 +319,9 @@ local function _getStreetTypesWithApi()
             categories = _cloneCategories(streetParams.categories),
             fileName = fileName,
             icon = streetParams.icon,
+            laneCount = #(streetParams.laneConfigs),
             name = streetParams.name,
+            rightLaneWidth = (streetParams.laneConfigs[2] or {}).width or 0,
             sidewalkWidth = streetParams.sidewalkWidth,
             streetWidth = streetParams.streetWidth,
             upgrade = streetParams.upgrade,

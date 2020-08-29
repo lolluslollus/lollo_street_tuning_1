@@ -1,8 +1,8 @@
 package.path = package.path .. ';res/scripts/?.lua'
-local arrayUtils = require('lollo_street_tuning.lolloArrayUtils')
+local arrayUtils = require('lollo_street_tuning.arrayUtils')
 local luadump = require('lollo_street_tuning.luadump')
 local matrixUtils = require('lollo_street_tuning.matrix')
-local streetUtils = require('lollo_street_tuning.lolloStreetUtils')
+local streetUtils = require('lollo_street_tuning.streetUtils')
 local transfUtils = require('lollo_street_tuning.transfUtils')
 local edgeUtils = require('lollo_street_tuning.edgeHelper')
 if debugPrint == nil then 

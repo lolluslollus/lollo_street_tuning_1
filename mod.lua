@@ -1,7 +1,7 @@
-local arrayUtils = require('lollo_street_tuning.lolloArrayUtils')
+local arrayUtils = require('lollo_street_tuning.arrayUtils')
 local streetChunksHelper = require('lollo_street_tuning/lolloStreetChunksHelper')
-local streetUtils = require('lollo_street_tuning/lolloStreetUtils')
-local stringUtils = require('lollo_street_tuning/lolloStringUtils')
+local streetUtils = require('lollo_street_tuning/streetUtils')
+local stringUtils = require('lollo_street_tuning/stringUtils')
 -- local debugger = require('debugger')
 
 -- LOLLO TODO

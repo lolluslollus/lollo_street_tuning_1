@@ -1,6 +1,6 @@
 -- local debugger = require('debugger')
 local edgeUtils = require('lollo_street_tuning.edgeHelper')
-local stringUtils = require('lollo_street_tuning/lolloStringUtils')
+local stringUtils = require('lollo_street_tuning/stringUtils')
 
 local function _isBuildingOneOfMine(param, fileName)
     local toAdd =
