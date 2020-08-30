@@ -371,23 +371,40 @@ local function _splitEdge(wholeEdge, nodeBetween)
     if type(baseEdge.objects) == 'table' then
         local edge0Objects = {}
         local edge1Objects = {}
-        for _, vv in pairs(baseEdge.objects) do
-            local entity = game.interface.getEntity(vv[1])
-            if type(entity) == 'table' and type(entity.position) == 'table' then
-                local position = entity.position
+        for _, edgeObj in pairs(baseEdge.objects) do
+            local edgeObjEntity = game.interface.getEntity(edgeObj[1])
+            if type(edgeObjEntity) == 'table' and type(edgeObjEntity.position) == 'table' then
+                local edgeObjPosition = edgeObjEntity.position
                 -- LOLLO NOTE this is a rough estimator to find out which edge gets which objects
-                local node0Distance = edgeUtils.getVectorLength({
-                    position[1] - wholeEdge.node0pos[1],
-                    position[2] - wholeEdge.node0pos[2]
-                })
-                local node1Distance = edgeUtils.getVectorLength({
-                    position[1] - wholeEdge.node1pos[1],
-                    position[2] - wholeEdge.node1pos[2]
-                })
-                if node0Distance < node1Distance then
-                    table.insert(edge0Objects, { vv[1], vv[2] })
+                -- local node0Distance = edgeUtils.getVectorLength({
+                --     position[1] - wholeEdge.node0pos[1],
+                --     position[2] - wholeEdge.node0pos[2]
+                -- })
+                -- local node1Distance = edgeUtils.getVectorLength({
+                --     position[1] - wholeEdge.node1pos[1],
+                --     position[2] - wholeEdge.node1pos[2]
+                -- })
+                -- if node0Distance < node1Distance then
+                --     table.insert(edge0Objects, { vv[1], vv[2] })
+                -- else
+                --     table.insert(edge1Objects, { vv[1], vv[2] })
+                -- end
+                -- LOLLO TODO make it better: check the following
+                if (
+                        (wholeEdge.node0pos[1] <= edgeObjPosition[1] and edgeObjPosition[1] <= nodeBetween.position[1])
+                        or
+                        (wholeEdge.node0pos[1] >= edgeObjPosition[1] and edgeObjPosition[1] >= nodeBetween.position[1])
+                    )
+                    and
+                    (
+                        (wholeEdge.node0pos[2] <= edgeObjPosition[2] and edgeObjPosition[2] <= nodeBetween.position[2])
+                        or
+                        (wholeEdge.node0pos[2] >= edgeObjPosition[2] and edgeObjPosition[2] >= nodeBetween.position[2])
+                    )
+                then
+                    table.insert(edge0Objects, { edgeObj[1], edgeObj[2] })
                 else
-                    table.insert(edge1Objects, { vv[1], vv[2] })
+                    table.insert(edge1Objects, { edgeObj[1], edgeObj[2] })
                 end
             end
         end
