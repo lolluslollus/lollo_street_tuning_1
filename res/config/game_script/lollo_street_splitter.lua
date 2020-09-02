@@ -151,76 +151,6 @@ local function _replaceEdge(oldEdge)
 	api.cmd.sendCommand(cmd, callback)
 end
 
-local function _splitEdgeBak(wholeEdge, nodeMid)
-    -- LOLLO NOTE this thing destroys all buildings along the edges that it replaces. This defies the very purpose of this mod!
-    local proposal = api.type.SimpleProposal.new()
-
-    local edge0 = api.type.SegmentAndEntity.new()
-    edge0.entity = -1
-    edge0.comp.node0 = wholeEdge.node0
-    edge0.comp.node1 = -3
-    edge0.comp.tangent0 = api.type.Vec3f.new(wholeEdge.node0tangent[1], wholeEdge.node0tangent[2], wholeEdge.node0tangent[3])
-    edge0.comp.tangent1 = api.type.Vec3f.new(nodeMid.tangent[1], nodeMid.tangent[2], nodeMid.tangent[3])
-    edge0.comp.type = 0
-    edge0.comp.typeIndex = 0
-    -- edge0.comp.objects = {{ -1, 1 }} --
-    edge0.type = 0
-    edge0.streetEdge = api.type.BaseEdgeStreet.new()
-    edge0.streetEdge.streetType = api.res.streetTypeRep.find(wholeEdge.streetType)
-
-    local edge1 = api.type.SegmentAndEntity.new()
-    edge1.entity = -2
-    edge1.comp.node0 = -3
-    edge1.comp.node1 = wholeEdge.node1
-    edge1.comp.tangent0 = api.type.Vec3f.new(nodeMid.tangent[1], nodeMid.tangent[2], nodeMid.tangent[3])
-    edge1.comp.tangent1 = api.type.Vec3f.new(wholeEdge.node1tangent[1], wholeEdge.node1tangent[2], wholeEdge.node1tangent[3])
-    edge1.comp.type = 0
-    edge1.comp.typeIndex = 0
-    --edge1.comp.objects = {{ -1, 1 }}
-    edge1.type = 0
-    edge1.streetEdge = api.type.BaseEdgeStreet.new()
-    edge1.streetEdge.streetType = api.res.streetTypeRep.find(wholeEdge.streetType)
-
-    proposal.streetProposal.edgesToAdd[1] = edge0
-    proposal.streetProposal.edgesToAdd[2] = edge1
-    proposal.streetProposal.edgesToRemove[1] = wholeEdge.id
-
-    -- eo = api.type.SimpleStreetProposal.EdgeObject.new()
-    -- eo.left = true
-    -- eo.model = "street/signal_waypoint.mdl"
-    -- eo.playerEntity = game.interface.getPlayer()
-    -- eo.oneWay = false
-    -- eo.param = 0.5
-    -- eo.edgeEntity = -1
-    -- eo.name = "MY Beautiful Signal"
-
-    -- proposal.streetProposal.edgeObjectsToAdd[1] = eo
-
-    local node1 = api.type.NodeAndEntity.new()
-    node1.entity = -3
-    node1.comp.position = api.type.Vec3f.new(nodeMid.position[1], nodeMid.position[2], nodeMid.position[3]) --api.type.Vec3f.new(40.0, 0.0, 0.0)
-
-    proposal.streetProposal.nodesToAdd[1] = node1
-
-
-    local context = api.type.Context:new()
-    context.checkTerrainAlignment = false
-    context.cleanupStreetGraph = true -- default is false, it seems to do nothing
-    context.gatherBuildings = false -- buildings are destroyed anyway
-    context.gatherFields = true
-    context.player = api.engine.util.getPlayer() -- buildings are destroyed anyway
-
-    local callback = function(res, success)
-        print('LOLLO street splitter callback returned res = ')
-        debugPrint(res)
-        --for _, v in pairs(res.entities) do print(v) end
-        print(success)
-    end
-
-    local cmd = api.cmd.make.buildProposal(proposal, context, true) -- true means, ignore errors. Errors are not ignored tho: wrong proposals will be discarded
-    api.cmd.sendCommand(cmd, callback)
-end
-
 local function _spliceEdge(edge0, edge1)
     -- LOLLO NOTE untested function, difficult to use coz it requires two selected objects
     local proposal = api.type.SimpleProposal.new()
@@ -282,6 +212,107 @@ local function _spliceEdge(edge0, edge1)
 
     local cmd = api.cmd.make.buildProposal(proposal, context, false) -- the third param means, ignore errors. Errors are not ignored tho: wrong proposals will be discarded
     api.cmd.sendCommand(cmd, callback)
+end
+
+local function _getWhichEdgeGetsEdgeObjectAfterSplit(edgeObjPosition, node0pos, node1pos, nodeBetween)
+    local result = {
+        assignToFirstEstimate = nil,
+        assignToSecondEstimate = nil,
+    }
+    -- print('LOLLO attempting to place edge object with position =')
+    -- debugPrint(edgeObjPosition)
+    -- print('wholeEdge.node0pos =')
+    -- debugPrint(node0pos)
+    -- print('nodeBetween.position =')
+    -- debugPrint(nodeBetween.position)
+    -- print('nodeBetween.tangent =')
+    -- debugPrint(nodeBetween.tangent)
+    -- print('wholeEdge.node1pos =')
+    -- debugPrint(node1pos)
+    -- first estimator
+    local nodeBetween_Node0_Distance = edgeUtils.getVectorLength({
+        nodeBetween.position[1] - node0pos[1],
+        nodeBetween.position[2] - node0pos[2]
+    })
+    local nodeBetween_Node1_Distance = edgeUtils.getVectorLength({
+        nodeBetween.position[1] - node1pos[1],
+        nodeBetween.position[2] - node1pos[2]
+    })
+    local edgeObj_Node0_Distance = edgeUtils.getVectorLength({
+        edgeObjPosition[1] - node0pos[1],
+        edgeObjPosition[2] - node0pos[2]
+    })
+    local edgeObj_Node1_Distance = edgeUtils.getVectorLength({
+        edgeObjPosition[1] - node1pos[1],
+        edgeObjPosition[2] - node1pos[2]
+    })
+    if edgeObj_Node0_Distance < nodeBetween_Node0_Distance then
+        result.assignToFirstEstimate = 0
+        -- table.insert(edge0Objects, { edgeObj[1], edgeObj[2] })
+    elseif edgeObj_Node1_Distance < nodeBetween_Node1_Distance then
+        result.assignToFirstEstimate = 1
+        -- table.insert(edge1Objects, { edgeObj[1], edgeObj[2] })
+    end
+
+    -- second estimator
+    local edgeObjPosition_assignTo = nil
+    local node0_assignTo = nil
+    local node1_assignTo = nil
+    -- at nodeBetween, I can draw the normal to the road:
+    -- y = a + bx
+    -- the angle is alpha = atan2(nodeBetween.tangent[2], nodeBetween.tangent[1]) + PI / 2
+    -- so b = math.tan(alpha)
+    -- a = y - bx
+    -- so a = nodeBetween.position[2] - b * nodeBetween.position[1]
+    -- points under this line will go one way, the others the other way
+    local alpha = math.atan2(nodeBetween.tangent[2], nodeBetween.tangent[1]) + math.pi * 0.5
+    local b = math.tan(alpha)
+    if math.abs(b) < 1e+06 then
+        local a = nodeBetween.position[2] - b * nodeBetween.position[1]
+        if a + b * edgeObjPosition[1] > edgeObjPosition[2] then -- edgeObj is below the line
+            edgeObjPosition_assignTo = 0
+        else
+            edgeObjPosition_assignTo = 1
+        end
+        if a + b * node0pos[1] > node0pos[2] then -- wholeEdge.node0pos is below the line
+            node0_assignTo = 0
+        else
+            node0_assignTo = 1
+        end
+        if a + b * node1pos[1] > node1pos[2] then -- wholeEdge.node1pos is below the line
+            node1_assignTo = 0
+        else
+            node1_assignTo = 1
+        end
+    -- if b grows too much, I lose precision, so I approximate it with the y axis
+    else
+        -- print('alpha =', alpha, 'b =', b)
+        if edgeObjPosition[1] > nodeBetween.position[1] then
+            edgeObjPosition_assignTo = 0
+        else
+            edgeObjPosition_assignTo = 1
+        end
+        if node0pos[1] > nodeBetween.position[1] then
+            node0_assignTo = 0
+        else
+            node0_assignTo = 1
+        end
+        if node1pos[1] > nodeBetween.position[1] then
+            node1_assignTo = 0
+        else
+            node1_assignTo = 1
+        end
+    end
+
+    if edgeObjPosition_assignTo == node0_assignTo then
+        result.assignToSecondEstimate = 0
+    elseif edgeObjPosition_assignTo == node1_assignTo then
+        result.assignToSecondEstimate = 1
+    end
+
+    -- print('LOLLO assignment =')
+    -- debugPrint(result)
+    return result
 end
 
 local function _splitEdge(wholeEdge, nodeBetween)
@@ -374,37 +405,23 @@ local function _splitEdge(wholeEdge, nodeBetween)
         for _, edgeObj in pairs(baseEdge.objects) do
             local edgeObjEntity = game.interface.getEntity(edgeObj[1])
             if type(edgeObjEntity) == 'table' and type(edgeObjEntity.position) == 'table' then
-                local edgeObjPosition = edgeObjEntity.position
-                -- LOLLO NOTE this is a rough estimator to find out which edge gets which objects
-                -- local node0Distance = edgeUtils.getVectorLength({
-                --     position[1] - wholeEdge.node0pos[1],
-                --     position[2] - wholeEdge.node0pos[2]
-                -- })
-                -- local node1Distance = edgeUtils.getVectorLength({
-                --     position[1] - wholeEdge.node1pos[1],
-                --     position[2] - wholeEdge.node1pos[2]
-                -- })
-                -- if node0Distance < node1Distance then
-                --     table.insert(edge0Objects, { vv[1], vv[2] })
-                -- else
-                --     table.insert(edge1Objects, { vv[1], vv[2] })
-                -- end
-                -- LOLLO TODO make it better: check the following
-                if (
-                        (wholeEdge.node0pos[1] <= edgeObjPosition[1] and edgeObjPosition[1] <= nodeBetween.position[1])
-                        or
-                        (wholeEdge.node0pos[1] >= edgeObjPosition[1] and edgeObjPosition[1] >= nodeBetween.position[1])
-                    )
-                    and
-                    (
-                        (wholeEdge.node0pos[2] <= edgeObjPosition[2] and edgeObjPosition[2] <= nodeBetween.position[2])
-                        or
-                        (wholeEdge.node0pos[2] >= edgeObjPosition[2] and edgeObjPosition[2] >= nodeBetween.position[2])
-                    )
-                then
+                local assignment = _getWhichEdgeGetsEdgeObjectAfterSplit(
+                    edgeObjEntity.position,
+                    wholeEdge.node0pos,
+                    wholeEdge.node1pos,
+                    nodeBetween
+                )
+                -- if assignment.assignToFirstEstimate == 0 then
+                if assignment.assignToSecondEstimate == 0 then
                     table.insert(edge0Objects, { edgeObj[1], edgeObj[2] })
-                else
+                -- elseif assignment.assignToFirstEstimate == 1 then
+                elseif assignment.assignToSecondEstimate == 1 then
                     table.insert(edge1Objects, { edgeObj[1], edgeObj[2] })
+                else
+                    -- don't change anything and leave
+                    -- print('LOLLO error, assignment.assignToFirstEstimate =', assignment.assignToFirstEstimate)
+                    -- print('LOLLO error, assignment.assignToSecondEstimate =', assignment.assignToSecondEstimate)
+                    return
                 end
             end
         end
@@ -477,10 +494,6 @@ function data()
                             -- },
                             splitterConstruction.position
                         )
-                        -- print('LOLLO nodeBetween = ')
-                        -- debugPrint(nodeBetween)
-                        -- print('LOLLO nearbyEdges[1] = ')
-                        -- debugPrint(nearbyEdges[1])
 
                         _splitEdge(nearbyEdges[1], nodeBetween)
                     end
@@ -505,6 +518,10 @@ function data()
                         for _, entity in pairs(nearbyEntities) do
                             debugPrint(entity)
                             if entity.type == 'BASE_EDGE' and not(stringUtils.isNullOrEmptyString(entity.streetType)) then
+                                print('base edge component =')
+                                debugPrint(api.engine.getComponent(entity.id, api.type.ComponentType.BASE_EDGE))
+                                print('base edge street component =')
+                                debugPrint(api.engine.getComponent(entity.id, api.type.ComponentType.BASE_EDGE_STREET))
                                 print('street properties =')
                                 debugPrint(api.res.streetTypeRep.get(api.res.streetTypeRep.find(entity.streetType)))
                             end
