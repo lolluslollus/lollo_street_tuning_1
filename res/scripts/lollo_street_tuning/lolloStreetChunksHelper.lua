@@ -345,6 +345,12 @@ helper.getStreetChunksSnapEdgeLists = function(params, pitchAdjusted, streetData
     -- LOLLO TODO check this, it might need extending
     -- local x0 = - math.max(7.0, streetHalfWidth + 1.0) - streetHalfWidth - halfExtraLength -- this dumps
     -- local x0 = - math.max(9.0, streetHalfWidth + 1.0) - streetHalfWidth - halfExtraLength
+
+    -- old
+    -- local x0 = - math.max(8.0, streetHalfWidth + 1.0) - streetHalfWidth - halfExtraLength -- this is the fruit of trial and error: if x1 - x0 is too little, snapping will dump
+    -- local x1 = - streetHalfWidth - halfExtraLength
+
+    -- new
     local x0 = - math.max(8.0, streetHalfWidth + 1.0) - 1 - halfExtraLength -- this is the fruit of trial and error: if x1 - x0 is too little, snapping will dump
     local x1 = - 1 - halfExtraLength
     local x2 = - x1
@@ -607,7 +613,7 @@ helper.getStreetChunksSnapEdgeLists = function(params, pitchAdjusted, streetData
                     params.direction,
                     pitchAdjusted,
                     {x0, -3.0 * streetHalfWidth - 3.0 * halfDistance - halfIslandWidth, 0},
-                    {- streetHalfWidth, -3.0 * streetHalfWidth - 3.0 * halfDistance - halfIslandWidth, 0},
+                    {x1, -3.0 * streetHalfWidth - 3.0 * halfDistance - halfIslandWidth, 0},
                     true
                 ),
                 freeNodes = _getFreeNodesLowX(params, true),
