@@ -175,6 +175,16 @@ helper.getStreetChunksParams = function()
             -- yearTo = 0
         },
         {
+            key = 'direction',
+            name = _('Direction'),
+            values = {
+                _('↑'),
+                _('↓'),
+                _('↓↑'),
+            },
+            defaultIndex = 0
+        },
+        {
             key = 'snapNodes',
             name = _('Snap to neighbours'),
             values = {
@@ -182,6 +192,17 @@ helper.getStreetChunksParams = function()
                 _('Yes')
             },
             defaultIndex = 0
+        },
+        {
+            key = 'tramTrack',
+            name = _('Tram track type'),
+            values = {
+                -- must be in this sequence
+                _('NO'),
+                _('YES'),
+                _('ELECTRIC')
+            },
+            defaultIndex = 2
         },
         {
             key = 'lockLayoutCentre',
@@ -235,27 +256,6 @@ helper.getStreetChunksParams = function()
         --     defaultIndex = 1
         -- },
         {
-            key = 'direction',
-            name = _('Direction'),
-            values = {
-                _('↑'),
-                _('↓'),
-                _('↓↑'),
-            },
-            defaultIndex = 0
-        },
-        {
-            key = 'tramTrack',
-            name = _('Tram track type'),
-            values = {
-                -- must be in this sequence
-                _('NO'),
-                _('YES'),
-                _('ELECTRIC')
-            },
-            defaultIndex = 2
-        },
-        {
             key = 'pitch',
             name = _('Pitch (adjust it with O and P while building)'),
             values = pitchUtil.getPitchParamValues(),
@@ -285,30 +285,20 @@ helper.getStreetHairpinParams = function()
             -- yearTo = 0
         },
         {
-            key = 'snapNodes',
-            name = _('Snap to neighbours'),
-            values = {
-                _('No'),
-                _('Yes')
-            },
-            defaultIndex = 0
-        },
-        {
-            key = 'lockLayoutCentre',
-            name = _('Lock curve'),
-            tooltip = _('Lock a curve to keep its shape pretty and prevent other roads merging in. Unlock it to treat it like ordinary roads. You cannot relock an unlocked curve.'),
-            values = {
-                _('No'),
-                _('Yes')
-            },
-            defaultIndex = 0
-        },
-        {
             key = 'direction',
             name = _('Direction'),
             values = {
                 _('↑'),
                 _('↓')
+            },
+            defaultIndex = 0
+        },
+        {
+            key = 'snapNodes',
+            name = _('Snap to neighbours'),
+            values = {
+                _('No'),
+                _('Yes')
             },
             defaultIndex = 0
         },
@@ -322,6 +312,16 @@ helper.getStreetHairpinParams = function()
                 _('ELECTRIC')
             },
             defaultIndex = 2
+        },
+        {
+            key = 'lockLayoutCentre',
+            name = _('Lock curve'),
+            tooltip = _('Lock a curve to keep its shape pretty and prevent other roads merging in. Unlock it to treat it like ordinary roads. You cannot relock an unlocked curve.'),
+            values = {
+                _('No'),
+                _('Yes')
+            },
+            defaultIndex = 0
         },
         {
             key = 'pitch',

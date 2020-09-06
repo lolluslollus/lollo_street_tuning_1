@@ -2322,6 +2322,15 @@ function data()
                 defaultIndex = 0
             },
             {
+                key = 'snapNodes',
+                name = _('Snap to neighbours'),
+                values = {
+                    _('No'),
+                    _('Yes')
+                },
+                defaultIndex = 0
+            },
+            {
                 key = 'tramTrack',
                 name = _('Tram track type'),
                 values = {
@@ -2341,15 +2350,6 @@ function data()
             --     },
             --     defaultIndex = 0
             -- },
-            {
-                key = 'snapNodes',
-                name = _('Snap to neighbours'),
-                values = {
-                    _('No'),
-                    _('Yes')
-                },
-                defaultIndex = 0
-            },
             {
                 key = 'pitch',
                 name = _('Pitch (adjust it with O and P while building)'),
