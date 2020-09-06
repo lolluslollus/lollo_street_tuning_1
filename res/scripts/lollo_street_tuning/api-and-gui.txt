@@ -1,0 +1,118 @@
+- api.gui.util.getById('menu.construction.road.streets.street.item.lollo_ultrathin_path.lua') is the icon displaying one street type. It is an ImageView.
+
+- its parent is a List::ListContent. It has an enormous minimum size.
+
+- its parent is a List::Content. It has an enormous minimum size, too.
+
+- its parent is a List. It has an enormous minimum size, too.
+
+- its parent is a ContentView. It has an enormous minimum size, too. Get it with:
+api.gui.util.getById('menu.construction.road.streets.street.item.lollo_ultrathin_path.lua'):getParent():getParent():getParent():getParent()
+
+- its parent is a ScrollView. Get it with api.gui.util.getById('menu.construction.road.streets.street.item.lollo_ultrathin_path.lua'):getParent():getParent():getParent():getParent():getParent()
+It has an enormous minimum size, too.
+
+- its parent is a ConstructionList. It has an enormous minimum size, too.
+
+- its parent is a ConstructionMenuTab (NOT the ConstructionMenu::Tab you see below!). It has an enormous minimum size, too.
+
+- its parent is a ConstructionMenu::Content. THIS ONE HAS WIDTH = 1000. Get it with:
+api.gui.util.getById('menu.construction.road.streets.street.item.lollo_ultrathin_path.lua'):getParent():getParent():getParent():getParent():getParent():getParent():getParent():getParent()
+PROBLEM: setMinimumSize here does not work.
+
+- its parent is a ConstructionMenu with id = 'menu.construction.roadmenu'. Get it with:
+api.gui.util.getById('menu.construction.road.streets.street.item.lollo_ultrathin_path.lua'):getParent():getParent():getParent():getParent():getParent():getParent():getParent():getParent():getParent()
+or with
+api.gui.util.getById('menu.construction.roadmenu')
+
+api.gui.util.getById('menu.construction.roadmenu'):calcMinimumSize() returns:
+{
+  new = nil,
+  h = 246,
+  w = 1000,
+  __doc__ = {
+    new = "() -> Size",
+    h = "Number",
+    w = "Number",
+  },
+}
+
+
+
+api.gui.util.getById('menu.construction.road') is the round button at the bottom
+
+api.gui.util.getById('menu.construction.road.streets') is the tab of the menu, which opens when clicking on that button. 
+
+- its parent is a TabWidget, which contains the tops of the tab strips. Get it with:
+api.gui.util.getById('menu.construction.road.streets'):getParent()
+
+- its parent is a ConstructionMenu::Tab
+
+- its parent is a ConstructionMenu with id = 'menu.construction.roadmenu', get it with:
+conMenu = api.gui.util.getById('menu.construction.road.streets'):getParent():getParent():getParent()
+conSize = conMenu:calcMinimumSize()
+conSize.w = 2000.0
+conMenu:setMinimumSize(conSize) makes the menu broader but not its contents
+
+- its parent is a ConstructionMenuContent
+
+
+
+
+newSize = api.gui.util.getById('menu.construction.road.streets'):calcMinimumSize()
+newSize.w = 300.0
+api.gui.util.getById('menu.construction.road.streets'):setMinimumSize(newSize)
+
+
+
+All objects here look like:
+{
+  new = nil,
+  setText = <function>,
+  setTextAlignment = <function>,
+  getTextAlignment = <function>,
+  setSelectable = <function>,
+  getSelectedText = <function>,
+  getText = <function>,
+  __doc__ = {
+    new = "(String text) -> TextView",
+
+    addStyleClass = "(Component self, String class) -> Nil",
+    calcMinimumSize = "(Component self) -> Size",
+    removeStyleClass = "(Component self, String class) -> Nil",
+
+    getContentRect = "(Component self) -> Rect",
+    getId = "(ILayoutItem self) -> String",
+    getLayout = "(Component self) -> Object",
+    getParent = "(Component self) -> Component",
+    setEnabled = "(Component self, Bool enabled) -> Component",
+    setGravity = "(Component self, Number horizontal, Number vertical) -> Component",
+    setLayout = "(Component self, ILayout layout) -> Component",
+    setMaximumSize = "(Component self, Size size) -> Component",
+    setMinimumSize = "(Component self, Size size) -> Component",
+    setStyleClassList = "(Component self, Vector[String] list) -> Component",
+    setTextAlignment = "(TextView self, Number horizontal, Number vertical) -> Nil",
+
+    setText = "(TextView self, String text) -> Nil",
+    hasFocus = "(Component self) -> Bool",
+    getTextAlignment = "(TextView self) -> Pair[Number,Number]",
+    getSelectedText = "(TextView self) -> String",
+    setSelectable = "(TextView self, Bool) -> TextView",
+    getText = "(TextView self) -> String",
+    isEnabled = "(Component self) -> Bool",
+    setId = "(Component self, String id) -> Nil",
+    setHighlighted = "(Component self, Bool highlighted) -> Nil",
+    setName = "(Component self, String name) -> Nil",
+    getName = "(Component self) -> String",
+    setTransparent = "(Component self, Bool transparent) -> Nil",
+    setVisible = "(Component self, Bool visible, Bool emitSignal) -> Nil",
+    destroy = "(ILayoutItem self) -> Nil",
+    setFocus = "(Component self) -> Bool",    
+    addLifeTimeChecker = "(Component self) -> LifetimeChecker",
+    setTooltip = "(Component self, String text) -> Component",
+    isVisible = "(Component self) -> Bool",
+    onDestroy = "(Component self, Function callback) -> Connection",
+    onStep = "(Component self, Function callback[Number, Number]) -> Nil",
+    onVisibilityChange = "(Component self, Function callback) -> Connection",
+  },
+}
