@@ -11,7 +11,7 @@ function data()
             )
         },
         availability = {
-            yearFrom = 0,
+            yearFrom = 1925,
             yearTo = 0
         },
         order = 1,

@@ -47,39 +47,44 @@ local function _getToggleAllTramTracksStreetType(streetFileName)
     if type(streetFileName) ~= 'string' or streetFileName == '' then return nil end
 
     local allStreetData = streetUtils.getGlobalStreetData(streetUtils.getStreetDataFilters().STOCK_AND_RESERVED_LANES)
-    local oldStreet = nil
+    local oldStreetProperties = nil
     for _, value in pairs(allStreetData) do
         if value.fileName == streetFileName then
-            oldStreet = value
+            oldStreetProperties = value
             break
         end
     end
-    if not(oldStreet) then return nil end
+    if not(oldStreetProperties) then return nil end
 
-    local sameSizeStreets = {}
+    local sameSizeStreetsProperties = {}
     for _, value in pairs(allStreetData) do
         if value.fileName ~= streetFileName
-        and value.laneCount == oldStreet.laneCount
-        and value.sidewalkWidth == oldStreet.sidewalkWidth
-        and value.streetWidth == oldStreet.streetWidth then
-            sameSizeStreets[#sameSizeStreets+1] = value
+        and value.isAllTramTracks ~= oldStreetProperties.isAllTramTracks
+        and value.laneCount == oldStreetProperties.laneCount
+        and value.sidewalkWidth == oldStreetProperties.sidewalkWidth
+        and value.streetWidth == oldStreetProperties.streetWidth then
+            sameSizeStreetsProperties[#sameSizeStreetsProperties+1] = value
         end
     end
-    if #sameSizeStreets == 0 then return nil end
+    if #sameSizeStreetsProperties == 0 then return nil end
 
-    local concatCategories = function(arr)
+    local getConcatCategories = function(arr)
         local result = ''
-        for _, value in pairs(table.sort(arr)) do
-            result = result .. value:lower()
+        for i = 1, #arr do
+            result = result .. tostring(arr[i]):lower()
         end
+        return result
     end
-    local oldStreetCategoriesStr = concatCategories(oldStreet.categories)
 
-    for _, value in pairs(sameSizeStreets) do
+    local oldStreetCategoriesStr = getConcatCategories(oldStreetProperties.categories)
+
+    for i = 1, #sameSizeStreetsProperties do
         -- LOLLO TODO this estimator may be a little weak.
         -- we need a new property in streetUtils._getStreetTypesWithApi
-        if concatCategories(value) == oldStreetCategoriesStr then
-            return value.fileName
+        -- to identify similar streets with different tarmac.
+        -- For the moment, we can probably toggle multiple times.
+        if getConcatCategories(sameSizeStreetsProperties[i].categories) == oldStreetCategoriesStr then
+            return sameSizeStreetsProperties[i].fileName
         end
     end
 
