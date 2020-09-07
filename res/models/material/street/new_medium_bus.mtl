@@ -21,8 +21,8 @@ function data()
                 fadeOutStartDist = 10000,
             },
             map_albedo_opacity = {
-                fileName = "streets/new_medium_bus.dds",
-                -- fileName = "streets/new_medium_bus_stripes_bc3.dds",
+                -- fileName = "streets/new_medium_bus.dds",
+                fileName = "streets/new_medium_bus_stripes_bc3.dds",
                 -- fileName = "streets/new_medium_bus_bc3.dds",
                 type = "TWOD",
                 wrapS = "REPEAT",
