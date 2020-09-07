@@ -1,0 +1,60 @@
+local vec3 = require 'vec3'
+local transf = require 'transf'
+
+function data()
+    return {
+        type = 'STREET_CONSTRUCTION',
+        description = {
+            name = _('Toggle tram tracks in every lane'),
+            description = _(
+                'Toggles tram tracks in every lane.'
+            )
+        },
+        availability = {
+            yearFrom = 0,
+            yearTo = 0
+        },
+        order = 1,
+        collider = {
+            type = 'NONE'
+        },
+        autoRemovable = true,
+        skipCollision = true,
+        skipCollisionCheck = true,
+        updateFn = function(params)
+            local result = {
+                colliders = {},
+                cost = 0,
+                edgeLists = {},
+                models = {
+                    {
+                        id = 'lollo_assets/mark.mdl',
+                        collider = {
+                            type = 'NONE'
+                        },
+                        autoRemovable = true,
+                        skipCollision = true,
+                        skipCollisionCheck = true,
+                        transf = transf.transl(vec3.new(0.0, 0.0, .0))
+                    }
+                },
+            --		result.groundFaces = {}
+            --		result.h0 = {}
+            --		result.h1 = {}
+                collider = {
+                    type = 'NONE'
+                },
+                autoRemovable = true,
+                skipCollision = true,
+                skipCollisionCheck = true,
+            --		result.stations = {}
+            --		result.terminalGroups = {}
+            --		result.terrainAlignmentLists = {}
+            }
+
+            return result
+        end,
+        upgradeFn = function(_)
+        end
+    }
+end

@@ -1,5 +1,6 @@
--- local debugger = require('debugger')
+local arrayUtils = require('lollo_street_tuning.arrayUtils')
 local edgeUtils = require('lollo_street_tuning.edgeHelper')
+local streetUtils = require('lollo_street_tuning.streetUtils')
 local stringUtils = require('lollo_street_tuning/stringUtils')
 
 local function _isBuildingOneOfMine(param, fileName)
@@ -34,8 +35,55 @@ local function _isBuildingStreetSplitterWithApi(param)
     return _isBuildingOneOfMine(param, 'lollo_street_splitter_w_api.con')
 end
 
+local function _isBuildingToggleAllTracks(param)
+    return _isBuildingOneOfMine(param, 'lollo_toggle_all_tracks.con')
+end
+
 local function _myErrorHandler(err)
     print('lollo street splitter ERROR: ', err)
+end
+
+local function _getToggleAllTramTracksStreetType(streetFileName)
+    if type(streetFileName) ~= 'string' or streetFileName == '' then return nil end
+
+    local allStreetData = streetUtils.getGlobalStreetData(streetUtils.getStreetDataFilters().STOCK_AND_RESERVED_LANES)
+    local oldStreet = nil
+    for _, value in pairs(allStreetData) do
+        if value.fileName == streetFileName then
+            oldStreet = value
+            break
+        end
+    end
+    if not(oldStreet) then return nil end
+
+    local sameSizeStreets = {}
+    for _, value in pairs(allStreetData) do
+        if value.fileName ~= streetFileName
+        and value.laneCount == oldStreet.laneCount
+        and value.sidewalkWidth == oldStreet.sidewalkWidth
+        and value.streetWidth == oldStreet.streetWidth then
+            sameSizeStreets[#sameSizeStreets+1] = value
+        end
+    end
+    if #sameSizeStreets == 0 then return nil end
+
+    local concatCategories = function(arr)
+        local result = ''
+        for _, value in pairs(table.sort(arr)) do
+            result = result .. value:lower()
+        end
+    end
+    local oldStreetCategoriesStr = concatCategories(oldStreet.categories)
+
+    for _, value in pairs(sameSizeStreets) do
+        -- LOLLO TODO this estimator may be a little weak.
+        -- we need a new property in streetUtils._getStreetTypesWithApi
+        if concatCategories(value) == oldStreetCategoriesStr then
+            return value.fileName
+        end
+    end
+
+    return nil
 end
 
 local function _replaceEdgeDestroyingBuildings(oldEdge)
@@ -80,8 +128,78 @@ local function _replaceEdge(oldEdge)
     -- LOLLO NOTE this replaces the street without destroying the buildings
     if type(oldEdge) ~= 'table' then return end
 
-	local proposal = api.type.SimpleProposal.new()
+	local baseEdge = api.engine.getComponent(oldEdge.id, api.type.ComponentType.BASE_EDGE)
+	local baseEdgeStreet = api.engine.getComponent(oldEdge.id, api.type.ComponentType.BASE_EDGE_STREET)
+
+	local newEdge = api.type.SegmentAndEntity.new()
+	newEdge.entity = -1
+	newEdge.type = 0
+    newEdge.comp = baseEdge
+    -- newEdge.playerOwned = {player = api.engine.util.getPlayer()}
+    newEdge.playerOwned = oldEdge.playerOwned
+	newEdge.streetEdge = baseEdgeStreet
+	-- eo.streetEdge.streetType = api.res.streetTypeRep.find(streetEdgeEntity.streetType)
+
+    local proposal = api.type.SimpleProposal.new()
 	proposal.streetProposal.edgesToRemove[1] = oldEdge.id
+    proposal.streetProposal.edgesToAdd[1] = newEdge
+    --[[ local sampleNewEdge =
+    {
+      entity = -1,
+      comp = {
+        node0 = 13010,
+        node1 = 18753,
+        tangent0 = {
+          x = -32.318000793457,
+          y = 81.757850646973,
+          z = 3.0953373908997,
+        },
+        tangent1 = {
+          x = -34.457527160645,
+          y = 80.931526184082,
+          z = -1.0708819627762,
+        },
+        type = 0,
+        typeIndex = -1,
+        objects = { },
+      },
+      type = 0,
+      params = {
+        streetType = 23,
+        hasBus = false,
+        tramTrackType = 0,
+        precedenceNode0 = 2,
+        precedenceNode1 = 2,
+      },
+      playerOwned = nil,
+      streetEdge = {
+        streetType = 23,
+        hasBus = false,
+        tramTrackType = 0,
+        precedenceNode0 = 2,
+        precedenceNode1 = 2,
+      },
+      trackEdge = {
+        trackType = -1,
+        catenary = false,
+      },
+    } ]]
+
+    local callback = function(res, success)
+        -- print('LOLLO res = ')
+		-- debugPrint(res)
+        --for _, v in pairs(res.entities) do print(v) end
+        -- print('LOLLO success = ')
+		-- debugPrint(success)
+	end
+
+	local cmd = api.cmd.make.buildProposal(proposal, nil, false)
+	api.cmd.sendCommand(cmd, callback)
+end
+
+local function _replaceEdgeWithStreetType(oldEdge, newStreetType)
+    -- LOLLO NOTE this replaces the street without destroying the buildings
+    if type(oldEdge) ~= 'table' or newStreetType < 0 then return end
 
 	local baseEdge = api.engine.getComponent(oldEdge.id, api.type.ComponentType.BASE_EDGE)
 	local baseEdgeStreet = api.engine.getComponent(oldEdge.id, api.type.ComponentType.BASE_EDGE_STREET)
@@ -90,13 +208,15 @@ local function _replaceEdge(oldEdge)
 	newEdge.entity = -1
 	newEdge.type = 0
     newEdge.comp = baseEdge
-    newEdge.playerOwned = {player = api.engine.util.getPlayer()}
-	newEdge.streetEdge = baseEdgeStreet
+    -- newEdge.playerOwned = {player = api.engine.util.getPlayer()}
+    newEdge.playerOwned = oldEdge.playerOwned
+    newEdge.streetEdge = baseEdgeStreet
+    newEdge.streetEdge.streetType = newStreetType
 	-- eo.streetEdge.streetType = api.res.streetTypeRep.find(streetEdgeEntity.streetType)
 
+    local proposal = api.type.SimpleProposal.new()
+	proposal.streetProposal.edgesToRemove[1] = oldEdge.id
     proposal.streetProposal.edgesToAdd[1] = newEdge
-    -- print('LOLLO eo = ')
-    -- debugPrint(newEdge)
     --[[ local sampleNewEdge =
     {
       entity = -1,
@@ -509,6 +629,24 @@ function data()
                         _replaceEdge(nearbyEdges[1])
                     end
                 end
+            elseif name == 'toggleAllTracksBuilt' then
+                local myConstruction = game.interface.getEntity(param.constructionEntityId)
+                if type(myConstruction) == 'table' and type(myConstruction.transf) == 'table' then
+                    local nearbyEdges = edgeUtils.getNearbyStreetEdges(myConstruction.transf)
+                    if #nearbyEdges > 0 then
+                        print('LOLLO nearbyEdges[1] = ')
+                        debugPrint(nearbyEdges[1])
+                        local newStreetType = _getToggleAllTramTracksStreetType(
+                            nearbyEdges[1].streetType
+                        )
+                        if newStreetType then
+                            _replaceEdgeWithStreetType(
+                                nearbyEdges[1],
+                                api.res.streetTypeRep.find(newStreetType)
+                            )
+                        end
+                    end
+                end
             elseif name == 'streetGetInfoBuilt' then
                 local getInfoConstruction = game.interface.getEntity(param.constructionEntityId)
                 if type(getInfoConstruction) == 'table' and type(getInfoConstruction.transf) == 'table' then
@@ -574,6 +712,14 @@ function data()
                         game.interface.sendScriptEvent(
                             '__lolloStreetSplitterEvent__',
                             'streetChangerBuilt',
+                            {
+                                constructionEntityId = param.result[1]
+                            }
+                        )
+                    elseif _isBuildingToggleAllTracks(param) then
+                        game.interface.sendScriptEvent(
+                            '__lolloStreetSplitterEvent__',
+                            'toggleAllTracksBuilt',
                             {
                                 constructionEntityId = param.result[1]
                             }
