@@ -250,6 +250,7 @@ local function _getStreetDataFiltered_Stock(streetDataTable)
 
     local results = {}
     for _, strDataRecord in pairs(streetDataTable) do
+        -- LOLLO TODO we may want not to check upgrade here if we use it for the multi-tram-track roads
         if strDataRecord.upgrade == false and strDataRecord.yearTo == 0 then
             if arrayUtils.arrayHasValue(strDataRecord.categories, helper.getStreetCategories().COUNTRY)
             or arrayUtils.arrayHasValue(strDataRecord.categories, helper.getStreetCategories().HIGHWAY)
@@ -267,6 +268,7 @@ local function _getStreetDataFiltered_StockAndReservedLanes(streetDataTable)
 
     local results = {}
     for _, strDataRecord in pairs(streetDataTable) do
+        -- LOLLO TODO we may want not to check upgrade here if we use it for the multi-tram-track roads
         if strDataRecord.upgrade == false and strDataRecord.yearTo == 0 then
             if arrayUtils.arrayHasValue(strDataRecord.categories, helper.getStreetCategories().COUNTRY)
             or arrayUtils.arrayHasValue(strDataRecord.categories, helper.getStreetCategories().COUNTRY_BUS_RIGHT)
