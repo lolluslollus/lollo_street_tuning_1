@@ -45,6 +45,7 @@ helper.adjustParamsPitch = function(params)
     params.paramX = params.paramX or 0
     params.pitch = params.pitch or _getMiddlePitchParamValue()
 
+    -- params.upgrade = true tells me that I am upgrading an existing construction
     if params.upgrade then
         params.pitch = params.pitch - _getMiddlePitchParamValue()
     else

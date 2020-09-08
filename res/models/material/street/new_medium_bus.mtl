@@ -4,8 +4,8 @@ function data()
         params = {
             albedo_scale = {
                 albedoScale = { 
-                    1.6,                      -- scale value of red color channel
-                    1.6,                      -- scale value of green color channel
+                    1.7,                      -- scale value of red color channel
+                    1.7,                      -- scale value of green color channel
                     0.15                       -- scale value of blue color channel
                 }
             },

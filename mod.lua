@@ -258,10 +258,11 @@ function data()
         newStreet.yearFrom = oldStreet.yearFrom or 0
         newStreet.yearTo = oldStreet.yearTo or 0
         newStreet.priority = oldStreet.priority
+        -- LOLLO TODO we may want to respect the upgrade flag and use it to hide multi-tram-track roads
         newStreet.upgrade = false -- false makes it visible in the construction menu
         newStreet.country = oldStreet.country or false
         -- LOLLO NOTE this has no effect if cars are not allowed
-        -- the upgrade status may show false, but the lane is blocked for cars,
+        -- the upgrade status (nothing to do with the flag above) may show false, but the lane is blocked for cars,
         -- as long as they have an alternative route, as usual
         -- Message from Filippo:
         -- At the moment, bus upgrades are enforced on the outermost lane (there, cars are forbidden), 
