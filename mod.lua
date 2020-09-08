@@ -1,4 +1,5 @@
 local arrayUtils = require('lollo_street_tuning.arrayUtils')
+local modSettings = require('lollo_street_tuning.settings')
 local streetChunksHelper = require('lollo_street_tuning/lolloStreetChunksHelper')
 local streetUtils = require('lollo_street_tuning/streetUtils')
 local stringUtils = require('lollo_street_tuning/stringUtils')
@@ -349,8 +350,19 @@ function data()
                     name = 'Lollus',
                     role = 'CREATOR'
                 }
-            }
+            },
+            params = {
+                {
+                    key = "lolloStreetTuning_YellowBusLaneStripes",
+                    name = _("Yellow bus lanes with stripes"),
+                    values = { _("No"), _("Yes"), },
+                    defaultIndex = 1,
+                },
+            },
         },
+        runFn = function(settings, modParams)
+            modSettings.setModParamsFromRunFn(modParams[getCurrentModId()])
+        end,
         -- Unlike runFn, postRunFn runs after all resources have been loaded.
         -- It is the only place where we can define a dynamic construction,
         -- which is the only way we can define dynamic parameters.
