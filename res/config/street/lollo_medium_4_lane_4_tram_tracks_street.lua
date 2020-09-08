@@ -27,7 +27,7 @@
         sidewalkHeight = .3,
         yearFrom = 1925,
         yearTo = 0,
-        upgrade = false,
+        upgrade = true,
         country = false,
         speed = 50.0,
         -- priority = this crashes 5, -- LOLLO NOTE this is copied from airports, it should give priority to this street

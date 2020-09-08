@@ -21,7 +21,7 @@
         type = 'lollo_internal_1_way_1_lane_street_no_sidewalk.lua',
         name = _('Medium one-way street with 1 lane'),
         desc = _('Medium one-way street with 1 lane. Speed limit is %2%.'),
-        --categories = {'internal', 'one-way'},
+        --categories = {},
         --borderGroundTex = 'street_border.lua',
         materials = {
             streetPaving = {

@@ -181,7 +181,7 @@ local function _getStreetFilesContents(streetDirPath, fileNamePrefix)
                 name = fileData.name or '',
                 sidewalkWidth = fileData.sidewalkWidth or 0.2,
                 streetWidth = fileData.streetWidth or 0.2,
-                upgrade = fileData.upgrade or true, -- true means, do not show this street in the menu
+                upgrade = fileData.upgrade, -- true means, do not show this street in the menu
                 yearTo = fileData.yearTo or 1925
             }
             if type(newRecord.fileName) == 'string' and newRecord.fileName:len() > 0
@@ -250,8 +250,7 @@ local function _getStreetDataFiltered_Stock(streetDataTable)
 
     local results = {}
     for _, strDataRecord in pairs(streetDataTable) do
-        -- LOLLO TODO we may want not to check upgrade here if we use it for the multi-tram-track roads
-        if strDataRecord.upgrade == false and strDataRecord.yearTo == 0 then
+        if strDataRecord.yearTo == 0 then
             if arrayUtils.arrayHasValue(strDataRecord.categories, helper.getStreetCategories().COUNTRY)
             or arrayUtils.arrayHasValue(strDataRecord.categories, helper.getStreetCategories().HIGHWAY)
             or arrayUtils.arrayHasValue(strDataRecord.categories, helper.getStreetCategories().ONE_WAY)
@@ -268,8 +267,7 @@ local function _getStreetDataFiltered_StockAndReservedLanes(streetDataTable)
 
     local results = {}
     for _, strDataRecord in pairs(streetDataTable) do
-        -- LOLLO TODO we may want not to check upgrade here if we use it for the multi-tram-track roads
-        if strDataRecord.upgrade == false and strDataRecord.yearTo == 0 then
+        if strDataRecord.yearTo == 0 then
             if arrayUtils.arrayHasValue(strDataRecord.categories, helper.getStreetCategories().COUNTRY)
             or arrayUtils.arrayHasValue(strDataRecord.categories, helper.getStreetCategories().COUNTRY_BUS_RIGHT)
             or arrayUtils.arrayHasValue(strDataRecord.categories, helper.getStreetCategories().COUNTRY_CARGO_RIGHT)

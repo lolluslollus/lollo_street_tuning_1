@@ -36,14 +36,14 @@ local function _isBuildingStreetSplitterWithApi(param)
 end
 
 local function _isBuildingToggleAllTracks(param)
-    return _isBuildingOneOfMine(param, 'lollo_toggle_all_tracks.con')
+    return _isBuildingOneOfMine(param, 'lollo_toggle_all_tram_tracks.con')
 end
 
 local function _myErrorHandler(err)
     print('lollo street splitter ERROR: ', err)
 end
 
-local function _getToggleAllTramTracksStreetType(streetFileName)
+local function _getToggleAllTramTracksStreetTypeFileName(streetFileName)
     if type(streetFileName) ~= 'string' or streetFileName == '' then return nil end
 
     local allStreetData = streetUtils.getGlobalStreetData(streetUtils.getStreetDataFilters().STOCK_AND_RESERVED_LANES)
@@ -217,6 +217,10 @@ local function _replaceEdgeWithStreetType(oldEdge, newStreetType)
     newEdge.playerOwned = oldEdge.playerOwned
     newEdge.streetEdge = baseEdgeStreet
     newEdge.streetEdge.streetType = newStreetType
+    -- add tram tracks upgrade if the new street type wants so
+    if streetUtils.getIsStreetAllTramTracks(api.res.streetTypeRep.get(newStreetType)) then
+        newEdge.streetEdge.tramTrackType = 2
+    end
 	-- eo.streetEdge.streetType = api.res.streetTypeRep.find(streetEdgeEntity.streetType)
 
     local proposal = api.type.SimpleProposal.new()
@@ -641,7 +645,7 @@ function data()
                     if #nearbyEdges > 0 then
                         print('LOLLO nearbyEdges[1] = ')
                         debugPrint(nearbyEdges[1])
-                        local newStreetType = _getToggleAllTramTracksStreetType(
+                        local newStreetType = _getToggleAllTramTracksStreetTypeFileName(
                             nearbyEdges[1].streetType
                         )
                         if newStreetType then

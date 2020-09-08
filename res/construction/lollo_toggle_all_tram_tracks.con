@@ -7,7 +7,7 @@ function data()
         description = {
             name = _('Toggle tram tracks in every lane'),
             description = _(
-                'Toggles tram tracks in every lane.'
+                'Toggles tram tracks in every lane, for those streets that support it.'
             )
         },
         availability = {

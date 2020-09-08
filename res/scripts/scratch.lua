@@ -13,6 +13,7 @@ end
 -- actboy lua debugger
 -- actboy extension path
 -- sumneko lua assist
+local aaa = false or true
 
 local node0 = {
     {0, 1000, 50},
