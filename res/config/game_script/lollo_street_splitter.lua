@@ -46,6 +46,9 @@ end
 local function _getToggleAllTramTracksStreetTypeFileName(streetFileName)
     if type(streetFileName) ~= 'string' or streetFileName == '' then return nil end
 
+    -- print('KKKKKKKKKKKKKKKK')
+    -- debugPrint(streetUtils.getGlobalStreetData(streetUtils.getStreetDataFilters().STOCK))
+    -- print('KKKKKKKKKKKKKKKK')
     local allStreetData = streetUtils.getGlobalStreetData(streetUtils.getStreetDataFilters().STOCK_AND_RESERVED_LANES)
     -- print('allStreetData has', #allStreetData, 'records')
     local oldStreetProperties = nil
