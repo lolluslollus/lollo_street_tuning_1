@@ -7,12 +7,12 @@ function data()
 				[h1]Problem A: vehicles queue up[/h1]
 				When you build a long enough piece of road, the game splits it into seamless chunks. The joints between these chunks allow vehicles to change lanes. The trouble is, these chunks are fairly long, and crossings do not allow switching lanes. As a result, vehicles will queue up more than required.
 				[h2]Solution step 1: add lane switchers[/h2]
-				You can create an extra lane switcher by adding an intersecting street and deleting it, but this often involves destroying several buildings. To keep the carnage down, this mod adds two street slicers into the street construction menu. The automatic slicer preserves all buildings, just plop it where you want. The manual slicer allows finer control. Place it on the roadside and rotate it with <m>, <shift> + <m>, <n> or <shift> + <n>, carefully adjusting its location. Both slicers destroy themselves after placement, leaving your new lane switcher in place. Debug mode and AltGr + L will reveal the effect.
+				You can create an extra lane switcher by adding an intersecting street and deleting it, but this often involves destroying several buildings. To keep the carnage down, this mod adds two street slicers into the street construction menu. The automatic slicer preserves all buildings, just plop it where you want. The manual slicer is a backup. Place it on the roadside and rotate it with <m>, <shift> + <m>, <n> or <shift> + <n>, carefully adjusting its location. Both slicers destroy themselves after placement, leaving your new lane switcher in place. Debug mode and AltGr + L will reveal the effect.
 				[h2]Solution step 2: add lanes[/h2]
 				Once you have a few lane switchers, you can change the road segments between them. This mod adds a selection of streets with multiple lanes, to allow overtaking, but with the same width, so you can try different road types without destroying your buildings. Some road types reserve the right lane for passenger or cargo vehicles. The game does not offer lane-bound waypoints, so routing the vehicles might involve some trial and error.
 				[h2]The easiest way to have lorries overtake stopping trams, or viceversa[/h2]
 				- Add two lane switchers before and after your roadside stop, with no crossings in between.
-				- Replace the road between them with one of the same width, but an extra lane and maybe extra tram lanes. Use a road type that reserves the right lane for passenger or cargo vehicles.
+				- Replace the road between them with one of the same width, and maybe an extra lane or extra tram lanes. Use a road type that reserves the right lane for passenger or cargo vehicles.
 				[h1]Problem B: little control building roads[/h1]
 				This mod adds a "street construction" to build chunks of road with useful parameters. These chunks can be single or multiple, arranged in parallel. Lock them to keep their shape pretty and prevent other roads merging in. Unlock them to treat them like ordinary roads. You cannot relock an unlocked chunk.
 				[h1]Problem C: ugly merges[/h1]
@@ -22,6 +22,9 @@ function data()
 				This mod adds a "street construction" to build prettier tight curves. Lock a curve to keep its shape pretty and prevent other roads merging in. Unlock it to treat it like ordinary roads. You cannot relock an unlocked curve.
 				[h1]Problem E: no footpaths[/h1]
 				This mod contains some thin footpaths. You can use them to perform various tricks, eg connecting stations to roads or having people walk across a park. Give them a bus lane to pedestrianise them.
+				[h1]Problem F: trams only run in the rightmost lane[/h1]
+				This mod contains a construction to toggle extra tram tracks. Plop it on a road and it will add or remove extra tram tracks, if there are enough lanes.
+				Previous iterations exposed roads with many tram tracks in the street menu, but that was too crammed.
 				[h1]Some handy tips:[/h1]
 				- To better visualise the lanes, start the game in debug mode and press <AltGr> + <L>.
 				- Press and hold <shift> to place a short road segment between two joints.
