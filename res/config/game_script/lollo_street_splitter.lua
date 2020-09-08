@@ -47,6 +47,7 @@ local function _getToggleAllTramTracksStreetTypeFileName(streetFileName)
     if type(streetFileName) ~= 'string' or streetFileName == '' then return nil end
 
     local allStreetData = streetUtils.getGlobalStreetData(streetUtils.getStreetDataFilters().STOCK_AND_RESERVED_LANES)
+    -- print('allStreetData has', #allStreetData, 'records')
     local oldStreetProperties = nil
     for _, value in pairs(allStreetData) do
         if value.fileName == streetFileName then
@@ -67,6 +68,9 @@ local function _getToggleAllTramTracksStreetTypeFileName(streetFileName)
         end
     end
     if #sameSizeStreetsProperties == 0 then return nil end
+
+    -- print('sameSizeStreetsProperties =')
+    -- debugPrint(sameSizeStreetsProperties)
 
     local getConcatCategories = function(arr)
         local result = ''
@@ -218,7 +222,10 @@ local function _replaceEdgeWithStreetType(oldEdge, newStreetType)
     newEdge.streetEdge = baseEdgeStreet
     newEdge.streetEdge.streetType = newStreetType
     -- add tram tracks upgrade if the new street type wants so
-    if streetUtils.getIsStreetAllTramTracks(api.res.streetTypeRep.get(newStreetType)) then
+    local _newStreetProperties = api.res.streetTypeRep.get(newStreetType)
+    if not(_newStreetProperties) or not(_newStreetProperties.laneConfigs) then return end
+
+    if streetUtils.getIsStreetAllTramTracks(_newStreetProperties.laneConfigs) then
         newEdge.streetEdge.tramTrackType = 2
     end
 	-- eo.streetEdge.streetType = api.res.streetTypeRep.find(streetEdgeEntity.streetType)
@@ -643,8 +650,6 @@ function data()
                 if type(myConstruction) == 'table' and type(myConstruction.transf) == 'table' then
                     local nearbyEdges = edgeUtils.getNearbyStreetEdges(myConstruction.transf)
                     if #nearbyEdges > 0 then
-                        print('LOLLO nearbyEdges[1] = ')
-                        debugPrint(nearbyEdges[1])
                         local newStreetType = _getToggleAllTramTracksStreetTypeFileName(
                             nearbyEdges[1].streetType
                         )

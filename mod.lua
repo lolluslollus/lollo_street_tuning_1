@@ -159,26 +159,11 @@ function data()
         return {0, 0, 0, 1,  1, 0, 0, 0,  0, 0, 0, 0,  0, 0, 0, 0}
     end
 
-    local function _getIsOneWay(laneConfigs)
-        if #laneConfigs < 2 then return false end
-
-        local lastForward = laneConfigs[2].forward
-        for index, laneConfig in pairs(laneConfigs) do
-            if index > 2 and index < #laneConfigs then
-                if laneConfig.forward ~= lastForward then
-                    return false
-                end
-            end
-        end
-
-        return true
-    end
-
     local function _replaceOuterLanes(newStreet, targetTransportModes)
         -- print('LOLLO newStreet before change =')
         -- debugPrint(newStreet)
         local success = false
-        local isOneWay = _getIsOneWay(newStreet.laneConfigs)
+        local isOneWay = streetUtils.getIsStreetOneWay(newStreet.laneConfigs)
         -- print('LOLLO isOneWay =', isOneWay)
         for index, oldLaneConfig in pairs(newStreet.laneConfigs) do
             local newLaneConfig = api.type.LaneConfig.new()
@@ -193,8 +178,7 @@ function data()
             end
 
             -- change the transport modes of the rightmost lane
-            if (index == 2 and index < #newStreet.laneConfigs and not(isOneWay)) -- rightmost lane in 2-way roads, leftmost in 1-way
-            or (index > 1 and index == #newStreet.laneConfigs - 1) then -- leftmost lane in 2-way roads, rightmost in 1-way
+            if streetUtils.getIsOuterLane(newStreet.laneConfigs, index, isOneWay) then
                 local newTransportModes = arrayUtils.cloneOmittingFields(targetTransportModes)
                 -- do not allow a transport mode that is disallowed in the original street type
                 -- if oldLaneConfig.transportModes[api.type.enum.TransportMode.BUS + 1] == 0 then
@@ -230,7 +214,7 @@ function data()
         local newStreet = api.type.StreetType.new()
 
         -- for key, value in pairs(streetData) do -- dumps
-        newStreet.name = oldStreet.name .. ' - ' .. descSuffix -- 'LOLLO test'
+        newStreet.name = oldStreet.name .. ' - ' .. descSuffix
         newStreet.desc = oldStreet.desc .. ' - ' .. descSuffix
         -- newStreet.fileName = 'lollo_large_4_lane_4_tram_tracks_street_2.lua' -- dumps
         newStreet.type = string.sub(fileName, 1, string.len(fileName) - string.len('.lua')) .. '-' .. _getLaneConfigToString(targetTransportModes) .. '.lua'
