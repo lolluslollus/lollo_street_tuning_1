@@ -1189,10 +1189,9 @@ end
 helper.getStreetHairpinSnapEdgeLists = function(params, pitchAdjusted, streetData, tramTrackType)
     local streetHalfWidth = _getStreetHalfWidth(streetData)
     local widthFactorBend = _getWidthFactor(streetHalfWidth)
-
     -- this is the fruit of trial and error, see the notes
-    -- local xMax = math.max(9.0, streetHalfWidth + 1.0)
-    local xMax = streetHalfWidth + 1.0 -- LOLLO TODO check this, it might need extending
+    local xMax = math.max(9.0, streetHalfWidth + 1.0)
+    -- local xMax = streetHalfWidth + 1.0 -- LOLLO TODO check this, it might need extending
     local edgeParams = {
         skipCollision = true,
         type = streetData.fileName,
