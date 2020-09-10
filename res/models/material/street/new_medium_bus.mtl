@@ -7,9 +7,9 @@ function data()
         params = {
             albedo_scale = {
                 albedoScale = _isUseBusLaneStripes and {
-                    1.7,                      -- scale value of red color channel
-                    1.7,                      -- scale value of green color channel
-                    0.1                       -- scale value of blue color channel
+                    1.75,                      -- scale value of red color channel
+                    1.75,                      -- scale value of green color channel
+                    0.05                       -- scale value of blue color channel
                 } or {
                     1.0, 1.0, 1.0
                 }
@@ -26,7 +26,10 @@ function data()
                 fadeOutStartDist = 10000,
             },
             map_albedo_opacity = {
-                fileName = _isUseBusLaneStripes and "streets/new_medium_bus_stripes_bc3.dds" or "streets/new_medium_bus.dds",
+                fileName = _isUseBusLaneStripes
+                    -- and "streets/new_medium_bus_stripes_bc3.dds"
+                    and "streets/new_medium_bus_stripes_2_bc3.dds"
+                    or "streets/new_medium_bus.dds",
                 type = "TWOD",
                 wrapS = "REPEAT",
             },
