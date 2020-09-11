@@ -137,7 +137,7 @@ results.getCountryRoadLods = function()
     }
 end
 
-results.getTransportNetworkProvider_AllowReversal = function(isSidewalkRaised)
+results.getTransportNetworkProvider = function(isSidewalkRaised)
     local sidewalkHeight = isSidewalkRaised and 0.3 or 0.0
     return {
         laneLists = {
@@ -145,52 +145,36 @@ results.getTransportNetworkProvider_AllowReversal = function(isSidewalkRaised)
             laneutil.createLanes(
                 {
                     curves = {
-                        -- ['right_lane'] = {
+                        -- ['reversal_inner'] = {
                         --     -- right with | | below and || above
-                        --     {{-2.00000, -4.00000, 0.00000}, {-1.00000, -3.900000, 0.00000}, {1.00000, -2.10000, 0.00000}, {2.00000, -2.00000, 0.00000}}
+                        --     {{-2, -2, 0.00000}, {2, 0, 0.00000}, {-2, 2, 0.00000}}
                         -- },
-                        -- ['left_lane'] = {
-                        --     -- left with | | below and || above
-                        --     {{-2.00000, 4.00000, 0.00000}, {-1.00000, 3.900000, 0.00000}, {1.00000, 2.10000, 0.00000}, {2.00000, 2.00000, 0.00000}}
-                        -- }
-                        ['reversal_inner'] = {
-                            -- right with | | below and || above
-                            {{-2, -2, 0.00000}, {2, 0, 0.00000}, {-2, 2, 0.00000}}
-                        },
-                        ['reversal_outer'] = {
-                            -- right with | | below and || above
-                            {{-2, -6, 0.00000}, {6, 0, 0.00000}, {-2, 6, 0.00000}}
-                        },
+                        -- ['reversal_outer'] = {
+                        --     -- right with | | below and || above
+                        --     {{-2, -6, 0.00000}, {6, 0, 0.00000}, {-2, 6, 0.00000}}
+                        -- },
                         ['right_lane_one'] = {
-                            -- right with | | below and || above
                             {{-2, -6, 0.00000}, {-1.8, -6, 0.00000}}
                         },
                         ['right_lane_two'] = {
-                            -- right with | | below and || above
                             {{1.8, -6, 0.00000}, {2, -6, 0.00000}}
                         },
                         ['centre_right_lane_one'] = {
-                            -- right with | | below and || above
                             {{-2, -2, 0.00000}, {-1.8, -2, 0.00000}}
                         },
                         ['centre_right_lane_two'] = {
-                            -- right with | | below and || above
                             {{1.8, -2, 0.00000}, {2, -2, 0.00000}}
                         },
                         ['centre_left_lane_one'] = {
-                            -- right with | | below and || above
                             {{-2, 2, 0.00000}, {-1.8, 2, 0.00000}}
                         },
                         ['centre_left_lane_two'] = {
-                            -- right with | | below and || above
                             {{1.8, 2, 0.00000}, {2, 2, 0.00000}}
                         },
                         ['left_lane_one'] = {
-                            -- left with | | below and || above
                             {{-2, 6, 0.00000}, {-1.8, 6.00000, 0.00000}}
                         },
                         ['left_lane_two'] = {
-                            -- left with | | below and || above
                             {{1.8, 6, 0.00000}, {2, 6, 0.00000}}
                         }
                     }
