@@ -1,5 +1,5 @@
 local myUtil = require('lollo_street_tuning/mdlHelpers/lollo_street_confluence_2_lanes_narrow_sidewalk')
-
+-- LOLLO NOTE "allow reversal" is the wrong name, it should be "one way"
 function data()
     return {
         boundingInfo = myUtil.getBoundingInfo(),
@@ -16,7 +16,7 @@ function data()
             --autoRemovable = true,
             skipCollision = true,
             --skipCollisionCheck = true,
-            transportNetworkProvider = myUtil.getTransportNetworkProvider(true)
+            transportNetworkProvider = myUtil.getTransportNetworkProvider(false, true)
         },
         version = 1
     }

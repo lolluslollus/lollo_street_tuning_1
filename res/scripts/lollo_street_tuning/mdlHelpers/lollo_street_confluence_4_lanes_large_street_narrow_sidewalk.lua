@@ -138,6 +138,7 @@ results.getCountryRoadLods = function()
 end
 
 results.getTransportNetworkProvider = function(isSidewalkRaised)
+    -- this is always two-way
     local sidewalkHeight = isSidewalkRaised and 0.3 or 0.0
     return {
         laneLists = {
@@ -166,16 +167,16 @@ results.getTransportNetworkProvider = function(isSidewalkRaised)
                             {{1.8, -2, 0.00000}, {2, -2, 0.00000}}
                         },
                         ['centre_left_lane_one'] = {
-                            {{-2, 2, 0.00000}, {-1.8, 2, 0.00000}}
+                            {{-1.8, 2, 0.00000}, {-2, 2, 0.00000}}
                         },
                         ['centre_left_lane_two'] = {
-                            {{1.8, 2, 0.00000}, {2, 2, 0.00000}}
+                            {{2, 2, 0.00000}, {1.8, 2, 0.00000}}
                         },
                         ['left_lane_one'] = {
-                            {{-2, 6, 0.00000}, {-1.8, 6.00000, 0.00000}}
+                            {{-1.8, 6, 0.00000}, {-2, 6, 0.00000}}
                         },
                         ['left_lane_two'] = {
-                            {{1.8, 6, 0.00000}, {2, 6, 0.00000}}
+                            {{2, 6, 0.00000}, {1.8, 6, 0.00000}}
                         }
                     }
                 },
@@ -188,17 +189,10 @@ results.getTransportNetworkProvider = function(isSidewalkRaised)
             laneutil.createLanes(
                 {
                     curves = {
-                        -- ['right_lane'] = {
-                        --     -- right with | | below and || above
-                        --     {{10.00000, -6.00000, sidewalkHeight}, {2.00000, -6.00000, sidewalkHeight}, {-2.00000, -7.00000, sidewalkHeight}, {-6.00000, -7.00000, sidewalkHeight}}
-                        -- },
                         ['shorter_right_lane'] = {
                             -- right with | | below and || above
                             {{2.00000, -10.00000, sidewalkHeight}, {-2.00000, -7.60000, sidewalkHeight}}
                         },
-                        -- ['left_lane'] = { -- left with | | below and || above
-                        --     {{10.00000, 6.00000, sidewalkHeight}, {2.00000, 6.00000, sidewalkHeight}, {-2.00000, 7.00000, sidewalkHeight}, {-6.00000, 7.00000, sidewalkHeight}}
-                        -- }
                         ['shorter_left_lane'] = {
                             -- left with | | below and || above
                             {{2.00000, 10.00000, sidewalkHeight}, {-2.00000, 7.60000, sidewalkHeight}}

@@ -114,130 +114,62 @@ results.getCountryRoadLods = function()
     }
 end
 
-results.getTransportNetworkProvider = function(isSidewalkRaised)
+results.getTransportNetworkProvider = function(isOneWay, isSidewalkRaised)
     local sidewalkHeight = isSidewalkRaised and 0.3 or 0.0
     return {
         laneLists = {
             -- vehicles
-            {
-                linkable = false,
-                nodes = {
-                    {
-                        {-2, -2, 0.00000},
-                        {1, 0, 0},
-                        3.0
-                    },
-                    {
-                        {-1.8, -2, 0.00000},
-                        {1, 0, 0},
-                        3.0
-                    },
+            isOneWay and laneutil.createLanes(
+                {
+                    curves = {
+                        ['right_lane_one'] = {
+                            {{-2, -2, 0}, {-1.8, -2, 0}}
+                        },
+                        ['right_lane_two'] = {
+                            {{1.8, -2, 0}, {2, -2, 0}}
+                        },
+                        ['left_lane_one'] = {
+                            {{-2, 2, 0}, {-1.8, 2, 0}}
+                        },
+                        ['left_lane_two'] = {
+                            {{1.8, 2, 0}, {2, 2, 0}}
+                        }
+                    }
                 },
-                speedLimit = 100,
-                transportModes = {'BUS', 'CAR', 'ELECTRIC_TRAM', 'TRAM', 'TRUCK'}
-            },
-            {
-                linkable = false,
-                nodes = {
-                    {
-                        {1.8, -2, 0.00000},
-                        {1, 0, 0},
-                        3.0
-                    },
-                    {
-                        {2, -2, 0.00000},
-                        {1, 0, 0},
-                        3.0
-                    },
+                {'BUS', 'CAR', 'ELECTRIC_TRAM', 'TRAM', 'TRUCK'},
+                100,
+                3,
+                false --linkable
+            ) or laneutil.createLanes(
+                {
+                    curves = {
+                        ['right_lane_one'] = {
+                            {{-2, -2, 0}, {-1.8, -2, 0}}
+                        },
+                        ['right_lane_two'] = {
+                            {{1.8, -2, 0}, {2, -2, 0}}
+                        },
+                        ['left_lane_one'] = {
+                            {{-1.8, 2, 0}, {-2, 2, 0}}
+                        },
+                        ['left_lane_two'] = {
+                            {{2, 2, 0}, {1.8, 2, 0}}
+                        }
+                    }
                 },
-                speedLimit = 100,
-                transportModes = {'BUS', 'CAR', 'ELECTRIC_TRAM', 'TRAM', 'TRUCK'}
-            },
-            {
-                linkable = false,
-                nodes = {
-                    {
-                        {-2, 2, 0.00000},
-                        {1, 0, 0},
-                        3.0
-                    },
-                    {
-                        {-1.8, 2, 0.00000},
-                        {1, 0, 0},
-                        3.0
-                    },
-                },
-                speedLimit = 100,
-                transportModes = {'BUS', 'CAR', 'ELECTRIC_TRAM', 'TRAM', 'TRUCK'}
-            },
-            {
-                linkable = false,
-                nodes = {
-                    {
-                        {1.8, 2, 0.00000},
-                        {1, 0, 0},
-                        3.0
-                    },
-                    {
-                        {2, 2, 0.00000},
-                        {1, 0, 0},
-                        3.0
-                    },
-                },
-                speedLimit = 100,
-                transportModes = {'BUS', 'CAR', 'ELECTRIC_TRAM', 'TRAM', 'TRUCK'}
-            },
-            -- laneutil.createLanes(
-            --     {
-            --         curves = {
-            --             -- ['right_lane'] = {
-            --             --     -- right with | | below and || above
-            --             --     {{-2.00000, -4.00000, 0.00000}, {-1.00000, -3.900000, 0.00000}, {1.00000, -2.10000, 0.00000}, {2.00000, -2.00000, 0.00000}}
-            --             -- },
-            --             -- ['left_lane'] = {
-            --             --     -- left with | | below and || above
-            --             --     {{-2.00000, 4.00000, 0.00000}, {-1.00000, 3.900000, 0.00000}, {1.00000, 2.10000, 0.00000}, {2.00000, 2.00000, 0.00000}}
-            --             -- }
-            --             ['right_lane_one'] = {
-            --                 -- right with | | below and || above
-            --                 {{-2, -3, 0.00000}, {-1.9, -3, 0.00000}}
-            --             },
-            --             ['right_lane_two'] = {
-            --                 -- right with | | below and || above
-            --                 {{1.9, -3, 0.00000}, {2, -3, 0.00000}}
-            --             },
-            --             ['left_lane_one'] = {
-            --                 -- left with | | below and || above
-            --                 {{-2, 3, 0.00000}, {-1.9, 3.00000, 0.00000}}
-            --             },
-            --             ['left_lane_two'] = {
-            --                 -- left with | | below and || above
-            --                 {{1.9, 3, 0.00000}, {2, 3.00000, 0.00000}}
-            --             }
-            --         }
-            --     },
-            --     {'BUS', 'CAR', 'ELECTRIC_TRAM', 'TRAM', 'TRUCK'},
-            --     100,
-            --     3.0,
-            --     false --linkable
-            -- ),
+                {'BUS', 'CAR', 'ELECTRIC_TRAM', 'TRAM', 'TRUCK'},
+                100,
+                3,
+                false --linkable
+            ),
             -- pedestrians
             laneutil.createLanes(
                 {
                     curves = {
-                        -- ['right_lane'] = {
-                        --     -- right with | | below and || above
-                        --     {{10.00000, -6.00000, sidewalkHeight}, {2.00000, -6.00000, sidewalkHeight}, {-2.00000, -7.00000, sidewalkHeight}, {-6.00000, -7.00000, sidewalkHeight}}
-                        -- },
                         ['shorter_right_lane'] = {
-                            -- right with | | below and || above
                             {{2.00000, -6.00000, sidewalkHeight}, {-2.00000, -3.60000, sidewalkHeight}}
                         },
-                        -- ['left_lane'] = { -- left with | | below and || above
-                        --     {{10.00000, 6.00000, sidewalkHeight}, {2.00000, 6.00000, sidewalkHeight}, {-2.00000, 7.00000, sidewalkHeight}, {-6.00000, 7.00000, sidewalkHeight}}
-                        -- }
                         ['shorter_left_lane'] = {
-                            -- left with | | below and || above
                             {{2.00000, 6.00000, sidewalkHeight}, {-2.00000, 3.60000, sidewalkHeight}}
                         }
                     }

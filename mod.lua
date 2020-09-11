@@ -255,7 +255,7 @@ function data()
         -- meaning that it's on both sides if not one way, and only on one side depending on "busAndTramRight"
         -- newStreet.busAndTramRight = oldStreet.busAndTramRight or false
         newStreet.busAndTramRight = true
-        newStreet.materials = oldStreet.materials -- LOLLO TODO this is not accessible, so we must displkay the different lanes with some other system
+        newStreet.materials = oldStreet.materials -- LOLLO TODO this is not accessible, so we must display the different lanes with some other system
         -- print('LOLLO materials = ')
         -- debugPrint(newStreet.materials)
         -- print('LOLLO materials.streetBorder = ')
@@ -336,7 +336,7 @@ function data()
 
     return {
         info = {
-            minorVersion = 28,
+            minorVersion = 29,
             severityAdd = 'NONE',
             severityRemove = 'WARNING',
             name = _('_NAME'),

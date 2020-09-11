@@ -87,37 +87,46 @@ results.getStreetLods = function()
     }
 end
 
-results.getTransportNetworkProvider = function(isSidewalkRaised)
+results.getTransportNetworkProvider = function(isOneWay, isSidewalkRaised)
     local sidewalkHeight = isSidewalkRaised and 0.3 or 0.0
     return {
         laneLists = {
             -- vehicles
-            laneutil.createLanes(
+            isOneWay and laneutil.createLanes(
                 {
                     curves = {
-                        -- ['right_lane'] = {
-                        --     -- right with | | below and || above
-                        --     {{-2.00000, -4.00000, 0.00000}, {-1.00000, -3.900000, 0.00000}, {1.00000, -2.10000, 0.00000}, {2.00000, -2.00000, 0.00000}}
-                        -- },
-                        -- ['left_lane'] = {
-                        --     -- left with | | below and || above
-                        --     {{-2.00000, 4.00000, 0.00000}, {-1.00000, 3.900000, 0.00000}, {1.00000, 2.10000, 0.00000}, {2.00000, 2.00000, 0.00000}}
-                        -- }
                         ['right_lane_one'] = {
-                            -- right with | | below and || above
                             {{-2, -4, 0.00000}, {-1.8, -4, 0.00000}}
                         },
                         ['right_lane_two'] = {
-                            -- right with | | below and || above
                             {{1.8, -3, 0.00000}, {2, -3, 0.00000}}
                         },
                         ['left_lane_one'] = {
-                            -- left with | | below and || above
                             {{-2, 4, 0.00000}, {-1.8, 4.00000, 0.00000}}
                         },
                         ['left_lane_two'] = {
-                            -- left with | | below and || above
                             {{1.8, 3, 0.00000}, {2, 3.00000, 0.00000}}
+                        }
+                    }
+                },
+                {'BUS', 'CAR', 'ELECTRIC_TRAM', 'TRAM', 'TRUCK'},
+                100,
+                3,
+                false --linkable
+            ) or laneutil.createLanes(
+                {
+                    curves = {
+                        ['right_lane_one'] = {
+                            {{-2, -4, 0.00000}, {-1.8, -4, 0.00000}}
+                        },
+                        ['right_lane_two'] = {
+                            {{1.8, -3, 0.00000}, {2, -3, 0.00000}}
+                        },
+                        ['left_lane_one'] = {
+                            {{-1.8, 4, 0.00000}, {-2, 4.00000, 0.00000}}
+                        },
+                        ['left_lane_two'] = {
+                            {{2, 3, 0.00000}, {1.8, 3.00000, 0.00000}}
                         }
                     }
                 },
@@ -130,19 +139,10 @@ results.getTransportNetworkProvider = function(isSidewalkRaised)
             laneutil.createLanes(
                 {
                     curves = {
-                        -- ['right_lane'] = {
-                        --     -- right with | | below and || above
-                        --     {{10.00000, -6.00000, sidewalkHeight}, {2.00000, -6.00000, sidewalkHeight}, {-2.00000, -7.00000, sidewalkHeight}, {-6.00000, -7.00000, sidewalkHeight}}
-                        -- },
                         ['shorter_right_lane'] = {
-                            -- right with | | below and || above
                             {{6.00000, -7.00000, sidewalkHeight}, {2.00000, -7.00000, sidewalkHeight}, {-2.00000, -7.00000, sidewalkHeight}}
                         },
-                        -- ['left_lane'] = { -- left with | | below and || above
-                        --     {{10.00000, 6.00000, sidewalkHeight}, {2.00000, 6.00000, sidewalkHeight}, {-2.00000, 7.00000, sidewalkHeight}, {-6.00000, 7.00000, sidewalkHeight}}
-                        -- }
                         ['shorter_left_lane'] = {
-                            -- left with | | below and || above
                             {{6.00000, 7.00000, sidewalkHeight}, {2.00000, 7.00000, sidewalkHeight}, {-2.00000, 7.00000, sidewalkHeight}}
                         }
                     }

@@ -63,27 +63,6 @@ results.getStreetLods = function()
                             name = 'straight_spcl2_l',
                             transf = {-1, 0, 0, 0, 0, -1, 0, 0, 0, 0, 1, 0, -5, -10, 0, 1}
                         },
-                        -- ground
-                        -- {
-                        --     materials = {'street/country_new_medium_paving.mtl'},
-                        --     mesh = 'station/rail/era_c/station_1_main/station_1_main_perron_lod0.msh',
-                        --     transf = {.26, 0, 0, 0, 0, .99, 0, 0, 0, 0, 1, 0, 0.0, 9.8, -.795, 1}
-                        -- },
-                        -- {
-                        --     materials = {'street/country_new_medium_paving.mtl'},
-                        --     mesh = 'station/rail/era_c/station_1_main/station_1_main_perron_lod0.msh',
-                        --     transf = {.26, 0, 0, 0, 0, .99, 0, 0, 0, 0, 1, 0, 0.0, 4.9, -.795, 1}
-                        -- },
-                        -- {
-                        --     materials = {'street/country_new_medium_paving.mtl'},
-                        --     mesh = 'station/rail/era_c/station_1_main/station_1_main_perron_lod0.msh',
-                        --     transf = {.26, 0, 0, 0, 0, .99, 0, 0, 0, 0, 1, 0, 0.0, 0, -.795, 1}
-                        -- },
-                        -- {
-                        --     materials = {'street/country_new_medium_paving.mtl'},
-                        --     mesh = 'station/rail/era_c/station_1_main/station_1_main_perron_lod0.msh',
-                        --     transf = {.26, 0, 0, 0, 0, .99, 0, 0, 0, 0, 1, 0, 0.0, -4.9, -.795, 1}
-                        -- },
                     },
                     transf = {.8, 0, 0, 0, 0, .8, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1}
                 },
@@ -106,6 +85,7 @@ results.getCountryRoadLods = function()
 end
 
 results.getTransportNetworkProvider = function(isSidewalkRaised)
+    -- this is always one way
     local sidewalkHeight = isSidewalkRaised and 0.3 or 0.0
     return {
         laneLists = {
@@ -113,37 +93,23 @@ results.getTransportNetworkProvider = function(isSidewalkRaised)
             laneutil.createLanes(
                 {
                     curves = {
-                        -- ['right_lane'] = {
-                        --     -- right with | | below and || above
-                        --     {{-2.00000, -4.00000, 0.00000}, {-1.00000, -3.900000, 0.00000}, {1.00000, -2.10000, 0.00000}, {2.00000, -2.00000, 0.00000}}
-                        -- },
-                        -- ['left_lane'] = {
-                        --     -- left with | | below and || above
-                        --     {{-2.00000, 4.00000, 0.00000}, {-1.00000, 3.900000, 0.00000}, {1.00000, 2.10000, 0.00000}, {2.00000, 2.00000, 0.00000}}
-                        -- }
                         ['right_lane_one'] = {
-                            -- right with | | below and || above
-                            {{-2, -4, 0.00000}, {-1.8, -4, 0.00000}}
+                            {{-2, -4, 0}, {-1.8, -4, 0}}
                         },
                         ['right_lane_two'] = {
-                            -- right with | | below and || above
-                            {{1.8, -4, 0.00000}, {2, -4, 0.00000}}
+                            {{1.8, -4, 0}, {2, -4, 0}}
                         },
                         ['centre_lane_one'] = {
-                            -- right with | | below and || above
-                            {{-2, 0, 0.00000}, {-1.8, 0, 0.00000}}
+                            {{-2, 0, 0}, {-1.8, 0, 0}}
                         },
                         ['centre_lane_two'] = {
-                            -- right with | | below and || above
-                            {{1.8, 0, 0.00000}, {2, 0, 0.00000}}
+                            {{1.8, 0, 0}, {2, 0, 0}}
                         },
                         ['left_lane_one'] = {
-                            -- left with | | below and || above
-                            {{-2, 4, 0.00000}, {-1.8, 4.00000, 0.00000}}
+                            {{-2, 4, 0}, {-1.8, 4, 0}}
                         },
                         ['left_lane_two'] = {
-                            -- left with | | below and || above
-                            {{1.8, 4, 0.00000}, {2, 4.00000, 0.00000}}
+                            {{1.8, 4, 0}, {2, 4, 0}}
                         }
                     }
                 },
