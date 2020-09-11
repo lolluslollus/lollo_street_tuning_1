@@ -1,0 +1,96 @@
+-- local dump = require('lollo_street_tuning/luadump')
+local vec3 = require 'vec3'
+local transf = require 'transf'
+
+function data()
+    local getGroundFace = function(face, key)
+        return {
+            face = face, -- LOLLO NOTE Z is ignored here
+            loop = true,
+            modes = {
+                {
+                    type = 'FILL',
+                    key = key
+                }
+            }
+        }
+    end
+    local getTerrainAlignmentList = function(face)
+        local _raiseBy = 0.30
+        local raisedFace = {}
+        for i = 1, #face do
+            raisedFace[i] = face[i]
+            raisedFace[i][3] = raisedFace[i][3] + _raiseBy
+        end
+        -- print('LOLLO raisedFaces =')
+        -- debugPrint(raisedFace)
+        return {
+            faces = {raisedFace},
+            optional = true,
+            slopeHigh = 999,
+            slopeLow = 99,
+            type = 'EQUAL', -- EQUAL -- LESS -- GREATER
+        }
+    end
+
+    return {
+        -- collider = {
+        --     type = 'NONE'
+        -- },
+        autoRemovable = true,
+        availability = {
+            yearFrom = 1925,
+            yearTo = 0
+        },
+        description = {
+            name = _('Pavement extender'),
+            description = _(
+                'Build some of these next to each other to extend the pavement.'
+            )
+        },
+        maintenanceCost = 0,
+        order = 1244,
+        params = {
+            {
+                key = 'size',
+                name = _('Size'),
+                values = {_('1 m'), _('2 m'), _('3 m'), _('4 m'), _('5 m'), _('6 m')},
+                defaultIndex = 0
+                -- yearFrom = 1925,
+                -- yearTo = 0
+            }
+        },
+        skipCollision = true,
+        skipCollisionCheck = true,
+        type = 'STREET_CONSTRUCTION',
+        updateFn = function(params)
+            local result = {
+                colliders = {},
+                cost = 0,
+                edgeLists = {},
+                groundFaces = {},
+                models = {
+                    {
+                        id = 'lollo_assets/empty.mdl',
+                        transf = {1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1}
+                    }
+                },
+                terrainAlignmentLists = {}
+            }
+
+            local radius = 0.5 * (params.size + 1)
+            local face = {
+				{-radius, -radius, 0, 1},
+				{-radius, radius, 0, 1},
+				{radius, radius, 0, 1},
+				{radius, -radius, 0, 1},
+			}
+			result.groundFaces[#result.groundFaces + 1] = getGroundFace(face, 'shared/asphalt_01.gtex.lua')
+			result.terrainAlignmentLists[#result.terrainAlignmentLists + 1] = getTerrainAlignmentList(face)
+
+            return result
+        end,
+        upgradeFn = function(_)
+        end
+    }
+end

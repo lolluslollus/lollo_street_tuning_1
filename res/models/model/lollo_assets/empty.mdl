@@ -1,0 +1,43 @@
+function data()
+    return {
+        boundingInfo = {
+            bbMax = {0, 0, 0},
+            bbMin = {0, 0, 0}
+        },
+        --[[         collider = {
+            params = {},
+            transf = {1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1},
+            type = 'MESH'
+        }, ]]
+        collider = {
+            type = 'NONE'
+        },
+        lods = {
+            {
+                node = {
+                    children = {
+                        -- {
+                        --     materials = { 'asphalt_01.mtl' },
+                        --     mesh = 'lollo4x4.msh',
+                        --     transf = { 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, -2, -2, 0, 1, },
+                        -- },
+                    },
+                    transf = {1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1}
+                },
+                static = false,
+                visibleFrom = 0,
+                visibleTo = 1000
+            }
+        },
+        metadata = {
+            availability = {
+                yearFrom = 0,
+                yearTo = 0
+            },
+            cost = {
+                price = 0
+            },
+        },
+        version = 1
+    }
+end
