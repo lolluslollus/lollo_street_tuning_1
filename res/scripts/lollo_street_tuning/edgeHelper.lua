@@ -128,12 +128,14 @@ local function _getIsPointWithin(sortedVertices, position)
     if position[2] > sortedVertices.topLeft.y and position[2] > sortedVertices.topRight.y then return false end
     if position[2] < sortedVertices.bottomLeft.y and position[2] < sortedVertices.bottomRight.y then return false end
 
+    print('thinking')
     -- y = a + bx
     -- y0 = a + b * x0
     -- y1 = a + b * x1
     -- y0 - y1 = b * (x0 - x1)  =>  b = (y0 - y1) / (x0 - x1)
     -- a = y0 - b * x0
     if sortedVertices.topLeft.x == sortedVertices.topRight.x then
+        print('infinite') -- LOLLO TODO check the sign of all 4 infinites
         if position[1] < sortedVertices.topLeft.x then return false end
     else
         local b = (sortedVertices.topLeft.y - sortedVertices.topRight.y) / (sortedVertices.topLeft.x - sortedVertices.topRight.x)
@@ -142,22 +144,25 @@ local function _getIsPointWithin(sortedVertices, position)
     end
 
     if sortedVertices.topRight.x == sortedVertices.bottomRight.x then
-        if position[1] < sortedVertices.topRight.x then return false end
+        print('infinite')
+        if position[1] > sortedVertices.topRight.x then return false end
     else
         local b = (sortedVertices.topRight.y - sortedVertices.bottomRight.y) / (sortedVertices.topRight.x - sortedVertices.bottomRight.x)
         local a = sortedVertices.topRight.y - b * sortedVertices.topRight.x
-        if position[2] > a + b * position[1] then return false end
+        if position[2] < a + b * position[1] then return false end
     end
 
-    if sortedVertices.bottomLeft.x == sortedVertices.bottomRight.x then
-        if position[1] > sortedVertices.bottomLeft.x then return false end
+    if sortedVertices.bottomRight.x == sortedVertices.bottomLeft.x then
+        print('infinite')
+        if position[1] > sortedVertices.bottomRight.x then return false end
     else
-        local b = (sortedVertices.bottomLeft.y - sortedVertices.bottomRight.y) / (sortedVertices.bottomLeft.x - sortedVertices.bottomRight.x)
-        local a = sortedVertices.bottomLeft.y - b * sortedVertices.bottomLeft.x
+        local b = (sortedVertices.bottomRight.y - sortedVertices.bottomLeft.y) / (sortedVertices.bottomRight.x - sortedVertices.bottomLeft.x)
+        local a = sortedVertices.bottomRight.y - b * sortedVertices.bottomRight.x
         if position[2] < a + b * position[1] then return false end
     end
 
     if sortedVertices.bottomLeft.x == sortedVertices.topLeft.x then
+        print('infinite')
         if position[1] < sortedVertices.bottomLeft.x then return false end
     else
         local b = (sortedVertices.bottomLeft.y - sortedVertices.topLeft.y) / (sortedVertices.bottomLeft.x - sortedVertices.topLeft.x)
@@ -190,9 +195,10 @@ helper.getNearestEdgeId = function(transf)
         print('callback0 found entity', entity)
         if not(entity) or result then return end
 
+        print('going on')
         if not(api.engine.getComponent(entity, api.type.ComponentType.BASE_EDGE)) then return end
         -- this returns the usual edge data, like:
-        local sample = {
+--[[         local sample = {
             node0 = 27290,
             node1 = 27291,
             tangent0 = {
@@ -208,7 +214,7 @@ helper.getNearestEdgeId = function(transf)
             type = 0,
             typeIndex = -1,
             objects = { },
-          }
+          } ]]
         -- api.engine.getComponent(entity, api.type.ComponentType.TRANSPORT_NETWORK)
         -- this returns all the lanes as separate edges, the result looks like
 --[[         local sample = {
@@ -453,10 +459,13 @@ helper.getNearestEdgeId = function(transf)
               },
             },
           } ]]
+        print('about to get the lots')
         local lotList = api.engine.getComponent(entity, api.type.ComponentType.LOT_LIST)
         if not(lotList) or not(lotList.lots) then return end
 
+        print('got the lots')
         for _, value in pairs(lotList.lots) do
+            print('trying')
             if _getIsPointWithin(_getVerticesSorted(value.vertices), position) then
                 result = entity
                 return
