@@ -43,7 +43,7 @@ local function _myErrorHandler(err)
     print('lollo street splitter ERROR: ', err)
 end
 
-local function _getToggleAllTramTracksStreetTypeFileName(streetFileName)
+local function _getToggledAllTramTracksStreetTypeFileName(streetFileName)
     if type(streetFileName) ~= 'string' or streetFileName == '' then return nil end
 
     -- print('KKKKKKKKKKKKKKKK')
@@ -53,7 +53,7 @@ local function _getToggleAllTramTracksStreetTypeFileName(streetFileName)
     -- print('allStreetData has', #allStreetData, 'records')
     local oldStreetProperties = nil
     for _, value in pairs(allStreetData) do
-        if value.fileName == streetFileName then
+        if stringUtils.stringEndsWith(streetFileName, value.fileName) then
             oldStreetProperties = value
             break
         end
@@ -136,24 +136,25 @@ local function _replaceEdgeDestroyingBuildings(oldEdge)
     api.cmd.sendCommand(cmd, callback)
 end
 
-local function _replaceEdge(oldEdge)
+local function _replaceEdge(oldEdgeId)
     -- LOLLO NOTE this replaces the street without destroying the buildings
-    if type(oldEdge) ~= 'table' then return end
+    if type(oldEdgeId) ~= 'number' or oldEdgeId < 0 then return end
 
-	local baseEdge = api.engine.getComponent(oldEdge.id, api.type.ComponentType.BASE_EDGE)
-	local baseEdgeStreet = api.engine.getComponent(oldEdge.id, api.type.ComponentType.BASE_EDGE_STREET)
+	local baseEdge = api.engine.getComponent(oldEdgeId, api.type.ComponentType.BASE_EDGE)
+    local baseEdgeStreet = api.engine.getComponent(oldEdgeId, api.type.ComponentType.BASE_EDGE_STREET)
+    local playerOwned = api.engine.getComponent(oldEdgeId, api.type.ComponentType.PLAYER_OWNED)
 
 	local newEdge = api.type.SegmentAndEntity.new()
 	newEdge.entity = -1
 	newEdge.type = 0
     newEdge.comp = baseEdge
     -- newEdge.playerOwned = {player = api.engine.util.getPlayer()}
-    newEdge.playerOwned = oldEdge.playerOwned
+    newEdge.playerOwned = playerOwned
 	newEdge.streetEdge = baseEdgeStreet
 	-- eo.streetEdge.streetType = api.res.streetTypeRep.find(streetEdgeEntity.streetType)
 
     local proposal = api.type.SimpleProposal.new()
-	proposal.streetProposal.edgesToRemove[1] = oldEdge.id
+	proposal.streetProposal.edgesToRemove[1] = oldEdgeId
     proposal.streetProposal.edgesToAdd[1] = newEdge
     --[[ local sampleNewEdge =
     {
@@ -209,23 +210,25 @@ local function _replaceEdge(oldEdge)
 	api.cmd.sendCommand(cmd, callback)
 end
 
-local function _replaceEdgeWithStreetType(oldEdge, newStreetType)
+local function _replaceEdgeWithStreetType(oldEdgeId, newStreetTypeId)
     -- LOLLO NOTE this replaces the street without destroying the buildings
-    if type(oldEdge) ~= 'table' or newStreetType < 0 then return end
+    if type(oldEdgeId) ~= 'number' or oldEdgeId < 0
+    or type(newStreetTypeId) ~= 'number' or newStreetTypeId < 0 then return end
 
-	local baseEdge = api.engine.getComponent(oldEdge.id, api.type.ComponentType.BASE_EDGE)
-	local baseEdgeStreet = api.engine.getComponent(oldEdge.id, api.type.ComponentType.BASE_EDGE_STREET)
+	local baseEdge = api.engine.getComponent(oldEdgeId, api.type.ComponentType.BASE_EDGE)
+	local baseEdgeStreet = api.engine.getComponent(oldEdgeId, api.type.ComponentType.BASE_EDGE_STREET)
+    local playerOwned = api.engine.getComponent(oldEdgeId, api.type.ComponentType.PLAYER_OWNED)
 
 	local newEdge = api.type.SegmentAndEntity.new()
 	newEdge.entity = -1
 	newEdge.type = 0
     newEdge.comp = baseEdge
     -- newEdge.playerOwned = {player = api.engine.util.getPlayer()}
-    newEdge.playerOwned = oldEdge.playerOwned
+    newEdge.playerOwned = playerOwned
     newEdge.streetEdge = baseEdgeStreet
-    newEdge.streetEdge.streetType = newStreetType
+    newEdge.streetEdge.streetType = newStreetTypeId
     -- add tram tracks upgrade if the new street type wants so
-    local _newStreetProperties = api.res.streetTypeRep.get(newStreetType)
+    local _newStreetProperties = api.res.streetTypeRep.get(newStreetTypeId)
     if not(_newStreetProperties) or not(_newStreetProperties.laneConfigs) then return end
 
     if streetUtils.getIsStreetAllTramTracks(_newStreetProperties.laneConfigs) then
@@ -234,7 +237,7 @@ local function _replaceEdgeWithStreetType(oldEdge, newStreetType)
 	-- eo.streetEdge.streetType = api.res.streetTypeRep.find(streetEdgeEntity.streetType)
 
     local proposal = api.type.SimpleProposal.new()
-	proposal.streetProposal.edgesToRemove[1] = oldEdge.id
+	proposal.streetProposal.edgesToRemove[1] = oldEdgeId
     proposal.streetProposal.edgesToAdd[1] = newEdge
     --[[ local sampleNewEdge =
     {
@@ -454,39 +457,35 @@ local function _getWhichEdgeGetsEdgeObjectAfterSplit(edgeObjPosition, node0pos, 
     return result
 end
 
-local function _splitEdge(wholeEdge, nodeBetween)
-    if type(wholeEdge) ~= 'table' or type(nodeBetween) ~= 'table' then return end
+local function _splitEdge(wholeEdgeId, position0, tangent0, position1, tangent1, nodeBetween)
+    if type(wholeEdgeId) ~= 'number' or wholeEdgeId < 0 or type(nodeBetween) ~= 'table' then return end
 
     local node0TangentLength = edgeUtils.getVectorLength({
-        wholeEdge.node0tangent[1],
-        wholeEdge.node0tangent[2],
-        wholeEdge.node0tangent[3]
-        -- 0
+        tangent0.x,
+        tangent0.y,
+        tangent0.z
     })
     local node1TangentLength = edgeUtils.getVectorLength({
-        wholeEdge.node1tangent[1],
-        wholeEdge.node1tangent[2],
-        wholeEdge.node1tangent[3]
-        -- 0
+        tangent1.x,
+        tangent1.y,
+        tangent1.z
     })
     local edge0Length = edgeUtils.getVectorLength({
-        nodeBetween.position[1] - wholeEdge.node0pos[1],
-        nodeBetween.position[2] - wholeEdge.node0pos[2],
-        -- 0
-        nodeBetween.position[3] - wholeEdge.node0pos[3]
+        nodeBetween.position[1] - position0.x,
+        nodeBetween.position[2] - position0.y,
+        nodeBetween.position[3] - position0.z
     })
     local edge1Length = edgeUtils.getVectorLength({
-        nodeBetween.position[1] - wholeEdge.node1pos[1],
-        nodeBetween.position[2] - wholeEdge.node1pos[2],
-        -- 0
-        nodeBetween.position[3] - wholeEdge.node1pos[3]
+        nodeBetween.position[1] - position1.x,
+        nodeBetween.position[2] - position1.y,
+        nodeBetween.position[3] - position1.z
     })
 
     local proposal = api.type.SimpleProposal.new()
 
     -- LOLLO NOTE api.engine.getComponent gets more properties than game.interface.getEntity()
-    local baseEdge = api.engine.getComponent(wholeEdge.id, api.type.ComponentType.BASE_EDGE)
-    local baseEdgeStreet = api.engine.getComponent(wholeEdge.id, api.type.ComponentType.BASE_EDGE_STREET)
+    local baseEdge = api.engine.getComponent(wholeEdgeId, api.type.ComponentType.BASE_EDGE)
+    local baseEdgeStreet = api.engine.getComponent(wholeEdgeId, api.type.ComponentType.BASE_EDGE_STREET)
     -- print('LOLLO baseEdge = ')
     -- debugPrint(baseEdge)
     -- print('LOLLO baseEdgeStreet = ')
@@ -496,17 +495,17 @@ local function _splitEdge(wholeEdge, nodeBetween)
 
     local newNodeBetween = api.type.NodeAndEntity.new()
     newNodeBetween.entity = -3
-    newNodeBetween.comp.position = api.type.Vec3f.new(nodeBetween.position[1], nodeBetween.position[2], nodeBetween.position[3]) --api.type.Vec3f.new(40.0, 0.0, 0.0)
+    newNodeBetween.comp.position = api.type.Vec3f.new(nodeBetween.position[1], nodeBetween.position[2], nodeBetween.position[3])
 
     local newEdge0 = api.type.SegmentAndEntity.new()
     newEdge0.entity = -1
     newEdge0.type = 0
-    newEdge0.comp.node0 = wholeEdge.node0
+    newEdge0.comp.node0 = baseEdge.node0
     newEdge0.comp.node1 = -3
     newEdge0.comp.tangent0 = api.type.Vec3f.new(
-        wholeEdge.node0tangent[1] * edge0Length / node0TangentLength,
-        wholeEdge.node0tangent[2] * edge0Length / node0TangentLength,
-        wholeEdge.node0tangent[3] * edge0Length / node0TangentLength
+        tangent0.x * edge0Length / node0TangentLength,
+        tangent0.y * edge0Length / node0TangentLength,
+        tangent0.z * edge0Length / node0TangentLength
     )
     newEdge0.comp.tangent1 = api.type.Vec3f.new(
         nodeBetween.tangent[1] * edge0Length,
@@ -522,16 +521,16 @@ local function _splitEdge(wholeEdge, nodeBetween)
     newEdge1.entity = -2
     newEdge1.type = 0
     newEdge1.comp.node0 = -3
-    newEdge1.comp.node1 = wholeEdge.node1
+    newEdge1.comp.node1 = baseEdge.node1
     newEdge1.comp.tangent0 = api.type.Vec3f.new(
         nodeBetween.tangent[1] * edge1Length,
         nodeBetween.tangent[2] * edge1Length,
         nodeBetween.tangent[3] * edge1Length
     )
     newEdge1.comp.tangent1 = api.type.Vec3f.new(
-        wholeEdge.node1tangent[1] * edge1Length / node1TangentLength,
-        wholeEdge.node1tangent[2] * edge1Length / node1TangentLength,
-        wholeEdge.node1tangent[3] * edge1Length / node1TangentLength
+        tangent1.x * edge1Length / node1TangentLength,
+        tangent1.y * edge1Length / node1TangentLength,
+        tangent1.z * edge1Length / node1TangentLength
     )
     newEdge1.comp.type = baseEdge.type -- 0
     newEdge1.comp.typeIndex = baseEdge.typeIndex -- -1
@@ -546,8 +545,8 @@ local function _splitEdge(wholeEdge, nodeBetween)
             if type(edgeObjEntity) == 'table' and type(edgeObjEntity.position) == 'table' then
                 local assignment = _getWhichEdgeGetsEdgeObjectAfterSplit(
                     edgeObjEntity.position,
-                    wholeEdge.node0pos,
-                    wholeEdge.node1pos,
+                    {position0.x, position0.y, position0.z},
+                    {position1.x, position1.y, position1.z},
                     nodeBetween
                 )
                 -- if assignment.assignToFirstEstimate == 0 then
@@ -570,7 +569,7 @@ local function _splitEdge(wholeEdge, nodeBetween)
 
     proposal.streetProposal.edgesToAdd[1] = newEdge0
     proposal.streetProposal.edgesToAdd[2] = newEdge1
-    proposal.streetProposal.edgesToRemove[1] = wholeEdge.id
+    proposal.streetProposal.edgesToRemove[1] = wholeEdgeId
     proposal.streetProposal.nodesToAdd[1] = newNodeBetween
 
     local context = api.type.Context:new()
@@ -597,8 +596,8 @@ local function _splitEdge(wholeEdge, nodeBetween)
         -- print('LOLLO street splitter callback returned success = ')
         -- print(success)
     end
-
-    local cmd = api.cmd.make.buildProposal(proposal, context, false) -- the third param means, ignore errors. Errors are not ignored tho: wrong proposals will be discarded
+    -- the third param means, ignore errors. Errors are not ignored tho: wrong proposals will be discarded
+    local cmd = api.cmd.make.buildProposal(proposal, context, false)
     api.cmd.sendCommand(cmd, callback)
 end
 
@@ -614,64 +613,77 @@ function data()
             elseif name == 'streetSplitterWithApiBuilt' then
                 local splitterConstruction = game.interface.getEntity(param.constructionEntityId)
                 if type(splitterConstruction) == 'table' and type(splitterConstruction.transf) == 'table' then
-                    local nearestEdge = edgeUtils.getNearestEdge(
-                        splitterConstruction.transf,
-                        edgeUtils.getNearbyStreetEdges(splitterConstruction.transf)
+                    local nearestEdgeId = edgeUtils.getNearestEdgeId(
+                        splitterConstruction.transf
                     )
-                    if nearestEdge then
-                        local nodeBetween = edgeUtils.getNodeBetween(
-                            {
-                                nearestEdge['node0pos'],
-                                nearestEdge['node0tangent'],
-                            },
-                            {
-                                nearestEdge['node1pos'],
-                                nearestEdge['node1tangent'],
-                            },
-                            -- LOLLO NOTE position and transf are always very similar
-                            -- {
-                            --     splitterConstruction.transf[13],
-                            --     splitterConstruction.transf[14],
-                            --     splitterConstruction.transf[15],
-                            -- },
-                            splitterConstruction.position
-                        )
+                    print('nearestEdge =', nearestEdgeId or 'NIL')
+                    if type(nearestEdgeId) == 'number' and nearestEdgeId >= 0 then
+                        local baseEdge = api.engine.getComponent(nearestEdgeId, api.type.ComponentType.BASE_EDGE)
+                        if baseEdge then
+                            local node0 = api.engine.getComponent(baseEdge.node0, api.type.ComponentType.BASE_NODE)
+                            local node1 = api.engine.getComponent(baseEdge.node1, api.type.ComponentType.BASE_NODE)
+                            if node0 and node1 then
+                                local nodeBetween = edgeUtils.getNodeBetween(
+                                    node0.position,
+                                    baseEdge.tangent0,
+                                    node1.position,
+                                    baseEdge.tangent1,
+                                    -- LOLLO NOTE position and transf are always very similar
+                                    -- {
+                                    --     splitterConstruction.transf[13],
+                                    --     splitterConstruction.transf[14],
+                                    --     splitterConstruction.transf[15],
+                                    -- },
+                                    splitterConstruction.position
+                                )
 
-                        _splitEdge(nearestEdge, nodeBetween)
+                                print('nodeBetween =')
+                                debugPrint(nodeBetween)
+
+                                _splitEdge(
+                                    nearestEdgeId,
+                                    node0.position,
+                                    baseEdge.tangent0,
+                                    node1.position,
+                                    baseEdge.tangent1,
+                                    nodeBetween
+                                )
+                            end
+                        end
                     end
                 end
             elseif name == 'streetChangerBuilt' then
                 local changerConstruction = game.interface.getEntity(param.constructionEntityId)
                 if type(changerConstruction) == 'table' and type(changerConstruction.transf) == 'table' then
-                    local nearestEdge = edgeUtils.getNearestEdge(
-                        changerConstruction.transf,
-                        edgeUtils.getNearbyStreetEdges(changerConstruction.transf)
+                    local nearestEdgeId = edgeUtils.getNearestEdgeId(
+                        changerConstruction.transf
                     )
-                    if nearestEdge then
-                        print('LOLLO nearestEdge = ')
-                        debugPrint(nearestEdge)
-
-                        _replaceEdge(nearestEdge)
+                    print('nearestEdge =', nearestEdgeId or 'NIL')
+                    if nearestEdgeId then
+                        print('LOLLO nearestEdgeId = ', nearestEdgeId or 'NIL')
+                        _replaceEdge(nearestEdgeId)
                     end
                 end
             elseif name == 'toggleAllTracksBuilt' then
                 local myConstruction = game.interface.getEntity(param.constructionEntityId)
                 if type(myConstruction) == 'table' and type(myConstruction.transf) == 'table' then
-                    local nearestEdge = edgeUtils.getNearestEdge(
-                        myConstruction.transf,
-                        edgeUtils.getNearbyStreetEdges(myConstruction.transf)
+                    local nearestEdgeId = edgeUtils.getNearestEdgeId(
+                        myConstruction.transf
                     )
-                    -- print('LOLLO nearestEdge =')
-                    -- debugPrint(nearestEdge)
-                    if nearestEdge then
-                        local newStreetType = _getToggleAllTramTracksStreetTypeFileName(
-                            nearestEdge.streetType
-                        )
-                        if newStreetType then
-                            _replaceEdgeWithStreetType(
-                                nearestEdge,
-                                api.res.streetTypeRep.find(newStreetType)
+                    -- print('nearestEdgeId =', nearestEdgeId or 'NIL')
+                    if type(nearestEdgeId) == 'number' and nearestEdgeId >= 0 then
+                        local baseEdgeStreet = api.engine.getComponent(nearestEdgeId, api.type.ComponentType.BASE_EDGE_STREET)
+                        if baseEdgeStreet and baseEdgeStreet.streetType then
+                            local newStreetTypeFileName = _getToggledAllTramTracksStreetTypeFileName(
+                                api.res.streetTypeRep.getFileName(baseEdgeStreet.streetType)
                             )
+                            -- print('newStreetTypeFileName =', newStreetTypeFileName or 'NIL')
+                            if newStreetTypeFileName then
+                                _replaceEdgeWithStreetType(
+                                    nearestEdgeId,
+                                    api.res.streetTypeRep.find(newStreetTypeFileName)
+                                )
+                            end
                         end
                     end
                 end
