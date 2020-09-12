@@ -24,19 +24,19 @@ results.getStreetLods = function()
             {
                 node = {
                     children = {
-                        -- close the incoming thinner roads
-                        {
-                            materials = { "street/new_medium_sidewalk_border_inner.mtl", "street/new_medium_sidewalk.mtl", },
-                            mesh = "station/road/streetstation/era_c/pltfrm_r_top_lod0.msh",
-                            name = "pltfrm_r_top",
-                            transf = { 0, 0.4, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0, -7.5, -2.5, 0, 1, },
-                        },
-                        {
-                            materials = { "street/new_medium_sidewalk_border_inner.mtl", "street/new_medium_sidewalk.mtl", },
-                            mesh = "station/road/streetstation/era_c/pltfrm_r_top_lod0.msh",
-                            name = "pltfrm_r_top",
-                            transf = { 0, 0.4, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0, -7.5, 2.5, 0, 1, },
-                        },
+                        -- -- close the incoming thinner roads
+                        -- {
+                        --     materials = { "street/new_medium_sidewalk_border_inner.mtl", "street/new_medium_sidewalk.mtl", },
+                        --     mesh = "station/road/streetstation/era_c/pltfrm_r_top_lod0.msh",
+                        --     name = "pltfrm_r_top",
+                        --     transf = { 0, 0.4, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0, -7.5, -2.5, -0.3, 1, },
+                        -- },
+                        -- {
+                        --     materials = { "street/new_medium_sidewalk_border_inner.mtl", "street/new_medium_sidewalk.mtl", },
+                        --     mesh = "station/road/streetstation/era_c/pltfrm_r_top_lod0.msh",
+                        --     name = "pltfrm_r_top",
+                        --     transf = { 0, 0.4, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0, -7.5, 2.5, -0.3, 1, },
+                        -- },
                         -- straight bits
                         {
                             materials = {'street/new_medium_sidewalk_border_inner.mtl', 'street/new_medium_sidewalk.mtl'},

@@ -25,17 +25,21 @@
         categories = {'urban'},
         borderGroundTex = 'street_border.lua',
         materials = {
-            streetPaving = {
-                name = 'street/country_new_medium_paving.mtl',
-                size = {8.0, 8.0}
-            },
             streetBorder = {
                 name = 'street/new_medium_border.mtl',
                 size = {2.0, .3}
             },
+            streetBus = {
+                name = 'street/new_medium_bus_3_8th.mtl',
+                size = {12, 5.4}
+            },
             streetLane = {
                 name = 'street/new_medium_lane.mtl',
                 size = {4.0, 4.0}
+            },
+            streetPaving = {
+                name = 'street/country_new_medium_paving.mtl',
+                size = {8.0, 8.0}
             },
             streetStripeMedian = {
                 name = 'street/new_medium_stripes.mtl',
@@ -53,10 +57,7 @@
                 name = 'street/new_medium_tram_track.mtl',
                 size = {2.0, 2.0}
             },
-            streetBus = {
-                name = 'street/new_medium_bus.mtl',
-                size = {12, 2.7}
-            },
+
             crossingLane = {
                 name = 'street/new_medium_lane.mtl',
                 size = {4.0, 4.0}

@@ -11,7 +11,7 @@
         --transportModesSidewalk = { "PERSON" }, --crashes
         streetWidth = 2.4, -- was 3
         sidewalkWidth = 0.8, -- was 0.5; 2 * sidewalkWidth + streetWidth must be 4
-        sidewalkHeight = .3,
+        sidewalkHeight = 0.0, -- .3,
         yearFrom = 1925,
         yearTo = 0,
         upgrade = false,
@@ -24,21 +24,22 @@
         categories = {'one-way'},
         borderGroundTex = 'street_border.lua',
         materials = {
-            streetPaving = {
-                name = 'street/country_new_medium_paving.mtl',
-                size = {8.0, 8.0}
+            streetArrow = {
+                name = 'street/default_arrows.mtl',
+                -- size = {9.0, 3.0}
+                size = {9.0, 2.0}
             },
             streetBorder = {
                 name = 'street/new_medium_border.mtl',
-                size = {2.0, .3}
+                size = {2.0, 0.3}
+            },
+            streetBus = {
+                name = 'street/new_medium_bus.mtl',
+                size = {12, 2.0}
             },
             streetLane = {
                 name = 'street/new_medium_lane.mtl',
                 size = {4.0, 4.0}
-            },
-            streetArrow = {
-                name = 'street/default_arrows.mtl',
-                size = {9.0, 3.0}
             },
             -- streetStripe = {
             --     name = 'street/new_medium_stripes.mtl',
@@ -48,6 +49,10 @@
             --     name = 'street/new_large_median.mtl',
             --     size = {4.0, 1}
             -- },
+            streetPaving = {
+                name = 'street/country_new_medium_paving.mtl',
+                size = {8.0, 8.0}
+            },
             streetTram = {
                 name = 'street/new_medium_tram_paving.mtl',
                 size = {2.0, 2.0}
@@ -56,16 +61,17 @@
                 name = 'street/new_medium_tram_track.mtl',
                 size = {2.0, 2.0}
             },
-            streetBus = {
-                name = 'street/new_medium_bus.mtl',
-                size = {12, 2.7}
+            crossingBus = {
+            },
+            crossingCrosswalk = {
             },
             crossingLane = {
                 name = 'street/new_medium_lane.mtl',
                 size = {4.0, 4.0}
             },
-            crossingBus = {
-                name = ''
+            crossingStopline = {
+                -- name = 'street/new_medium_stopline.mtl',
+                -- size = {6.0, .5}
             },
             crossingTram = {
                 name = 'street/new_medium_tram_paving.mtl',
@@ -75,35 +81,26 @@
                 name = 'street/new_medium_tram_track.mtl',
                 size = {2.0, 2.0}
             },
-            crossingCrosswalk = {
-                name = 'street/new_medium_crosswalk.mtl',
-                size = {3.0, 2.5}
-                -- size = { 2.5, 2.5 }
-            },
-            crossingStopline = {
-                name = 'street/new_medium_stopline.mtl',
-                size = {6.0, .5}
-            },
-            sidewalkPaving = {
-                name = 'street/new_medium_sidewalk.mtl',
-                size = {4.0, 4.0}
-            },
-            sidewalkLane = {},
             sidewalkBorderInner = {
                 name = 'street/new_medium_sidewalk_border_inner.mtl',
                 size = {3, 0.6}
             },
             sidewalkBorderOuter = {
-                name = 'street/new_medium_sidewalk_border_outer.mtl',
-                size = {8.0, 0.41602}
+                -- name = 'street/new_medium_sidewalk_border_outer.mtl',
+                -- size = {8.0, 0.41602}
             },
             sidewalkCurb = {
-                name = 'street/new_medium_sidewalk_curb.mtl',
-                size = {3, .35}
+                -- name = 'street/new_medium_sidewalk_curb.mtl',
+                -- size = {3, .35}
+            },
+            sidewalkLane = {},
+            sidewalkPaving = {
+                name = 'street/new_medium_sidewalk.mtl',
+                size = {4.0, 4.0}
             },
             sidewalkWall = {
-                name = 'street/new_medium_sidewalk_wall.mtl',
-                size = {8.0, 0.41602}
+                -- name = 'street/new_medium_sidewalk_wall.mtl',
+                -- size = {8.0, 0.41602}
             }
         },
         assets = {

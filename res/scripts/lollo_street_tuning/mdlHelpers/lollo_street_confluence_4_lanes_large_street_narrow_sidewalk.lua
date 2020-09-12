@@ -24,37 +24,37 @@ results.getStreetLods = function()
         {
             node = {
                 children = {
-                    -- close the incoming thinner roads
-                    {
-                        materials = { "street/new_medium_sidewalk_border_inner.mtl", "street/new_medium_sidewalk.mtl", },
-                        mesh = "station/road/streetstation/era_c/pltfrm_r_top_lod0.msh",
-                        name = "pltfrm_r_top",
-                        transf = { 0, 0.4, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0, -7.6, -5, 0, 1, },
-                    },
-                    {
-                        materials = { "street/new_medium_sidewalk_border_inner.mtl", "street/new_medium_sidewalk.mtl", },
-                        mesh = "station/road/streetstation/era_c/pltfrm_r_top_lod0.msh",
-                        name = "pltfrm_r_top",
-                        transf = { 0, 0.4, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0, -7.6, 0, 0, 1, },
-                    },
-                    {
-                        materials = { "street/new_medium_sidewalk_border_inner.mtl", "street/new_medium_sidewalk.mtl", },
-                        mesh = "station/road/streetstation/era_c/pltfrm_r_top_lod0.msh",
-                        name = "pltfrm_r_top",
-                        transf = { 0, 0.4, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0, -7.6, 5, 0, 1, },
-                    },
-                    {
-                        materials = {'street/new_medium_sidewalk_border_inner.mtl', 'street/new_medium_sidewalk.mtl'},
-                        mesh = 'station/road/streetstation/pedestrian_era_c/straight_spcl2_r_lod0.msh',
-                        name = "pltfrm_r_top",
-                        transf = { -0.40, 0, 0, 0, 0, -0.40, 0, 0, 0, 0, 1, 0, -1.6, 9.00, 0, 1, },
-                    },
-                    {
-                        materials = {'street/new_medium_sidewalk_border_inner.mtl', 'street/new_medium_sidewalk.mtl'},
-                        mesh = 'station/road/streetstation/pedestrian_era_c/straight_spcl2_r_lod0.msh',
-                        name = "pltfrm_r_top",
-                        transf = { -0.40, 0, 0, 0, 0, 0.40, 0, 0, 0, 0, 1, 0, -1.6, -9.00, 0, 1, },
-                    },
+                    -- -- close the incoming thinner roads
+                    -- {
+                    --     materials = { "street/new_medium_sidewalk_border_inner.mtl", "street/new_medium_sidewalk.mtl", },
+                    --     mesh = "station/road/streetstation/era_c/pltfrm_r_top_lod0.msh",
+                    --     name = "pltfrm_r_top",
+                    --     transf = { 0, 0.4, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0, -7.6, -5, 0, 1, },
+                    -- },
+                    -- {
+                    --     materials = { "street/new_medium_sidewalk_border_inner.mtl", "street/new_medium_sidewalk.mtl", },
+                    --     mesh = "station/road/streetstation/era_c/pltfrm_r_top_lod0.msh",
+                    --     name = "pltfrm_r_top",
+                    --     transf = { 0, 0.4, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0, -7.6, 0, 0, 1, },
+                    -- },
+                    -- {
+                    --     materials = { "street/new_medium_sidewalk_border_inner.mtl", "street/new_medium_sidewalk.mtl", },
+                    --     mesh = "station/road/streetstation/era_c/pltfrm_r_top_lod0.msh",
+                    --     name = "pltfrm_r_top",
+                    --     transf = { 0, 0.4, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0, -7.6, 5, 0, 1, },
+                    -- },
+                    -- {
+                    --     materials = {'street/new_medium_sidewalk_border_inner.mtl', 'street/new_medium_sidewalk.mtl'},
+                    --     mesh = 'station/road/streetstation/pedestrian_era_c/straight_spcl2_r_lod0.msh',
+                    --     name = "pltfrm_r_top",
+                    --     transf = { -0.40, 0, 0, 0, 0, -0.40, 0, 0, 0, 0, 1, 0, -1.6, 9.00, 0, 1, },
+                    -- },
+                    -- {
+                    --     materials = {'street/new_medium_sidewalk_border_inner.mtl', 'street/new_medium_sidewalk.mtl'},
+                    --     mesh = 'station/road/streetstation/pedestrian_era_c/straight_spcl2_r_lod0.msh',
+                    --     name = "pltfrm_r_top",
+                    --     transf = { -0.40, 0, 0, 0, 0, 0.40, 0, 0, 0, 0, 1, 0, -1.6, -9.00, 0, 1, },
+                    -- },
                     -- bevel the pavement outside
                     {
                         --materials = {'station/road/streetstation/streetstation_perron_border.mtl', 'station/road/streetstation/streetstation_perron_base_new.mtl'},

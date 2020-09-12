@@ -7,7 +7,7 @@
         },
         streetWidth = 2.4, -- was 3
         sidewalkWidth = 0.8, -- was 0.5; 2 * sidewalkWidth + streetWidth must be 4
-        sidewalkHeight = .0,
+        sidewalkHeight = 0.0,
         yearFrom = 1925,
         yearTo = 0,
         upgrade = false,
@@ -31,6 +31,12 @@
                 name = 'street/country_new_large_border.mtl',
                 size = {24, 0.459}
             },
+            streetBus = {
+                -- name = 'street/new_medium_bus.mtl',
+                -- size = {12, 2.7}
+                name = 'street/new_medium_bus.mtl',
+                size = {12, 2.0}
+            },
             -- junctionBorder = {
             --     name = "street/country_new_small_street_border.mtl",
             --     size = { 9.0, 0.56 }
@@ -48,14 +54,8 @@
                 size = {6.0, 3.0}
             },
             streetStripe = {
-    
             },
             streetStripeMedian = {
-    
-            },
-            streetBus = {
-                name = 'street/new_medium_bus.mtl',
-                size = {12, 2.7}
             },
             streetTram = {
                 name = "street/new_medium_tram_paving.mtl",
@@ -65,12 +65,15 @@
                 name = "street/new_medium_tram_track.mtl",
                 size = { 2.0, 2.0 }
             },
+            crossingBus = {
+            },
+            crossingCrosswalk = {
+            },
             crossingLane = {
                 name = "street/country_new_medium_lane.mtl",
                 size = { 2.5, 2.5 }
             },
-            crossingBus = {
-                name = ""		
+            crossingStopline = {
             },
             crossingTram = {
                 name = "street/new_medium_tram_paving.mtl",
@@ -80,13 +83,9 @@
                 name = "street/new_medium_tram_track.mtl",
                 size = { 2.0, 2.0 }
             },
-            crossingCrosswalk = {
-                name = ""		
-            },
             sidewalkPaving = {
-                name = ""		
             },
-            sidewalkLane = {	
+            sidewalkLane = {
             },
             sidewalkBorderInner = {
             },
@@ -95,7 +94,7 @@
             sidewalkCurb = {
             },
             sidewalkWall = {
-            }	
+            }
         },
         assets = {},
         signalAssetName = 'asset/ampel.mdl',

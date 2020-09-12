@@ -63,7 +63,7 @@
             },
             streetBus = {
                 name = 'street/new_medium_bus.mtl',
-                size = {12, 2.7}
+                size = {12, 2.5}
             },
             crossingLane = {
                 name = 'street/new_medium_lane.mtl',

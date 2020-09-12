@@ -59,8 +59,8 @@
                 size = {2.0, 2.0}
             },
             streetBus = {
-                name = 'street/new_medium_bus.mtl',
-                size = {12, 2.7}
+                name = 'street/new_medium_bus_3_8th.mtl',
+                size = {12, 5.4}
             },
             crossingLane = {
                 name = 'street/new_medium_lane.mtl',

@@ -27,7 +27,7 @@ function data()
             },
             map_albedo_opacity = {
                 fileName = _isUseBusLaneStripes
-                    and "streets/new_full_width_bus_stripes_bc3.dds"
+                    and "streets/new_full_width_bus_stripes_3_8th_bc3.dds"
                     or "streets/new_medium_bus.dds",
                 type = "TWOD",
                 wrapS = "REPEAT",
