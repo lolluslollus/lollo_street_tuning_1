@@ -651,6 +651,7 @@ function data()
             elseif name == 'toggleAllTracksBuilt' then
                 local myConstruction = game.interface.getEntity(param.constructionEntityId)
                 if type(myConstruction) == 'table' and type(myConstruction.transf) == 'table' then
+                    -- LOLLO TODO sometimes, this selects an edge nearby: fix it
                     local nearbyEdges = edgeUtils.getNearbyStreetEdges(myConstruction.transf)
                     if #nearbyEdges > 0 then
                         local newStreetType = _getToggleAllTramTracksStreetTypeFileName(
