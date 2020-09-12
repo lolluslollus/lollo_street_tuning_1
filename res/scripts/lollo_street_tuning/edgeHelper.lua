@@ -123,10 +123,11 @@ local function _getVerticesSorted(unsorted)
 end
 
 local function _getIsPointWithin(sortedVertices, position)
-    if position[1] < sortedVertices.topLeft.x and position[1] < sortedVertices.bottomLeft.x then return false end
-    if position[1] > sortedVertices.topRight.x and position[1] > sortedVertices.bottomRight.x then return false end
-    if position[2] > sortedVertices.topLeft.y and position[2] > sortedVertices.topRight.y then return false end
-    if position[2] < sortedVertices.bottomLeft.y and position[2] < sortedVertices.bottomRight.y then return false end
+    -- LOLLO TODO this is still too pessimistic
+    -- if position[1] < sortedVertices.topLeft.x and position[1] < sortedVertices.bottomLeft.x then return false end
+    -- if position[1] > sortedVertices.topRight.x and position[1] > sortedVertices.bottomRight.x then return false end
+    -- if position[2] > sortedVertices.topLeft.y and position[2] > sortedVertices.topRight.y then return false end
+    -- if position[2] < sortedVertices.bottomLeft.y and position[2] < sortedVertices.bottomRight.y then return false end
 
     print('thinking')
     -- y = a + bx
