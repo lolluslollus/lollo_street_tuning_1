@@ -1,0 +1,61 @@
+function data()
+    local modSettings = require('lollo_street_tuning.settings')
+    local _isUseBusLaneStripes = modSettings.get('lolloStreetTuning_YellowBusLaneStripes') == 1
+
+    return {
+        order = 3,
+        params = {
+            albedo_scale = {
+                albedoScale = _isUseBusLaneStripes and {
+                    1.75,                      -- scale value of red color channel
+                    1.75,                      -- scale value of green color channel
+                    0.05                       -- scale value of blue color channel
+                } or {
+                    1.0, 1.0, 1.0
+                }
+            },
+            alpha_scale = {
+                alphaScale = 1,
+            },
+            alpha_test = {
+                alphaThreshold = 0.5,
+                cutout = false,
+            },
+            fade_out_range = {
+                fadeOutEndDist = 20000,
+                fadeOutStartDist = 10000,
+            },
+            map_albedo_opacity = {
+                fileName = _isUseBusLaneStripes
+                    and "streets/new_full_width_bus_stripes_4_8th_bc3.dds"
+                    or "streets/new_medium_bus.dds",
+                type = "TWOD",
+                wrapS = "REPEAT",
+            },
+            map_metal_gloss_ao = {
+                fileName = "default_metal_gloss_ao.tga",
+                type = "TWOD",
+                wrapS = "REPEAT",
+            },
+            map_normal = {
+                fileName = "default_normal_map.tga",
+                redGreen = true,
+                type = "TWOD",
+                wrapS = "REPEAT",
+            },
+            normal_scale = {
+                normalScale = 1,
+            },
+            polygon_offset = {
+                factor = -3,
+                units = -3,
+            },
+            two_sided = {
+                flipNormal = false,
+                twoSided = false,
+            },
+        },
+        type = "PHYS_TRANSPARENT_NRML_MAP",
+    }
+    end
+    

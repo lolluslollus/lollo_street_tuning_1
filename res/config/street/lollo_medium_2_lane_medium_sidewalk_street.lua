@@ -30,7 +30,7 @@
                 size = {2.0, .3}
             },
             streetBus = {
-                name = 'street/new_medium_bus_3_8th.mtl',
+                name = 'street/new_medium_bus_4_8th.mtl',
                 size = {12, 5.4}
             },
             streetLane = {
