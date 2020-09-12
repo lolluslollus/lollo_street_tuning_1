@@ -670,7 +670,8 @@ function data()
                     local nearestEdgeId = edgeUtils.getNearestEdgeId(
                         myConstruction.transf
                     )
-                    -- LOLLO TODO this does not catch the edge after the street has been split
+                    -- LOLLO TODO this does not catch the edge after the street has been split,
+                    -- but it might be an impression
                     -- print('nearestEdgeId =', nearestEdgeId or 'NIL')
                     if type(nearestEdgeId) == 'number' and nearestEdgeId >= 0 then
                         local baseEdgeStreet = api.engine.getComponent(nearestEdgeId, api.type.ComponentType.BASE_EDGE_STREET)
