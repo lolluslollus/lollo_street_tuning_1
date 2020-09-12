@@ -39,25 +39,6 @@ helper.getVectorLength = function(xyz)
     local z = xyz.z or xyz[3] or 0.0
     return math.sqrt(x * x + y * y + z * z)
 end
--- helper.getNearbyStreetEdges = function(position, edgeSearchRadius)
---     -- if you want to use this, you may have to account for the transformation
---     if type(position) ~= 'table' then return {} end
-
---     local nearbyEdges = game.interface.getEntities(
---         {pos = position, radius = edgeSearchRadius},
---         -- {type = "BASE_EDGE", includeData = true}
---         {includeData = true}
---     )
-
---     local results = {}
---     for i, v in pairs(nearbyEdges) do
---         if not v.track and v.streetType then
---             table.insert(results, v)
---         end
---     end
-
---     return results
--- end
 
 helper.getNearbyEntities = function(transf)
     if type(transf) ~= 'table' then return {} end
@@ -85,7 +66,6 @@ helper.getNearbyStreetEdges = function(transf)
     local nearbyEdges = game.interface.getEntities(
         {pos = squareCentrePosition, radius = edgeSearchRadius},
         {type = "BASE_EDGE", includeData = true}
-        -- {includeData = true}
     )
     local sampleNearbyEdges = {
         [27346] = {
@@ -130,6 +110,41 @@ helper.getNearbyStreetEdges = function(transf)
     end
 
     return results
+end
+
+helper.getNearestEdge = function(transf, edges)
+    -- LOLLO TODO this is a simple estimator, not perfect.
+    -- Best would be to work out the spline and the street width
+    -- and see if {transf[13], transf[14], transf[15]} fits in the street
+    -- or compare the distances between {transf[13], transf[14], transf[15]} and the splines
+    if type(transf) ~= 'table' or type(edges) ~= 'table' then return nil end
+
+    local position = transfUtils.getVec123Transformed({0, 0, 0}, transf)
+
+    for i = 1, #edges do
+        if (edges[i].node0pos[1] >= position[1] and position[1] >= edges[i].node1pos[1]
+        or edges[i].node0pos[1] <= position[1] and position[1] <= edges[i].node1pos[1])
+        and (edges[i].node0pos[2] >= position[2] and position[2] >= edges[i].node1pos[2]
+        or edges[i].node0pos[2] <= position[2] and position[2] <= edges[i].node1pos[2])
+        and (edges[i].node0pos[3] >= position[3] and position[3] >= edges[i].node1pos[3]
+        or edges[i].node0pos[3] <= position[3] and position[3] <= edges[i].node1pos[3])
+        then
+            return edges[i]
+        end
+    end
+
+    -- bridges and tunnels: ignore z (basically, return the first edge, which is a bit random)
+    for i = 1, #edges do
+        if (edges[i].node0pos[1] >= position[1] and position[1] >= edges[i].node1pos[1]
+        or edges[i].node0pos[1] <= position[1] and position[1] <= edges[i].node1pos[1])
+        and (edges[i].node0pos[2] >= position[2] and position[2] >= edges[i].node1pos[2]
+        or edges[i].node0pos[2] <= position[2] and position[2] <= edges[i].node1pos[2])
+        then
+            return edges[i]
+        end
+    end
+
+    return nil
 end
 
 helper.getXKey = function(x)

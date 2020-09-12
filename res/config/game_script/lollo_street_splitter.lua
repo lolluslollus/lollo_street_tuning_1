@@ -614,16 +614,19 @@ function data()
             elseif name == 'streetSplitterWithApiBuilt' then
                 local splitterConstruction = game.interface.getEntity(param.constructionEntityId)
                 if type(splitterConstruction) == 'table' and type(splitterConstruction.transf) == 'table' then
-                    local nearbyEdges = edgeUtils.getNearbyStreetEdges(splitterConstruction.transf)
-                    if #nearbyEdges > 0 then
+                    local nearestEdge = edgeUtils.getNearestEdge(
+                        splitterConstruction.transf,
+                        edgeUtils.getNearbyStreetEdges(splitterConstruction.transf)
+                    )
+                    if nearestEdge then
                         local nodeBetween = edgeUtils.getNodeBetween(
                             {
-                                nearbyEdges[1]['node0pos'],
-                                nearbyEdges[1]['node0tangent'],
+                                nearestEdge['node0pos'],
+                                nearestEdge['node0tangent'],
                             },
                             {
-                                nearbyEdges[1]['node1pos'],
-                                nearbyEdges[1]['node1tangent'],
+                                nearestEdge['node1pos'],
+                                nearestEdge['node1tangent'],
                             },
                             -- LOLLO NOTE position and transf are always very similar
                             -- {
@@ -634,32 +637,39 @@ function data()
                             splitterConstruction.position
                         )
 
-                        _splitEdge(nearbyEdges[1], nodeBetween)
+                        _splitEdge(nearestEdge, nodeBetween)
                     end
                 end
             elseif name == 'streetChangerBuilt' then
                 local changerConstruction = game.interface.getEntity(param.constructionEntityId)
                 if type(changerConstruction) == 'table' and type(changerConstruction.transf) == 'table' then
-                    local nearbyEdges = edgeUtils.getNearbyStreetEdges(changerConstruction.transf)
-                    if #nearbyEdges > 0 then
-                        print('LOLLO nearbyEdges[1] = ')
-                        debugPrint(nearbyEdges[1])
+                    local nearestEdge = edgeUtils.getNearestEdge(
+                        changerConstruction.transf,
+                        edgeUtils.getNearbyStreetEdges(changerConstruction.transf)
+                    )
+                    if nearestEdge then
+                        print('LOLLO nearestEdge = ')
+                        debugPrint(nearestEdge)
 
-                        _replaceEdge(nearbyEdges[1])
+                        _replaceEdge(nearestEdge)
                     end
                 end
             elseif name == 'toggleAllTracksBuilt' then
                 local myConstruction = game.interface.getEntity(param.constructionEntityId)
                 if type(myConstruction) == 'table' and type(myConstruction.transf) == 'table' then
-                    -- LOLLO TODO sometimes, this selects an edge nearby: fix it
-                    local nearbyEdges = edgeUtils.getNearbyStreetEdges(myConstruction.transf)
-                    if #nearbyEdges > 0 then
+                    local nearestEdge = edgeUtils.getNearestEdge(
+                        myConstruction.transf,
+                        edgeUtils.getNearbyStreetEdges(myConstruction.transf)
+                    )
+                    -- print('LOLLO nearestEdge =')
+                    -- debugPrint(nearestEdge)
+                    if nearestEdge then
                         local newStreetType = _getToggleAllTramTracksStreetTypeFileName(
-                            nearbyEdges[1].streetType
+                            nearestEdge.streetType
                         )
                         if newStreetType then
                             _replaceEdgeWithStreetType(
-                                nearbyEdges[1],
+                                nearestEdge,
                                 api.res.streetTypeRep.find(newStreetType)
                             )
                         end
