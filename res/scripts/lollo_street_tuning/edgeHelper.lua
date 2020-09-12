@@ -144,7 +144,8 @@ helper.getNearestEdge = function(transf, edges)
         end
     end
 
-    return nil
+    -- return nil
+    return edges[1]
 end
 
 helper.getXKey = function(x)
