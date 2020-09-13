@@ -55,6 +55,14 @@ helper.getNearbyEntities = function(transf)
     return results
 end
 
+local function sign(num1)
+    if type(num1) ~= 'number' then return nil end
+
+    if num1 == 0 then return 0 end
+    if num1 > 0 then return 1 end
+    return -1
+end
+
 local function swap(num1, num2)
     local swapTemp = num1
     num1 = num2
@@ -129,7 +137,17 @@ local function _getIsPointWithin(sortedVertices, position)
     -- if position[2] > sortedVertices.topLeft.y and position[2] > sortedVertices.topRight.y then return false end
     -- if position[2] < sortedVertices.bottomLeft.y and position[2] < sortedVertices.bottomRight.y then return false end
 
-    print('thinking')
+    -- print('thinking')
+    -- local test = sortedVertices.topLeft.x
+    -- print('KKKKKK')
+    -- local test2 = sortedVertices.topLeft.x + sortedVertices.bottomRight.x
+    -- print('HHHHHHHHHHHHHHHH')
+    local midPoint = {
+        x = (sortedVertices.topLeft.x + sortedVertices.bottomRight.x) * 0.5,
+        y = (sortedVertices.topLeft.y + sortedVertices.bottomRight.y) * 0.5,
+    }
+    -- print('still thinking')
+    -- debugPrint(midPoint)
     -- y = a + bx
     -- y0 = a + b * x0
     -- y1 = a + b * x1
@@ -141,7 +159,8 @@ local function _getIsPointWithin(sortedVertices, position)
     else
         local b = (sortedVertices.topLeft.y - sortedVertices.topRight.y) / (sortedVertices.topLeft.x - sortedVertices.topRight.x)
         local a = sortedVertices.topLeft.y - b * sortedVertices.topLeft.x
-        if position[2] > a + b * position[1] then return false end
+        -- if position[2] > a + b * position[1] then return false end
+        if (position[2] > (a + b * position[1])) ~= (midPoint.y > (a + b * midPoint.x)) then return false end
     end
 
     if sortedVertices.topRight.x == sortedVertices.bottomRight.x then
@@ -150,7 +169,8 @@ local function _getIsPointWithin(sortedVertices, position)
     else
         local b = (sortedVertices.topRight.y - sortedVertices.bottomRight.y) / (sortedVertices.topRight.x - sortedVertices.bottomRight.x)
         local a = sortedVertices.topRight.y - b * sortedVertices.topRight.x
-        if position[2] < a + b * position[1] then return false end
+        -- if position[2] < a + b * position[1] then return false end
+        if (position[2] < (a + b * position[1])) ~= (midPoint.y < (a + b * midPoint.x)) then return false end
     end
 
     if sortedVertices.bottomRight.x == sortedVertices.bottomLeft.x then
@@ -159,7 +179,8 @@ local function _getIsPointWithin(sortedVertices, position)
     else
         local b = (sortedVertices.bottomRight.y - sortedVertices.bottomLeft.y) / (sortedVertices.bottomRight.x - sortedVertices.bottomLeft.x)
         local a = sortedVertices.bottomRight.y - b * sortedVertices.bottomRight.x
-        if position[2] < a + b * position[1] then return false end
+        -- if position[2] < a + b * position[1] then return false end
+        if (position[2] < (a + b * position[1])) ~= (midPoint.y < (a + b * midPoint.x)) then return false end
     end
 
     if sortedVertices.bottomLeft.x == sortedVertices.topLeft.x then
@@ -168,7 +189,8 @@ local function _getIsPointWithin(sortedVertices, position)
     else
         local b = (sortedVertices.bottomLeft.y - sortedVertices.topLeft.y) / (sortedVertices.bottomLeft.x - sortedVertices.topLeft.x)
         local a = sortedVertices.bottomLeft.y - b * sortedVertices.bottomLeft.x
-        if position[2] > a + b * position[1] then return false end
+        -- if position[2] > a + b * position[1] then return false end
+        if (position[2] > (a + b * position[1])) ~= (midPoint.y > (a + b * midPoint.x)) then return false end
     end
 -- LOLLO TODO this estimator is not so good yet
     print('point is within. position =')
