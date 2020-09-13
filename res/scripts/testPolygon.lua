@@ -10,54 +10,54 @@ end
 -- actboy extension path
 -- sumneko lua assist
 
-local vertices = {
-    [1] = {
-        x = -100,
-        y = -100
-    },
-    [2] = {
-        x = 100,
-        y = -100
-    },
-    [3] = {
-        x = 100,
-        y = 100
-    },
-    [4] = {
-        x = -100,
-        y = 100
-    },
-}
-local positionToCheck = {10, 10, 10}
-local testResult = edgeUtils.testGetIsPointWithin(vertices, positionToCheck)
-assert(testResult == true)
-local positionToCheck = {-99, -99, 10}
-local testResult = edgeUtils.testGetIsPointWithin(vertices, positionToCheck)
-assert(testResult == true)
-local positionToCheck = {-101, -99, 10}
-local testResult = edgeUtils.testGetIsPointWithin(vertices, positionToCheck)
-assert(testResult == false)
-local positionToCheck = {99, -99, 10}
-local testResult = edgeUtils.testGetIsPointWithin(vertices, positionToCheck)
-assert(testResult == true)
-local positionToCheck = {99, -101, 10}
-local testResult = edgeUtils.testGetIsPointWithin(vertices, positionToCheck)
-assert(testResult == false)
-local positionToCheck = {99, 99, 10}
-local testResult = edgeUtils.testGetIsPointWithin(vertices, positionToCheck)
-assert(testResult == true)
-local positionToCheck = {-99, 99, 10}
-local testResult = edgeUtils.testGetIsPointWithin(vertices, positionToCheck)
-assert(testResult == true)
-local positionToCheck = {-99, 0, 10}
-local testResult = edgeUtils.testGetIsPointWithin(vertices, positionToCheck)
-assert(testResult == true)
-local positionToCheck = {-101, 0, 10}
-local testResult = edgeUtils.testGetIsPointWithin(vertices, positionToCheck)
-assert(testResult == false)
-local positionToCheck = {199, 0, 10}
-local testResult = edgeUtils.testGetIsPointWithin(vertices, positionToCheck)
-assert(testResult == false)
+-- local vertices = {
+--     [1] = {
+--         x = -100,
+--         y = -100
+--     },
+--     [2] = {
+--         x = 100,
+--         y = -100
+--     },
+--     [3] = {
+--         x = 100,
+--         y = 100
+--     },
+--     [4] = {
+--         x = -100,
+--         y = 100
+--     },
+-- }
+-- local positionToCheck = {10, 10, 10}
+-- local testResult = edgeUtils.testGetIsPointWithin(vertices, positionToCheck)
+-- assert(testResult == true)
+-- local positionToCheck = {-99, -99, 10}
+-- local testResult = edgeUtils.testGetIsPointWithin(vertices, positionToCheck)
+-- assert(testResult == true)
+-- local positionToCheck = {-101, -99, 10}
+-- local testResult = edgeUtils.testGetIsPointWithin(vertices, positionToCheck)
+-- assert(testResult == false)
+-- local positionToCheck = {99, -99, 10}
+-- local testResult = edgeUtils.testGetIsPointWithin(vertices, positionToCheck)
+-- assert(testResult == true)
+-- local positionToCheck = {99, -101, 10}
+-- local testResult = edgeUtils.testGetIsPointWithin(vertices, positionToCheck)
+-- assert(testResult == false)
+-- local positionToCheck = {99, 99, 10}
+-- local testResult = edgeUtils.testGetIsPointWithin(vertices, positionToCheck)
+-- assert(testResult == true)
+-- local positionToCheck = {-99, 99, 10}
+-- local testResult = edgeUtils.testGetIsPointWithin(vertices, positionToCheck)
+-- assert(testResult == true)
+-- local positionToCheck = {-99, 0, 10}
+-- local testResult = edgeUtils.testGetIsPointWithin(vertices, positionToCheck)
+-- assert(testResult == true)
+-- local positionToCheck = {-101, 0, 10}
+-- local testResult = edgeUtils.testGetIsPointWithin(vertices, positionToCheck)
+-- assert(testResult == false)
+-- local positionToCheck = {199, 0, 10}
+-- local testResult = edgeUtils.testGetIsPointWithin(vertices, positionToCheck)
+-- assert(testResult == false)
 
 local vertices = {
     [1] = {
@@ -77,9 +77,9 @@ local vertices = {
         y = 100
     },
 }
-local positionToCheck = {10, 10, 10}
-local testResult = edgeUtils.testGetIsPointWithin(vertices, positionToCheck)
-assert(testResult == true)
+-- local positionToCheck = {10, 10, 10}
+-- local testResult = edgeUtils.testGetIsPointWithin(vertices, positionToCheck)
+-- assert(testResult == true)
 local positionToCheck = {-99, -99, 10}
 local testResult = edgeUtils.testGetIsPointWithin(vertices, positionToCheck)
 assert(testResult == true)

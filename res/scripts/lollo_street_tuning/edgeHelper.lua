@@ -107,7 +107,10 @@ local function _getVerticesSortedClockwise(unsorted)
                 unsorted[i].y - unsorted[indexes.topRight].y,
                 unsorted[i].x - unsorted[indexes.topRight].x
             )
-            if newAtan ~= false then
+            if newAtan == false then -- edge case: two points are equal
+                indexes.bottomRight = i
+                break
+            else
                 if newAtan > lastAtan then
                     lastAtan = newAtan
                     indexes.bottomRight = i
@@ -164,9 +167,10 @@ local function _getIsPointWithin(sortedVertices, position)
     -- y0 - y1 = b * (x0 - x1)  =>  b = (y0 - y1) / (x0 - x1)
     -- a = y0 - b * x0
     if sortedVertices.topLeft.x == sortedVertices.topRight.x then
-        if (position[2] > sortedVertices.topLeft.y or position[2] > sortedVertices.topRight.y)
-        ~= (midPoint.y > sortedVertices.topLeft.y or midPoint.y > sortedVertices.topRight.y)
-        then return false end
+        if sortedVertices.topLeft.y ~= sortedVertices.topRight.y then
+            if (sortedVertices.topLeft.x > position[1]) ~= (sortedVertices.topLeft.x > midPoint.x)
+            then return false end
+        end
     else
         local b = (sortedVertices.topLeft.y - sortedVertices.topRight.y) / (sortedVertices.topLeft.x - sortedVertices.topRight.x)
         local a = sortedVertices.topLeft.y - b * sortedVertices.topLeft.x
@@ -174,8 +178,10 @@ local function _getIsPointWithin(sortedVertices, position)
     end
 
     if sortedVertices.topRight.x == sortedVertices.bottomRight.x then
-        if (position[1] > sortedVertices.topRight.x) ~= (midPoint.x > sortedVertices.topRight.x)
-        then return false end
+        if sortedVertices.topRight.y ~= sortedVertices.bottomRight.y then
+            if (sortedVertices.topRight.x > position[1]) ~= (sortedVertices.topRight.x > midPoint.x)
+            then return false end
+        end
     else
         local b = (sortedVertices.topRight.y - sortedVertices.bottomRight.y) / (sortedVertices.topRight.x - sortedVertices.bottomRight.x)
         local a = sortedVertices.topRight.y - b * sortedVertices.topRight.x
@@ -183,9 +189,10 @@ local function _getIsPointWithin(sortedVertices, position)
     end
 
     if sortedVertices.bottomRight.x == sortedVertices.bottomLeft.x then
-        if (position[2] < sortedVertices.bottomLeft.y or position[2] < sortedVertices.bottomRight.y)
-        ~= (midPoint.y < sortedVertices.bottomLeft.y or midPoint.y < sortedVertices.bottomRight.y)
-        then return false end
+        if sortedVertices.bottomRight.y ~= sortedVertices.bottomLeft.y then
+            if (sortedVertices.bottomRight.x < position[1]) ~= (sortedVertices.bottomRight.x < midPoint.x)
+            then return false end
+        end
     else
         local b = (sortedVertices.bottomRight.y - sortedVertices.bottomLeft.y) / (sortedVertices.bottomRight.x - sortedVertices.bottomLeft.x)
         local a = sortedVertices.bottomRight.y - b * sortedVertices.bottomRight.x
@@ -193,8 +200,10 @@ local function _getIsPointWithin(sortedVertices, position)
     end
 
     if sortedVertices.bottomLeft.x == sortedVertices.topLeft.x then
-        if (position[1] < sortedVertices.bottomLeft.x) ~= (midPoint.x < sortedVertices.bottomLeft.x)
-        then return false end
+        if sortedVertices.bottomLeft.y ~= sortedVertices.topLeft.y then
+            if (sortedVertices.bottomLeft.x < position[1]) ~= (sortedVertices.bottomLeft.x < midPoint.x)
+            then return false end
+        end
     else
         local b = (sortedVertices.bottomLeft.y - sortedVertices.topLeft.y) / (sortedVertices.bottomLeft.x - sortedVertices.topLeft.x)
         local a = sortedVertices.bottomLeft.y - b * sortedVertices.bottomLeft.x
