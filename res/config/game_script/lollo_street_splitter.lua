@@ -478,7 +478,7 @@ local function _splitEdge(wholeEdgeId, position0, tangent0, position1, tangent1,
         local edge0Objects = {}
         local edge1Objects = {}
         for _, edgeObj in pairs(baseEdge.objects) do
-            -- api.engine.getComponent(edgeObj[1], api.type.ComponentType.BOUNDING_VOLUME) returns a bounding box that I could use
+            -- api.engine.getComponent(edgeObj[1], api.type.ComponentType.BOUNDING_VOLUME) returns a bounding volume without transf
             -- api.engine.getComponent(edgeObj[1], api.type.ComponentType.MODEL_INSTANCE_LIST) returns a transf that I cannot use
             local edgeObjEntity = game.interface.getEntity(edgeObj[1])
             if type(edgeObjEntity) == 'table' and type(edgeObjEntity.position) == 'table' then
