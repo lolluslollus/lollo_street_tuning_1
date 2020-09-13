@@ -616,7 +616,7 @@ function data()
                     local nearestEdgeId = edgeUtils.getNearestEdgeId(
                         splitterConstruction.transf
                     )
-                    print('nearestEdge =', nearestEdgeId or 'NIL')
+                    -- print('nearestEdge =', nearestEdgeId or 'NIL')
                     if type(nearestEdgeId) == 'number' and nearestEdgeId >= 0 then
                         local baseEdge = api.engine.getComponent(nearestEdgeId, api.type.ComponentType.BASE_EDGE)
                         if baseEdge then
@@ -637,8 +637,8 @@ function data()
                                     splitterConstruction.position
                                 )
 
-                                print('nodeBetween =')
-                                debugPrint(nodeBetween)
+                                -- print('nodeBetween =')
+                                -- debugPrint(nodeBetween)
 
                                 _splitEdge(
                                     nearestEdgeId,
@@ -658,7 +658,7 @@ function data()
                     local nearestEdgeId = edgeUtils.getNearestEdgeId(
                         changerConstruction.transf
                     )
-                    print('nearestEdge =', nearestEdgeId or 'NIL')
+                    -- print('nearestEdge =', nearestEdgeId or 'NIL')
                     if nearestEdgeId then
                         print('LOLLO nearestEdgeId = ', nearestEdgeId or 'NIL')
                         _replaceEdge(nearestEdgeId)
