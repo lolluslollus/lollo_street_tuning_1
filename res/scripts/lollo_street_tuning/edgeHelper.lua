@@ -131,12 +131,6 @@ local function _getVerticesSorted(unsorted)
 end
 
 local function _getIsPointWithin(sortedVertices, position)
-    -- LOLLO TODO this is still too pessimistic
-    -- if position[1] < sortedVertices.topLeft.x and position[1] < sortedVertices.bottomLeft.x then return false end
-    -- if position[1] > sortedVertices.topRight.x and position[1] > sortedVertices.bottomRight.x then return false end
-    -- if position[2] > sortedVertices.topLeft.y and position[2] > sortedVertices.topRight.y then return false end
-    -- if position[2] < sortedVertices.bottomLeft.y and position[2] < sortedVertices.bottomRight.y then return false end
-
     -- print('thinking')
     -- local test = sortedVertices.topLeft.x
     -- print('KKKKKK')
@@ -154,7 +148,7 @@ local function _getIsPointWithin(sortedVertices, position)
     -- y0 - y1 = b * (x0 - x1)  =>  b = (y0 - y1) / (x0 - x1)
     -- a = y0 - b * x0
     if sortedVertices.topLeft.x == sortedVertices.topRight.x then
-        print('infinite') -- LOLLO TODO check the sign of all 4 infinites
+        print('infinite')
         if position[1] < sortedVertices.topLeft.x then return false end
     else
         local b = (sortedVertices.topLeft.y - sortedVertices.topRight.y) / (sortedVertices.topLeft.x - sortedVertices.topRight.x)
@@ -192,11 +186,7 @@ local function _getIsPointWithin(sortedVertices, position)
         -- if position[2] > a + b * position[1] then return false end
         if (position[2] > (a + b * position[1])) ~= (midPoint.y > (a + b * midPoint.x)) then return false end
     end
--- LOLLO TODO this estimator is not so good yet
-    print('point is within. position =')
-    debugPrint(position)
-    print('sortedVertices =')
-    debugPrint(sortedVertices)
+
     return true
 end
 
@@ -215,10 +205,10 @@ helper.getNearestEdgeId = function(transf)
     local callback0 = function(entity, boundingVolume)
         -- debugPrint(entity)
         -- debugPrint(boundingVolume)
-        print('callback0 found entity', entity)
+        -- print('callback0 found entity', entity)
         if not(entity) or result then return end
 
-        print('going on')
+        -- print('going on')
         if not(api.engine.getComponent(entity, api.type.ComponentType.BASE_EDGE)) then return end
         -- this returns the usual edge data, like:
 --[[         local sample = {
@@ -482,13 +472,13 @@ helper.getNearestEdgeId = function(transf)
               },
             },
           } ]]
-        print('about to get the lots')
+        -- print('about to get the lots')
         local lotList = api.engine.getComponent(entity, api.type.ComponentType.LOT_LIST)
         if not(lotList) or not(lotList.lots) then return end
 
-        print('got the lots')
+        -- print('got the lots')
         for _, value in pairs(lotList.lots) do
-            print('trying')
+            -- print('trying')
             if _getIsPointWithin(_getVerticesSorted(value.vertices), position) then
                 result = entity
                 return
