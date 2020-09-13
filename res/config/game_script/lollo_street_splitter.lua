@@ -550,6 +550,13 @@ function data()
             if name == 'streetSplitterBuilt' then
                 -- do nothing
             elseif name == 'streetSplitterWithApiBuilt' then
+                -- local con = api.engine.getComponent(param.constructionEntityId, api.type.ComponentType.CONSTRUCTION)
+                -- print('con with api =')
+                -- debugPrint(con)
+                -- print('con.transf with api =')
+                -- debugPrint(con.transf)
+                -- print('con.transf.cols(0) with api =')
+                -- debugPrint(con.transf.cols(0)) -- dumps
                 local splitterConstruction = game.interface.getEntity(param.constructionEntityId)
                 if type(splitterConstruction) == 'table' and type(splitterConstruction.transf) == 'table' then
                     local nearestEdgeId = edgeUtils.getNearestEdgeId(
