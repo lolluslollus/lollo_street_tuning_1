@@ -54,7 +54,7 @@ helper.getNearbyEntities = function(transf)
 
     return results
 end
-
+-- LOLLO TODO get rid of all game. dependencies
 local function sign(num1)
     if type(num1) ~= 'number' then return nil end
 
