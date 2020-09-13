@@ -1,10 +1,5 @@
-local arrayUtils = require('lollo_street_tuning.arrayUtils')
 local matrixUtils = require('lollo_street_tuning.matrix')
-local streetUtils = require('lollo_street_tuning.streetUtils')
-local stringUtils = require('lollo_street_tuning.stringUtils')
 local transfUtils = require('lollo_street_tuning.transfUtils')
--- local debugger = require('debugger')
--- local luadump = require('lollo_street_tuning/luadump')
 
 if math.atan2 == nil then
 	math.atan2 = function(dy, dx)
@@ -69,76 +64,97 @@ local function swap(num1, num2)
     num2 = swapTemp
 end
 
-local function _getVerticesSorted(unsorted)
-    local maxY2 = 1
+local function _getVerticesSortedClockwise(unsorted)
+    local indexes = {
+        topLeft = 1,
+        topRight = -1,
+        bottomRight = -1,
+        bottomLeft = -1
+    }
+    -- find the highest of the leftmost points
     for i = 2, 4 do
-        if unsorted[i].y > unsorted[maxY2].y then
-            maxY2 = i
-        elseif unsorted[i].y == unsorted[maxY2].y then
-            if unsorted[i].x < unsorted[maxY2].x then
-                maxY2 = i
+        if unsorted[i].x < unsorted[indexes.topLeft].x then
+            indexes.topLeft = i
+        elseif unsorted[i].x == unsorted[indexes.topLeft].x then
+            if unsorted[i].y > unsorted[indexes.topLeft].y then
+                indexes.topLeft = i
             end
         end
     end
 
-    local maxY1 = maxY2 == 1 and 2 or 1
+    -- now find the second point clockwise
+    local lastTan = -math.huge
     for i = 1, 4 do
-        if i ~= maxY2 then
-            if unsorted[i].y > unsorted[maxY1].y then
-                maxY1 = i
-            elseif unsorted[i].y == unsorted[maxY1].y then
-                if unsorted[i].x < unsorted[maxY1].x then
-                    maxY1 = i
+        if i ~= indexes.topLeft and unsorted[i].x > unsorted[indexes.topLeft].x then
+            local newTan = (unsorted[i].y - unsorted[indexes.topLeft].y) / (unsorted[i].x - unsorted[indexes.topLeft].x)
+            if newTan > lastTan then
+                lastTan = newTan
+                indexes.topRight = i
+            elseif newTan == lastTan
+            and indexes.topRight > 0
+            and unsorted[i].x < unsorted[indexes.topRight].x then
+                indexes.topRight = i
+            end
+        end
+    end
+    if indexes.topRight == -1 then return nil end
+
+    -- now find the third point clockwise
+    local lastAtan = -2 * math.pi
+    for i = 1, 4 do
+        if i ~= indexes.topLeft and i ~= indexes.topRight then
+            local newAtan = math.atan2(
+                unsorted[i].y - unsorted[indexes.topRight].y,
+                unsorted[i].x - unsorted[indexes.topRight].x
+            )
+            if newAtan ~= false then
+                if newAtan > lastAtan then
+                    lastAtan = newAtan
+                    indexes.bottomRight = i
+                elseif newAtan == lastAtan
+                and indexes.bottomRight > 0
+                and unsorted[i].x < unsorted[indexes.bottomRight].x then
+                    indexes.bottomRight = i
                 end
             end
         end
     end
+    if indexes.bottomRight == -1 then return nil end
 
-    local minY1 = 0
     for i = 1, 4 do
-        if i ~= maxY2 and i ~= maxY1 then minY1 = i end
-    end
-    for i = 1, 4 do
-        if i ~= maxY2 and i ~= maxY1 then
-            if unsorted[i].y > unsorted[minY1].y then
-                minY1 = i
-            elseif unsorted[i].y == unsorted[minY1].y then
-                if unsorted[i].x < unsorted[minY1].x then
-                    minY1 = i
-                end
-            end
+        if i ~= indexes.topLeft and i ~= indexes.topRight and i ~= indexes.bottomRight then
+            indexes.bottomLeft = i
+            break
         end
     end
 
-    local minY2 = 0
-    for i = 1, 4 do
-        if i ~= maxY2 and i ~= maxY1 and i ~= minY1 then minY2 = i end
-    end
-    -- what if maxY2 and (minY1 or minY2) have the same y? maxY2 will be left of them.
-
-    -- print('unsorted with new indexes =')
-    -- debugPrint(unsorted[maxY2])
-    -- debugPrint(unsorted[maxY1])
-    -- debugPrint(unsorted[minY1])
-    -- debugPrint(unsorted[minY2])
     local result = {
-        topLeft = unsorted[maxY2].x < unsorted[maxY1].x and unsorted[maxY2] or unsorted[maxY1],
-        topRight = unsorted[maxY2].x >= unsorted[maxY1].x and unsorted[maxY2] or unsorted[maxY1],
-        bottomLeft = unsorted[minY1].x < unsorted[minY2].x and unsorted[minY1] or unsorted[minY2],
-        bottomRight = unsorted[minY1].x >= unsorted[minY2].x and unsorted[minY1] or unsorted[minY2],
+        topLeft = unsorted[indexes.topLeft],
+        topRight = unsorted[indexes.topRight],
+        bottomRight = unsorted[indexes.bottomRight],
+        bottomLeft = unsorted[indexes.bottomLeft],
     }
     return result
 end
 
 local function _getIsPointWithin(sortedVertices, position)
+    if not(sortedVertices) or not(position) then return false end
     -- print('thinking')
     -- local test = sortedVertices.topLeft.x
     -- print('KKKKKK')
     -- local test2 = sortedVertices.topLeft.x + sortedVertices.bottomRight.x
     -- print('HHHHHHHHHHHHHHHH')
-    local midPoint = {
+    local midPoint1 = {
         x = (sortedVertices.topLeft.x + sortedVertices.bottomRight.x) * 0.5,
         y = (sortedVertices.topLeft.y + sortedVertices.bottomRight.y) * 0.5,
+    }
+    local midPoint2 = {
+        x = (sortedVertices.topRight.x + sortedVertices.bottomLeft.x) * 0.5,
+        y = (sortedVertices.topRight.y + sortedVertices.bottomLeft.y) * 0.5,
+    }
+    local midPoint = {
+        x = (midPoint1.x + midPoint2.x) * 0.5,
+        y = (midPoint1.y + midPoint2.y) * 0.5,
     }
     -- print('still thinking')
     -- debugPrint(midPoint)
@@ -148,8 +164,9 @@ local function _getIsPointWithin(sortedVertices, position)
     -- y0 - y1 = b * (x0 - x1)  =>  b = (y0 - y1) / (x0 - x1)
     -- a = y0 - b * x0
     if sortedVertices.topLeft.x == sortedVertices.topRight.x then
-        print('infinite 1') -- LOLLO TODO test these infinites
-        if (position[2] > (position[1] - sortedVertices.topLeft.x)) ~= (midPoint.y > (midPoint.x - sortedVertices.topLeft.x)) then return false end
+        if (position[2] > sortedVertices.topLeft.y or position[2] > sortedVertices.topRight.y)
+        ~= (midPoint.y > sortedVertices.topLeft.y or midPoint.y > sortedVertices.topRight.y)
+        then return false end
     else
         local b = (sortedVertices.topLeft.y - sortedVertices.topRight.y) / (sortedVertices.topLeft.x - sortedVertices.topRight.x)
         local a = sortedVertices.topLeft.y - b * sortedVertices.topLeft.x
@@ -157,17 +174,18 @@ local function _getIsPointWithin(sortedVertices, position)
     end
 
     if sortedVertices.topRight.x == sortedVertices.bottomRight.x then
-        print('infinite 2')
-        if (position[2] < (position[1] - sortedVertices.topRight.x)) ~= (midPoint.y < (midPoint.x - sortedVertices.topRight.x)) then return false end
+        if (position[1] > sortedVertices.topRight.x) ~= (midPoint.x > sortedVertices.topRight.x)
+        then return false end
     else
         local b = (sortedVertices.topRight.y - sortedVertices.bottomRight.y) / (sortedVertices.topRight.x - sortedVertices.bottomRight.x)
         local a = sortedVertices.topRight.y - b * sortedVertices.topRight.x
-        if (position[2] < (a + b * position[1])) ~= (midPoint.y < (a + b * midPoint.x)) then return false end
+        if (position[2] > (a + b * position[1])) ~= (midPoint.y > (a + b * midPoint.x)) then return false end
     end
 
     if sortedVertices.bottomRight.x == sortedVertices.bottomLeft.x then
-        print('infinite 3')
-        if (position[2] < (position[1] - sortedVertices.bottomRight.x)) ~= (midPoint.y < (midPoint.x - sortedVertices.bottomRight.x)) then return false end
+        if (position[2] < sortedVertices.bottomLeft.y or position[2] < sortedVertices.bottomRight.y)
+        ~= (midPoint.y < sortedVertices.bottomLeft.y or midPoint.y < sortedVertices.bottomRight.y)
+        then return false end
     else
         local b = (sortedVertices.bottomRight.y - sortedVertices.bottomLeft.y) / (sortedVertices.bottomRight.x - sortedVertices.bottomLeft.x)
         local a = sortedVertices.bottomRight.y - b * sortedVertices.bottomRight.x
@@ -175,15 +193,19 @@ local function _getIsPointWithin(sortedVertices, position)
     end
 
     if sortedVertices.bottomLeft.x == sortedVertices.topLeft.x then
-        print('infinite 4')
-        if (position[2] > (position[1] - sortedVertices.bottomLeft.x)) ~= (midPoint.y > (midPoint.x - sortedVertices.bottomLeft.x)) then return false end
+        if (position[1] < sortedVertices.bottomLeft.x) ~= (midPoint.x < sortedVertices.bottomLeft.x)
+        then return false end
     else
         local b = (sortedVertices.bottomLeft.y - sortedVertices.topLeft.y) / (sortedVertices.bottomLeft.x - sortedVertices.topLeft.x)
         local a = sortedVertices.bottomLeft.y - b * sortedVertices.bottomLeft.x
-        if (position[2] > (a + b * position[1])) ~= (midPoint.y > (a + b * midPoint.x)) then return false end
+        if (position[2] < (a + b * position[1])) ~= (midPoint.y < (a + b * midPoint.x)) then return false end
     end
 
     return true
+end
+
+helper.testGetIsPointWithin = function(vertices, position)
+    return _getIsPointWithin(_getVerticesSortedClockwise(vertices), position)
 end
 
 helper.getNearestEdgeId = function(transf)
@@ -475,7 +497,7 @@ helper.getNearestEdgeId = function(transf)
         -- print('got the lots')
         for _, value in pairs(lotList.lots) do
             -- print('trying')
-            if _getIsPointWithin(_getVerticesSorted(value.vertices), position) then
+            if _getIsPointWithin(_getVerticesSortedClockwise(value.vertices), position) then
                 result = entity
                 return
             end
