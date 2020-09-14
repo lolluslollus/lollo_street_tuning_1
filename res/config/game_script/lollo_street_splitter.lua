@@ -1,4 +1,3 @@
-local arrayUtils = require('lollo_street_tuning.arrayUtils')
 local edgeUtils = require('lollo_street_tuning.edgeHelper')
 local streetUtils = require('lollo_street_tuning.streetUtils')
 local stringUtils = require('lollo_street_tuning/stringUtils')
@@ -96,44 +95,6 @@ local function _getToggledAllTramTracksStreetTypeFileName(streetFileName)
     end
 
     return nil
-end
-
-local function _replaceEdgeDestroyingBuildings(oldEdge)
-    -- LOLLO NOTE this thing destroys all buildings along the edges that it replaces.
-    local proposal = api.type.SimpleProposal.new()
-
-    local newEdge = api.type.SegmentAndEntity.new()
-    newEdge.entity = -1
-    newEdge.comp.node0 = oldEdge.node0
-    newEdge.comp.node1 = oldEdge.node1
-    newEdge.comp.tangent0 = api.type.Vec3f.new(oldEdge.node0tangent[1], oldEdge.node0tangent[2], oldEdge.node0tangent[3])
-    newEdge.comp.tangent1 = api.type.Vec3f.new(oldEdge.node1tangent[1], oldEdge.node1tangent[2], oldEdge.node1tangent[3])
-    newEdge.comp.type = 0
-    newEdge.comp.typeIndex = 0
-    -- edge0.comp.objects = {{ -1, 1 }} --
-    newEdge.type = 0
-    newEdge.streetEdge = api.type.BaseEdgeStreet.new()
-    newEdge.streetEdge.streetType = api.res.streetTypeRep.find(oldEdge.streetType)
-
-    proposal.streetProposal.edgesToAdd[1] = newEdge
-    proposal.streetProposal.edgesToRemove[1] = oldEdge.id
-
-    local context = api.type.Context:new()
-    context.checkTerrainAlignment = false
-    context.cleanupStreetGraph = true -- default is false, it seems to do nothing
-    context.gatherBuildings = false -- buildings are destroyed anyway
-    context.gatherFields = true
-    context.player = api.engine.util.getPlayer() -- buildings are destroyed anyway
-
-    local callback = function(res, success)
-        print('LOLLO street changer callback returned res = ')
-        debugPrint(res)
-        --for _, v in pairs(res.entities) do print(v) end
-        print(success)
-    end
-
-    local cmd = api.cmd.make.buildProposal(proposal, context, true) -- true means, ignore errors. Errors are not ignored tho: wrong proposals will be discarded
-    api.cmd.sendCommand(cmd, callback)
 end
 
 local function _replaceEdge(oldEdgeId)
@@ -295,7 +256,7 @@ end
 
 local function _getWhichEdgeGetsEdgeObjectAfterSplit(edgeObjPosition, node0pos, node1pos, nodeBetween)
     local result = {
-        assignToFirstEstimate = nil,
+        -- assignToFirstEstimate = nil,
         assignToSecondEstimate = nil,
     }
     -- print('LOLLO attempting to place edge object with position =')
@@ -309,29 +270,27 @@ local function _getWhichEdgeGetsEdgeObjectAfterSplit(edgeObjPosition, node0pos, 
     -- print('wholeEdge.node1pos =')
     -- debugPrint(node1pos)
     -- first estimator
-    local nodeBetween_Node0_Distance = edgeUtils.getVectorLength({
-        nodeBetween.position[1] - node0pos[1],
-        nodeBetween.position[2] - node0pos[2]
-    })
-    local nodeBetween_Node1_Distance = edgeUtils.getVectorLength({
-        nodeBetween.position[1] - node1pos[1],
-        nodeBetween.position[2] - node1pos[2]
-    })
-    local edgeObj_Node0_Distance = edgeUtils.getVectorLength({
-        edgeObjPosition[1] - node0pos[1],
-        edgeObjPosition[2] - node0pos[2]
-    })
-    local edgeObj_Node1_Distance = edgeUtils.getVectorLength({
-        edgeObjPosition[1] - node1pos[1],
-        edgeObjPosition[2] - node1pos[2]
-    })
-    if edgeObj_Node0_Distance < nodeBetween_Node0_Distance then
-        result.assignToFirstEstimate = 0
-        -- table.insert(edge0Objects, { edgeObj[1], edgeObj[2] })
-    elseif edgeObj_Node1_Distance < nodeBetween_Node1_Distance then
-        result.assignToFirstEstimate = 1
-        -- table.insert(edge1Objects, { edgeObj[1], edgeObj[2] })
-    end
+    -- local nodeBetween_Node0_Distance = edgeUtils.getVectorLength({
+    --     nodeBetween.position[1] - node0pos[1],
+    --     nodeBetween.position[2] - node0pos[2]
+    -- })
+    -- local nodeBetween_Node1_Distance = edgeUtils.getVectorLength({
+    --     nodeBetween.position[1] - node1pos[1],
+    --     nodeBetween.position[2] - node1pos[2]
+    -- })
+    -- local edgeObj_Node0_Distance = edgeUtils.getVectorLength({
+    --     edgeObjPosition[1] - node0pos[1],
+    --     edgeObjPosition[2] - node0pos[2]
+    -- })
+    -- local edgeObj_Node1_Distance = edgeUtils.getVectorLength({
+    --     edgeObjPosition[1] - node1pos[1],
+    --     edgeObjPosition[2] - node1pos[2]
+    -- })
+    -- if edgeObj_Node0_Distance < nodeBetween_Node0_Distance then
+    --     result.assignToFirstEstimate = 0
+    -- elseif edgeObj_Node1_Distance < nodeBetween_Node1_Distance then
+    --     result.assignToFirstEstimate = 1
+    -- end
 
     -- second estimator
     local edgeObjPosition_assignTo = nil
@@ -550,19 +509,37 @@ function data()
             if name == 'streetSplitterBuilt' then
                 -- do nothing
             elseif name == 'streetSplitterWithApiBuilt' then
-                -- local con = api.engine.getComponent(param.constructionEntityId, api.type.ComponentType.CONSTRUCTION)
-                -- print('con with api =')
-                -- debugPrint(con)
-                -- print('con.transf with api =')
-                -- debugPrint(con.transf)
+--[[                 local con = api.engine.getComponent(param.constructionEntityId, api.type.ComponentType.CONSTRUCTION)
+                print('con with api =')
+                debugPrint(con)
+                print('con.transf with api =')
+                debugPrint(con.transf)
+                print('con.transf[0] with api =')
+                debugPrint(con.transf[0]) -- returns nil
+                print('con.transf[1] with api =')
+                debugPrint(con.transf[1]) -- returns 1
+                print('con.transf[2] with api =')
+                debugPrint(con.transf[2]) -- returns 0
+                print('con.transf[3] with api =')
+                debugPrint(con.transf[3]) -- returns 0
+                print('con.transf[16] with api =')
+                debugPrint(con.transf[16]) -- returns 1
+                print('con.transf[17] with api =')
+                debugPrint(con.transf[17]) -- returns nil
+                print('con.transf:cols(0) with api =')
+                debugPrint(con.transf:cols(0)) -- returns { x = 1, y = 0, z = 0, w = 0, }
+                print('con.transf:cols(0)[1] with api =')
+                debugPrint(con.transf:cols(0)[1]) -- returns 1
                 -- print('con.transf.cols(0) with api =')
                 -- debugPrint(con.transf.cols(0)) -- dumps
+                -- print('con.transf.cols(0)[1] with api =')
+                -- debugPrint(con.transf.cols(0)[1]) -- dumps ]]
                 local splitterConstruction = game.interface.getEntity(param.constructionEntityId)
                 if type(splitterConstruction) == 'table' and type(splitterConstruction.transf) == 'table' then
                     local nearestEdgeId = edgeUtils.getNearestEdgeId(
                         splitterConstruction.transf
                     )
-                    -- print('nearestEdge =', nearestEdgeId or 'NIL')
+                    -- print('street splitter got nearestEdge =', nearestEdgeId or 'NIL')
                     if type(nearestEdgeId) == 'number' and nearestEdgeId >= 0 then
                         local baseEdge = api.engine.getComponent(nearestEdgeId, api.type.ComponentType.BASE_EDGE)
                         if baseEdge then

@@ -3,27 +3,27 @@ local quadrangleUtils = require('lollo_street_tuning.quadrangleUtils')
 local transfUtils = require('lollo_street_tuning.transfUtils')
 
 if math.atan2 == nil then
-	math.atan2 = function(dy, dx)
-		local result = 0
-		if dx == 0 then
-			result = math.pi * 0.5
-		else
-			result = math.atan(dy / dx)
-		end
+    math.atan2 = function(dy, dx)
+        local result = 0
+        if dx == 0 then
+            result = math.pi * 0.5
+        else
+            result = math.atan(dy / dx)
+        end
 
-		if dx > 0 then
-			return result
-		elseif dx < 0 and dy >= 0 then
-			return result + math.pi
-		elseif dx < 0 and dy < 0 then
-			return result - math.pi
-		elseif dy > 0 then
-			return result
-		elseif dy < 0 then
-			return - result
-		else return false
-		end
-	end
+        if dx > 0 then
+            return result
+        elseif dx < 0 and dy >= 0 then
+            return result + math.pi
+        elseif dx < 0 and dy < 0 then
+            return result - math.pi
+        elseif dy > 0 then
+            return result
+        elseif dy < 0 then
+            return - result
+        else return false
+        end
+    end
 end
 
 local helper = {}
@@ -50,14 +50,7 @@ helper.getNearbyEntities = function(transf)
 
     return results
 end
--- LOLLO TODO get rid of all game. dependencies
-local function sign(num1)
-    if type(num1) ~= 'number' then return nil end
-
-    if num1 == 0 then return 0 end
-    if num1 > 0 then return 1 end
-    return -1
-end
+-- LOLLO TODO try and get rid of all game. dependencies
 
 local function swap(num1, num2)
     local swapTemp = num1
@@ -65,629 +58,77 @@ local function swap(num1, num2)
     num2 = swapTemp
 end
 
+-- LOLLO TODO fix bridges and tunnels in the following
+-- LOLLO TODO see what happens with ultrathin paths and other streets that are not standard
 helper.getNearestEdgeId = function(transf)
     if type(transf) ~= 'table' then return nil end
 
-    local result = nil
-    local position = transfUtils.getVec123Transformed({0, 0, 0}, transf)
+    local _position = transfUtils.getVec123Transformed({0, 0, 0}, transf)
     local _searchRadius = 0.5
-    -- local box0 = api.type.Box3.new(api.type.Vec3f.new(-1136, -1580, 0), api.type.Vec3f.new(-1134, -1578, 100))
-    local box0 = api.type.Box3.new(
-        api.type.Vec3f.new(position[1] - _searchRadius, position[2] - _searchRadius, -9999),
-        api.type.Vec3f.new(position[1] + _searchRadius, position[2] + _searchRadius, 9999)
+    local _box0 = api.type.Box3.new(
+        api.type.Vec3f.new(_position[1] - _searchRadius, _position[2] - _searchRadius, -9999),
+        api.type.Vec3f.new(_position[1] + _searchRadius, _position[2] + _searchRadius, 9999)
     )
-    -- local callback0 = function(entity, buondingVolume) return entity end
+    -- LOLLO TODO if there is only one edge, always return it
+    local baseEdgeIds = {}
     local callback0 = function(entity, boundingVolume)
-        -- debugPrint(entity)
-        -- debugPrint(boundingVolume)
         -- print('callback0 found entity', entity)
-        if not(entity) or result then return end
+        -- print('boundingVolume =')
+        -- debugPrint(boundingVolume)
+        if not(entity) then return end
 
-        -- print('going on')
         if not(api.engine.getComponent(entity, api.type.ComponentType.BASE_EDGE)) then return end
-        -- this returns the usual edge data, like:
---[[         local sample = {
-            node0 = 27290,
-            node1 = 27291,
-            tangent0 = {
-              x = -85.331359863281,
-              y = -40.367069244385,
-              z = 5.1617665290833,
-            },
-            tangent1 = {
-              x = -85.331359863281,
-              y = -40.367069244385,
-              z = 5.1617660522461,
-            },
-            type = 0,
-            typeIndex = -1,
-            objects = { },
-          } ]]
-        -- api.engine.getComponent(entity, api.type.ComponentType.TRANSPORT_NETWORK)
-        -- this returns all the lanes as separate edges, the result looks like
---[[         local sample = {
-            nodes = {
-            },
-            edges = {
-              [1] = {
-                conns = {
-                  [1] = {
-                    new = nil,
-                    entity = 27290,
-                    index = 0,
-                  },
-                  [2] = {
-                    new = nil,
-                    entity = 27291,
-                    index = 0,
-                  },
-                },
-                geometry = {
-                  params = {
-                    pos = {
-                      x = -1131.1846923828,
-                      y = -1550.6062011719,
-                    },
-                    tangent = {
-                      x = -85.331359863281,
-                      y = -40.367069244385,
-                    },
-                    offset = 7,
-                  },
-                  tangent = {
-                    x = 5.1617665290833,
-                    y = 5.1617660522461,
-                  },
-                  height = {
-                    x = 19.267086029053,
-                    y = 24.428852081299,
-                  },
-                  length = 94.538864135742,
-                  width = 2,
-                },
-                transportModes = {
-                  [1] = 1,
-                  [2] = 1,
-                  [3] = 0,
-                  [4] = 0,
-                  [5] = 0,
-                  [6] = 0,
-                  [7] = 0,
-                  [8] = 0,
-                  [9] = 0,
-                  [10] = 0,
-                  [11] = 0,
-                  [12] = 0,
-                  [13] = 0,
-                  [14] = 0,
-                  [15] = 0,
-                  [16] = 0,
-                },
-                speedLimit = 0,
-                curveSpeedLimit = 0,
-                curSpeed = 0,
-                precedence = false,
-              },
-              [2] = {
-                conns = {
-                  [1] = {
-                    new = nil,
-                    entity = 27290,
-                    index = 2,
-                  },
-                  [2] = {
-                    new = nil,
-                    entity = 27291,
-                    index = 2,
-                  },
-                },
-                geometry = {
-                  params = {
-                    pos = {
-                      x = -1131.1846923828,
-                      y = -1550.6062011719,
-                    },
-                    tangent = {
-                      x = -85.331359863281,
-                      y = -40.367069244385,
-                    },
-                    offset = 3,
-                  },
-                  tangent = {
-                    x = 5.1617665290833,
-                    y = 5.1617660522461,
-                  },
-                  height = {
-                    x = 18.967086791992,
-                    y = 24.128852844238,
-                  },
-                  length = 94.538864135742,
-                  width = 6,
-                },
-                transportModes = {
-                  [1] = 0,
-                  [2] = 0,
-                  [3] = 1,
-                  [4] = 1,
-                  [5] = 1,
-                  [6] = 0,
-                  [7] = 0,
-                  [8] = 0,
-                  [9] = 0,
-                  [10] = 0,
-                  [11] = 0,
-                  [12] = 0,
-                  [13] = 0,
-                  [14] = 0,
-                  [15] = 0,
-                  [16] = 0,
-                },
-                speedLimit = 13.888889312744,
-                curveSpeedLimit = 160.00799560547,
-                curSpeed = 9.1666669845581,
-                precedence = false,
-              },
-              [3] = {
-                conns = {
-                  [1] = {
-                    new = nil,
-                    entity = 27290,
-                    index = 3,
-                  },
-                  [2] = {
-                    new = nil,
-                    entity = 27291,
-                    index = 3,
-                  },
-                },
-                geometry = {
-                  params = {
-                    pos = {
-                      x = -1131.1846923828,
-                      y = -1550.6062011719,
-                    },
-                    tangent = {
-                      x = -85.331359863281,
-                      y = -40.367069244385,
-                    },
-                    offset = -3,
-                  },
-                  tangent = {
-                    x = 5.1617665290833,
-                    y = 5.1617660522461,
-                  },
-                  height = {
-                    x = 18.967086791992,
-                    y = 24.128852844238,
-                  },
-                  length = 94.538856506348,
-                  width = 6,
-                },
-                transportModes = {
-                  [1] = 0,
-                  [2] = 0,
-                  [3] = 0,
-                  [4] = 1,
-                  [5] = 1,
-                  [6] = 1,
-                  [7] = 1,
-                  [8] = 0,
-                  [9] = 0,
-                  [10] = 0,
-                  [11] = 0,
-                  [12] = 0,
-                  [13] = 0,
-                  [14] = 0,
-                  [15] = 0,
-                  [16] = 0,
-                },
-                speedLimit = 13.888889312744,
-                curveSpeedLimit = 160.00799560547,
-                curSpeed = 9.1666669845581,
-                precedence = false,
-              },
-              [4] = {
-                conns = {
-                  [1] = {
-                    new = nil,
-                    entity = 27290,
-                    index = 1,
-                  },
-                  [2] = {
-                    new = nil,
-                    entity = 27291,
-                    index = 1,
-                  },
-                },
-                geometry = {
-                  params = {
-                    pos = {
-                      x = -1131.1846923828,
-                      y = -1550.6062011719,
-                    },
-                    tangent = {
-                      x = -85.331359863281,
-                      y = -40.367069244385,
-                    },
-                    offset = -7,
-                  },
-                  tangent = {
-                    x = 5.1617665290833,
-                    y = 5.1617660522461,
-                  },
-                  height = {
-                    x = 19.267086029053,
-                    y = 24.428852081299,
-                  },
-                  length = 94.538864135742,
-                  width = 2,
-                },
-                transportModes = {
-                  [1] = 1,
-                  [2] = 1,
-                  [3] = 0,
-                  [4] = 0,
-                  [5] = 0,
-                  [6] = 0,
-                  [7] = 0,
-                  [8] = 0,
-                  [9] = 0,
-                  [10] = 0,
-                  [11] = 0,
-                  [12] = 0,
-                  [13] = 0,
-                  [14] = 0,
-                  [15] = 0,
-                  [16] = 0,
-                },
-                speedLimit = 0,
-                curveSpeedLimit = 0,
-                curSpeed = 0,
-                precedence = false,
-              },
-            },
-          } ]]
-        -- print('about to get the lots')
-        local lotList = api.engine.getComponent(entity, api.type.ComponentType.LOT_LIST)
-        if not(lotList) or not(lotList.lots) then return end
+        -- print('the entity is a BASE_EDGE')
 
-        -- print('got the lots')
-        for _, value in pairs(lotList.lots) do
-            -- print('trying')
-            if quadrangleUtils.getIsPointWithin(quadrangleUtils.getVerticesSortedClockwise(value.vertices), position) then
-                result = entity
-                return
+        baseEdgeIds[#baseEdgeIds+1] = entity
+    end
+    api.engine.system.octreeSystem.findIntersectingEntities(_box0, callback0)
+
+    if #baseEdgeIds == 0 then
+        return nil
+    elseif #baseEdgeIds == 1 then
+        return baseEdgeIds[1]
+    else
+        -- choose one edge and return its id
+        for i = 1, #baseEdgeIds do
+            local baseEdge = api.engine.getComponent(baseEdgeIds[i], api.type.ComponentType.BASE_EDGE)
+            local baseEdgeStreet = api.engine.getComponent(baseEdgeIds[i], api.type.ComponentType.BASE_EDGE_STREET)
+            local node0 = api.engine.getComponent(baseEdge.node0, api.type.ComponentType.BASE_NODE)
+            local node1 = api.engine.getComponent(baseEdge.node1, api.type.ComponentType.BASE_NODE)
+            local streetTypeProperties = api.res.streetTypeRep.get(baseEdgeStreet.streetType)
+            local halfStreetWidth = (streetTypeProperties.streetWidth or 0) * 0.5 + (streetTypeProperties.sidewalkWidth or 0)
+            local alpha = math.atan2(node1.position.y - node0.position.y, node1.position.x - node0.position.x)
+            local xPlus = - math.sin(alpha) * halfStreetWidth
+            local yPlus = math.cos(alpha) * halfStreetWidth
+            local vertices = {
+                [1] = {
+                    x = node0.position.x - xPlus,
+                    y = node0.position.y - yPlus
+                },
+                [2] = {
+                    x = node0.position.x + xPlus,
+                    y = node0.position.y + yPlus
+                },
+                [3] = {
+                    x = node1.position.x + xPlus,
+                    y = node1.position.y + yPlus
+                },
+                [4] = {
+                    x = node1.position.x - xPlus,
+                    y = node1.position.y - yPlus
+                },
+            }
+            -- check if the _position falls within the quadrangle approximating the edge
+            -- LOLLO NOTE I could get a more accurate polygon (not necessarily a quadrangle!) getIsPointWithin
+            -- api.engine.getComponent(entity, api.type.ComponentType.LOT_LIST)
+            -- but it returns nothing with bridges and tunnels
+            if quadrangleUtils.getIsPointWithin(quadrangleUtils.getVerticesSortedClockwise(vertices), _position) then
+                return baseEdgeIds[i]
             end
         end
-        -- this returns the rectangles drawn over by the edge:
---[[         local sample = {
-        lots = {
-            [1] = {
-            vertices = {
-                [1] = {
-                x = -1133.7504882812,
-                y = -1545.1824951172,
-                },
-                [2] = {
-                x = -1128.6188964844,
-                y = -1556.0299072266,
-                },
-                [3] = {
-                x = -1219.0819091797,
-                y = -1585.5495605469,
-                },
-                [4] = {
-                x = -1213.9503173828,
-                y = -1596.3969726562,
-                },
-            },
-            texCoords = {
-                [1] = {
-                x = -1133.7504882812,
-                y = -1545.1824951172,
-                },
-                [2] = {
-                x = -1128.6188964844,
-                y = -1556.0299072266,
-                },
-                [3] = {
-                x = -1219.0819091797,
-                y = -1585.5495605469,
-                },
-                [4] = {
-                x = -1213.9503173828,
-                y = -1596.3969726562,
-                },
-            },
-            triangles = {
-                [1] = 0,
-                [2] = 2,
-                [3] = 1,
-                [4] = 3,
-                [5] = 1,
-                [6] = 2,
-            },
-            texKey = "street_fill.lua",
-            solid = false,
-            },
-            [2] = {
-            vertices = {
-                [1] = {
-                x = -1127.763671875,
-                y = -1557.837890625,
-                },
-                [2] = {
-                x = -1127.1223144531,
-                y = -1559.1938476562,
-                },
-                [3] = {
-                x = -1213.0950927734,
-                y = -1598.2049560547,
-                },
-                [4] = {
-                x = -1212.4537353516,
-                y = -1599.5609130859,
-                },
-            },
-            texCoords = {
-                [1] = {
-                x = 0,
-                y = 0,
-                },
-                [2] = {
-                x = 0,
-                y = 1,
-                },
-                [3] = {
-                x = 2.9543392658234,
-                y = 0,
-                },
-                [4] = {
-                x = 2.9543392658234,
-                y = 1,
-                },
-            },
-            triangles = {
-                [1] = 0,
-                [2] = 2,
-                [3] = 1,
-                [4] = 3,
-                [5] = 1,
-                [6] = 2,
-            },
-            texKey = "street_border.lua",
-            solid = false,
-            },
-            [3] = {
-            vertices = {
-                [1] = {
-                x = -1128.6188964844,
-                y = -1556.0299072266,
-                },
-                [2] = {
-                x = -1127.763671875,
-                y = -1557.837890625,
-                },
-                [3] = {
-                x = -1213.9503173828,
-                y = -1596.3969726562,
-                },
-                [4] = {
-                x = -1213.0950927734,
-                y = -1598.2049560547,
-                },
-            },
-            texCoords = {
-                [1] = {
-                x = 0,
-                y = 0,
-                },
-                [2] = {
-                x = 0,
-                y = 1,
-                },
-                [3] = {
-                x = 94.538856506348,
-                y = 0,
-                },
-                [4] = {
-                x = 94.538856506348,
-                y = 1,
-                },
-            },
-            triangles = {
-                [1] = 0,
-                [2] = 2,
-                [3] = 1,
-                [4] = 3,
-                [5] = 1,
-                [6] = 2,
-            },
-            texKey = "street_sidewalk_fill.lua",
-            solid = false,
-            },
-            [4] = {
-            vertices = {
-                [1] = {
-                x = -1219.9371337891,
-                y = -1583.7415771484,
-                },
-                [2] = {
-                x = -1220.5784912109,
-                y = -1582.3856201172,
-                },
-                [3] = {
-                x = -1134.6057128906,
-                y = -1543.3745117188,
-                },
-                [4] = {
-                x = -1135.2470703125,
-                y = -1542.0185546875,
-                },
-            },
-            texCoords = {
-                [1] = {
-                x = 0,
-                y = 0,
-                },
-                [2] = {
-                x = 0,
-                y = 1,
-                },
-                [3] = {
-                x = 2.9543392658234,
-                y = 0,
-                },
-                [4] = {
-                x = 2.9543392658234,
-                y = 1,
-                },
-            },
-            triangles = {
-                [1] = 0,
-                [2] = 2,
-                [3] = 1,
-                [4] = 3,
-                [5] = 1,
-                [6] = 2,
-            },
-            texKey = "street_border.lua",
-            solid = false,
-            },
-            [5] = {
-            vertices = {
-                [1] = {
-                x = -1219.0819091797,
-                y = -1585.5495605469,
-                },
-                [2] = {
-                x = -1219.9371337891,
-                y = -1583.7415771484,
-                },
-                [3] = {
-                x = -1133.7504882812,
-                y = -1545.1824951172,
-                },
-                [4] = {
-                x = -1134.6057128906,
-                y = -1543.3745117188,
-                },
-            },
-            texCoords = {
-                [1] = {
-                x = 0,
-                y = 0,
-                },
-                [2] = {
-                x = 0,
-                y = 1,
-                },
-                [3] = {
-                x = 94.538856506348,
-                y = 0,
-                },
-                [4] = {
-                x = 94.538856506348,
-                y = 1,
-                },
-            },
-            triangles = {
-                [1] = 0,
-                [2] = 2,
-                [3] = 1,
-                [4] = 3,
-                [5] = 1,
-                [6] = 2,
-            },
-            texKey = "street_sidewalk_fill.lua",
-            solid = false,
-            },
-            [6] = {
-            vertices = {
-                [1] = {
-                x = -1127.763671875,
-                y = -1557.837890625,
-                },
-                [2] = {
-                x = -1127.1221923828,
-                y = -1559.1938476562,
-                },
-                [3] = {
-                x = -1126.4077148438,
-                y = -1557.1964111328,
-                },
-                [4] = {
-                x = -1133.2497558594,
-                y = -1542.7330322266,
-                },
-                [5] = {
-                x = -1135.2471923828,
-                y = -1542.0185546875,
-                },
-                [6] = {
-                x = -1134.6057128906,
-                y = -1543.3745117188,
-                },
-            },
-            texCoords = {
-                [1] = {
-                x = 0,
-                y = 0,
-                },
-                [2] = {
-                x = -2.1213202476501,
-                y = 1,
-                },
-                [3] = {
-                x = 0,
-                y = 1,
-                },
-                [4] = {
-                x = 16.000089645386,
-                y = 1,
-                },
-                [5] = {
-                x = 18.121410369873,
-                y = 1,
-                },
-                [6] = {
-                x = 16.000089645386,
-                y = 0,
-                },
-            },
-            triangles = {
-                [1] = 0,
-                [2] = 1,
-                [3] = 2,
-                [4] = 0,
-                [5] = 2,
-                [6] = 3,
-                [7] = 0,
-                [8] = 3,
-                [9] = 5,
-                [10] = 5,
-                [11] = 3,
-                [12] = 4,
-            },
-            texKey = "street_border.lua",
-            solid = false,
-            },
-        },
-        } ]]
+        print('falling back')
+        return baseEdgeIds[1] -- fallback
     end
-    api.engine.system.octreeSystem.findIntersectingEntities(box0, callback0)
-    -- 27360
-    -- 27289
-
-    return result
-end
-
-helper.getXKey = function(x)
-    return tostring(x)
-end
-
-helper.getYKey = function(y)
-    return tostring(y)
 end
 
 helper.getNodeBetween = function(position0, tangent0, position1, tangent1, betweenPosition)
