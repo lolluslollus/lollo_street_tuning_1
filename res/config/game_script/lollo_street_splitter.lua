@@ -3,6 +3,8 @@ local streetUtils = require('lollo_street_tuning.streetUtils')
 local stringUtils = require('lollo_street_tuning/stringUtils')
 local transfUtilUG = require('transf')
 
+-- LOLLO TODO try and get rid of all game. dependencies
+
 local function _isBuildingOneOfMine(param, fileName)
     local toAdd =
         type(param) == 'table' and type(param.proposal) == 'userdata' and type(param.proposal.toAdd) == 'userdata' and
@@ -41,6 +43,40 @@ end
 
 local function _myErrorHandler(err)
     print('lollo street splitter ERROR: ', err)
+end
+
+local function _getObjectPositionOld(objectId)
+    if type(objectId) ~= 'number' or objectId < 0 then return nil end
+
+    local edgeObjEntity = game.interface.getEntity(objectId)
+    if type(edgeObjEntity) == 'table' then
+        return edgeObjEntity.position
+    end
+
+    return nil
+end
+
+local function _getObjectPosition(objectId)
+    if type(objectId) ~= 'number' or objectId < 0 then return nil end
+
+    local fatInstances = api.engine.getComponent(objectId, api.type.ComponentType.MODEL_INSTANCE_LIST).fatInstances
+    if not(fatInstances) or not(fatInstances[1]) then return nil end
+
+    local objectTransf = transfUtilUG.new(
+        fatInstances[1].transf:cols(0),
+        fatInstances[1].transf:cols(1),
+        fatInstances[1].transf:cols(2),
+        fatInstances[1].transf:cols(3)
+    )
+    -- print('fatInstances[1]', fatInstances[1] and true)
+    -- print('fatInstances[2]', fatInstances[2] and true) -- always nil
+    -- print('fatInstances[3]', fatInstances[3] and true) -- always nil
+
+    return {
+        [1] = objectTransf[13],
+        [2] = objectTransf[14],
+        [3] = objectTransf[15]
+    }
 end
 
 local function _getToggledAllTramTracksStreetTypeFileName(streetFileName)
@@ -433,12 +469,15 @@ local function _splitEdge(wholeEdgeId, position0, tangent0, position1, tangent1,
         local edge0Objects = {}
         local edge1Objects = {}
         for _, edgeObj in pairs(baseEdge.objects) do
-            -- api.engine.getComponent(edgeObj[1], api.type.ComponentType.BOUNDING_VOLUME) returns a bounding volume without transf
-            -- api.engine.getComponent(edgeObj[1], api.type.ComponentType.MODEL_INSTANCE_LIST) returns a transf that I cannot use
-            local edgeObjEntity = game.interface.getEntity(edgeObj[1])
-            if type(edgeObjEntity) == 'table' and type(edgeObjEntity.position) == 'table' then
+            -- print('edgeObjEntityId =', edgeObj[1])
+            -- local edgeObjPositionOld = _getObjectPositionOld(edgeObj[1])
+            local edgeObjPosition = _getObjectPosition(edgeObj[1])
+            -- print('edge object position: old and new way')
+            -- debugPrint(edgeObjPositionOld)
+            -- debugPrint(edgeObjPosition)
+            if type(edgeObjPosition) == 'table' then
                 local assignment = _getWhichEdgeGetsEdgeObjectAfterSplit(
-                    edgeObjEntity.position,
+                    edgeObjPosition,
                     {position0.x, position0.y, position0.z},
                     {position1.x, position1.y, position1.z},
                     nodeBetween
@@ -450,7 +489,7 @@ local function _splitEdge(wholeEdgeId, position0, tangent0, position1, tangent1,
                 elseif assignment.assignToSecondEstimate == 1 then
                     table.insert(edge1Objects, { edgeObj[1], edgeObj[2] })
                 else
-                    print('dont change anything and leave')
+                    -- print('don\'t change anything and leave')
                     -- don't change anything and leave
                     -- print('LOLLO error, assignment.assignToFirstEstimate =', assignment.assignToFirstEstimate)
                     -- print('LOLLO error, assignment.assignToSecondEstimate =', assignment.assignToSecondEstimate)
@@ -478,8 +517,8 @@ local function _splitEdge(wholeEdgeId, position0, tangent0, position1, tangent1,
         -- print('LOLLO street splitter callback returned res = ')
         -- debugPrint(res)
         --for _, v in pairs(res.entities) do print(v) end
-        print('LOLLO street splitter callback returned success = ')
-        print(success)
+        -- print('LOLLO street splitter callback returned success = ')
+        -- print(success)
     end
     -- the third param means, ignore errors. Errors are not ignored tho: wrong proposals will be discarded
     local cmd = api.cmd.make.buildProposal(proposal, context, false)
@@ -492,122 +531,110 @@ function data()
         end,
         handleEvent = function(src, id, name, param)
             if (id ~= '__lolloStreetSplitterEvent__') then return end
-            if type(param) ~= 'table' or type(param.constructionEntityId) ~= 'number' then return end
+            if type(param) ~= 'table' or type(param.constructionEntityId) ~= 'number' or param.constructionEntityId < 0 then return end
+
+            -- print('param.constructionEntityId =', param.constructionEntityId or 'NIL')
+            local constructionTransf = api.engine.getComponent(param.constructionEntityId, api.type.ComponentType.CONSTRUCTION).transf
+            constructionTransf = transfUtilUG.new(constructionTransf:cols(0), constructionTransf:cols(1), constructionTransf:cols(2), constructionTransf:cols(3))
+            -- print('type(constructionTransf) =', type(constructionTransf))
+            -- debugPrint(constructionTransf)
             if name == 'streetSplitterBuilt' then
-                -- do nothing
+            -- do nothing
             elseif name == 'streetSplitterWithApiBuilt' then
-                print('param.constructionEntityId =', param.constructionEntityId or 'NIL')
+                local nearestEdgeId = edgeUtils.getNearestEdgeId(constructionTransf)
+                -- print('street splitter got nearestEdge =', nearestEdgeId or 'NIL')
+                if type(nearestEdgeId) == 'number' and nearestEdgeId >= 0 then
+                    local baseEdge = api.engine.getComponent(nearestEdgeId, api.type.ComponentType.BASE_EDGE)
+                    if baseEdge then
+                        local node0 = api.engine.getComponent(baseEdge.node0, api.type.ComponentType.BASE_NODE)
+                        local node1 = api.engine.getComponent(baseEdge.node1, api.type.ComponentType.BASE_NODE)
+                        if node0 and node1 then
+                            local nodeBetween = edgeUtils.getNodeBetween(
+                                node0.position,
+                                baseEdge.tangent0,
+                                node1.position,
+                                baseEdge.tangent1,
+                                -- LOLLO NOTE position and transf are always very similar
+                                -- {
+                                --     splitterConstruction.transf[13],
+                                --     splitterConstruction.transf[14],
+                                --     splitterConstruction.transf[15],
+                                -- },
+                                {
+                                    x = constructionTransf[13],
+                                    y = constructionTransf[14],
+                                    z = constructionTransf[15],
+                                }
+                            )
 
-                if type(param.constructionEntityId) == 'number' and param.constructionEntityId >= 0 then
-                    local constructionTransf = api.engine.getComponent(param.constructionEntityId, api.type.ComponentType.CONSTRUCTION).transf
-                    constructionTransf = transfUtilUG.new(constructionTransf:cols(0), constructionTransf:cols(1), constructionTransf:cols(2), constructionTransf:cols(3))
-                    print('type(constructionTransf) =', type(constructionTransf))
-                    debugPrint(constructionTransf)
+                            -- print('node0 =')
+                            -- debugPrint(node0)
+                            -- print('baseEdge.tangent0 =')
+                            -- debugPrint(baseEdge.tangent0)
+                            -- print('node1 =')
+                            -- debugPrint(node1)
+                            -- print('baseEdge.tangent1 =')
+                            -- debugPrint(baseEdge.tangent1)
+                            -- print('splitterConstruction.transf =')
+                            -- debugPrint(constructionTransf)
+                            -- print('nodeBetween =')
+                            -- debugPrint(nodeBetween)
 
-                    local nearestEdgeId = edgeUtils.getNearestEdgeId(constructionTransf)
-                    -- print('street splitter got nearestEdge =', nearestEdgeId or 'NIL')
-                    if type(nearestEdgeId) == 'number' and nearestEdgeId >= 0 then
-                        local baseEdge = api.engine.getComponent(nearestEdgeId, api.type.ComponentType.BASE_EDGE)
-                        if baseEdge then
-                            local node0 = api.engine.getComponent(baseEdge.node0, api.type.ComponentType.BASE_NODE)
-                            local node1 = api.engine.getComponent(baseEdge.node1, api.type.ComponentType.BASE_NODE)
-                            if node0 and node1 then
-                                local nodeBetween = edgeUtils.getNodeBetween(
-                                    node0.position,
-                                    baseEdge.tangent0,
-                                    node1.position,
-                                    baseEdge.tangent1,
-                                    -- LOLLO NOTE position and transf are always very similar
-                                    -- {
-                                    --     splitterConstruction.transf[13],
-                                    --     splitterConstruction.transf[14],
-                                    --     splitterConstruction.transf[15],
-                                    -- },
-                                    {
-                                        x = constructionTransf[13],
-                                        y = constructionTransf[14],
-                                        z = constructionTransf[15],
-                                    }
-                                )
-                                
-                                print('node0 =')
-                                debugPrint(node0)
-                                print('baseEdge.tangent0 =')
-                                debugPrint(baseEdge.tangent0)
-                                print('node1 =')
-                                debugPrint(node1)
-                                print('baseEdge.tangent1 =')
-                                debugPrint(baseEdge.tangent1)
-                                print('splitterConstruction.transf =')
-                                debugPrint(constructionTransf)
-                                print('nodeBetween =')
-                                debugPrint(nodeBetween)
-
-                                _splitEdge(
-                                    nearestEdgeId,
-                                    node0.position,
-                                    baseEdge.tangent0,
-                                    node1.position,
-                                    baseEdge.tangent1,
-                                    nodeBetween
-                                )
-                            end
+                            _splitEdge(
+                                nearestEdgeId,
+                                node0.position,
+                                baseEdge.tangent0,
+                                node1.position,
+                                baseEdge.tangent1,
+                                nodeBetween
+                            )
                         end
                     end
                 end
             elseif name == 'streetChangerBuilt' then
-                local changerConstruction = game.interface.getEntity(param.constructionEntityId)
-                if type(changerConstruction) == 'table' and type(changerConstruction.transf) == 'table' then
-                    local nearestEdgeId = edgeUtils.getNearestEdgeId(
-                        changerConstruction.transf
-                    )
-                    -- print('nearestEdge =', nearestEdgeId or 'NIL')
-                    if nearestEdgeId then
-                        print('LOLLO nearestEdgeId = ', nearestEdgeId or 'NIL')
-                        _replaceEdge(nearestEdgeId)
-                    end
+                local nearestEdgeId = edgeUtils.getNearestEdgeId(
+                    constructionTransf
+                )
+                -- print('nearestEdge =', nearestEdgeId or 'NIL')
+                if type(nearestEdgeId) == 'number' and nearestEdgeId >= 0 then
+                    print('LOLLO nearestEdgeId = ', nearestEdgeId or 'NIL')
+                    _replaceEdge(nearestEdgeId)
                 end
             elseif name == 'toggleAllTracksBuilt' then
-                local myConstruction = game.interface.getEntity(param.constructionEntityId)
-                if type(myConstruction) == 'table' and type(myConstruction.transf) == 'table' then
-                    local nearestEdgeId = edgeUtils.getNearestEdgeId(
-                        myConstruction.transf
-                    )
-                    -- print('nearestEdgeId =', nearestEdgeId or 'NIL')
-                    if type(nearestEdgeId) == 'number' and nearestEdgeId >= 0 then
-                        local baseEdgeStreet = api.engine.getComponent(nearestEdgeId, api.type.ComponentType.BASE_EDGE_STREET)
-                        if baseEdgeStreet and baseEdgeStreet.streetType then
-                            local newStreetTypeFileName = _getToggledAllTramTracksStreetTypeFileName(
-                                api.res.streetTypeRep.getFileName(baseEdgeStreet.streetType)
+                local nearestEdgeId = edgeUtils.getNearestEdgeId(
+                    constructionTransf
+                )
+                -- print('nearestEdgeId =', nearestEdgeId or 'NIL')
+                if type(nearestEdgeId) == 'number' and nearestEdgeId >= 0 then
+                    local baseEdgeStreet = api.engine.getComponent(nearestEdgeId, api.type.ComponentType.BASE_EDGE_STREET)
+                    if baseEdgeStreet and baseEdgeStreet.streetType then
+                        local newStreetTypeFileName = _getToggledAllTramTracksStreetTypeFileName(
+                            api.res.streetTypeRep.getFileName(baseEdgeStreet.streetType)
+                        )
+                        -- print('newStreetTypeFileName =', newStreetTypeFileName or 'NIL')
+                        if newStreetTypeFileName then
+                            _replaceEdgeWithStreetType(
+                                nearestEdgeId,
+                                api.res.streetTypeRep.find(newStreetTypeFileName)
                             )
-                            -- print('newStreetTypeFileName =', newStreetTypeFileName or 'NIL')
-                            if newStreetTypeFileName then
-                                _replaceEdgeWithStreetType(
-                                    nearestEdgeId,
-                                    api.res.streetTypeRep.find(newStreetTypeFileName)
-                                )
-                            end
                         end
                     end
                 end
             elseif name == 'streetGetInfoBuilt' then
-                local getInfoConstruction = game.interface.getEntity(param.constructionEntityId)
-                if type(getInfoConstruction) == 'table' and type(getInfoConstruction.transf) == 'table' then
-                    local nearbyEntities = edgeUtils.getNearbyEntities(getInfoConstruction.transf)
-                    if type(nearbyEntities) == 'table' then
-                        print('LOLLO GET INFO found nearby entities = ')
-                        for _, entity in pairs(nearbyEntities) do
-                            debugPrint(entity)
-                            if entity.type == 'BASE_EDGE' and not(stringUtils.isNullOrEmptyString(entity.streetType)) then
-                                print('base edge component =')
-                                debugPrint(api.engine.getComponent(entity.id, api.type.ComponentType.BASE_EDGE))
-                                print('base edge street component =')
-                                debugPrint(api.engine.getComponent(entity.id, api.type.ComponentType.BASE_EDGE_STREET))
-                                print('street properties =')
-                                debugPrint(api.res.streetTypeRep.get(api.res.streetTypeRep.find(entity.streetType)))
-                            end
-                            debugPrint('--------')
+                local nearbyEntities = edgeUtils.getNearbyEntities(constructionTransf)
+                if type(nearbyEntities) == 'table' then
+                    print('LOLLO GET INFO found nearby entities = ')
+                    for _, entity in pairs(nearbyEntities) do
+                        debugPrint(entity)
+                        if entity.type == 'BASE_EDGE' and not(stringUtils.isNullOrEmptyString(entity.streetType)) then
+                            print('base edge component =')
+                            debugPrint(api.engine.getComponent(entity.id, api.type.ComponentType.BASE_EDGE))
+                            print('base edge street component =')
+                            debugPrint(api.engine.getComponent(entity.id, api.type.ComponentType.BASE_EDGE_STREET))
+                            print('street properties =')
+                            debugPrint(api.res.streetTypeRep.get(api.res.streetTypeRep.find(entity.streetType)))
                         end
+                        debugPrint('--------')
                     end
                 end
             end

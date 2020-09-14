@@ -50,7 +50,6 @@ helper.getNearbyEntities = function(transf)
 
     return results
 end
--- LOLLO TODO try and get rid of all game. dependencies
 
 local function swap(num1, num2)
     local swapTemp = num1
@@ -139,8 +138,7 @@ end
 
 helper.getNodeBetween = function(position0, tangent0, position1, tangent1, betweenPosition)
     if not(position0) or not(position1) or not(tangent0) or not(tangent1) then return nil end
--- LOLLO TODO when splitting sharp bends, the results are funny. Try with the hairpins.
-    -- print('AAAAAAAAAAAAAAAAAAA')
+
     local node01Distance = helper.getVectorLength({
         position1.x - position0.x,
         position1.y - position0.y,
@@ -148,6 +146,11 @@ helper.getNodeBetween = function(position0, tangent0, position1, tangent1, betwe
     })
     if node01Distance == 0 then return nil end
 
+    local node01DistanceXY = helper.getVectorLength({
+        position1.x - position0.x,
+        position1.y - position0.y,
+        0.0
+    })
     local x20Shift = type(betweenPosition) ~= 'table'
         and
             0.5
@@ -158,7 +161,7 @@ helper.getNodeBetween = function(position0, tangent0, position1, tangent1, betwe
                 -- betweenPosition.z - position0.z
                 -- 0.0
             }) / node01Distance)
-    print('x20Shift =', x20Shift or 'NIL')
+    -- print('x20Shift =', x20Shift or 'NIL')
     -- shift everything around betweenPosition to avoid large numbers being summed and subtracted
     local x0 = position0.x - betweenPosition.x
     local x1 = position1.x - betweenPosition.x
@@ -171,8 +174,10 @@ helper.getNodeBetween = function(position0, tangent0, position1, tangent1, betwe
     -- rotate the edges around the Z axis so that y0 = y1
     local zRotation = -math.atan2(y1 - y0, x1 - x0)
     local x0I = x0
-    local x1I = x0 + helper.getVectorLength({x1 - x0, y1 - y0, 0.0})
+    local x1I = x0 + node01DistanceXY
     local y0I = y0
+    local ypsilon0I = ypsilon0 + zRotation
+    local ypsilon1I = ypsilon1 + zRotation
     local z0I = z0
     local z1I = z1
 
@@ -185,9 +190,16 @@ helper.getNodeBetween = function(position0, tangent0, position1, tangent1, betwe
         }
     )
 
-    if not(invertedXMatrix) then return nil end -- if x0 == x1 the system cannot be solved TODO rotate or solve for y(x)
+    if not(invertedXMatrix) then return nil end -- if x0 == x1 the system cannot be solved, this is why I rotated it. If it still fails, reject.
 
-    local _maxTangent = 5 -- this is tricky
+    local _maxTangent = 3 -- node01DistanceXY * 0.3 -- 5 -- this is tricky. In edge cases, I will be approximating a U or a J with a polynom.
+    -- That means, the bottom tip of the U or the bottom tip of the J will be infinitely far away from its top.
+    -- This factor keeps the curve in shape, but it must have the right sign. Beyond that, I can reject or bodge.
+    -- Also, tangents have a discontinuity at +/- PI/2: bodging could get tricky
+    local tan0I = math.tan(ypsilon0I)
+    if math.abs(tan0I) > _maxTangent then return nil end
+    local tan1I = math.tan(ypsilon1I)
+    if math.abs(tan1I) > _maxTangent then return nil end
 
     -- Now I solve the system for y:
     -- a + b x0' + c x0'^2 + d x0'^3 = y0'
@@ -199,14 +211,8 @@ helper.getNodeBetween = function(position0, tangent0, position1, tangent1, betwe
         {
             {y0I},
             {y0I},
-            -- {math.tan(ypsilon0 + zRotation)}, -- {sin0I / cos0I}, -- risk of division by zero or high inaccuracy
-            (math.abs(math.tan(ypsilon0 + zRotation)) < _maxTangent)
-                and {math.tan(ypsilon0 + zRotation)}
-                or {_maxTangent * sign(math.tan(ypsilon0 + zRotation))}, -- TODO check: tangents have a discontinuity at +/- PI/2
-            -- {math.tan(ypsilon1 + zRotation)}, -- {sin1I / cos1I}, -- risk of division by zero or high inaccuracy
-            (math.abs(math.tan(ypsilon1 + zRotation)) < _maxTangent)
-                and {math.tan(ypsilon1 + zRotation)}
-                or {_maxTangent * sign(math.tan(ypsilon1 + zRotation))} -- TODO check: tangents have a discontinuity at +/- PI/2
+            {tan0I},
+            {tan1I}
         }
     )
     local aY = abcdY[1][1]
@@ -255,12 +261,9 @@ helper.getNodeBetween = function(position0, tangent0, position1, tangent1, betwe
             z2I + betweenPosition.z
         },
         tangent = {
-            math.cos(ypsilon2I - zRotation), -- * ro2,
-            math.sin(ypsilon2I - zRotation), -- * ro2,
-            -- math.sin(zeta2I) * math.cos(ypsilon2I - zRotation) / math.cos(zeta2I)
+            math.cos(ypsilon2I - zRotation),
+            math.sin(ypsilon2I - zRotation),
             math.sin(zeta2I)
-            -- math.sin(zeta2I) * math.cos(ypsilon2I - zRotation)
-            -- math.sin(zeta2I) * math.cos(- zRotation)
         }
     }
 
