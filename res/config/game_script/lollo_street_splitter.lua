@@ -480,16 +480,6 @@ local function _splitEdge(wholeEdgeId, position0, tangent0, position1, tangent1,
     local callback = function(res, success)
         -- print('LOLLO street splitter callback returned res = ')
         -- debugPrint(res)
-        if success == true
-        and res
-        and res.resultProposalData
-        and res.resultProposalData.tpNetLinkProposal
-        and res.resultProposalData.tpNetLinkProposal.toAdd
-        and #res.resultProposalData.tpNetLinkProposal.toAdd > 0 then
-            print('LOLLO new tpNetLinkProposals', #res.resultProposalData.tpNetLinkProposal.toAdd)
-            -- LOLLO TODO MAYBE undo
-            -- _spliceEdge(edge0, edge1)
-        end
         --for _, v in pairs(res.entities) do print(v) end
         -- print('LOLLO street splitter callback returned success = ')
         -- print(success)

@@ -58,8 +58,6 @@ local function swap(num1, num2)
     num2 = swapTemp
 end
 
--- LOLLO TODO fix bridges and tunnels in the following
--- LOLLO TODO see what happens with ultrathin paths and other streets that are not standard
 helper.getNearestEdgeId = function(transf)
     if type(transf) ~= 'table' then return nil end
 
@@ -69,7 +67,6 @@ helper.getNearestEdgeId = function(transf)
         api.type.Vec3f.new(_position[1] - _searchRadius, _position[2] - _searchRadius, -9999),
         api.type.Vec3f.new(_position[1] + _searchRadius, _position[2] + _searchRadius, 9999)
     )
-    -- LOLLO TODO if there is only one edge, always return it
     local baseEdgeIds = {}
     local callback0 = function(entity, boundingVolume)
         -- print('callback0 found entity', entity)
@@ -89,6 +86,7 @@ helper.getNearestEdgeId = function(transf)
     elseif #baseEdgeIds == 1 then
         return baseEdgeIds[1]
     else
+        -- print('multiple base edges found')
         -- choose one edge and return its id
         for i = 1, #baseEdgeIds do
             local baseEdge = api.engine.getComponent(baseEdgeIds[i], api.type.ComponentType.BASE_EDGE)
@@ -126,7 +124,7 @@ helper.getNearestEdgeId = function(transf)
                 return baseEdgeIds[i]
             end
         end
-        print('falling back')
+        -- print('falling back')
         return baseEdgeIds[1] -- fallback
     end
 end
