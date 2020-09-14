@@ -15,19 +15,6 @@ end
 -- sumneko lua assist
 local aaa = false or true
 
-local node0 = {
-    {0, 1000, 50},
-    {0, 1000, 100}
-}
-local node1 = {
-    {1000, 0, 100},
-    {1000, 0, 0}
-}
-local betweenPosition = {500, 500, 55}
-local nodeBetween1 = edgeUtils.getNodeBetween(node0, node1, betweenPosition)
-local nodeBetween2 = edgeUtils.getNodeBetween(node0, node1)
-local dummy = 'AAA'
-
 local fileName = 'LOLLO.lua'
 local targetLaneConfig = {0, 0, 0, 1}
 local function _getConfigToString(config)

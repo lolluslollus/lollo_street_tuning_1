@@ -129,9 +129,17 @@ helper.getNearestEdgeId = function(transf)
     end
 end
 
+local function sign(num1)
+    if type(num1) ~= 'number' then return nil end
+
+    if num1 == 0 then return 0 end
+    if num1 > 0 then return 1 end
+    return -1
+end
+
 helper.getNodeBetween = function(position0, tangent0, position1, tangent1, betweenPosition)
     if not(position0) or not(position1) or not(tangent0) or not(tangent1) then return nil end
-
+-- LOLLO TODO when splitting sharp bends, the results are funny. Try with the hairpins.
     -- print('AAAAAAAAAAAAAAAAAAA')
     local node01Distance = helper.getVectorLength({
         position1.x - position0.x,
@@ -144,22 +152,22 @@ helper.getNodeBetween = function(position0, tangent0, position1, tangent1, betwe
         and
             0.5
         or
-            helper.getVectorLength({
-                betweenPosition[1] - position0.x,
-                betweenPosition[2] - position0.y,
-                -- betweenPosition[3] - position0.z
+            (helper.getVectorLength({
+                betweenPosition.x - position0.x,
+                betweenPosition.y - position0.y,
+                -- betweenPosition.z - position0.z
                 -- 0.0
-            })
-            /
-            node01Distance
-    local x0 = position0.x
-    local x1 = position1.x
-    local y0 = position0.y
-    local y1 = position1.y
+            }) / node01Distance)
+    print('x20Shift =', x20Shift or 'NIL')
+    -- shift everything around betweenPosition to avoid large numbers being summed and subtracted
+    local x0 = position0.x - betweenPosition.x
+    local x1 = position1.x - betweenPosition.x
+    local y0 = position0.y - betweenPosition.y
+    local y1 = position1.y - betweenPosition.y
     local ypsilon0 = math.atan2(tangent0.y, tangent0.x)
     local ypsilon1 = math.atan2(tangent1.y, tangent1.x)
-    local z0 = position0.z
-    local z1 = position1.z
+    local z0 = position0.z - betweenPosition.z
+    local z1 = position1.z - betweenPosition.z
     -- rotate the edges around the Z axis so that y0 = y1
     local zRotation = -math.atan2(y1 - y0, x1 - x0)
     local x0I = x0
@@ -177,6 +185,10 @@ helper.getNodeBetween = function(position0, tangent0, position1, tangent1, betwe
         }
     )
 
+    if not(invertedXMatrix) then return nil end -- if x0 == x1 the system cannot be solved TODO rotate or solve for y(x)
+
+    local _maxTangent = 5 -- this is tricky
+
     -- Now I solve the system for y:
     -- a + b x0' + c x0'^2 + d x0'^3 = y0'
     -- a + b x1' + c x1'^2 + d x1'^3 = y0' .. y0' == y1' by construction
@@ -187,8 +199,14 @@ helper.getNodeBetween = function(position0, tangent0, position1, tangent1, betwe
         {
             {y0I},
             {y0I},
-            {math.tan(ypsilon0 + zRotation)}, -- {sin0I / cos0I}, -- risk of division by zero
-            {math.tan(ypsilon1 + zRotation)}, -- {sin1I / cos1I}, -- risk of division by zero
+            -- {math.tan(ypsilon0 + zRotation)}, -- {sin0I / cos0I}, -- risk of division by zero or high inaccuracy
+            (math.abs(math.tan(ypsilon0 + zRotation)) < _maxTangent)
+                and {math.tan(ypsilon0 + zRotation)}
+                or {_maxTangent * sign(math.tan(ypsilon0 + zRotation))}, -- TODO check: tangents have a discontinuity at +/- PI/2
+            -- {math.tan(ypsilon1 + zRotation)}, -- {sin1I / cos1I}, -- risk of division by zero or high inaccuracy
+            (math.abs(math.tan(ypsilon1 + zRotation)) < _maxTangent)
+                and {math.tan(ypsilon1 + zRotation)}
+                or {_maxTangent * sign(math.tan(ypsilon1 + zRotation))} -- TODO check: tangents have a discontinuity at +/- PI/2
         }
     )
     local aY = abcdY[1][1]
@@ -226,15 +244,15 @@ helper.getNodeBetween = function(position0, tangent0, position1, tangent1, betwe
     local DZOnDX2I = bZ + 2 * cZ * x2I + 3 * dZ * x2I * x2I
     local zeta2I = math.atan(DZOnDX2I)
 
-    -- Now I undo the rotation I did at the beginning
+    -- Now I undo the rotation and the traslation I did at the beginning
     local ro2 = helper.getVectorLength({x2I - x0I, y2I - y0I, 0.0})
     local alpha2I = math.atan2(y2I - y0I, x2I - x0I)
 
     local nodeBetween = {
         position = {
-            x0I + ro2 * math.cos(alpha2I - zRotation),
-            y0I + ro2 * math.sin(alpha2I - zRotation),
-            z2I
+            x0I + ro2 * math.cos(alpha2I - zRotation) + betweenPosition.x,
+            y0I + ro2 * math.sin(alpha2I - zRotation) + betweenPosition.y,
+            z2I + betweenPosition.z
         },
         tangent = {
             math.cos(ypsilon2I - zRotation), -- * ro2,

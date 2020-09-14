@@ -1,6 +1,7 @@
 local edgeUtils = require('lollo_street_tuning.edgeHelper')
 local streetUtils = require('lollo_street_tuning.streetUtils')
 local stringUtils = require('lollo_street_tuning/stringUtils')
+local transfUtilUG = require('transf')
 
 local function _isBuildingOneOfMine(param, fileName)
     local toAdd =
@@ -354,7 +355,6 @@ local function _getWhichEdgeGetsEdgeObjectAfterSplit(edgeObjPosition, node0pos, 
 end
 
 local function _splitEdge(wholeEdgeId, position0, tangent0, position1, tangent1, nodeBetween)
-    -- LOLLO TODO when splitting sharp bends, the results are funny
     if type(wholeEdgeId) ~= 'number' or wholeEdgeId < 0 or type(nodeBetween) ~= 'table' then return end
 
     local node0TangentLength = edgeUtils.getVectorLength({
@@ -380,13 +380,8 @@ local function _splitEdge(wholeEdgeId, position0, tangent0, position1, tangent1,
 
     local proposal = api.type.SimpleProposal.new()
 
-    -- LOLLO NOTE api.engine.getComponent gets more properties than game.interface.getEntity()
     local baseEdge = api.engine.getComponent(wholeEdgeId, api.type.ComponentType.BASE_EDGE)
     local baseEdgeStreet = api.engine.getComponent(wholeEdgeId, api.type.ComponentType.BASE_EDGE_STREET)
-    -- print('LOLLO baseEdge = ')
-    -- debugPrint(baseEdge)
-    -- print('LOLLO baseEdgeStreet = ')
-    -- debugPrint(baseEdgeStreet)
     local playerOwned = api.type.PlayerOwned.new()
     playerOwned.player = api.engine.util.getPlayer()
 
@@ -455,6 +450,7 @@ local function _splitEdge(wholeEdgeId, position0, tangent0, position1, tangent1,
                 elseif assignment.assignToSecondEstimate == 1 then
                     table.insert(edge1Objects, { edgeObj[1], edgeObj[2] })
                 else
+                    print('dont change anything and leave')
                     -- don't change anything and leave
                     -- print('LOLLO error, assignment.assignToFirstEstimate =', assignment.assignToFirstEstimate)
                     -- print('LOLLO error, assignment.assignToSecondEstimate =', assignment.assignToSecondEstimate)
@@ -482,8 +478,8 @@ local function _splitEdge(wholeEdgeId, position0, tangent0, position1, tangent1,
         -- print('LOLLO street splitter callback returned res = ')
         -- debugPrint(res)
         --for _, v in pairs(res.entities) do print(v) end
-        -- print('LOLLO street splitter callback returned success = ')
-        -- print(success)
+        print('LOLLO street splitter callback returned success = ')
+        print(success)
     end
     -- the third param means, ignore errors. Errors are not ignored tho: wrong proposals will be discarded
     local cmd = api.cmd.make.buildProposal(proposal, context, false)
@@ -500,36 +496,15 @@ function data()
             if name == 'streetSplitterBuilt' then
                 -- do nothing
             elseif name == 'streetSplitterWithApiBuilt' then
---[[                 local con = api.engine.getComponent(param.constructionEntityId, api.type.ComponentType.CONSTRUCTION)
-                print('con with api =')
-                debugPrint(con)
-                print('con.transf with api =')
-                debugPrint(con.transf)
-                print('con.transf[0] with api =')
-                debugPrint(con.transf[0]) -- returns nil
-                print('con.transf[1] with api =')
-                debugPrint(con.transf[1]) -- returns 1
-                print('con.transf[2] with api =')
-                debugPrint(con.transf[2]) -- returns 0
-                print('con.transf[3] with api =')
-                debugPrint(con.transf[3]) -- returns 0
-                print('con.transf[16] with api =')
-                debugPrint(con.transf[16]) -- returns 1
-                print('con.transf[17] with api =')
-                debugPrint(con.transf[17]) -- returns nil
-                print('con.transf:cols(0) with api =')
-                debugPrint(con.transf:cols(0)) -- returns { x = 1, y = 0, z = 0, w = 0, }
-                print('con.transf:cols(0)[1] with api =')
-                debugPrint(con.transf:cols(0)[1]) -- returns 1
-                -- print('con.transf.cols(0) with api =')
-                -- debugPrint(con.transf.cols(0)) -- dumps
-                -- print('con.transf.cols(0)[1] with api =')
-                -- debugPrint(con.transf.cols(0)[1]) -- dumps ]]
-                local splitterConstruction = game.interface.getEntity(param.constructionEntityId)
-                if type(splitterConstruction) == 'table' and type(splitterConstruction.transf) == 'table' then
-                    local nearestEdgeId = edgeUtils.getNearestEdgeId(
-                        splitterConstruction.transf
-                    )
+                print('param.constructionEntityId =', param.constructionEntityId or 'NIL')
+
+                if type(param.constructionEntityId) == 'number' and param.constructionEntityId >= 0 then
+                    local constructionTransf = api.engine.getComponent(param.constructionEntityId, api.type.ComponentType.CONSTRUCTION).transf
+                    constructionTransf = transfUtilUG.new(constructionTransf:cols(0), constructionTransf:cols(1), constructionTransf:cols(2), constructionTransf:cols(3))
+                    print('type(constructionTransf) =', type(constructionTransf))
+                    debugPrint(constructionTransf)
+
+                    local nearestEdgeId = edgeUtils.getNearestEdgeId(constructionTransf)
                     -- print('street splitter got nearestEdge =', nearestEdgeId or 'NIL')
                     if type(nearestEdgeId) == 'number' and nearestEdgeId >= 0 then
                         local baseEdge = api.engine.getComponent(nearestEdgeId, api.type.ComponentType.BASE_EDGE)
@@ -548,11 +523,25 @@ function data()
                                     --     splitterConstruction.transf[14],
                                     --     splitterConstruction.transf[15],
                                     -- },
-                                    splitterConstruction.position
+                                    {
+                                        x = constructionTransf[13],
+                                        y = constructionTransf[14],
+                                        z = constructionTransf[15],
+                                    }
                                 )
-
-                                -- print('nodeBetween =')
-                                -- debugPrint(nodeBetween)
+                                
+                                print('node0 =')
+                                debugPrint(node0)
+                                print('baseEdge.tangent0 =')
+                                debugPrint(baseEdge.tangent0)
+                                print('node1 =')
+                                debugPrint(node1)
+                                print('baseEdge.tangent1 =')
+                                debugPrint(baseEdge.tangent1)
+                                print('splitterConstruction.transf =')
+                                debugPrint(constructionTransf)
+                                print('nodeBetween =')
+                                debugPrint(nodeBetween)
 
                                 _splitEdge(
                                     nearestEdgeId,
