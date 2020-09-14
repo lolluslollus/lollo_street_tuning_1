@@ -196,6 +196,7 @@ helper.getNodeBetween = function(position0, tangent0, position1, tangent1, betwe
     -- That means, the bottom tip of the U or the bottom tip of the J will be infinitely far away from its top.
     -- This factor keeps the curve in shape, but it must have the right sign. Beyond that, I can reject or bodge.
     -- Also, tangents have a discontinuity at +/- PI/2: bodging could get tricky
+    -- AN idea could be: replace the equation with the large tangent with one based on the position the user clicked.
     local tan0I = math.tan(ypsilon0I)
     if math.abs(tan0I) > _maxTangent then return nil end
     local tan1I = math.tan(ypsilon1I)
