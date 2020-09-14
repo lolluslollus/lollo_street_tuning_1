@@ -42,13 +42,14 @@ end
 local function _getWidthFactor(streetHalfWidth)
     -- this is the fruit of trial and error. On 2020-06-25, the game does not allow really sharp curves.
     local result = 0.0
+    -- print('streetHalfWidth =', streetHalfWidth)
     if streetHalfWidth <= 2.01 then
         -- print('LOLLO very narrow')
         result = 1.60
     elseif streetHalfWidth <= 4.01 then
         -- print('LOLLO narrow')
         result = 1.32
-    elseif streetHalfWidth <= 4.51 then
+    elseif streetHalfWidth <= 6.01 then
         -- print('LOLLO medium')
         result = 1.30
     else
