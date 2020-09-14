@@ -115,6 +115,13 @@ helper.getNearestEdgeId = function(transf)
                     y = node1.position.y - yPlus
                 },
             }
+            -- LOLLO TODO delete the following when done testing
+            print('node0 =')
+            debugPrint(node0.position)
+            print('node1 =')
+            debugPrint(node1.position)
+            print('vertices =')
+            debugPrint(vertices)
             -- check if the _position falls within the quadrangle approximating the edge
             -- LOLLO NOTE I could get a more accurate polygon (not necessarily a quadrangle!) getIsPointWithin
             -- api.engine.getComponent(entity, api.type.ComponentType.LOT_LIST)
