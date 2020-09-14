@@ -98,7 +98,7 @@ local function _getToggledAllTramTracksStreetTypeFileName(streetFileName)
 end
 
 local function _replaceEdge(oldEdgeId)
-    -- LOLLO NOTE this replaces the street without destroying the buildings
+    -- this replaces the street without destroying the buildings
     if type(oldEdgeId) ~= 'number' or oldEdgeId < 0 then return end
 
 	local baseEdge = api.engine.getComponent(oldEdgeId, api.type.ComponentType.BASE_EDGE)
@@ -172,7 +172,7 @@ local function _replaceEdge(oldEdgeId)
 end
 
 local function _replaceEdgeWithStreetType(oldEdgeId, newStreetTypeId)
-    -- LOLLO NOTE this replaces the street without destroying the buildings
+    -- this replaces the street without destroying the buildings
     if type(oldEdgeId) ~= 'number' or oldEdgeId < 0
     or type(newStreetTypeId) ~= 'number' or newStreetTypeId < 0 then return end
 
@@ -354,6 +354,7 @@ local function _getWhichEdgeGetsEdgeObjectAfterSplit(edgeObjPosition, node0pos, 
 end
 
 local function _splitEdge(wholeEdgeId, position0, tangent0, position1, tangent1, nodeBetween)
+    -- LOLLO TODO when splitting sharp bends, the results are funny
     if type(wholeEdgeId) ~= 'number' or wholeEdgeId < 0 or type(nodeBetween) ~= 'table' then return end
 
     local node0TangentLength = edgeUtils.getVectorLength({
