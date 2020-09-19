@@ -149,7 +149,7 @@ local function _getSnapNodesLowX(params, isRightOfIsland)
 end
 
 helper.getStreetChunksParams = function()
-    local defaultStreetTypeIndex = arrayUtils.findIndex(streetUtils.getGlobalStreetData(), 'fileName', 'lollo_medium_1_way_1_lane_street.lua') - 1
+    local defaultStreetTypeIndex = arrayUtils.findIndex(streetUtils.getGlobalStreetData(), 'fileName', 'lollo_medium_1_way_1_lane_street_narrow_sidewalk.lua') - 1
     if defaultStreetTypeIndex < 0 then defaultStreetTypeIndex = 0 end
 -- print('LOLLO getting params for street chunk')
     return {
@@ -267,7 +267,7 @@ helper.getStreetChunksParams = function()
 end
 
 helper.getStreetHairpinParams = function()
-    local defaultStreetTypeIndex = arrayUtils.findIndex(streetUtils.getGlobalStreetData(), 'fileName', 'lollo_medium_1_way_1_lane_street.lua') - 1
+    local defaultStreetTypeIndex = arrayUtils.findIndex(streetUtils.getGlobalStreetData(), 'fileName', 'lollo_medium_1_way_1_lane_street_narrow_sidewalk.lua') - 1
     if defaultStreetTypeIndex < 0 then defaultStreetTypeIndex = 0 end
 -- print('LOLLO getting params for street hairpin')
     return {
