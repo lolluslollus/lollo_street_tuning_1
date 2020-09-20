@@ -398,6 +398,19 @@ helper.getIsStreetAllTramTracks = function(laneConfigs)
     return false
 end
 
+helper.getIsStreetWithOuterTram = function(laneConfigs)
+    local _isOneWay = helper.getIsStreetOneWay(laneConfigs)
+
+    for i = 2, #laneConfigs - 1 do
+        if helper.getIsOuterLane(laneConfigs, i, _isOneWay)
+        and (laneConfigs[i].transportModes[6] > 0 or laneConfigs[i].transportModes[7] > 0)
+        then
+            return true
+        end
+    end
+
+    return false
+end
 
 helper.getStreetCategories = function()
     return {

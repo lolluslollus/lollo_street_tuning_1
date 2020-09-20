@@ -229,7 +229,8 @@ local function _replaceEdgeWithStreetType(oldEdgeId, newStreetTypeId)
     local _newStreetProperties = api.res.streetTypeRep.get(newStreetTypeId)
     if not(_newStreetProperties) or not(_newStreetProperties.laneConfigs) then return end
 
-    if streetUtils.getIsStreetAllTramTracks(_newStreetProperties.laneConfigs) then
+    if streetUtils.getIsStreetAllTramTracks(_newStreetProperties.laneConfigs)
+    and streetUtils.getIsStreetWithOuterTram(_newStreetProperties.laneConfigs) then
         newEdge.streetEdge.tramTrackType = 2
     end
 	-- eo.streetEdge.streetType = api.res.streetTypeRep.find(streetEdgeEntity.streetType)
