@@ -624,6 +624,7 @@ function data()
             elseif name == 'streetGetInfoBuilt' then
                 local nearbyEntities = edgeUtils.getNearbyEntities(constructionTransf)
                 if type(nearbyEntities) == 'table' then
+                    debugPrint('<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<')
                     print('LOLLO GET INFO found nearby entities = ')
                     for _, entity in pairs(nearbyEntities) do
                         debugPrint('<<<<<<<<')
@@ -638,6 +639,7 @@ function data()
                         end
                         debugPrint('>>>>>>>>')
                     end
+                    debugPrint('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>')
                 end
             end
 
