@@ -140,6 +140,9 @@ local function _replaceEdge(oldEdgeId)
 
 	local baseEdge = api.engine.getComponent(oldEdgeId, api.type.ComponentType.BASE_EDGE)
     local baseEdgeStreet = api.engine.getComponent(oldEdgeId, api.type.ComponentType.BASE_EDGE_STREET)
+    -- save a crash when a modded road underwent a breaking change, so it has no baseEdgeStreet
+    if baseEdge == nil or baseEdgeStreet == nil then return end
+
     local playerOwned = api.engine.getComponent(oldEdgeId, api.type.ComponentType.PLAYER_OWNED)
 
 	local newEdge = api.type.SegmentAndEntity.new()
@@ -214,7 +217,10 @@ local function _replaceEdgeWithStreetType(oldEdgeId, newStreetTypeId)
     or type(newStreetTypeId) ~= 'number' or newStreetTypeId < 0 then return end
 
 	local baseEdge = api.engine.getComponent(oldEdgeId, api.type.ComponentType.BASE_EDGE)
-	local baseEdgeStreet = api.engine.getComponent(oldEdgeId, api.type.ComponentType.BASE_EDGE_STREET)
+    local baseEdgeStreet = api.engine.getComponent(oldEdgeId, api.type.ComponentType.BASE_EDGE_STREET)
+    -- save a crash when a modded road underwent a breaking change, so it has no baseEdgeStreet
+    if baseEdge == nil or baseEdgeStreet == nil then return end
+
     local playerOwned = api.engine.getComponent(oldEdgeId, api.type.ComponentType.PLAYER_OWNED)
 
 	local newEdge = api.type.SegmentAndEntity.new()
@@ -419,6 +425,9 @@ local function _splitEdge(wholeEdgeId, position0, tangent0, position1, tangent1,
 
     local baseEdge = api.engine.getComponent(wholeEdgeId, api.type.ComponentType.BASE_EDGE)
     local baseEdgeStreet = api.engine.getComponent(wholeEdgeId, api.type.ComponentType.BASE_EDGE_STREET)
+    -- save a crash when a modded road underwent a breaking change, so it has no baseEdgeStreet
+    if baseEdge == nil or baseEdgeStreet == nil then return end
+
     local playerOwned = api.type.PlayerOwned.new()
     playerOwned.player = api.engine.util.getPlayer()
 
