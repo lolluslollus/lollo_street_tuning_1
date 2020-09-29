@@ -28,7 +28,7 @@ function data()
                 edgeLists = {},
                 models = {
                     {
-                        id = 'lollo_assets/mark.mdl',
+                        id = 'lollo_assets/icon/pointer.mdl',
                         collider = {
                             type = 'NONE'
                         },

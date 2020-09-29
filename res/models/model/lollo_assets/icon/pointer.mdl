@@ -20,11 +20,12 @@ function data()
                     children = {
                         {
                             materials = {'asset/icon/asset_icon_mark.mtl'},
-                            mesh = 'asset/icon/lod_0_icon_exclamation_mark.msh',
+                            -- mesh = 'asset/icon/lod_0_icon_exclamation_mark.msh',
+                            mesh = 'asset/icon/lod_0_icon_pointer.msh',
                             transf = {1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1}
                         },
                     },
-                    transf = {1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 5, 0, 0, 0, 0, 1}
+                    transf = {1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 2, 0, 0, 0, 0, 1}
                 },
                 static = false,
                 visibleFrom = 0,
