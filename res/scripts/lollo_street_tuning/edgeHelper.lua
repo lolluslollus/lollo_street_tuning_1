@@ -90,37 +90,39 @@ helper.getNearestEdgeId = function(transf)
         for i = 1, #baseEdgeIds do
             local baseEdge = api.engine.getComponent(baseEdgeIds[i], api.type.ComponentType.BASE_EDGE)
             local baseEdgeStreet = api.engine.getComponent(baseEdgeIds[i], api.type.ComponentType.BASE_EDGE_STREET)
-            local node0 = api.engine.getComponent(baseEdge.node0, api.type.ComponentType.BASE_NODE)
-            local node1 = api.engine.getComponent(baseEdge.node1, api.type.ComponentType.BASE_NODE)
-            local streetTypeProperties = api.res.streetTypeRep.get(baseEdgeStreet.streetType)
-            local halfStreetWidth = (streetTypeProperties.streetWidth or 0) * 0.5 + (streetTypeProperties.sidewalkWidth or 0)
-            local alpha = math.atan2(node1.position.y - node0.position.y, node1.position.x - node0.position.x)
-            local xPlus = - math.sin(alpha) * halfStreetWidth
-            local yPlus = math.cos(alpha) * halfStreetWidth
-            local vertices = {
-                [1] = {
-                    x = node0.position.x - xPlus,
-                    y = node0.position.y - yPlus
-                },
-                [2] = {
-                    x = node0.position.x + xPlus,
-                    y = node0.position.y + yPlus
-                },
-                [3] = {
-                    x = node1.position.x + xPlus,
-                    y = node1.position.y + yPlus
-                },
-                [4] = {
-                    x = node1.position.x - xPlus,
-                    y = node1.position.y - yPlus
-                },
-            }
-            -- check if the _position falls within the quadrangle approximating the edge
-            -- LOLLO NOTE I could get a more accurate polygon (not necessarily a quadrangle!) getIsPointWithin
-            -- api.engine.getComponent(entity, api.type.ComponentType.LOT_LIST)
-            -- but it returns nothing with bridges and tunnels
-            if quadrangleUtils.getIsPointWithin(quadrangleUtils.getVerticesSortedClockwise(vertices), _position) then
-                return baseEdgeIds[i]
+            if baseEdge ~= nil and baseEdgeStreet ~= nil then -- false when there is a modded road that underwent a breaking change
+                local node0 = api.engine.getComponent(baseEdge.node0, api.type.ComponentType.BASE_NODE)
+                local node1 = api.engine.getComponent(baseEdge.node1, api.type.ComponentType.BASE_NODE)
+                local streetTypeProperties = api.res.streetTypeRep.get(baseEdgeStreet.streetType)
+                local halfStreetWidth = (streetTypeProperties.streetWidth or 0) * 0.5 + (streetTypeProperties.sidewalkWidth or 0)
+                local alpha = math.atan2(node1.position.y - node0.position.y, node1.position.x - node0.position.x)
+                local xPlus = - math.sin(alpha) * halfStreetWidth
+                local yPlus = math.cos(alpha) * halfStreetWidth
+                local vertices = {
+                    [1] = {
+                        x = node0.position.x - xPlus,
+                        y = node0.position.y - yPlus
+                    },
+                    [2] = {
+                        x = node0.position.x + xPlus,
+                        y = node0.position.y + yPlus
+                    },
+                    [3] = {
+                        x = node1.position.x + xPlus,
+                        y = node1.position.y + yPlus
+                    },
+                    [4] = {
+                        x = node1.position.x - xPlus,
+                        y = node1.position.y - yPlus
+                    },
+                }
+                -- check if the _position falls within the quadrangle approximating the edge
+                -- LOLLO NOTE I could get a more accurate polygon (not necessarily a quadrangle!) getIsPointWithin
+                -- api.engine.getComponent(entity, api.type.ComponentType.LOT_LIST)
+                -- but it returns nothing with bridges and tunnels
+                if quadrangleUtils.getIsPointWithin(quadrangleUtils.getVerticesSortedClockwise(vertices), _position) then
+                    return baseEdgeIds[i]
+                end
             end
         end
         -- print('falling back')

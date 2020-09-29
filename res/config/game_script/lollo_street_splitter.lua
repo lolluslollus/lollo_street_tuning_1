@@ -626,6 +626,7 @@ function data()
                 if type(nearbyEntities) == 'table' then
                     print('LOLLO GET INFO found nearby entities = ')
                     for _, entity in pairs(nearbyEntities) do
+                        debugPrint('<<<<<<<<')
                         debugPrint(entity)
                         if entity.type == 'BASE_EDGE' and not(stringUtils.isNullOrEmptyString(entity.streetType)) then
                             print('base edge component =')
@@ -635,7 +636,7 @@ function data()
                             print('street properties =')
                             debugPrint(api.res.streetTypeRep.get(api.res.streetTypeRep.find(entity.streetType)))
                         end
-                        debugPrint('--------')
+                        debugPrint('>>>>>>>>')
                     end
                 end
             end
