@@ -1,12 +1,10 @@
 package.path = package.path .. ';res/scripts/?.lua'
 local arrayUtils = require('lollo_street_tuning.arrayUtils')
-local luadump = require('lollo_street_tuning.luadump')
 local matrixUtils = require('lollo_street_tuning.matrix')
 local transfUtils = require('lollo_street_tuning.transfUtils')
 local edgeUtils = require('lollo_street_tuning.edgeHelper')
 if debugPrint == nil then 
     debugPrint = function(sth)
-        luadump(true)(sth)
     end
 end
 -- actboy lua debugger

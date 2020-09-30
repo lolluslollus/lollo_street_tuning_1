@@ -1,4 +1,3 @@
--- local dump = require('lollo_street_tuning/luadump')
 local vec3 = require 'vec3'
 local transf = require 'transf'
 
@@ -24,7 +23,7 @@ function data()
         skipCollisionCheck = true,
         updateFn = function(params)
             -- print('lollo street changer updateFn')
-            -- dump(true)(params)
+            -- debugPrint(params)
 
             local result = {}
             result.colliders = {}

@@ -1,4 +1,3 @@
-local luadump = require('lollo_street_tuning/luadump')
 -- local laneutil = require('laneutil')
 local edgeUtils = require('lollo_street_tuning/edgeHelper')
 local pitchUtil = require('lollo_street_tuning/lolloPitchHelper')
@@ -949,7 +948,7 @@ local function updateFn_4_1_lane_narrow_sidewalk_to_4_lane(params)
             snapNodes = params.snapNodes == 0 and {} or (params.direction == 0 and {1} or {0})
         }
     }
--- luadump(true)(result)
+-- debugPrint(result)
     return result
 end
 
@@ -2255,7 +2254,7 @@ function data()
             --     3,
             --     false --linkable
             -- )
-            -- luadump(true)(lanes)
+            -- debugPrint(lanes)
 
             pitchUtil.adjustParamsPitch(params)
 

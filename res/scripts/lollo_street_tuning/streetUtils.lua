@@ -207,7 +207,7 @@ local function _getStreetFilesContents(streetDirPath, fileNamePrefix)
 
     -- LOLLO NOTE very useful to see what is going on
     -- print('LOLLO debug.getregistry() = ')
-    -- print(inspect(debug.getregistry()))
+    -- debugPrint(debug.getregistry())
 
     -- LOLLO NOTE you can save the global var in game or in _G
     -- print('LOLLO game.config = ')

@@ -1,9 +1,7 @@
 package.path = package.path .. ';res/scripts/?.lua'
-local luadump = require('lollo_street_tuning.luadump')
 local quadrangleUtils = require('lollo_street_tuning.quadrangleUtils')
 if debugPrint == nil then
     debugPrint = function(sth)
-        luadump(true)(sth)
     end
 end
 
