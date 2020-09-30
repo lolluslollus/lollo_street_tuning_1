@@ -292,7 +292,6 @@ function data()
                 local streetDataRecordFull = api.res.streetTypeRep.get(streetId)
                 if streetDataRecordFull ~= nil
                 and streetDataRecordFull.laneConfigs ~= nil
-                -- and #streetDataRecordFull.laneConfigs > 4
                 and #streetDataRecordFull.laneConfigs > 2 then
                     _addOneStreetWithOuterReservedLanes(
                         streetDataRecordFull,

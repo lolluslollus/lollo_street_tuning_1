@@ -540,7 +540,7 @@ function data()
         ini = function()
         end,
         handleEvent = function(src, id, name, param)
-            if (id ~= '__lolloStreetSplitterEvent__') then return end
+            if (id ~= '__lolloStreetTuningEvent__') then return end
             if type(param) ~= 'table' or type(param.constructionEntityId) ~= 'number' or param.constructionEntityId < 0 then return end
 
             -- print('param.constructionEntityId =', param.constructionEntityId or 'NIL')
@@ -656,61 +656,69 @@ function data()
         end,
         guiHandleEvent = function(id, name, param)
             -- LOLLO NOTE param can have different types, even boolean, depending on the event id and name
-            if id ~= 'constructionBuilder' then return end
-            if name ~= 'builder.apply' then return end
-            -- if name == "builder.proposalCreate" then return end
+            if id == 'constructionBuilder' and name == 'builder.apply' then
+                -- if name == "builder.proposalCreate" then return end
+                -- print('guiHandleEvent caught id = constructionBuilder and name = builder.apply')
+                xpcall(
+                    function()
+                        if not param.result or not param.result[1] then
+                            return
+                        end
 
-            xpcall(
-                function()
-                    if not param.result or not param.result[1] then
-                        return
-                    end
-
-                    -- game.interface.bulldoze(constructionEntity.id) -- cannot call it from this thread, so I raise and call it in the worker thread
-                    if _isBuildingStreetSplitter(param) then
-                        game.interface.sendScriptEvent(
-                            '__lolloStreetSplitterEvent__',
-                            'streetSplitterBuilt',
-                            {
-                                constructionEntityId = param.result[1]
-                            }
-                        )
-                    elseif _isBuildingStreetSplitterWithApi(param) then
-                        game.interface.sendScriptEvent(
-                            '__lolloStreetSplitterEvent__',
-                            'streetSplitterWithApiBuilt',
-                            {
-                                constructionEntityId = param.result[1]
-                            }
-                        )
-                    elseif _isBuildingStreetGetInfo(param) then
-                        game.interface.sendScriptEvent(
-                            '__lolloStreetSplitterEvent__',
-                            'streetGetInfoBuilt',
-                            {
-                                constructionEntityId = param.result[1]
-                            }
-                        )
-                    elseif _isBuildingStreetChanger(param) then
-                        game.interface.sendScriptEvent(
-                            '__lolloStreetSplitterEvent__',
-                            'streetChangerBuilt',
-                            {
-                                constructionEntityId = param.result[1]
-                            }
-                        )
-                    elseif _isBuildingToggleAllTracks(param) then
-                        game.interface.sendScriptEvent(
-                            '__lolloStreetSplitterEvent__',
-                            'toggleAllTracksBuilt',
-                            {
-                                constructionEntityId = param.result[1]
-                            }
-                        )
-                    end
-                end,
-                _myErrorHandler
-            )
+                        -- game.interface.bulldoze(constructionEntity.id) -- cannot call it from this thread, so I raise and call it in the worker thread
+                        if _isBuildingStreetSplitter(param) then
+                            game.interface.sendScriptEvent(
+                                '__lolloStreetTuningEvent__',
+                                'streetSplitterBuilt',
+                                {
+                                    constructionEntityId = param.result[1]
+                                }
+                            )
+                        elseif _isBuildingStreetSplitterWithApi(param) then
+                            game.interface.sendScriptEvent(
+                                '__lolloStreetTuningEvent__',
+                                'streetSplitterWithApiBuilt',
+                                {
+                                    constructionEntityId = param.result[1]
+                                }
+                            )
+                        elseif _isBuildingStreetGetInfo(param) then
+                            game.interface.sendScriptEvent(
+                                '__lolloStreetTuningEvent__',
+                                'streetGetInfoBuilt',
+                                {
+                                    constructionEntityId = param.result[1]
+                                }
+                            )
+                        elseif _isBuildingStreetChanger(param) then
+                            game.interface.sendScriptEvent(
+                                '__lolloStreetTuningEvent__',
+                                'streetChangerBuilt',
+                                {
+                                    constructionEntityId = param.result[1]
+                                }
+                            )
+                        elseif _isBuildingToggleAllTracks(param) then
+                            game.interface.sendScriptEvent(
+                                '__lolloStreetTuningEvent__',
+                                'toggleAllTracksBuilt',
+                                {
+                                    constructionEntityId = param.result[1]
+                                }
+                            )
+                        end
+                    end,
+                    _myErrorHandler
+                )
+            -- elseif id == 'streetBuilder' and name == 'builder.apply' then
+                -- print('guiHandleEvent caught id = streetBuilder and name = builder.apply')
+                -- print('param =')
+                -- debugPrint(param)
+            -- elseif id == 'streetTrackModifier' and name == 'builder.apply' then
+                -- print('guiHandleEvent caught id = streetTrackModifier and name = builder.apply')
+                -- print('param =')
+                -- debugPrint(param)
+            end
         end,
         update = function()
         end,
