@@ -211,7 +211,7 @@ function data()
         return isSuccess
     end
 
-    local function _addOneStreetWithOuterReservedLanes(oldStreet, fileName, targetTransportModes, descSuffix, categorySuffix)
+    local function _addOneStreetWithOuterReservedLanes(oldStreet, fileName, targetTransportModes, descSuffix, categorySuffix, extraAssets)
         local newStreet = api.type.StreetType.new()
 
         -- for key, value in pairs(streetData) do -- dumps
@@ -271,12 +271,15 @@ function data()
         -- meaning that it's on both sides if not one way, and only on one side depending on "busAndTramRight"
         -- newStreet.busAndTramRight = oldStreet.busAndTramRight or false
         newStreet.busAndTramRight = true
-        newStreet.materials = oldStreet.materials -- LOLLO TODO this is not accessible, so we must display the different lanes with some other system
+        newStreet.materials = oldStreet.materials -- LOLLO NOTE this is not accessible, so we must display the different lanes with some other system
         -- print('LOLLO materials = ')
         -- debugPrint(newStreet.materials)
         -- print('LOLLO materials.streetBorder = ')
         -- debugPrint(newStreet.materials.streetBorder) -- dumps
         newStreet.assets = oldStreet.assets
+        if extraAssets then
+            newStreet.assets:add(tostring(#newStreet.assets + 1), extraAssets['1'])
+        end
         newStreet.signalAssetName = oldStreet.signalAssetName
         newStreet.cost = oldStreet.cost or 0
         newStreet.catenary = oldStreet.catenary
@@ -314,7 +317,8 @@ function data()
                         streetDataRecordSmall.fileName,
                         _getTargetTransportModes4Bus(),
                         'bus right lane',
-                        streetUtils.getStreetCategorySuffixes().BUS_RIGHT
+                        streetUtils.getStreetCategorySuffixes().BUS_RIGHT,
+                        api.res.streetTypeRep.get(api.res.streetTypeRep.find('lollo_internal_only_bus_right.lua')).assets
                     )
                     -- _addOneStreetWithOuterReservedLanes( -- dumps
                     --     streetDataRecordFull,
@@ -342,7 +346,8 @@ function data()
                         streetDataRecordSmall.fileName,
                         _getTargetTransportModes4Tyres(),
                         'tyres right lane',
-                        streetUtils.getStreetCategorySuffixes().TYRES_RIGHT
+                        streetUtils.getStreetCategorySuffixes().TYRES_RIGHT,
+                        api.res.streetTypeRep.get(api.res.streetTypeRep.find('lollo_internal_only_tyres_right.lua')).assets
                     )
                 end
             end
