@@ -719,6 +719,12 @@ function data()
                 -- print('param =')
                 -- debugPrint(param)
             end
+            -- if (name == "select") then -- clicking a street won't select it
+            --     -- with this event, param is the selected item id
+            --     local entity = game.interface.getEntity(param)
+            --     print('selected entity =')
+            --     debugPrint(entity)
+            -- end
         end,
         update = function()
         end,

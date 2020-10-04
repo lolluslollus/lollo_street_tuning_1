@@ -236,6 +236,22 @@ function data()
         newStreet.streetWidth = oldStreet.streetWidth
         newStreet.sidewalkWidth = oldStreet.sidewalkWidth
         newStreet.sidewalkHeight = oldStreet.sidewalkHeight
+        -- LOLLO NOTE even so, the game won't allow placing a bus lane,
+        -- or building a street with "bus lane = keep",
+        -- if the rightmost lane is not enabled for buses.
+        -- if categorySuffix == streetUtils.getStreetCategorySuffixes().CARGO_RIGHT then
+        --     local newTransportModes = {}
+        --     for i = 1, #oldStreet.transportModesStreet do
+        --         if oldStreet.transportModesStreet[i] ~= api.type.enum.TransportMode.BUS then
+        --             newTransportModes[#newTransportModes+1] = oldStreet.transportModesStreet[i]
+        --         end
+        --     end
+        --     newStreet.transportModesStreet = newTransportModes
+        --     print('newStreet.transportModesStreet =')
+        --     debugPrint(newStreet.transportModesStreet)
+        -- else
+        --     newStreet.transportModesStreet = oldStreet.transportModesStreet
+        -- end
         newStreet.transportModesStreet = oldStreet.transportModesStreet
         newStreet.transportModesSidewalk = oldStreet.transportModesSidewalk
         newStreet.speed = oldStreet.speed
@@ -245,10 +261,10 @@ function data()
         newStreet.priority = oldStreet.priority
         newStreet.upgrade = oldStreet.upgrade -- false makes it visible in the construction menu
         newStreet.country = oldStreet.country or false
-        -- LOLLO NOTE this has no effect if cars are not allowed
+        -- LOLLO NOTE busAndTramRight has no effect if cars are not allowed
         -- the upgrade status (nothing to do with the flag above) may show false, but the lane is blocked for cars,
         -- as long as they have an alternative route, as usual
-        -- Message from Filippo:
+        -- Message from UG:
         -- At the moment, bus upgrades are enforced on the outermost lane (there, cars are forbidden), 
         -- and tram upgrades automatically appear on the outermost lane with the tool. 
         -- The "outermost" lane depends on the "busAndtramRight" only for one way streets, 
