@@ -129,7 +129,7 @@ function data()
             "PERSON", 1
             "CARGO", 2
             "CAR", 3 -- if set to 0, the bus lane will appear and attempt to prevent cars, never mind the upgrade state
-            "BUS", 4
+            "BUS", 4 -- if set to 0, the game will crash when building with "bus lane: keep" or adding a bus lane
             "TRUCK", 5
             "TRAM", 6 -- if set to 1, the tram track will appear and work, never mind the upgrade state
             "ELECTRIC_TRAM", 7 -- like above
@@ -160,18 +160,18 @@ function data()
         return {0, 0, 0, 1,  1, 0, 0, 0,  0, 0, 0, 0,  0, 0, 0, 0}
     end
 
-    local function _replaceOuterLanes(newStreet, targetTransportModes)
+    local function _tryReplaceOuterLanes(newStreet, targetTransportModes)
         -- print('LOLLO newStreet before change =')
         -- debugPrint(newStreet)
-        local success = false
-        local isOneWay = streetUtils.getIsStreetOneWay(newStreet.laneConfigs)
-        -- print('LOLLO isOneWay =', isOneWay)
+        local isSuccess = false
+        local _isOneWay = streetUtils.getIsStreetOneWay(newStreet.laneConfigs)
+        -- print('LOLLO _isOneWay =', _isOneWay)
         for index, oldLaneConfig in pairs(newStreet.laneConfigs) do
             local newLaneConfig = api.type.LaneConfig.new()
             newLaneConfig.speed = oldLaneConfig.speed
             newLaneConfig.width = oldLaneConfig.width
             newLaneConfig.height = oldLaneConfig.height
-            if isOneWay and index > 1 and index < #newStreet.laneConfigs then
+            if _isOneWay and index > 1 and index < #newStreet.laneConfigs then
                 -- invert one-way lanes so the bus lane and the tram track appear on the right
                 newLaneConfig.forward = true --false --not(oldLaneConfig.forward)
             else
@@ -179,7 +179,7 @@ function data()
             end
 
             -- change the transport modes of the rightmost lane
-            if streetUtils.getIsOuterLane(newStreet.laneConfigs, index, isOneWay) then
+            if streetUtils.getIsOuterLane(newStreet.laneConfigs, index, _isOneWay) then
                 local newTransportModes = arrayUtils.cloneOmittingFields(targetTransportModes)
                 -- do not allow a transport mode that is disallowed in the original street type
                 -- if oldLaneConfig.transportModes[api.type.enum.TransportMode.BUS + 1] == 0 then
@@ -199,7 +199,7 @@ function data()
                 -- end
 
                 newLaneConfig.transportModes = newTransportModes
-                success = true
+                isSuccess = true
             else
                 newLaneConfig.transportModes = oldLaneConfig.transportModes
             end
@@ -208,7 +208,7 @@ function data()
         end
         -- print('LOLLO newStreet after change =')
         -- debugPrint(newStreet)
-        return success
+        return isSuccess
     end
 
     local function _addOneStreetWithOuterReservedLanes(oldStreet, fileName, targetTransportModes, descSuffix, categorySuffix)
@@ -292,7 +292,7 @@ function data()
 
         newStreet.laneConfigs = oldStreet.laneConfigs
         -- print('LOLLO fileName=', fileName)
-        if _replaceOuterLanes(newStreet, targetTransportModes) == true then
+        if _tryReplaceOuterLanes(newStreet, targetTransportModes) == true then
             api.res.streetTypeRep.add(newStreet.type, newStreet, true)
             -- print('LOLLO added', newStreet.type)
             -- debugPrint(newStreet)

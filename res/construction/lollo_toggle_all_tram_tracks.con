@@ -7,7 +7,7 @@ function data()
         description = {
             name = _('Toggle tram tracks in every lane'),
             description = _(
-                'Plop this on a road to toggle tram tracks in every lane, on those roads that have enough lanes.'
+                'Plop this on a road to toggle tram tracks in every lane, on those roads that have enough lanes. The game will draw tracks in the outermost lanes, even if trams are barred there.'
             )
         },
         availability = {
