@@ -5,7 +5,7 @@ function data()
 				[b]This is a collection of tools to fine-tune the road vehicle routing and the streets.[/b]
 
 				[h1]Problem A: inflexible roads[/h1]
-				This mod adds a selection of streets with multiple lanes, to allow overtaking, but with the same width, so you can try different road types without destroying your buildings. Some road types reserve the right lane for passenger or cargo vehicles.
+				This mod adds a selection of streets with multiple lanes, to allow overtaking, but with the same width, so you can try different road types without destroying your buildings. Some road types reserve the right lane for passenger or cargo vehicles, they carry extra signs on the pavement.
 				Use the categories to select the right street type, for ease of navigation.
 				[h1]Problem B: little control destroying pieces of road[/h1]
 				This mod adds two slicers into the street construction menu. They split a piece of road in two segments.

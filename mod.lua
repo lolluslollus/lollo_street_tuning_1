@@ -332,7 +332,8 @@ function data()
                         streetDataRecordSmall.fileName,
                         _getTargetTransportModes4Person(),
                         'passengers right lane',
-                        streetUtils.getStreetCategorySuffixes().PERSON_RIGHT
+                        streetUtils.getStreetCategorySuffixes().PERSON_RIGHT,
+                        api.res.streetTypeRep.get(api.res.streetTypeRep.find('lollo_internal_only_passengers_right.lua')).assets
                     )
                     -- _addOneStreetWithOuterReservedLanes( -- dumps
                     --     streetDataRecordFull,

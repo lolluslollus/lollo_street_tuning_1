@@ -1,0 +1,43 @@
+function data()
+    return {
+        boundingInfo = {
+            bbMax = { -1.4722854757565e-007, -2.3199999332428, 2.5002937316895, },
+            bbMin = { -0.095000177621841, -2.6700000762939, -1.5, },
+        },
+        collider = {
+            params = { },
+            transf = { 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, },
+            type = "MESH",
+        },
+        lods = {
+            {
+                node = {
+                    children = {
+                        {
+                            materials = { "lollo_assets/only_passengers.mtl", },
+                            mesh = "asset/track_multi_p_tafel.msh",
+                            transf = { -1, 0, 0, 0, 0, -1, 0, 0, 0, 0, 1, 0, 0, -2.5, 0, 1, },
+                        },
+                    },
+                    transf = { 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, },
+                },
+                static = false,
+                visibleFrom = 0,
+                visibleTo = 260,
+            },
+        },
+        metadata = {
+            availability = {
+                yearFrom = 0,
+                yearTo = 0,
+            },
+            cost = {
+                price = 0,
+            },
+            description = {
+                name = _("Only passengers sign"),
+            },
+        },
+        version = 1,
+    }
+end
