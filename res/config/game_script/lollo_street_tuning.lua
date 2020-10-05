@@ -50,66 +50,34 @@ local function _isBuildingToggleAllTracks(param)
 end
 
 local function _getEdgeId(entity2tn, addedSegment)
-    -- these variables are all userdata but I can use pairs on entity2tn
+    -- these variables are all userdata but I can use pairs on entity2tn.
+    -- the game does not populate result here, so I have to go through this.
     if not(entity2tn) or not(addedSegment) or not(addedSegment.comp) then return nil end
 
-    for k, segment in pairs(entity2tn) do
-        -- the api calls them edges but they are actually lanes
+    for edgeId, segment in pairs(entity2tn) do
+        -- the api calls them edges but they are actually lanes, and the segments are actually edges.
         -- print('segment =')
         -- debugPrint(segment)
-        if segment.edges and segment.edges[1] and segment.edges[1].conns
-        and segment.edges[1].conns[1] and segment.edges[1].conns[2] then
-            local node0Id = segment.edges[1].conns[1].entity
-            local node1Id = segment.edges[1].conns[2].entity
-            -- print('node0Id =', node0Id)
-            -- print('node1Id =', node1Id)
-            if (node0Id == addedSegment.comp.node0 and node1Id == addedSegment.comp.node1)
-            or (node0Id == addedSegment.comp.node1 and node1Id == addedSegment.comp.node0) then
-                -- print('k =', k)
-                return k
+        -- if segment.edges and segment.edges[1] and segment.edges[1].conns
+        -- and segment.edges[1].conns[1] and segment.edges[1].conns[2] then
+        if segment and segment.edges then
+            for i = 1, #segment.edges do
+                local edge = segment.edges[i]
+                if edge and edge.conns and edge.conns[1] and edge.conns[2] then
+                    local node0Id = edge.conns[1].entity
+                    local node1Id = edge.conns[2].entity
+                    -- print('node0Id =', node0Id)
+                    -- print('node1Id =', node1Id)
+                    if (node0Id == addedSegment.comp.node0 and node1Id == addedSegment.comp.node1)
+                    or (node0Id == addedSegment.comp.node1 and node1Id == addedSegment.comp.node0) then
+                        -- print('k =', k)
+                        return edgeId
+                    end
+                end
             end
         end
     end
     return nil
-end
-
-local function _myErrorHandler(err)
-    print('lollo street tuning error caught: ', err)
-end
-
-local function _bulldozeConstruction(constructionId)
-    -- print('constructionId =', constructionId)
-    if type(constructionId) ~= 'number' or constructionId < 0 then return end
-
-    local oldConstruction = api.engine.getComponent(constructionId, api.type.ComponentType.CONSTRUCTION)
-    -- print('oldConstruction =')
-    -- debugPrint(oldConstruction)
-    if not(oldConstruction) or not(oldConstruction.params) then return end
-
-    local proposal = api.type.SimpleProposal.new()
-    -- LOLLO NOTE there are asymmetries how different tables are handled.
-    -- This one requires this system, UG says they will document it or amend it.
-    proposal.constructionsToRemove = { constructionId }
-    -- proposal.constructionsToRemove[1] = constructionId -- fails to add
-    -- proposal.constructionsToRemove:add(constructionId) -- fails to add
-
-    local callback = function(res, success)
-        -- print('LOLLO _bulldozeConstruction res = ')
-		-- debugPrint(res)
-        --for _, v in pairs(res.entities) do print(v) end
-        -- print('LOLLO _bulldozeConstruction success = ')
-        -- debugPrint(success)
-	end
-
-    local context = api.type.Context:new()
-    context.checkTerrainAlignment = false -- true gives smoother z, default is false
-    context.cleanupStreetGraph = false -- default is false
-    context.gatherBuildings = false -- default is false
-    context.gatherFields = true -- default is true
-    context.player = api.engine.util.getPlayer()
-
-	local cmd = api.cmd.make.buildProposal(proposal, context, true) -- the 3rd param is "ignore errors"
-	api.cmd.sendCommand(cmd, callback)
 end
 
 local function _getObjectPositionOld(objectId)
@@ -198,136 +166,6 @@ local function _getToggledAllTramTracksStreetTypeFileName(streetFileName)
     end
 
     return nil
-end
-
-local function _replaceEdge(oldEdgeId)
-    -- replaces a street segment with an identical one, without destroying the buildings
-    if type(oldEdgeId) ~= 'number' or oldEdgeId < 0 then return end
-
-	local oldEdge = api.engine.getComponent(oldEdgeId, api.type.ComponentType.BASE_EDGE)
-    local oldEdgeStreet = api.engine.getComponent(oldEdgeId, api.type.ComponentType.BASE_EDGE_STREET)
-    -- save a crash when a modded road underwent a breaking change, so it has no oldEdgeStreet
-    if oldEdge == nil or oldEdgeStreet == nil then return end
-
-    local playerOwned = api.engine.getComponent(oldEdgeId, api.type.ComponentType.PLAYER_OWNED)
-
-	local newEdge = api.type.SegmentAndEntity.new()
-	newEdge.entity = -1
-	newEdge.type = 0
-    newEdge.comp = oldEdge
-    -- newEdge.playerOwned = {player = api.engine.util.getPlayer()}
-    newEdge.playerOwned = playerOwned
-	newEdge.streetEdge = oldEdgeStreet
-	-- eo.streetEdge.streetType = api.res.streetTypeRep.find(streetEdgeEntity.streetType)
-
-    local proposal = api.type.SimpleProposal.new()
-	proposal.streetProposal.edgesToRemove[1] = oldEdgeId
-    proposal.streetProposal.edgesToAdd[1] = newEdge
-    --[[ local sampleNewEdge =
-    {
-      entity = -1,
-      comp = {
-        node0 = 13010,
-        node1 = 18753,
-        tangent0 = {
-          x = -32.318000793457,
-          y = 81.757850646973,
-          z = 3.0953373908997,
-        },
-        tangent1 = {
-          x = -34.457527160645,
-          y = 80.931526184082,
-          z = -1.0708819627762,
-        },
-        type = 0,
-        typeIndex = -1,
-        objects = { },
-      },
-      type = 0,
-      params = {
-        streetType = 23,
-        hasBus = false,
-        tramTrackType = 0,
-        precedenceNode0 = 2,
-        precedenceNode1 = 2,
-      },
-      playerOwned = nil,
-      streetEdge = {
-        streetType = 23,
-        hasBus = false,
-        tramTrackType = 0,
-        precedenceNode0 = 2,
-        precedenceNode1 = 2,
-      },
-      trackEdge = {
-        trackType = -1,
-        catenary = false,
-      },
-    } ]]
-
-    local callback = function(res, success)
-        -- print('LOLLO res = ')
-		-- debugPrint(res)
-        --for _, v in pairs(res.entities) do print(v) end
-        -- print('LOLLO success = ')
-		-- debugPrint(success)
-	end
-
-	local cmd = api.cmd.make.buildProposal(proposal, nil, false)
-	api.cmd.sendCommand(cmd, callback)
-end
-
-local function _replaceEdgeWithStreetType(oldEdgeId, newStreetTypeId)
-    -- replaces the street without destroying the buildings
-    if type(oldEdgeId) ~= 'number' or oldEdgeId < 0
-    or type(newStreetTypeId) ~= 'number' or newStreetTypeId < 0 then return end
-
-    local oldEdge = api.engine.getComponent(oldEdgeId, api.type.ComponentType.BASE_EDGE)
-    local oldEdgeStreet = api.engine.getComponent(oldEdgeId, api.type.ComponentType.BASE_EDGE_STREET)
-    -- save a crash when a modded road underwent a breaking change, so it has no oldEdgeStreet
-    if oldEdge == nil or oldEdgeStreet == nil then return end
-
-    local newEdge = api.type.SegmentAndEntity.new()
-	newEdge.entity = -1
-	newEdge.type = 0
-    newEdge.comp = oldEdge
-    -- newEdge.playerOwned = {player = api.engine.util.getPlayer()}
-    newEdge.playerOwned = api.engine.getComponent(oldEdgeId, api.type.ComponentType.PLAYER_OWNED)
-    newEdge.streetEdge = oldEdgeStreet
-    newEdge.streetEdge.streetType = newStreetTypeId
-    -- add / remove tram tracks upgrade if the new street type wants so
-    local _newStreetProperties = api.res.streetTypeRep.get(newStreetTypeId)
-    if not(_newStreetProperties) or not(_newStreetProperties.laneConfigs) then return end
-
-    local isOuterBus = streetUtils.getIsStreetWithOuterBus(_newStreetProperties.laneConfigs)
-    local isOuterTyres = streetUtils.getIsStreetWithOuterTyres(_newStreetProperties.laneConfigs)
-    if streetUtils.getIsStreetAllTramTracks(_newStreetProperties.laneConfigs)
-    and not(isOuterBus)
-    and not(isOuterTyres)
-    then
-        newEdge.streetEdge.tramTrackType = 2
-    elseif isOuterBus or isOuterTyres then
-        newEdge.streetEdge.tramTrackType = 0
-    end
-
-    -- leave if nothing changed
-    if newEdge.streetEdge.streetType == oldEdgeStreet.streetType
-    and newEdge.streetEdge.tramTrackType == oldEdgeStreet.tramTrackType then return end
-
-    local proposal = api.type.SimpleProposal.new()
-	proposal.streetProposal.edgesToRemove[1] = oldEdgeId
-    proposal.streetProposal.edgesToAdd[1] = newEdge
-
-    local callback = function(res, success)
-        -- print('LOLLO res = ')
-		-- debugPrint(res)
-        --for _, v in pairs(res.entities) do print(v) end
-        -- print('LOLLO _replaceEdgeWithStreetType success = ')
-		-- debugPrint(success)
-	end
-
-	local cmd = api.cmd.make.buildProposal(proposal, nil, false)
-	api.cmd.sendCommand(cmd, callback)
 end
 
 local function _getWhichEdgeGetsEdgeObjectAfterSplit(edgeObjPosition, node0pos, node1pos, nodeBetween)
@@ -429,7 +267,169 @@ local function _getWhichEdgeGetsEdgeObjectAfterSplit(edgeObjPosition, node0pos, 
     return result
 end
 
-local function _splitEdge(wholeEdgeId, position0, tangent0, position1, tangent1, nodeBetween)
+local function _myErrorHandler(err)
+    print('lollo street tuning error caught: ', err)
+end
+
+local _actions = {
+    bulldozeConstruction = function(constructionId)
+    -- print('constructionId =', constructionId)
+    if type(constructionId) ~= 'number' or constructionId < 0 then return end
+
+    local oldConstruction = api.engine.getComponent(constructionId, api.type.ComponentType.CONSTRUCTION)
+    -- print('oldConstruction =')
+    -- debugPrint(oldConstruction)
+    if not(oldConstruction) or not(oldConstruction.params) then return end
+
+    local proposal = api.type.SimpleProposal.new()
+    -- LOLLO NOTE there are asymmetries how different tables are handled.
+    -- This one requires this system, UG says they will document it or amend it.
+    proposal.constructionsToRemove = { constructionId }
+    -- proposal.constructionsToRemove[1] = constructionId -- fails to add
+    -- proposal.constructionsToRemove:add(constructionId) -- fails to add
+
+    local callback = function(res, success)
+        -- print('LOLLO _bulldozeConstruction res = ')
+		-- debugPrint(res)
+        --for _, v in pairs(res.entities) do print(v) end
+        -- print('LOLLO _bulldozeConstruction success = ')
+        -- debugPrint(success)
+	end
+
+    local context = api.type.Context:new()
+    context.checkTerrainAlignment = false -- true gives smoother z, default is false
+    context.cleanupStreetGraph = false -- default is false
+    context.gatherBuildings = false -- default is false
+    context.gatherFields = true -- default is true
+    context.player = api.engine.util.getPlayer()
+
+	local cmd = api.cmd.make.buildProposal(proposal, context, true) -- the 3rd param is "ignore errors"
+	api.cmd.sendCommand(cmd, callback)
+    end,
+
+    replaceEdge = function(oldEdgeId)
+    -- replaces a street segment with an identical one, without destroying the buildings
+    if type(oldEdgeId) ~= 'number' or oldEdgeId < 0 then return end
+
+	local oldEdge = api.engine.getComponent(oldEdgeId, api.type.ComponentType.BASE_EDGE)
+    local oldEdgeStreet = api.engine.getComponent(oldEdgeId, api.type.ComponentType.BASE_EDGE_STREET)
+    -- save a crash when a modded road underwent a breaking change, so it has no oldEdgeStreet
+    if oldEdge == nil or oldEdgeStreet == nil then return end
+
+    local playerOwned = api.engine.getComponent(oldEdgeId, api.type.ComponentType.PLAYER_OWNED)
+
+	local newEdge = api.type.SegmentAndEntity.new()
+	newEdge.entity = -1
+	newEdge.type = 0
+    newEdge.comp = oldEdge
+    -- newEdge.playerOwned = {player = api.engine.util.getPlayer()}
+    newEdge.playerOwned = playerOwned
+	newEdge.streetEdge = oldEdgeStreet
+	-- eo.streetEdge.streetType = api.res.streetTypeRep.find(streetEdgeEntity.streetType)
+
+    local proposal = api.type.SimpleProposal.new()
+	proposal.streetProposal.edgesToRemove[1] = oldEdgeId
+    proposal.streetProposal.edgesToAdd[1] = newEdge
+    --[[ local sampleNewEdge =
+    {
+      entity = -1,
+      comp = {
+        node0 = 13010,
+        node1 = 18753,
+        tangent0 = {
+          x = -32.318000793457,
+          y = 81.757850646973,
+          z = 3.0953373908997,
+        },
+        tangent1 = {
+          x = -34.457527160645,
+          y = 80.931526184082,
+          z = -1.0708819627762,
+        },
+        type = 0,
+        typeIndex = -1,
+        objects = { },
+      },
+      type = 0,
+      params = {
+        streetType = 23,
+        hasBus = false,
+        tramTrackType = 0,
+        precedenceNode0 = 2,
+        precedenceNode1 = 2,
+      },
+      playerOwned = nil,
+      streetEdge = {
+        streetType = 23,
+        hasBus = false,
+        tramTrackType = 0,
+        precedenceNode0 = 2,
+        precedenceNode1 = 2,
+      },
+      trackEdge = {
+        trackType = -1,
+        catenary = false,
+      },
+    } ]]
+
+    local callback = function(res, success)
+        -- print('LOLLO res = ')
+		-- debugPrint(res)
+        --for _, v in pairs(res.entities) do print(v) end
+        -- print('LOLLO success = ')
+		-- debugPrint(success)
+	end
+
+	local cmd = api.cmd.make.buildProposal(proposal, nil, false)
+	api.cmd.sendCommand(cmd, callback)
+    end,
+
+    replaceEdgeWithStreetType = function(oldEdgeId, newStreetTypeId)
+    -- replaces the street without destroying the buildings
+    if type(oldEdgeId) ~= 'number' or oldEdgeId < 0
+    or type(newStreetTypeId) ~= 'number' or newStreetTypeId < 0 then return end
+
+    local oldEdge = api.engine.getComponent(oldEdgeId, api.type.ComponentType.BASE_EDGE)
+    local oldEdgeStreet = api.engine.getComponent(oldEdgeId, api.type.ComponentType.BASE_EDGE_STREET)
+    -- save a crash when a modded road underwent a breaking change, so it has no oldEdgeStreet
+    if oldEdge == nil or oldEdgeStreet == nil then return end
+
+    local newEdge = api.type.SegmentAndEntity.new()
+	newEdge.entity = -1
+	newEdge.type = 0
+    newEdge.comp = oldEdge
+    -- newEdge.playerOwned = {player = api.engine.util.getPlayer()}
+    newEdge.playerOwned = api.engine.getComponent(oldEdgeId, api.type.ComponentType.PLAYER_OWNED)
+    newEdge.streetEdge = oldEdgeStreet
+    newEdge.streetEdge.streetType = newStreetTypeId
+    -- add / remove tram tracks upgrade if the new street type explicitly wants so
+    if streetUtils.transportModes.isTramRightBarred(newStreetTypeId) then
+        newEdge.streetEdge.tramTrackType = 0
+    elseif streetUtils.getIsStreetAllTramTracks((api.res.streetTypeRep.get(newStreetTypeId) or {}).laneConfigs) then
+        newEdge.streetEdge.tramTrackType = 2
+    end
+
+    -- leave if nothing changed
+    if newEdge.streetEdge.streetType == oldEdgeStreet.streetType
+    and newEdge.streetEdge.tramTrackType == oldEdgeStreet.tramTrackType then return end
+
+    local proposal = api.type.SimpleProposal.new()
+	proposal.streetProposal.edgesToRemove[1] = oldEdgeId
+    proposal.streetProposal.edgesToAdd[1] = newEdge
+
+    local callback = function(res, success)
+        -- print('LOLLO res = ')
+		-- debugPrint(res)
+        --for _, v in pairs(res.entities) do print(v) end
+        -- print('LOLLO _replaceEdgeWithStreetType success = ')
+		-- debugPrint(success)
+	end
+
+	local cmd = api.cmd.make.buildProposal(proposal, nil, false)
+	api.cmd.sendCommand(cmd, callback)
+    end,
+
+    splitEdge = function(wholeEdgeId, position0, tangent0, position1, tangent1, nodeBetween)
     if type(wholeEdgeId) ~= 'number' or wholeEdgeId < 0 or type(nodeBetween) ~= 'table' then return end
 
     local node0TangentLength = edgeUtils.getVectorLength({
@@ -565,7 +565,8 @@ local function _splitEdge(wholeEdgeId, position0, tangent0, position1, tangent1,
     -- the third param means, ignore errors. Errors are not ignored tho: wrong proposals will be discarded
     local cmd = api.cmd.make.buildProposal(proposal, context, false)
     api.cmd.sendCommand(cmd, callback)
-end
+    end,
+}
 
 function data()
     return {
@@ -617,7 +618,7 @@ function data()
                                 -- print('nodeBetween =')
                                 -- debugPrint(nodeBetween)
 
-                                _splitEdge(
+                                _actions.splitEdge(
                                     nearestEdgeId,
                                     node0.position,
                                     oldEdge.tangent0,
@@ -635,7 +636,7 @@ function data()
                     -- print('nearestEdge =', nearestEdgeId or 'NIL')
                     if type(nearestEdgeId) == 'number' and nearestEdgeId >= 0 then
                         -- print('LOLLO nearestEdgeId = ', nearestEdgeId or 'NIL')
-                        _replaceEdge(nearestEdgeId)
+                        _actions.replaceEdge(nearestEdgeId)
                     end
                 elseif name == _eventProperties.lollo_toggle_all_tram_tracks.eventName then
                     local nearestEdgeId = edgeUtils.getNearestEdgeId(
@@ -650,7 +651,7 @@ function data()
                             )
                             -- print('newStreetTypeFileName =', newStreetTypeFileName or 'NIL')
                             if newStreetTypeFileName then
-                                _replaceEdgeWithStreetType(
+                                _actions.replaceEdgeWithStreetType(
                                     nearestEdgeId,
                                     api.res.streetTypeRep.find(newStreetTypeFileName)
                                 )
@@ -680,14 +681,18 @@ function data()
                 end
 
                 -- game.interface.bulldoze(param.constructionEntityId)
-                _bulldozeConstruction(param.constructionEntityId)
+                _actions.bulldozeConstruction(param.constructionEntityId)
             elseif type(param.edgeId) == 'number' and param.edgeId >= 0 then
+                -- print('param.edgeId =', param.edgeId or 'NIL')
                 if name == _eventProperties.noTramRightRoadBuilt.eventName then
-                    _replaceEdgeWithStreetType(
+                    _actions.replaceEdgeWithStreetType(
                         param.edgeId,
                         param.streetTypeId
                     )
                 end
+            -- else
+            --     print('id =', id or 'NIL', 'name =', name or 'NIL', 'param =')
+            --     debugPrint(param)
             end
         end,
         guiHandleEvent = function(id, name, param)
@@ -800,20 +805,18 @@ function data()
                                 -- if not(removedSegment) or not(removedSegment.streetEdge)
                                 -- or removedSegment.streetEdge.streetType ~= addedSegment.streetEdge.streetType then
                                 --     print('TEN')
-                                    local newStreetProperties = api.res.streetTypeRep.get(addedSegment.streetEdge.streetType)
-                                    if newStreetProperties and newStreetProperties.laneConfigs then
-                                        if streetUtils.getIsStreetWithOuterBus(newStreetProperties.laneConfigs)
-                                        or streetUtils.getIsStreetWithOuterTyres(newStreetProperties.laneConfigs) then
-                                            game.interface.sendScriptEvent(
-                                                _eventId,
-                                                _eventProperties.noTramRightRoadBuilt.eventName,
-                                                {
-                                                    edgeId = _getEdgeId(param.data.entity2tn, addedSegment),
-                                                    streetTypeId = addedSegment.streetEdge.streetType
-                                                }
-                                            )
-                                        end
-                                    end
+                                if streetUtils.transportModes.isTramRightBarred(addedSegment.streetEdge.streetType) then
+                                    -- print('sending script event, param =')
+                                    -- debugPrint(param)
+                                    game.interface.sendScriptEvent(
+                                        _eventId,
+                                        _eventProperties.noTramRightRoadBuilt.eventName,
+                                        {
+                                            edgeId = _getEdgeId(param.data.entity2tn, addedSegment),
+                                            streetTypeId = addedSegment.streetEdge.streetType
+                                        }
+                                    )
+                                end
                                 -- end
                             end
                         end

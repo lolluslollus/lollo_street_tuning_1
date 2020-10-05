@@ -116,14 +116,6 @@ function data()
         api.res.constructionRep.add(newCon.fileName, newCon, true) -- fileName, resource, visible
     end
 
-    local function _getLaneConfigToString(config)
-        local result = ''
-        for _, value in pairs(config) do
-            result = result .. tostring(value)
-        end
-        return result
-    end
-
     --[[
             Transport modes:
             "PERSON", 1
@@ -199,7 +191,7 @@ function data()
         newStreet.name = oldStreet.name .. ' - ' .. descSuffix
         newStreet.desc = oldStreet.desc .. ' - ' .. descSuffix
         -- newStreet.fileName = 'lollo_large_4_lane_4_tram_tracks_street_2.lua' -- dumps
-        newStreet.type = string.sub(fileName, 1, string.len(fileName) - string.len('.lua')) .. '-' .. _getLaneConfigToString(targetTransportModes) .. '.lua'
+        newStreet.type = string.sub(fileName, 1, string.len(fileName) - string.len('.lua')) .. '-' .. streetUtils.transportModes.getLaneConfigToString(targetTransportModes) .. '.lua'
         newStreet.categories = oldStreet.categories
         local newCategories = {}
         for _, value in pairs(newStreet.categories) do
@@ -296,7 +288,7 @@ function data()
                     _addOneStreetWithOuterReservedLanes(
                         streetDataRecordFull,
                         streetDataRecordSmall.fileName,
-                        streetUtils.getTargetTransportModes4Bus(),
+                        streetUtils.transportModes.getTargetTransportModes4Bus(),
                         'bus right lane',
                         streetUtils.getStreetCategorySuffixes().BUS_RIGHT,
                         api.res.streetTypeRep.get(api.res.streetTypeRep.find('lollo_internal_only_bus_right.lua')).assets
@@ -304,14 +296,14 @@ function data()
                     -- _addOneStreetWithOuterReservedLanes( -- dumps
                     --     streetDataRecordFull,
                     --     streetDataRecordSmall.fileName,
-                    --     streetUtils.getTargetTransportModes4Cargo(),
+                    --     streetUtils.transportModes.getTargetTransportModes4Cargo(),
                     --     'cargo right lane',
                     --     streetUtils.getStreetCategorySuffixes().CARGO_RIGHT
                     -- )
                     _addOneStreetWithOuterReservedLanes(
                         streetDataRecordFull,
                         streetDataRecordSmall.fileName,
-                        streetUtils.getTargetTransportModes4Person(),
+                        streetUtils.transportModes.getTargetTransportModes4Person(),
                         'passengers right lane',
                         streetUtils.getStreetCategorySuffixes().PERSON_RIGHT,
                         api.res.streetTypeRep.get(api.res.streetTypeRep.find('lollo_internal_only_passengers_right.lua')).assets
@@ -319,14 +311,14 @@ function data()
                     -- _addOneStreetWithOuterReservedLanes( -- dumps
                     --     streetDataRecordFull,
                     --     streetDataRecordSmall.fileName,
-                    --     streetUtils.getTargetTransportModes4Tram(),
+                    --     streetUtils.transportModes.getTargetTransportModes4Tram(),
                     --     'tram right lane',
                     --     streetUtils.getStreetCategorySuffixes().TRAM_RIGHT
                     -- )
                     _addOneStreetWithOuterReservedLanes(
                         streetDataRecordFull,
                         streetDataRecordSmall.fileName,
-                        streetUtils.getTargetTransportModes4Tyres(),
+                        streetUtils.transportModes.getTargetTransportModes4Tyres(),
                         'tyres right lane',
                         streetUtils.getStreetCategorySuffixes().TYRES_RIGHT,
                         api.res.streetTypeRep.get(api.res.streetTypeRep.find('lollo_internal_only_tyres_right.lua')).assets
@@ -338,7 +330,7 @@ function data()
 
     return {
         info = {
-            minorVersion = 35,
+            minorVersion = 36,
             severityAdd = 'NONE',
             severityRemove = 'WARNING',
             name = _('_NAME'),
