@@ -27,7 +27,7 @@
                 offset = 6.0,
                 distance = 12.0,
                 prob = 1.0,
-                offsetOrth = 3.2,
+                offsetOrth = 0.2,
                 randRot = false,
                 oneSideOnly = false,
                 alignToElevation = true,
