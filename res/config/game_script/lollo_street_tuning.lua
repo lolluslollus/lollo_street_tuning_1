@@ -299,19 +299,16 @@ local function _replaceEdgeWithStreetType(oldEdgeId, newStreetTypeId)
     local _newStreetProperties = api.res.streetTypeRep.get(newStreetTypeId)
     if not(_newStreetProperties) or not(_newStreetProperties.laneConfigs) then return end
 
-    -- more conservative
+    local isOuterBus = streetUtils.getIsStreetWithOuterBus(_newStreetProperties.laneConfigs)
+    local isOuterTyres = streetUtils.getIsStreetWithOuterTyres(_newStreetProperties.laneConfigs)
     if streetUtils.getIsStreetAllTramTracks(_newStreetProperties.laneConfigs)
-    and streetUtils.getIsStreetWithOuterTram(_newStreetProperties.laneConfigs) then
+    and not(isOuterBus)
+    and not(isOuterTyres)
+    then
         newEdge.streetEdge.tramTrackType = 2
-    elseif not(streetUtils.getIsStreetWithOuterTram(_newStreetProperties.laneConfigs)) then
+    elseif isOuterBus or isOuterTyres then
         newEdge.streetEdge.tramTrackType = 0
     end
-    -- more invasive
-    -- if streetUtils.getIsStreetWithOuterTram(_newStreetProperties.laneConfigs) then
-    --     newEdge.streetEdge.tramTrackType = 2
-    -- else
-    --     newEdge.streetEdge.tramTrackType = 0
-    -- end
 
     -- leave if nothing changed
     if newEdge.streetEdge.streetType == oldEdgeStreet.streetType
@@ -805,7 +802,8 @@ function data()
                                 --     print('TEN')
                                     local newStreetProperties = api.res.streetTypeRep.get(addedSegment.streetEdge.streetType)
                                     if newStreetProperties and newStreetProperties.laneConfigs then
-                                        if not(streetUtils.getIsStreetWithOuterTram(newStreetProperties.laneConfigs)) then
+                                        if streetUtils.getIsStreetWithOuterBus(newStreetProperties.laneConfigs)
+                                        or streetUtils.getIsStreetWithOuterTyres(newStreetProperties.laneConfigs) then
                                             game.interface.sendScriptEvent(
                                                 _eventId,
                                                 _eventProperties.noTramRightRoadBuilt.eventName,

@@ -398,18 +398,64 @@ helper.getIsStreetAllTramTracks = function(laneConfigs)
     return false
 end
 
-helper.getIsStreetWithOuterTram = function(laneConfigs)
+local function _getSum(arr)
+    if not(arr) then return 0 end
+
+    local sum = 0
+    for i = 1, #arr do
+        sum = sum + arr[i]
+    end
+    return sum
+end
+
+helper.getIsStreetWithOuterBus = function(laneConfigs)
     local _isOneWay = helper.getIsStreetOneWay(laneConfigs)
 
     for i = 2, #laneConfigs - 1 do
         if helper.getIsOuterLane(laneConfigs, i, _isOneWay)
-        and (laneConfigs[i].transportModes[6] > 0 or laneConfigs[i].transportModes[7] > 0)
+        and laneConfigs[i].transportModes[4] > 0
+        and _getSum(laneConfigs[i].transportModes) == 1
         then
             return true
         end
     end
 
     return false
+end
+
+helper.getIsStreetWithOuterTyres = function(laneConfigs)
+    local _isOneWay = helper.getIsStreetOneWay(laneConfigs)
+
+    for i = 2, #laneConfigs - 1 do
+        if helper.getIsOuterLane(laneConfigs, i, _isOneWay)
+        and (laneConfigs[i].transportModes[4] > 0 or laneConfigs[i].transportModes[5] > 0)
+        and _getSum(laneConfigs[i].transportModes) == 2
+        then
+            return true
+        end
+    end
+
+    return false
+end
+
+helper.getTargetTransportModes4Bus = function()
+    return {0, 0, 0, 1,  0, 0, 0, 0,  0, 0, 0, 0,  0, 0, 0, 0}
+end
+
+helper.getTargetTransportModes4Cargo = function()
+    return {0, 0, 0, 0,  1, 0, 0, 0,  0, 0, 0, 0,  0, 0, 0, 0}
+end
+
+helper.getTargetTransportModes4Person = function()
+    return {0, 0, 0, 1,  0, 1, 1, 0,  0, 0, 0, 0,  0, 0, 0, 0}
+end
+
+helper.getTargetTransportModes4Tram = function()
+    return {0, 0, 0, 0,  0, 1, 1, 0,  0, 0, 0, 0,  0, 0, 0, 0}
+end
+
+helper.getTargetTransportModes4Tyres = function()
+    return {0, 0, 0, 1,  1, 0, 0, 0,  0, 0, 0, 0,  0, 0, 0, 0}
 end
 
 helper.getStreetCategories = function()

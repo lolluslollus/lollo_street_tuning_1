@@ -140,25 +140,6 @@ function data()
             "SMALL_AIRCRAFT", 12
             "SMALL_SHIP", 12
      ]]
-    local function _getTargetTransportModes4Bus()
-        return {0, 0, 0, 1,  0, 0, 0, 0,  0, 0, 0, 0,  0, 0, 0, 0}
-    end
-
-    local function _getTargetTransportModes4Cargo()
-        return {0, 0, 0, 0,  1, 0, 0, 0,  0, 0, 0, 0,  0, 0, 0, 0}
-    end
-
-    local function _getTargetTransportModes4Person()
-        return {0, 0, 0, 1,  0, 1, 1, 0,  0, 0, 0, 0,  0, 0, 0, 0}
-    end
-
-    local function _getTargetTransportModes4Tram()
-        return {0, 0, 0, 0,  0, 1, 1, 0,  0, 0, 0, 0,  0, 0, 0, 0}
-    end
-
-    local function _getTargetTransportModes4Tyres()
-        return {0, 0, 0, 1,  1, 0, 0, 0,  0, 0, 0, 0,  0, 0, 0, 0}
-    end
 
     local function _tryReplaceOuterLanes(newStreet, targetTransportModes)
         -- print('LOLLO newStreet before change =')
@@ -315,7 +296,7 @@ function data()
                     _addOneStreetWithOuterReservedLanes(
                         streetDataRecordFull,
                         streetDataRecordSmall.fileName,
-                        _getTargetTransportModes4Bus(),
+                        streetUtils.getTargetTransportModes4Bus(),
                         'bus right lane',
                         streetUtils.getStreetCategorySuffixes().BUS_RIGHT,
                         api.res.streetTypeRep.get(api.res.streetTypeRep.find('lollo_internal_only_bus_right.lua')).assets
@@ -323,14 +304,14 @@ function data()
                     -- _addOneStreetWithOuterReservedLanes( -- dumps
                     --     streetDataRecordFull,
                     --     streetDataRecordSmall.fileName,
-                    --     _getTargetTransportModes4Cargo(),
+                    --     streetUtils.getTargetTransportModes4Cargo(),
                     --     'cargo right lane',
                     --     streetUtils.getStreetCategorySuffixes().CARGO_RIGHT
                     -- )
                     _addOneStreetWithOuterReservedLanes(
                         streetDataRecordFull,
                         streetDataRecordSmall.fileName,
-                        _getTargetTransportModes4Person(),
+                        streetUtils.getTargetTransportModes4Person(),
                         'passengers right lane',
                         streetUtils.getStreetCategorySuffixes().PERSON_RIGHT,
                         api.res.streetTypeRep.get(api.res.streetTypeRep.find('lollo_internal_only_passengers_right.lua')).assets
@@ -338,14 +319,14 @@ function data()
                     -- _addOneStreetWithOuterReservedLanes( -- dumps
                     --     streetDataRecordFull,
                     --     streetDataRecordSmall.fileName,
-                    --     _getTargetTransportModes4Tram(),
+                    --     streetUtils.getTargetTransportModes4Tram(),
                     --     'tram right lane',
                     --     streetUtils.getStreetCategorySuffixes().TRAM_RIGHT
                     -- )
                     _addOneStreetWithOuterReservedLanes(
                         streetDataRecordFull,
                         streetDataRecordSmall.fileName,
-                        _getTargetTransportModes4Tyres(),
+                        streetUtils.getTargetTransportModes4Tyres(),
                         'tyres right lane',
                         streetUtils.getStreetCategorySuffixes().TYRES_RIGHT,
                         api.res.streetTypeRep.get(api.res.streetTypeRep.find('lollo_internal_only_tyres_right.lua')).assets
