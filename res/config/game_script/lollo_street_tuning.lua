@@ -540,12 +540,14 @@ local _actions = {
                 if assignment.assignToSecondEstimate == 0 then
                     table.insert(edge0Objects, { edgeObj[1], edgeObj[2] })
                     local stationGroupId = api.engine.system.stationGroupSystem.getStationGroup(edgeObj[1])
+                    -- LOLLO TODO do we really need this check?
                     if arrayUtils.arrayHasValue(edge1StationGroups, stationGroupId) then return end -- don't split station groups
                     if type(stationGroupId) == 'number' and stationGroupId > 0 then table.insert(edge0StationGroups, stationGroupId) end
                 -- elseif assignment.assignToFirstEstimate == 1 then
                 elseif assignment.assignToSecondEstimate == 1 then
                     table.insert(edge1Objects, { edgeObj[1], edgeObj[2] })
                     local stationGroupId = api.engine.system.stationGroupSystem.getStationGroup(edgeObj[1])
+                    -- LOLLO TODO do we really need this check?
                     if arrayUtils.arrayHasValue(edge0StationGroups, stationGroupId) then return end -- don't split station groups
                     if type(stationGroupId) == 'number' and stationGroupId > 0 then table.insert(edge1StationGroups, stationGroupId) end
                 else
