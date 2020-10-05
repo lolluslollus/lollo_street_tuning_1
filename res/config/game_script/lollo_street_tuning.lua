@@ -4,11 +4,11 @@ local streetUtils = require('lollo_street_tuning.streetUtils')
 local stringUtils = require('lollo_street_tuning/stringUtils')
 local transfUtilUG = require('transf')
 
--- LOLLO BUG when you split a road near a street station with two sides,
+-- LOLLO BUG when you split a road near a modded street station, whose mod was removed,
 -- and then apply a modifier, such as add / remove bus lane or change the street type,
 -- the game crashes.
--- This happens with modded stations, when their mods were removed:
--- you can tell because the game shows a placeholder at their location.
+-- This happens with single as well as double-sided stations.
+-- You can tell those stations because the game shows a placeholder at their location.
 -- This seems to be a UG problem.
 -- To solve the issue, replace those stations with some others available in your game.
 
