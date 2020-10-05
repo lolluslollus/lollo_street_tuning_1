@@ -518,8 +518,8 @@ local _actions = {
         newEdge1.streetEdge = oldEdgeStreet
 
         if type(oldEdge.objects) == 'table' then
-            local edge0StationGroups = {}
-            local edge1StationGroups = {}
+            -- local edge0StationGroups = {}
+            -- local edge1StationGroups = {}
             local edge0Objects = {}
             local edge1Objects = {}
             for _, edgeObj in pairs(oldEdge.objects) do
@@ -539,17 +539,17 @@ local _actions = {
                 -- if assignment.assignToFirstEstimate == 0 then
                 if assignment.assignToSecondEstimate == 0 then
                     table.insert(edge0Objects, { edgeObj[1], edgeObj[2] })
-                    local stationGroupId = api.engine.system.stationGroupSystem.getStationGroup(edgeObj[1])
-                    -- LOLLO TODO do we really need this check?
-                    if arrayUtils.arrayHasValue(edge1StationGroups, stationGroupId) then return end -- don't split station groups
-                    if type(stationGroupId) == 'number' and stationGroupId > 0 then table.insert(edge0StationGroups, stationGroupId) end
+                    -- local stationGroupId = api.engine.system.stationGroupSystem.getStationGroup(edgeObj[1])
+                    -- LOLLO TODO do we really need this check? Now we know that the crash happens with removed mod stations!
+                    -- if arrayUtils.arrayHasValue(edge1StationGroups, stationGroupId) then return end -- don't split station groups
+                    -- if type(stationGroupId) == 'number' and stationGroupId > 0 then table.insert(edge0StationGroups, stationGroupId) end
                 -- elseif assignment.assignToFirstEstimate == 1 then
                 elseif assignment.assignToSecondEstimate == 1 then
                     table.insert(edge1Objects, { edgeObj[1], edgeObj[2] })
-                    local stationGroupId = api.engine.system.stationGroupSystem.getStationGroup(edgeObj[1])
-                    -- LOLLO TODO do we really need this check?
-                    if arrayUtils.arrayHasValue(edge0StationGroups, stationGroupId) then return end -- don't split station groups
-                    if type(stationGroupId) == 'number' and stationGroupId > 0 then table.insert(edge1StationGroups, stationGroupId) end
+                    -- local stationGroupId = api.engine.system.stationGroupSystem.getStationGroup(edgeObj[1])
+                    -- LOLLO TODO do we really need this check? Now we know that the crash happens with removed mod stations!
+                    -- if arrayUtils.arrayHasValue(edge0StationGroups, stationGroupId) then return end -- don't split station groups
+                    -- if type(stationGroupId) == 'number' and stationGroupId > 0 then table.insert(edge1StationGroups, stationGroupId) end
                 else
                     -- print('don\'t change anything and leave')
                     -- print('LOLLO error, assignment.assignToFirstEstimate =', assignment.assignToFirstEstimate)

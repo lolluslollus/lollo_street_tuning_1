@@ -59,6 +59,12 @@ function data()
 				- restore the files to their previous state (ie from the latest update)
 				- reload the game and rebuild the roads you destroyed
 				Chances are, the new street merger will help you make them nicer anyway.
+				[h2]Known problems[/h2]
+				A) When you split a road near a modded street station, whose mod was removed, and then apply a modifier, such as add / remove bus lane or change the street type, the game crashes.
+				This happens with single as well as double-sided stations. You can tell those stations because the game shows a placeholder at their location.
+				This seems to be a UG problem. To solve it, replace those stations with some others available in your game.
+				B) The game always draws the tram track on the outer lane(s), even if trams are barred there. Take this as a graphical glitch.
+				C) The game always expects buses to be allowed in the outer lane(s)
 			]],
 			["_NAME"] = "Street fine tuning"
 		},
