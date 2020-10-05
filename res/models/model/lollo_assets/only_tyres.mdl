@@ -1,9 +1,9 @@
 function data()
     return {
         boundingInfo = {
-            bbMax = { -1.4722854757565e-007, -2.3199999332428, 2.5002937316895, },
-            bbMin = { -0.095000177621841, -2.6700000762939, -1.5, },
-        },
+            bbMax = { 3.2503168582916, 1.4219369888306, 3.2145841121674, },
+            bbMin = { -3.2676060199738, -1.2628409862518, 0, },
+        },    
         collider = {
             params = { },
             transf = { 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, },
@@ -15,15 +15,15 @@ function data()
                     children = {
                         {
                             materials = { "lollo_assets/only_tyres.mtl", },
-                            mesh = "asset/track_multi_p_tafel.msh",
-                            transf = { -1, 0, 0, 0, 0, -1, 0, 0, 0, 0, 1, 0, 0, -2.5, 0, 1, },
+                            mesh = "street/signal_waypoint_road/signal_waypoint_road_lod0.msh",
+                            transf = { -1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, -3.0, 0, 1, },
                         },
                     },
                     transf = { 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, },
                 },
                 static = false,
                 visibleFrom = 0,
-                visibleTo = 260,
+                visibleTo = 400,
             },
         },
         metadata = {
