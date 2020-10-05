@@ -1,7 +1,16 @@
+local arrayUtils = require('lollo_street_tuning.arrayUtils')
 local edgeUtils = require('lollo_street_tuning.edgeHelper')
 local streetUtils = require('lollo_street_tuning.streetUtils')
 local stringUtils = require('lollo_street_tuning/stringUtils')
 local transfUtilUG = require('transf')
+
+-- LOLLO BUG when you split a road near a street station with two sides,
+-- and then apply a modifier, such as add / remove bus lane or change the street type,
+-- the game crashes.
+-- This happens with modded stations, when their mods were removed:
+-- you can tell because the game shows a placeholder at their location.
+-- This seems to be a UG problem.
+-- To solve the issue, replace those stations with some others available in your game.
 
 local function _myErrorHandler(err)
     print('lollo street tuning error caught: ', err)
@@ -99,6 +108,7 @@ local _utils = {
     end,
 
     getObjectPosition = function(objectId)
+        -- print('getObjectPosition starting')
         if type(objectId) ~= 'number' or objectId < 0 then return nil end
 
         local modelInstanceList = api.engine.getComponent(objectId, api.type.ComponentType.MODEL_INSTANCE_LIST)
@@ -116,6 +126,8 @@ local _utils = {
         -- print('fatInstances[1]', fatInstances[1] and true)
         -- print('fatInstances[2]', fatInstances[2] and true) -- always nil
         -- print('fatInstances[3]', fatInstances[3] and true) -- always nil
+        -- print('objectTransf =')
+        -- debugPrint(objectTransf)
         return {
             [1] = objectTransf[13],
             [2] = objectTransf[14],
@@ -506,6 +518,8 @@ local _actions = {
         newEdge1.streetEdge = oldEdgeStreet
 
         if type(oldEdge.objects) == 'table' then
+            local edge0StationGroups = {}
+            local edge1StationGroups = {}
             local edge0Objects = {}
             local edge1Objects = {}
             for _, edgeObj in pairs(oldEdge.objects) do
@@ -525,9 +539,15 @@ local _actions = {
                 -- if assignment.assignToFirstEstimate == 0 then
                 if assignment.assignToSecondEstimate == 0 then
                     table.insert(edge0Objects, { edgeObj[1], edgeObj[2] })
+                    local stationGroupId = api.engine.system.stationGroupSystem.getStationGroup(edgeObj[1])
+                    if arrayUtils.arrayHasValue(edge1StationGroups, stationGroupId) then return end -- don't split station groups
+                    if type(stationGroupId) == 'number' and stationGroupId > 0 then table.insert(edge0StationGroups, stationGroupId) end
                 -- elseif assignment.assignToFirstEstimate == 1 then
                 elseif assignment.assignToSecondEstimate == 1 then
                     table.insert(edge1Objects, { edgeObj[1], edgeObj[2] })
+                    local stationGroupId = api.engine.system.stationGroupSystem.getStationGroup(edgeObj[1])
+                    if arrayUtils.arrayHasValue(edge0StationGroups, stationGroupId) then return end -- don't split station groups
+                    if type(stationGroupId) == 'number' and stationGroupId > 0 then table.insert(edge1StationGroups, stationGroupId) end
                 else
                     -- print('don\'t change anything and leave')
                     -- print('LOLLO error, assignment.assignToFirstEstimate =', assignment.assignToFirstEstimate)
@@ -790,6 +810,7 @@ function data()
                         or not(param.data) or not(param.data.entity2tn) then return end
 
                         local addedSegments = param.proposal.proposal.addedSegments
+                        local eventParams = {}
                         -- local removedSegments = param.proposal.proposal.removedSegments
                         for i = 1, #addedSegments do
                             local addedSegment = addedSegments[i]
@@ -805,17 +826,20 @@ function data()
                                 if streetUtils.transportModes.isTramRightBarred(addedSegment.streetEdge.streetType) then
                                     -- print('sending script event, param =')
                                     -- debugPrint(param)
-                                    game.interface.sendScriptEvent(
-                                        _eventId,
-                                        _eventProperties.noTramRightRoadBuilt.eventName,
-                                        {
-                                            edgeId = _utils.getEdgeId(param.data.entity2tn, addedSegment),
-                                            streetTypeId = addedSegment.streetEdge.streetType
-                                        }
-                                    )
+                                    eventParams[#eventParams+1] = {
+                                        edgeId = _utils.getEdgeId(param.data.entity2tn, addedSegment),
+                                        streetTypeId = addedSegment.streetEdge.streetType
+                                    }
                                 end
                                 -- end
                             end
+                        end
+                        for i = 1, #eventParams do
+                            game.interface.sendScriptEvent(
+                                _eventId,
+                                _eventProperties.noTramRightRoadBuilt.eventName,
+                                eventParams[i]
+                            )
                         end
                     end,
                     _myErrorHandler
