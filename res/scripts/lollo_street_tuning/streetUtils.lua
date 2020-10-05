@@ -398,49 +398,44 @@ helper.getIsStreetAllTramTracks = function(laneConfigs)
     return false
 end
 
-helper.transportModes = {}
-helper.transportModes.getTargetTransportModes4Bus = function()
-    return {0, 0, 0, 1,  0, 0, 0, 0,  0, 0, 0, 0,  0, 0, 0, 0}
-end
+helper.transportModes = {
+    getTargetTransportModes4Bus = function()
+        return {0, 0, 0, 1,  0, 0, 0, 0,  0, 0, 0, 0,  0, 0, 0, 0}
+    end,
+    getTargetTransportModes4Cargo = function()
+        return {0, 0, 0, 0,  1, 0, 0, 0,  0, 0, 0, 0,  0, 0, 0, 0}
+    end,
+    getTargetTransportModes4Person = function()
+        return {0, 0, 0, 1,  0, 1, 1, 0,  0, 0, 0, 0,  0, 0, 0, 0}
+    end,
+    getTargetTransportModes4Tram = function()
+        return {0, 0, 0, 0,  0, 1, 1, 0,  0, 0, 0, 0,  0, 0, 0, 0}
+    end,
+    getTargetTransportModes4Tyres = function()
+        return {0, 0, 0, 1,  1, 0, 0, 0,  0, 0, 0, 0,  0, 0, 0, 0}
+    end,
+    getLaneConfigToString = function(transportModes)
+        local result = ''
+        for _, value in pairs(transportModes) do
+            result = result .. tostring(value)
+        end
+        return result
+    end,
+    isTramRightBarred = function(streetTypeId)
+        -- are tram tracks in the outer lane explicitly barred?
+        if type(streetTypeId) ~= 'number' or streetTypeId < 0 then return false end
 
-helper.transportModes.getTargetTransportModes4Cargo = function()
-    return {0, 0, 0, 0,  1, 0, 0, 0,  0, 0, 0, 0,  0, 0, 0, 0}
-end
+        local fileName = api.res.streetTypeRep.getFileName(streetTypeId)
+        if type(fileName) ~= 'string' then return false end
 
-helper.transportModes.getTargetTransportModes4Person = function()
-    return {0, 0, 0, 1,  0, 1, 1, 0,  0, 0, 0, 0,  0, 0, 0, 0}
-end
+        if fileName:find(helper.transportModes.getLaneConfigToString(helper.transportModes.getTargetTransportModes4Bus()))
+        or fileName:find(helper.transportModes.getLaneConfigToString(helper.transportModes.getTargetTransportModes4Cargo()))
+        or fileName:find(helper.transportModes.getLaneConfigToString(helper.transportModes.getTargetTransportModes4Tyres()))
+        then return true end
 
-helper.transportModes.getTargetTransportModes4Tram = function()
-    return {0, 0, 0, 0,  0, 1, 1, 0,  0, 0, 0, 0,  0, 0, 0, 0}
-end
-
-helper.transportModes.getTargetTransportModes4Tyres = function()
-    return {0, 0, 0, 1,  1, 0, 0, 0,  0, 0, 0, 0,  0, 0, 0, 0}
-end
-
-helper.transportModes.getLaneConfigToString = function(transportModes)
-    local result = ''
-    for _, value in pairs(transportModes) do
-        result = result .. tostring(value)
-    end
-    return result
-end
-
-helper.transportModes.isTramRightBarred = function(streetTypeId)
-    -- are tram tracks in the outer lane explicitly barred?
-    if type(streetTypeId) ~= 'number' or streetTypeId < 0 then return false end
-
-    local fileName = api.res.streetTypeRep.getFileName(streetTypeId)
-    if type(fileName) ~= 'string' then return false end
-
-    if fileName:find(helper.transportModes.getLaneConfigToString(helper.transportModes.getTargetTransportModes4Bus()))
-    or fileName:find(helper.transportModes.getLaneConfigToString(helper.transportModes.getTargetTransportModes4Cargo()))
-    or fileName:find(helper.transportModes.getLaneConfigToString(helper.transportModes.getTargetTransportModes4Tyres()))
-    then return true end
-
-    return false
-end
+        return false
+    end,
+}
 
 helper.getStreetCategories = function()
     return {
