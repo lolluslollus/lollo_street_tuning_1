@@ -34,21 +34,25 @@ results.getStreetLods = function()
                     -- bevel the pavement outside
                     -- left
                     {
-                        --materials = {'station/road/streetstation/streetstation_perron_border.mtl', 'station/road/streetstation/streetstation_perron_base_new.mtl'},
-                        materials = {'street/new_medium_sidewalk_border_inner.mtl', 'street/new_medium_sidewalk.mtl'},
-                        mesh = 'station/road/streetstation/pedestrian_era_c/straight_spcl2_r_lod0.msh',
-                        -- mesh = "station/road/streetstation/pedestrian_era_c/corner_out_lod0.msh",
+                        materials = {
+                            'street/new_medium_sidewalk_border_inner.mtl',
+                            'street/new_medium_sidewalk.mtl',
+                            'street/new_medium_sidewalk_border_inner.mtl',
+                        },
+                        mesh = 'merge/straight_spcl_r_5_lod0.msh',
                         name = 'straight_spcl2_l',
-                        transf = {2, 0, 0, 0, 0, 2, 0, 0, 0, 0, 1, 0, -2.5, 10, 0, 1}
+                        transf = {1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, -2.5, 10, 0, 1}
                     },
                     -- right
                     {
-                        --materials = {'station/road/streetstation/streetstation_perron_border.mtl', 'station/road/streetstation/streetstation_perron_base_new.mtl'},
-                        materials = {'street/new_medium_sidewalk_border_inner.mtl', 'street/new_medium_sidewalk.mtl'},
-                        mesh = 'station/road/streetstation/pedestrian_era_c/straight_spcl2_r_lod0.msh',
-                        -- mesh = "station/road/streetstation/pedestrian_era_c/corner_out_lod0.msh",
+                        materials = {
+                            'street/new_medium_sidewalk_border_inner.mtl',
+                            'street/new_medium_sidewalk.mtl',
+                            'street/new_medium_sidewalk_border_inner.mtl',
+                        },
+                        mesh = 'merge/straight_spcl_r_5_lod0.msh',
                         name = 'straight_spcl2_l',
-                        transf = {2, 0, 0, 0, 0, -2, 0, 0, 0, 0, 1, 0, -2.5, -10, 0, 1}
+                        transf = {1, 0, 0, 0, 0, -1, 0, 0, 0, 0, 1, 0, -2.5, -10, 0, 1}
                     },
                     -- -- bevel the pavement inside
                     -- {
