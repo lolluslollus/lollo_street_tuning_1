@@ -132,23 +132,13 @@ results.getStreetLods = function()
                     -- straight bits
                     {
                         materials = {'street/new_medium_sidewalk_border_inner.mtl', 'street/new_medium_sidewalk.mtl'},
-                        mesh = 'station/road/streetstation/pedestrian_era_c/straight_lod0.msh',
-                        transf = {0.8, 0, 0, 0, 0, -0.8, 0, 0, 0, 0, 1, 0, 0, -16, 0, 1}
+                        mesh = 'merge/straight_4m_lod0.msh',
+                        transf = {1, 0, 0, 0, 0, -1, 0, 0, 0, 0, 1, 0, -2, -16, 0, 1}
                     },
                     {
                         materials = {'street/new_medium_sidewalk_border_inner.mtl', 'street/new_medium_sidewalk.mtl'},
-                        mesh = 'station/road/streetstation/pedestrian_era_c/straight_lod0.msh',
-                        transf = {0.8, 0, 0, 0, 0, -0.8, 0, 0, 0, 0, 1, 0, 0, -14, 0, 1}
-                    },
-                    {
-                        materials = {'street/new_medium_sidewalk_border_inner.mtl', 'street/new_medium_sidewalk.mtl'},
-                        mesh = 'station/road/streetstation/pedestrian_era_c/straight_lod0.msh',
-                        transf = {0.8, 0, 0, 0, 0, -0.8, 0, 0, 0, 0, 1, 0, 0, 12, 0, 1}
-                    },
-                    {
-                        materials = {'street/new_medium_sidewalk_border_inner.mtl', 'street/new_medium_sidewalk.mtl'},
-                        mesh = 'station/road/streetstation/pedestrian_era_c/straight_lod0.msh',
-                        transf = {0.8, 0, 0, 0, 0, -0.8, 0, 0, 0, 0, 1, 0, 0, 14, 0, 1}
+                        mesh = 'merge/straight_4m_lod0.msh',
+                        transf = {1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, -2, 16, 0, 1}
                     },
                     -- ground
                     -- {
