@@ -68,30 +68,30 @@
                 name = 'street/new_medium_bus.mtl',
                 size = {12, 2.7}
             },
-            crossingLane = {
-                name = 'street/new_medium_lane.mtl',
-                size = {4.0, 4.0}
-            },
-            crossingBus = {
-                name = ''
-            },
-            crossingTram = {
-                name = 'street/new_medium_tram_paving.mtl',
-                size = {2.0, 2.0}
-            },
-            crossingTramTrack = {
-                name = 'street/new_medium_tram_track.mtl',
-                size = {2.0, 2.0}
-            },
-            crossingCrosswalk = {
-                name = 'street/new_medium_crosswalk.mtl',
-                size = {3.0, 2.5}
-                -- size = { 2.5, 2.5 }
-            },
-            crossingStopline = {
-                name = 'street/new_medium_stopline.mtl',
-                size = {6.0, .5}
-            },
+            -- crossingLane = {
+            --     name = 'street/new_medium_lane.mtl',
+            --     size = {4.0, 4.0}
+            -- },
+            -- crossingBus = {
+            --     name = ''
+            -- },
+            -- crossingTram = {
+            --     name = 'street/new_medium_tram_paving.mtl',
+            --     size = {2.0, 2.0}
+            -- },
+            -- crossingTramTrack = {
+            --     name = 'street/new_medium_tram_track.mtl',
+            --     size = {2.0, 2.0}
+            -- },
+            -- crossingCrosswalk = {
+            --     name = 'street/new_medium_crosswalk.mtl',
+            --     size = {3.0, 2.5}
+            --     -- size = { 2.5, 2.5 }
+            -- },
+            -- crossingStopline = {
+            --     name = 'street/new_medium_stopline.mtl',
+            --     size = {6.0, .5}
+            -- },
             -- sidewalkPaving = {
             --     name = 'street/new_medium_sidewalk.mtl',
             --     size = {4.0, 4.0}
