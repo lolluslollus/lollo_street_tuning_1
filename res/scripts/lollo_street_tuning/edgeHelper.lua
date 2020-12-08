@@ -42,6 +42,27 @@ helper.getVectorLength = function(xyz)
     return math.sqrt(x * x + y * y + z * z)
 end
 
+helper.getVectorNormalised = function(xyz)
+    if type(xyz) ~= 'table' then return nil end
+
+    local length = helper.getVectorLength(xyz)
+    if length == 0 then return nil end
+
+    if xyz.x ~= nil and xyz.y ~= nil and xyz.z ~= nil then
+        return {
+            x = xyz.x / length,
+            y = xyz.y / length,
+            z = xyz.z / length
+        }
+    else
+        return {
+            xyz[1] / length,
+            xyz[2] / length,
+            xyz[3] / length
+        }
+    end
+end
+
 helper.getNearbyEntities = function(transf)
     if type(transf) ~= 'table' then return {} end
 
@@ -317,6 +338,8 @@ end
 
 helper.getEdgeObjectsWithModelId = function(edgeObjects, refModelId)
     local results = {}
+    if type(edgeObjects) ~= 'table' or not(helper.isValidId(refModelId)) then return results end
+
     for i = 1, #edgeObjects do
         local modelInstanceList = api.engine.getComponent(edgeObjects[i][1], api.type.ComponentType.MODEL_INSTANCE_LIST)
         if modelInstanceList
@@ -330,6 +353,7 @@ helper.getEdgeObjectsWithModelId = function(edgeObjects, refModelId)
 end
 
 helper.getLastBuiltEdge = function(entity2tn)
+    -- LOLLO TODO this should come from UG!
     local nodeIds = {}
     for id, _ in pairs(entity2tn) do
         if api.engine.getComponent(id, api.type.ComponentType.BASE_NODE) ~= nil then nodeIds[#nodeIds+1] = id end
@@ -413,12 +437,12 @@ helper.track.getContiguousEdges = function(edgeId, trackType)
                 isExit = true
             else
                 for _, _edgeId in pairs(edgeIds) do -- cannot use edgeIds[index] here
-                    print('edgeId =')
-                    debugPrint(_edgeId)
+                    -- print('edgeId =')
+                    -- debugPrint(_edgeId)
                     if _edgeId ~= refEdgeId then
                         local baseEdgeTrack = api.engine.getComponent(_edgeId, api.type.ComponentType.BASE_EDGE_TRACK)
-                        print('baseEdgeTrack =')
-                        debugPrint(baseEdgeTrack)
+                        -- print('baseEdgeTrack =')
+                        -- debugPrint(baseEdgeTrack)
                         if not(baseEdgeTrack) or baseEdgeTrack.trackType ~= trackType then
                             isExit = true
                             break
@@ -444,10 +468,10 @@ helper.track.getContiguousEdges = function(edgeId, trackType)
         end
     end
 
-    print('getContiguousEdges starting, edgeId =')
-    debugPrint(edgeId)
-    print('track type =')
-    debugPrint(trackType)
+    -- print('getContiguousEdges starting, edgeId =')
+    -- debugPrint(edgeId)
+    -- print('track type =')
+    -- debugPrint(trackType)
 
     if not(edgeId) or not(trackType) then return {} end
 
@@ -466,6 +490,7 @@ helper.track.getContiguousEdges = function(edgeId, trackType)
 end
 
 helper.track.getEdgeIdsBetweenEdgeIds = function(_edge1Id, _edge2Id)
+    -- the output is sorted by sequence, from edge1 to edge2
     print('one')
     if type(_edge1Id) ~= 'number' or _edge1Id < 1 then return {} end
     if type(_edge2Id) ~= 'number' or _edge2Id < 1 then return {} end
@@ -488,77 +513,79 @@ helper.track.getEdgeIdsBetweenEdgeIds = function(_edge1Id, _edge2Id)
     local _trackType2 = _baseEdgeTrack2.trackType
 
     local _isTrackEdgeContiguousTo2 = function(baseEdge1)
-        if baseEdge1.node0 == _baseEdge2.node0 or baseEdge1.node0 == _baseEdge2.node1
-        or baseEdge1.node1 == _baseEdge2.node0 or baseEdge1.node1 == _baseEdge2.node1 then
-            return true
-        end
-
-        return false
+        return baseEdge1.node0 == _baseEdge2.node0 or baseEdge1.node0 == _baseEdge2.node1
+            or baseEdge1.node1 == _baseEdge2.node0 or baseEdge1.node1 == _baseEdge2.node1
     end
 
     local _isTrackEdgesSameTypeAs2 = function(edge1Id)
         local baseEdgeTrack1 = api.engine.getComponent(edge1Id, api.type.ComponentType.BASE_EDGE_TRACK)
-        if not(baseEdgeTrack1) or baseEdgeTrack1.trackType ~= _trackType2 then return false end
-
-        return true
+        return baseEdgeTrack1 ~= nil and baseEdgeTrack1.trackType == _trackType2
     end
 
     if _isTrackEdgeContiguousTo2(_baseEdge1) then
-        if _isTrackEdgesSameTypeAs2(_edge1Id) then print('six') return { _edge1Id, _edge2Id } end
-        print('seven')
-        return {}
+        -- if _isTrackEdgesSameTypeAs2(_edge1Id) then
+            print('six')
+            return { _edge1Id, _edge2Id }
+        -- end
+        -- print('seven')
+        -- return {}
     end
 
-    -- LOLLO TODO test this function from here on, we don't know how good it is
     local _map = api.engine.system.streetSystem.getNode2SegmentMap()
-    local _getEdgesBetween = function(node0Or1FieldName)
+    local _getEdgesBetween1and2 = function(node0Or1FieldName)
         local baseEdge1 = _baseEdge1
-        local baseEdges = { _baseEdge1, _baseEdge2 }
         local edge1Id = _edge1Id
-        local edgeIds = { _edge1Id, _edge2Id }
+        local edgeIds = { _edge1Id }
         local counter = 0
         while counter < 20 do
             counter = counter + 1
-            print('eight')
+            print('eight, node0Or1FieldName =')
+            debugPrint(node0Or1FieldName)
             local nodeId = baseEdge1[node0Or1FieldName]
+            print('nodeId =')
+            debugPrint(nodeId)
             local adjacentEdgeIds = _map[nodeId] -- userdata
-            if not(adjacentEdgeIds) or #adjacentEdgeIds ~= 2 then
+            if adjacentEdgeIds == nil then
                 print('nine')
                 return false
-            else
-                for _, edgeId in pairs(adjacentEdgeIds) do -- cannot use adjacentEdgeIds[index] here
-                    print('ten')
-                    if edgeId ~= edge1Id then
-                        print('eleven')
-                        edge1Id = edgeId
-                        edgeIds[#edgeIds-1] = edgeId
-                        baseEdge1 = api.engine.getComponent(
-                            edgeId,
-                            api.type.ComponentType.BASE_EDGE
-                        )
-                        baseEdges[#baseEdges-1] = baseEdge1
-                        if _isTrackEdgeContiguousTo2(baseEdge1) then
-                            print('twelve')
-                            if _isTrackEdgesSameTypeAs2(edge1Id) then print('thirteen') return edgeIds end
-                            print('fourteen')
-                            return false
-                        end
-
-                        break
+            end
+            local isFound = false
+            -- we don't deal with intersections for now
+            for _, edgeId in pairs(adjacentEdgeIds) do -- cannot use adjacentEdgeIds[index] here, it's fucking userdata
+                print('ten')
+                if edgeId ~= edge1Id then
+                    print('eleven')
+                    isFound = true
+                    edge1Id = edgeId
+                    edgeIds[#edgeIds+1] = edge1Id
+                    baseEdge1 = api.engine.getComponent(
+                        edgeId,
+                        api.type.ComponentType.BASE_EDGE
+                    )
+                    if _isTrackEdgeContiguousTo2(baseEdge1) then
+                        print('twelve')
+                        edgeIds[#edgeIds+1] = _edge2Id
+                        return edgeIds
                     end
+
+                    break
                 end
+            end
+            if not(isFound) then
+                print('thirteen')
+                return false
             end
         end
 
         return false
     end
 
-    local node0Results = _getEdgesBetween('node0')
+    local node0Results = _getEdgesBetween1and2('node0')
     print('node0results =')
     debugPrint(node0Results)
     if node0Results then return node0Results end
 
-    local node1Results = _getEdgesBetween('node1')
+    local node1Results = _getEdgesBetween1and2('node1')
     print('node1results =')
     debugPrint(node1Results)
     if node1Results then return node1Results end
@@ -622,6 +649,9 @@ helper.track.getTrackEdgeIdsBetweenEdgeIdsBROKEN = function(edge1Id, edge2Id)
 end
 
 helper.track.getTrackEdgeIdsBetweenNodeIds = function(_node1Id, _node2Id)
+    print('getTrackEdgeIdsBetweenNodeIds starting')
+    print('node1Id =', _node1Id)
+    print('node2Id =', _node2Id)
     print('ONE')
     if type(_node1Id) ~= 'number' or _node1Id < 1 then return {} end
     if type(_node2Id) ~= 'number' or _node2Id < 1 then return {} end
@@ -629,13 +659,13 @@ helper.track.getTrackEdgeIdsBetweenNodeIds = function(_node1Id, _node2Id)
     if _node1Id == _node2Id then return {} end
     print('THREE')
 
+    local _map = api.engine.system.streetSystem.getNode2SegmentMap()
     local adjacentEdge1Ids = {}
     local adjacentEdge2Ids = {}
     local _fetchAdjacentEdges = function()
-        local _map = api.engine.system.streetSystem.getNode2SegmentMap()
         local adjacentEdge1IdsUserdata = _map[_node1Id] -- userdata
         local adjacentEdge2IdsUserdata = _map[_node2Id] -- userdata
-        if not(adjacentEdge1IdsUserdata) then
+        if adjacentEdge1IdsUserdata == nil then
             print('FOUR')
             return false
         else
@@ -644,7 +674,7 @@ helper.track.getTrackEdgeIdsBetweenNodeIds = function(_node1Id, _node2Id)
             end
             print('FIVE')
         end
-        if not(adjacentEdge2IdsUserdata) then
+        if adjacentEdge2IdsUserdata == nil then
             print('SIX')
             return false
         else
@@ -657,20 +687,22 @@ helper.track.getTrackEdgeIdsBetweenNodeIds = function(_node1Id, _node2Id)
         return true
     end
 
-    _fetchAdjacentEdges()
+    if not(_fetchAdjacentEdges()) then print('SEVEN HALF') return {} end
     if #adjacentEdge1Ids < 1 or #adjacentEdge2Ids < 1 then print('EIGHT') return {} end
 
     if #adjacentEdge1Ids == 1 and #adjacentEdge2Ids == 1 then
         if adjacentEdge1Ids[1] == adjacentEdge2Ids[1] then
             print('NINE')
             return { adjacentEdge1Ids[1] }
-        else
-            print('TEN')
-            return {}
+        -- else
+        --     print('TEN')
+        --     return {}
         end
     end
 
     local trackEdgeIdsBetweenEdgeIds = helper.track.getEdgeIdsBetweenEdgeIds(adjacentEdge1Ids[1], adjacentEdge2Ids[1])
+    print('trackEdgeIdsBetweenEdgeIds =')
+    debugPrint(trackEdgeIdsBetweenEdgeIds)
     -- remove edges adjacent to but outside node1 and node2
     local isExit = false
     while not(isExit) do
