@@ -3,7 +3,7 @@ local arrayUtils = require('lollo_street_tuning.arrayUtils')
 local matrixUtils = require('lollo_street_tuning.matrix')
 local streetUtils = require('lollo_street_tuning.streetUtils')
 local transfUtils = require('lollo_street_tuning.transfUtils')
-local edgeUtils = require('lollo_street_tuning.edgeHelper')
+local edgeUtils = require('lollo_street_tuning.edgeUtils')
 if debugPrint == nil then
     debugPrint = function(sth)
     end

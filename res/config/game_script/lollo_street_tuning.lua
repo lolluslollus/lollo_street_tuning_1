@@ -1,5 +1,5 @@
 local arrayUtils = require('lollo_street_tuning.arrayUtils')
-local edgeUtils = require('lollo_street_tuning.edgeHelper')
+local edgeUtils = require('lollo_street_tuning.edgeUtils')
 local streetUtils = require('lollo_street_tuning.streetUtils')
 local stringUtils = require('lollo_street_tuning/stringUtils')
 local transfUtilUG = require('transf')
