@@ -752,6 +752,7 @@ function data()
 
                         local addedSegments = param.proposal.proposal.addedSegments
 
+                        -- remove right lane tram tracks if forbidden for current road
                         local removeTramTrackEventParams = {}
                         for _, addedSegment in pairs(addedSegments) do
                             if addedSegment and addedSegment.streetEdge
@@ -773,6 +774,7 @@ function data()
                             )
                         end
 
+                        -- add bus lane right if requiored for current road
                         local addBusLaneEventParams = {}
                         for _, addedSegment in pairs(addedSegments) do
                             if addedSegment and addedSegment.streetEdge
