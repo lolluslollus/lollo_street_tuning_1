@@ -228,6 +228,8 @@ helper.getNodeBetween = function(position0, tangent0, position1, tangent1, betwe
     local ypsilon1 = math.atan2(tangent1.y, tangent1.x)
     local z0 = position0.z - betweenPosition.z
     local z1 = position1.z - betweenPosition.z
+    local zeta0 = math.atan2(tangent0.z, tangent0.x)
+    local zeta1 = math.atan2(tangent1.z, tangent1.x)
     -- rotate the edges around the Z axis so that y0 = y1
     local zRotation = -math.atan2(y1 - y0, x1 - x0)
     local x0I = x0
@@ -237,6 +239,8 @@ helper.getNodeBetween = function(position0, tangent0, position1, tangent1, betwe
     local ypsilon1I = ypsilon1 + zRotation
     local z0I = z0
     local z1I = z1
+    local zeta0I = zeta0
+    local zeta1I = zeta1
 
     local invertedXMatrix = matrixUtils.invert(
         {
@@ -254,10 +258,10 @@ helper.getNodeBetween = function(position0, tangent0, position1, tangent1, betwe
     -- This factor keeps the curve in shape, but it must have the right sign. Beyond that, I can reject or bodge.
     -- Also, tangents have a discontinuity at +/- PI/2: bodging could get tricky
     -- AN idea could be: replace the equation with the large tangent with one based on the position the user clicked.
-    local tan0I = math.tan(ypsilon0I)
-    if math.abs(tan0I) > _maxTangent then return nil end
-    local tan1I = math.tan(ypsilon1I)
-    if math.abs(tan1I) > _maxTangent then return nil end
+    local tanY0I = math.tan(ypsilon0I)
+    if math.abs(tanY0I) > _maxTangent then return nil end
+    local tanY1I = math.tan(ypsilon1I)
+    if math.abs(tanY1I) > _maxTangent then return nil end
 
     -- Now I solve the system for y:
     -- a + b x0' + c x0'^2 + d x0'^3 = y0'
@@ -269,14 +273,19 @@ helper.getNodeBetween = function(position0, tangent0, position1, tangent1, betwe
         {
             {y0I},
             {y0I},
-            {tan0I},
-            {tan1I}
+            {tanY0I},
+            {tanY1I}
         }
     )
     local aY = abcdY[1][1]
     local bY = abcdY[2][1]
     local cY = abcdY[3][1]
     local dY = abcdY[4][1]
+
+    local tanZ0I = math.tan(zeta0I)
+    if math.abs(tanZ0I) > _maxTangent then return nil end
+    local tanZ1I = math.tan(zeta1I)
+    if math.abs(tanZ1I) > _maxTangent then return nil end
 
     -- Now I solve the system for z:
     -- a + b x0' + c x0'^2 + d x0'^3 = z0'
@@ -288,8 +297,10 @@ helper.getNodeBetween = function(position0, tangent0, position1, tangent1, betwe
         {
             {z0I},
             {z1I},
-            {tangent0.z / helper.getVectorLength({tangent0.x, tangent0.y, 0.0})},
-            {tangent1.z / helper.getVectorLength({tangent1.x, tangent1.y, 0.0})},
+            {tanZ0I},
+            {tanZ1I}
+            -- {tangent0.z / helper.getVectorLength({tangent0.x, tangent0.y, 0.0})},
+            -- {tangent1.z / helper.getVectorLength({tangent1.x, tangent1.y, 0.0})},
         }
     )
     local aZ = abcdZ[1][1]
