@@ -24,6 +24,24 @@ arrayUtils.map = function(arr, func)
     return results
 end
 
+arrayUtils.cloneDeepOmittingFields = function(tab, fields2Omit)
+    local results = {}
+    if type(tab) ~= 'table' then return results end
+
+    if type(fields2Omit) ~= 'table' then fields2Omit = {} end
+
+    for key, value in pairs(tab) do
+        if not arrayUtils.arrayHasValue(fields2Omit, key) then
+            if type(value) == 'table' then
+                results[key] = arrayUtils.cloneDeepOmittingFields(value, fields2Omit)
+            else
+                results[key] = value
+            end
+        end
+    end
+    return results
+end
+
 arrayUtils.cloneOmittingFields = function(tab, fields2Omit)
     local results = {}
     if type(tab) ~= 'table' then return results end
@@ -59,7 +77,7 @@ arrayUtils.concatKeysValues = function(table1, table2)
 end
 
 arrayUtils.sort = function(table0, elementName, asc)
-    if type(table0) ~= 'table' or type(elementName) ~= 'string' then
+    if type(table0) ~= 'table' then
         return table0
     end
 
@@ -67,18 +85,33 @@ arrayUtils.sort = function(table0, elementName, asc)
         asc = true
     end
 
-    table.sort(
-        table0,
-        function(elem1, elem2)
-            if not elem1 or not elem2 or not (elem1[elementName]) or not (elem2[elementName]) then
-                return true
+    if type(elementName) == 'string' then
+        table.sort(
+            table0,
+            function(elem1, elem2)
+                if not elem1 or not elem2 or not (elem1[elementName]) or not (elem2[elementName]) then
+                    return true
+                end
+                if asc then
+                    return elem1[elementName] < elem2[elementName]
+                end
+                return elem1[elementName] > elem2[elementName]
             end
-            if asc then
-                return elem1[elementName] < elem2[elementName]
+        )
+    else
+        table.sort(
+            table0,
+            function(elem1, elem2)
+                if not elem1 or not elem2 or not (elem1) or not (elem2) then
+                    return true
+                end
+                if asc then
+                    return elem1 < elem2
+                end
+                return elem1 > elem2
             end
-            return elem1[elementName] > elem2[elementName]
-        end
-    )
+        )
+    end
 
     return table0
 end
@@ -107,40 +140,15 @@ arrayUtils.addProps = function(baseTab, addedTab)
     return baseTab
 end
 
-arrayUtils.serialise1 = function(val, name, skipnewlines, depth)
-    -- the code created can then be executed using loadstring(): http://www.lua.org/manual/5.1/manual.html#pdf-loadstring
-    -- if you have passed an argument to 'name' parameter (or append it afterwards):
+arrayUtils.getReversed = function(tab)
+    if type(tab) ~= 'table' then return tab end
 
-    --     s = serializeTable({a = "foo", b = {c = 123, d = "foo"}})
-    --     print(s)
-    --     a = loadstring(s)()
-    skipnewlines = skipnewlines or false
-    depth = depth or 0
-
-    local tmp = string.rep(" ", depth)
-
-    if name then tmp = tmp .. name .. " = " end
-
-    if type(val) == "table" then
-        tmp = tmp .. "{" .. (not skipnewlines and "\n" or "")
-
-        for k, v in pairs(val) do
-            tmp =  tmp .. serializeTable(v, k, skipnewlines, depth + 1) .. "," .. (not skipnewlines and "\n" or "")
-        end
-
-        tmp = tmp .. string.rep(" ", depth) .. "}"
-    elseif type(val) == "number" then
-        tmp = tmp .. tostring(val)
-    elseif type(val) == "string" then
-        tmp = tmp .. string.format("%q", val)
-    elseif type(val) == "boolean" then
-        tmp = tmp .. (val and "true" or "false")
-    else
-        tmp = tmp .. "\"[inserializeable datatype:" .. type(val) .. "]\""
+    local reversedTab = {}
+    for i = #tab, 1, -1 do
+        reversedTab[#reversedTab+1] = tab[i]
     end
 
-    return tmp
+    return reversedTab
 end
-
 
 return arrayUtils
