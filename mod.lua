@@ -137,7 +137,7 @@ function data()
         -- print('LOLLO newStreet before change =')
         -- debugPrint(newStreet)
         local isSuccess = false
-        local _isOneWay = streetUtils.getIsStreetOneWay(newStreet.laneConfigs)
+        local _isOneWay = streetUtils.isStreetOneWay(newStreet.laneConfigs)
         -- print('LOLLO _isOneWay =', _isOneWay)
         for index, oldLaneConfig in pairs(newStreet.laneConfigs) do
             local newLaneConfig = api.type.LaneConfig.new()

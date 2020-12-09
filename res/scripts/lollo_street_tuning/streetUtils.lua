@@ -319,7 +319,7 @@ local function _getStreetTypesWithApi()
             categories = _cloneCategories(streetProperties.categories),
             fileName = fileName,
             icon = streetProperties.icon,
-            isAllTramTracks = helper.getIsStreetAllTramTracks(streetProperties.laneConfigs),
+            isAllTramTracks = helper.isStreetAllTramTracks(streetProperties.laneConfigs),
             laneCount = #(streetProperties.laneConfigs),
             name = streetProperties.name,
             rightLaneWidth = (streetProperties.laneConfigs[2] or {}).width or 0,
@@ -354,7 +354,7 @@ local function _initLolloStreetDataWithFiles(filter)
     end
 end
 
-helper.getIsStreetOneWay = function(laneConfigs)
+helper.isStreetOneWay = function(laneConfigs)
     if #laneConfigs < 2 then return false end
 
     local lastForward = laneConfigs[2].forward
@@ -384,8 +384,8 @@ helper.getIsOuterLane = function(laneConfigs, laneConfigIndex, isOneWay)
     or (laneConfigIndex > 1 and laneConfigIndex == #laneConfigs - 1) -- leftmost lane in 2-way roads, rightmost in 1-way
 end
 
-helper.getIsStreetAllTramTracks = function(laneConfigs)
-    local _isOneWay = helper.getIsStreetOneWay(laneConfigs)
+helper.isStreetAllTramTracks = function(laneConfigs)
+    local _isOneWay = helper.isStreetOneWay(laneConfigs)
 
     for i = 2, #laneConfigs - 1 do
         if helper.getIsInnerLane(laneConfigs, i, _isOneWay)
@@ -394,6 +394,31 @@ helper.getIsStreetAllTramTracks = function(laneConfigs)
             return true
         end
     end
+
+    return false
+end
+
+helper.isPath = function(streetTypeId)
+    -- is it a path street type?
+    if type(streetTypeId) ~= 'number' or streetTypeId < 0 then return false end
+
+    local streetProperties = api.res.streetTypeRep.get(streetTypeId)
+    if not(streetProperties) then return false end
+
+    return arrayUtils.arrayHasValue(streetProperties.categories, 'paths')
+end
+
+helper.isTramRightBarred = function(streetTypeId)
+    -- are tram tracks in the outer lane explicitly barred?
+    if type(streetTypeId) ~= 'number' or streetTypeId < 0 then return false end
+
+    local fileName = api.res.streetTypeRep.getFileName(streetTypeId)
+    if type(fileName) ~= 'string' then return false end
+
+    if fileName:find(helper.transportModes.getLaneConfigToString(helper.transportModes.getTargetTransportModes4Bus()))
+    or fileName:find(helper.transportModes.getLaneConfigToString(helper.transportModes.getTargetTransportModes4Cargo()))
+    or fileName:find(helper.transportModes.getLaneConfigToString(helper.transportModes.getTargetTransportModes4Tyres()))
+    then return true end
 
     return false
 end
@@ -420,20 +445,6 @@ helper.transportModes = {
             result = result .. tostring(value)
         end
         return result
-    end,
-    isTramRightBarred = function(streetTypeId)
-        -- are tram tracks in the outer lane explicitly barred?
-        if type(streetTypeId) ~= 'number' or streetTypeId < 0 then return false end
-
-        local fileName = api.res.streetTypeRep.getFileName(streetTypeId)
-        if type(fileName) ~= 'string' then return false end
-
-        if fileName:find(helper.transportModes.getLaneConfigToString(helper.transportModes.getTargetTransportModes4Bus()))
-        or fileName:find(helper.transportModes.getLaneConfigToString(helper.transportModes.getTargetTransportModes4Cargo()))
-        or fileName:find(helper.transportModes.getLaneConfigToString(helper.transportModes.getTargetTransportModes4Tyres()))
-        then return true end
-
-        return false
     end,
 }
 
