@@ -208,6 +208,8 @@ helper.getNodeBetween = function(position0, tangent0, position1, tangent1, betwe
         position1.y - position0.y,
         0.0
     })
+    if node01DistanceXY == 0 then return nil end
+
     local x20Shift = type(betweenPosition) ~= 'table'
         and
             0.5
@@ -216,7 +218,7 @@ helper.getNodeBetween = function(position0, tangent0, position1, tangent1, betwe
                 betweenPosition.x - position0.x,
                 betweenPosition.y - position0.y,
                 -- betweenPosition.z - position0.z
-                -- 0.0
+                0.0
             }) / node01DistanceXY)
     -- print('x20Shift =', x20Shift or 'NIL')
     -- shift everything around betweenPosition to avoid large numbers being summed and subtracted
@@ -228,8 +230,6 @@ helper.getNodeBetween = function(position0, tangent0, position1, tangent1, betwe
     local ypsilon1 = math.atan2(tangent1.y, tangent1.x)
     local z0 = position0.z - betweenPosition.z
     local z1 = position1.z - betweenPosition.z
-    local zeta0 = math.atan2(tangent0.z, tangent0.x)
-    local zeta1 = math.atan2(tangent1.z, tangent1.x)
     -- rotate the edges around the Z axis so that y0 = y1
     local zRotation = -math.atan2(y1 - y0, x1 - x0)
     local x0I = x0
@@ -239,8 +239,6 @@ helper.getNodeBetween = function(position0, tangent0, position1, tangent1, betwe
     local ypsilon1I = ypsilon1 + zRotation
     local z0I = z0
     local z1I = z1
-    local zeta0I = zeta0
-    local zeta1I = zeta1
 
     local invertedXMatrix = matrixUtils.invert(
         {
@@ -282,11 +280,6 @@ helper.getNodeBetween = function(position0, tangent0, position1, tangent1, betwe
     local cY = abcdY[3][1]
     local dY = abcdY[4][1]
 
-    local tanZ0I = math.tan(zeta0I)
-    if math.abs(tanZ0I) > _maxTangent then return nil end
-    local tanZ1I = math.tan(zeta1I)
-    if math.abs(tanZ1I) > _maxTangent then return nil end
-
     -- Now I solve the system for z:
     -- a + b x0' + c x0'^2 + d x0'^3 = z0'
     -- a + b x1' + c x1'^2 + d x1'^3 = z1'
@@ -297,10 +290,8 @@ helper.getNodeBetween = function(position0, tangent0, position1, tangent1, betwe
         {
             {z0I},
             {z1I},
-            {tanZ0I},
-            {tanZ1I}
-            -- {tangent0.z / helper.getVectorLength({tangent0.x, tangent0.y, 0.0})},
-            -- {tangent1.z / helper.getVectorLength({tangent1.x, tangent1.y, 0.0})},
+            {tangent0.z / helper.getVectorLength({tangent0.x, tangent0.y, 0.0})},
+            {tangent1.z / helper.getVectorLength({tangent1.x, tangent1.y, 0.0})},
         }
     )
     local aZ = abcdZ[1][1]
