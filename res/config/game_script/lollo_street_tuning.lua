@@ -537,7 +537,7 @@ function data()
                 if name == _eventProperties.lollo_street_splitter.eventName then
                 -- do nothing
                 elseif name == _eventProperties.lollo_street_splitter_w_api.eventName then
-                    local nearestEdgeId = edgeUtils.getNearestEdgeId(constructionTransf)
+                    local nearestEdgeId = edgeUtils.street.getNearestEdgeId(constructionTransf)
                     -- print('street splitter got nearestEdge =', nearestEdgeId or 'NIL')
                     if type(nearestEdgeId) == 'number' and nearestEdgeId >= 0 then
                         local oldEdge = api.engine.getComponent(nearestEdgeId, api.type.ComponentType.BASE_EDGE)
@@ -583,7 +583,7 @@ function data()
                         end
                     end
                 elseif name == _eventProperties.lollo_street_changer.eventName then
-                    local nearestEdgeId = edgeUtils.getNearestEdgeId(
+                    local nearestEdgeId = edgeUtils.street.getNearestEdgeId(
                         constructionTransf
                     )
                     -- print('nearestEdge =', nearestEdgeId or 'NIL')
@@ -592,7 +592,7 @@ function data()
                         _actions.replageEdgeWithSame(nearestEdgeId)
                     end
                 elseif name == _eventProperties.lollo_toggle_all_tram_tracks.eventName then
-                    local nearestEdgeId = edgeUtils.getNearestEdgeId(
+                    local nearestEdgeId = edgeUtils.street.getNearestEdgeId(
                         constructionTransf
                     )
                     -- print('nearestEdgeId =', nearestEdgeId or 'NIL')
