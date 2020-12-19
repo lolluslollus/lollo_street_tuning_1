@@ -135,20 +135,20 @@ local _utils = {
         -- debugPrint(node1pos)
         -- first estimator
         -- local nodeBetween_Node0_Distance = edgeUtils.getVectorLength({
-        --     nodeBetween.position[1] - node0pos[1],
-        --     nodeBetween.position[2] - node0pos[2]
+        --     nodeBetween.position.x - node0pos[1],
+        --     nodeBetween.position.y - node0pos[2]
         -- })
         -- local nodeBetween_Node1_Distance = edgeUtils.getVectorLength({
-        --     nodeBetween.position[1] - node1pos[1],
-        --     nodeBetween.position[2] - node1pos[2]
+        --     nodeBetween.position.x - node1pos[1],
+        --     nodeBetween.position.y - node1pos[2]
         -- })
         -- local edgeObj_Node0_Distance = edgeUtils.getVectorLength({
-        --     edgeObjPosition[1] - node0pos[1],
-        --     edgeObjPosition[2] - node0pos[2]
+        --     edgeObjPosition.x - node0pos[1],
+        --     edgeObjPosition.y - node0pos[2]
         -- })
         -- local edgeObj_Node1_Distance = edgeUtils.getVectorLength({
-        --     edgeObjPosition[1] - node1pos[1],
-        --     edgeObjPosition[2] - node1pos[2]
+        --     edgeObjPosition.x - node1pos[1],
+        --     edgeObjPosition.y - node1pos[2]
         -- })
         -- if edgeObj_Node0_Distance < nodeBetween_Node0_Distance then
         --     result.assignToFirstEstimate = 0
@@ -162,15 +162,15 @@ local _utils = {
         local node1_assignTo = nil
         -- at nodeBetween, I can draw the normal to the road:
         -- y = a + bx
-        -- the angle is alpha = atan2(nodeBetween.tangent[2], nodeBetween.tangent[1]) + PI / 2
+        -- the angle is alpha = atan2(nodeBetween.tangent.y, nodeBetween.tangent.x) + PI / 2
         -- so b = math.tan(alpha)
         -- a = y - bx
-        -- so a = nodeBetween.position[2] - b * nodeBetween.position[1]
+        -- so a = nodeBetween.position.y - b * nodeBetween.position.x
         -- points under this line will go one way, the others the other way
-        local alpha = math.atan2(nodeBetween.tangent[2], nodeBetween.tangent[1]) + math.pi * 0.5
+        local alpha = math.atan2(nodeBetween.tangent.y, nodeBetween.tangent.x) + math.pi * 0.5
         local b = math.tan(alpha)
         if math.abs(b) < 1e+06 then
-            local a = nodeBetween.position[2] - b * nodeBetween.position[1]
+            local a = nodeBetween.position.y - b * nodeBetween.position.x
             if a + b * edgeObjPosition[1] > edgeObjPosition[2] then -- edgeObj is below the line
                 edgeObjPosition_assignTo = 0
             else
@@ -189,17 +189,17 @@ local _utils = {
         -- if b grows too much, I lose precision, so I approximate it with the y axis
         else
             -- print('alpha =', alpha, 'b =', b)
-            if edgeObjPosition[1] > nodeBetween.position[1] then
+            if edgeObjPosition[1] > nodeBetween.position.x then
                 edgeObjPosition_assignTo = 0
             else
                 edgeObjPosition_assignTo = 1
             end
-            if node0pos[1] > nodeBetween.position[1] then
+            if node0pos[1] > nodeBetween.position.x then
                 node0_assignTo = 0
             else
                 node0_assignTo = 1
             end
-            if node1pos[1] > nodeBetween.position[1] then
+            if node1pos[1] > nodeBetween.position.x then
                 node1_assignTo = 0
             else
                 node1_assignTo = 1
@@ -378,7 +378,7 @@ local _actions = {
     end,
 
     splitEdge = function(wholeEdgeId, position0, tangent0, position1, tangent1, nodeBetween)
-        if type(wholeEdgeId) ~= 'number' or wholeEdgeId < 0 or type(nodeBetween) ~= 'table' then return end
+        if not(edgeUtils.isValidAndExistingId(wholeEdgeId)) or nodeBetween == nil then return end
 
         local node0TangentLength = edgeUtils.getVectorLength({
             tangent0.x,
@@ -389,16 +389,6 @@ local _actions = {
             tangent1.x,
             tangent1.y,
             tangent1.z
-        })
-        local edge0Length = edgeUtils.getVectorLength({
-            nodeBetween.position[1] - position0.x,
-            nodeBetween.position[2] - position0.y,
-            nodeBetween.position[3] - position0.z
-        })
-        local edge1Length = edgeUtils.getVectorLength({
-            nodeBetween.position[1] - position1.x,
-            nodeBetween.position[2] - position1.y,
-            nodeBetween.position[3] - position1.z
         })
 
         local oldEdge = api.engine.getComponent(wholeEdgeId, api.type.ComponentType.BASE_EDGE)
@@ -411,42 +401,42 @@ local _actions = {
 
         local newNodeBetween = api.type.NodeAndEntity.new()
         newNodeBetween.entity = -3
-        newNodeBetween.comp.position = api.type.Vec3f.new(nodeBetween.position[1], nodeBetween.position[2], nodeBetween.position[3])
+        newNodeBetween.comp.position = api.type.Vec3f.new(nodeBetween.position.x, nodeBetween.position.y, nodeBetween.position.z)
 
         local newEdge0 = api.type.SegmentAndEntity.new()
         newEdge0.entity = -1
-        newEdge0.type = 0
+        newEdge0.type = 0 -- ROAD
         newEdge0.comp.node0 = oldEdge.node0
         newEdge0.comp.node1 = -3
         newEdge0.comp.tangent0 = api.type.Vec3f.new(
-            tangent0.x * edge0Length / node0TangentLength,
-            tangent0.y * edge0Length / node0TangentLength,
-            tangent0.z * edge0Length / node0TangentLength
+            tangent0.x * nodeBetween.length0 / node0TangentLength,
+            tangent0.y * nodeBetween.length0 / node0TangentLength,
+            tangent0.z * nodeBetween.length0 / node0TangentLength
         )
         newEdge0.comp.tangent1 = api.type.Vec3f.new(
-            nodeBetween.tangent[1] * edge0Length,
-            nodeBetween.tangent[2] * edge0Length,
-            nodeBetween.tangent[3] * edge0Length
+            nodeBetween.tangent.x * nodeBetween.length0,
+            nodeBetween.tangent.y * nodeBetween.length0,
+            nodeBetween.tangent.z * nodeBetween.length0
         )
         newEdge0.comp.type = oldEdge.type -- respect bridge or tunnel
-        newEdge0.comp.typeIndex = oldEdge.typeIndex -- respect bridge or tunnel
+        newEdge0.comp.typeIndex = oldEdge.typeIndex -- respect bridge or tunnel type
         newEdge0.playerOwned = playerOwned
         newEdge0.streetEdge = oldEdgeStreet
 
         local newEdge1 = api.type.SegmentAndEntity.new()
         newEdge1.entity = -2
-        newEdge1.type = 0
+        newEdge1.type = 0 -- ROAD
         newEdge1.comp.node0 = -3
         newEdge1.comp.node1 = oldEdge.node1
         newEdge1.comp.tangent0 = api.type.Vec3f.new(
-            nodeBetween.tangent[1] * edge1Length,
-            nodeBetween.tangent[2] * edge1Length,
-            nodeBetween.tangent[3] * edge1Length
+            nodeBetween.tangent.x * nodeBetween.length1,
+            nodeBetween.tangent.y * nodeBetween.length1,
+            nodeBetween.tangent.z * nodeBetween.length1
         )
         newEdge1.comp.tangent1 = api.type.Vec3f.new(
-            tangent1.x * edge1Length / node1TangentLength,
-            tangent1.y * edge1Length / node1TangentLength,
-            tangent1.z * edge1Length / node1TangentLength
+            tangent1.x * nodeBetween.length1 / node1TangentLength,
+            tangent1.y * nodeBetween.length1 / node1TangentLength,
+            tangent1.z * nodeBetween.length1 / node1TangentLength
         )
         newEdge1.comp.type = oldEdge.type
         newEdge1.comp.typeIndex = oldEdge.typeIndex
@@ -513,9 +503,10 @@ local _actions = {
             function(res, success)
                 -- print('LOLLO street splitter callback returned res = ')
                 -- debugPrint(res)
-                --for _, v in pairs(res.entities) do print(v) end
-                -- print('LOLLO street splitter callback returned success = ')
-                -- print(success)
+                -- print('LOLLO street splitter callback returned success = ', success)
+                if not(success) then
+                    print('splitEdge failed, proposal = ') debugPrint(proposal)
+                end
             end
         )
     end,
@@ -539,48 +530,39 @@ function data()
                 elseif name == _eventProperties.lollo_street_splitter_w_api.eventName then
                     local nearestEdgeId = edgeUtils.street.getNearestEdgeId(constructionTransf)
                     -- print('street splitter got nearestEdge =', nearestEdgeId or 'NIL')
-                    if type(nearestEdgeId) == 'number' and nearestEdgeId >= 0 then
-                        local oldEdge = api.engine.getComponent(nearestEdgeId, api.type.ComponentType.BASE_EDGE)
-                        if oldEdge then
-                            local node0 = api.engine.getComponent(oldEdge.node0, api.type.ComponentType.BASE_NODE)
-                            local node1 = api.engine.getComponent(oldEdge.node1, api.type.ComponentType.BASE_NODE)
-                            if node0 and node1 then
-                                local nodeBetween = edgeUtils.getNodeBetween(
-                                    node0.position,
-                                    oldEdge.tangent0,
-                                    node1.position,
-                                    oldEdge.tangent1,
-                                    -- LOLLO NOTE position and transf are always very similar
-                                    {
-                                        x = constructionTransf[13],
-                                        y = constructionTransf[14],
-                                        z = constructionTransf[15],
-                                    }
-                                )
+                    if not(edgeUtils.isValidAndExistingId(nearestEdgeId)) then return end
 
-                                -- print('node0 =')
-                                -- debugPrint(node0)
-                                -- print('oldEdge.tangent0 =')
-                                -- debugPrint(oldEdge.tangent0)
-                                -- print('node1 =')
-                                -- debugPrint(node1)
-                                -- print('oldEdge.tangent1 =')
-                                -- debugPrint(oldEdge.tangent1)
-                                -- print('splitterConstruction.transf =')
-                                -- debugPrint(constructionTransf)
-                                -- print('nodeBetween =')
-                                -- debugPrint(nodeBetween)
+                    local oldEdge = api.engine.getComponent(nearestEdgeId, api.type.ComponentType.BASE_EDGE)
+                    if oldEdge == nil then return end
 
-                                _actions.splitEdge(
-                                    nearestEdgeId,
-                                    node0.position,
-                                    oldEdge.tangent0,
-                                    node1.position,
-                                    oldEdge.tangent1,
-                                    nodeBetween
-                                )
-                            end
-                        end
+                    local node0 = api.engine.getComponent(oldEdge.node0, api.type.ComponentType.BASE_NODE)
+                    local node1 = api.engine.getComponent(oldEdge.node1, api.type.ComponentType.BASE_NODE)
+                    if node0 and node1 then
+                        local nodeBetween = edgeUtils.getNodeBetweenByPosition(
+                            nearestEdgeId,
+                            -- LOLLO NOTE position and transf are always very similar
+                            {
+                                x = constructionTransf[13],
+                                y = constructionTransf[14],
+                                z = constructionTransf[15],
+                            }
+                        )
+
+                        -- print('node0 =') debugPrint(node0)
+                        -- print('oldEdge.tangent0 =') debugPrint(oldEdge.tangent0)
+                        -- print('node1 =') debugPrint(node1)
+                        -- print('oldEdge.tangent1 =') debugPrint(oldEdge.tangent1)
+                        -- print('splitterConstruction.transf =') debugPrint(constructionTransf)
+                        -- print('nodeBetween =') debugPrint(nodeBetween)
+
+                        _actions.splitEdge(
+                            nearestEdgeId,
+                            node0.position,
+                            oldEdge.tangent0,
+                            node1.position,
+                            oldEdge.tangent1,
+                            nodeBetween
+                        )
                     end
                 elseif name == _eventProperties.lollo_street_changer.eventName then
                     local nearestEdgeId = edgeUtils.street.getNearestEdgeId(
