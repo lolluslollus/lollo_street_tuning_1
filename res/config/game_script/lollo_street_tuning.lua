@@ -377,24 +377,24 @@ local _actions = {
         )
     end,
 
-    splitEdge = function(wholeEdgeId, position0, tangent0, position1, tangent1, nodeBetween)
-        if not(edgeUtils.isValidAndExistingId(wholeEdgeId)) or nodeBetween == nil then return end
+    splitEdge = function(wholeEdgeId, nodeBetween)
+        if not(edgeUtils.isValidAndExistingId(wholeEdgeId)) or type(nodeBetween) ~= 'table' then return end
 
-        local node0TangentLength = edgeUtils.getVectorLength({
-            tangent0.x,
-            tangent0.y,
-            tangent0.z
-        })
-        local node1TangentLength = edgeUtils.getVectorLength({
-            tangent1.x,
-            tangent1.y,
-            tangent1.z
-        })
-
-        local oldEdge = api.engine.getComponent(wholeEdgeId, api.type.ComponentType.BASE_EDGE)
-        local oldEdgeStreet = api.engine.getComponent(wholeEdgeId, api.type.ComponentType.BASE_EDGE_STREET)
+        local oldBaseEdge = api.engine.getComponent(wholeEdgeId, api.type.ComponentType.BASE_EDGE)
+        local oldBaseEdgeStreet = api.engine.getComponent(wholeEdgeId, api.type.ComponentType.BASE_EDGE_STREET)
         -- save a crash when a modded road underwent a breaking change, so it has no oldEdgeStreet
-        if oldEdge == nil or oldEdgeStreet == nil then return end
+        if oldBaseEdge == nil or oldBaseEdgeStreet == nil then return end
+
+        local node0 = api.engine.getComponent(oldBaseEdge.node0, api.type.ComponentType.BASE_NODE)
+        local node1 = api.engine.getComponent(oldBaseEdge.node1, api.type.ComponentType.BASE_NODE)
+        if node0 == nil or node1 == nil then return end
+
+        local isNodeBetweenOrientatedLikeMyEdge = edgeUtils.isXYZVeryClose(nodeBetween.refPosition0, node0.position)
+        local distance0 = isNodeBetweenOrientatedLikeMyEdge and nodeBetween.refDistance0 or nodeBetween.refDistance1
+        local distance1 = isNodeBetweenOrientatedLikeMyEdge and nodeBetween.refDistance1 or nodeBetween.refDistance0
+
+        local oldTan0Length = edgeUtils.getVectorLength(oldBaseEdge.tangent0)
+        local oldTan1Length = edgeUtils.getVectorLength(oldBaseEdge.tangent1)
 
         local playerOwned = api.type.PlayerOwned.new()
         playerOwned.player = api.engine.util.getPlayer()
@@ -406,49 +406,49 @@ local _actions = {
         local newEdge0 = api.type.SegmentAndEntity.new()
         newEdge0.entity = -1
         newEdge0.type = 0 -- ROAD
-        newEdge0.comp.node0 = oldEdge.node0
+        newEdge0.comp.node0 = oldBaseEdge.node0
         newEdge0.comp.node1 = -3
         newEdge0.comp.tangent0 = api.type.Vec3f.new(
-            tangent0.x * nodeBetween.length0 / node0TangentLength,
-            tangent0.y * nodeBetween.length0 / node0TangentLength,
-            tangent0.z * nodeBetween.length0 / node0TangentLength
+            oldBaseEdge.tangent0.x * distance0 / oldTan0Length,
+            oldBaseEdge.tangent0.y * distance0 / oldTan0Length,
+            oldBaseEdge.tangent0.z * distance0 / oldTan0Length
         )
         newEdge0.comp.tangent1 = api.type.Vec3f.new(
-            nodeBetween.tangent.x * nodeBetween.length0,
-            nodeBetween.tangent.y * nodeBetween.length0,
-            nodeBetween.tangent.z * nodeBetween.length0
+            nodeBetween.tangent.x * distance0,
+            nodeBetween.tangent.y * distance0,
+            nodeBetween.tangent.z * distance0
         )
-        newEdge0.comp.type = oldEdge.type -- respect bridge or tunnel
-        newEdge0.comp.typeIndex = oldEdge.typeIndex -- respect bridge or tunnel type
+        newEdge0.comp.type = oldBaseEdge.type -- respect bridge or tunnel
+        newEdge0.comp.typeIndex = oldBaseEdge.typeIndex -- respect bridge or tunnel type
         newEdge0.playerOwned = playerOwned
-        newEdge0.streetEdge = oldEdgeStreet
+        newEdge0.streetEdge = oldBaseEdgeStreet
 
         local newEdge1 = api.type.SegmentAndEntity.new()
         newEdge1.entity = -2
         newEdge1.type = 0 -- ROAD
         newEdge1.comp.node0 = -3
-        newEdge1.comp.node1 = oldEdge.node1
+        newEdge1.comp.node1 = oldBaseEdge.node1
         newEdge1.comp.tangent0 = api.type.Vec3f.new(
-            nodeBetween.tangent.x * nodeBetween.length1,
-            nodeBetween.tangent.y * nodeBetween.length1,
-            nodeBetween.tangent.z * nodeBetween.length1
+            nodeBetween.tangent.x * distance1,
+            nodeBetween.tangent.y * distance1,
+            nodeBetween.tangent.z * distance1
         )
         newEdge1.comp.tangent1 = api.type.Vec3f.new(
-            tangent1.x * nodeBetween.length1 / node1TangentLength,
-            tangent1.y * nodeBetween.length1 / node1TangentLength,
-            tangent1.z * nodeBetween.length1 / node1TangentLength
+            oldBaseEdge.tangent1.x * distance1 / oldTan1Length,
+            oldBaseEdge.tangent1.y * distance1 / oldTan1Length,
+            oldBaseEdge.tangent1.z * distance1 / oldTan1Length
         )
-        newEdge1.comp.type = oldEdge.type
-        newEdge1.comp.typeIndex = oldEdge.typeIndex
+        newEdge1.comp.type = oldBaseEdge.type
+        newEdge1.comp.typeIndex = oldBaseEdge.typeIndex
         newEdge1.playerOwned = playerOwned
-        newEdge1.streetEdge = oldEdgeStreet
+        newEdge1.streetEdge = oldBaseEdgeStreet
 
-        if type(oldEdge.objects) == 'table' then
+        if type(oldBaseEdge.objects) == 'table' then
             -- local edge0StationGroups = {}
             -- local edge1StationGroups = {}
             local edge0Objects = {}
             local edge1Objects = {}
-            for _, edgeObj in pairs(oldEdge.objects) do
+            for _, edgeObj in pairs(oldBaseEdge.objects) do
                 local edgeObjPosition = edgeUtils.getObjectPosition(edgeObj[1])
                 -- print('edge object position: old and new way')
                 -- debugPrint(edgeObjPositionOld)
@@ -456,8 +456,8 @@ local _actions = {
                 if type(edgeObjPosition) ~= 'table' then return end -- change nothing and leave
                 local assignment = _utils.getWhichEdgeGetsEdgeObjectAfterSplit(
                     edgeObjPosition,
-                    {position0.x, position0.y, position0.z},
-                    {position1.x, position1.y, position1.z},
+                    {node0.position.x, node0.position.y, node0.position.z},
+                    {node1.position.x, node1.position.y, node1.position.z},
                     nodeBetween
                 )
                 -- if assignment.assignToFirstEstimate == 0 then
@@ -493,16 +493,16 @@ local _actions = {
 
         local context = api.type.Context:new()
         context.checkTerrainAlignment = true -- default is false, true gives smoother Z
-        -- context.cleanupStreetGraph = true -- default is false, it seems to do nothing
+        -- context.cleanupStreetGraph = true -- default is false
         -- context.gatherBuildings = true  -- default is false
         -- context.gatherFields = true -- default is true
         context.player = api.engine.util.getPlayer() -- default is -1
 
         api.cmd.sendCommand(
             api.cmd.make.buildProposal(proposal, context, false), -- the 3rd param is "ignore errors"; wrong proposals will be discarded anyway
-            function(res, success)
-                -- print('LOLLO street splitter callback returned res = ')
-                -- debugPrint(res)
+            function(result, success)
+                -- print('LOLLO street splitter callback returned result = ')
+                -- debugPrint(result)
                 -- print('LOLLO street splitter callback returned success = ', success)
                 if not(success) then
                     print('splitEdge failed, proposal = ') debugPrint(proposal)
@@ -532,38 +532,24 @@ function data()
                     -- print('street splitter got nearestEdge =', nearestEdgeId or 'NIL')
                     if not(edgeUtils.isValidAndExistingId(nearestEdgeId)) then return end
 
-                    local oldEdge = api.engine.getComponent(nearestEdgeId, api.type.ComponentType.BASE_EDGE)
-                    if oldEdge == nil then return end
+                    local nodeBetween = edgeUtils.getNodeBetweenByPosition(
+                        nearestEdgeId,
+                        -- LOLLO NOTE position and transf are always very similar
+                        {
+                            x = constructionTransf[13],
+                            y = constructionTransf[14],
+                            z = constructionTransf[15],
+                        }
+                    )
 
-                    local node0 = api.engine.getComponent(oldEdge.node0, api.type.ComponentType.BASE_NODE)
-                    local node1 = api.engine.getComponent(oldEdge.node1, api.type.ComponentType.BASE_NODE)
-                    if node0 and node1 then
-                        local nodeBetween = edgeUtils.getNodeBetweenByPosition(
-                            nearestEdgeId,
-                            -- LOLLO NOTE position and transf are always very similar
-                            {
-                                x = constructionTransf[13],
-                                y = constructionTransf[14],
-                                z = constructionTransf[15],
-                            }
-                        )
+                    -- print('node0 =') debugPrint(node0)
+                    -- print('oldEdge.tangent0 =') debugPrint(oldEdge.tangent0)
+                    -- print('node1 =') debugPrint(node1)
+                    -- print('oldEdge.tangent1 =') debugPrint(oldEdge.tangent1)
+                    -- print('splitterConstruction.transf =') debugPrint(constructionTransf)
+                    -- print('nodeBetween =') debugPrint(nodeBetween)
 
-                        -- print('node0 =') debugPrint(node0)
-                        -- print('oldEdge.tangent0 =') debugPrint(oldEdge.tangent0)
-                        -- print('node1 =') debugPrint(node1)
-                        -- print('oldEdge.tangent1 =') debugPrint(oldEdge.tangent1)
-                        -- print('splitterConstruction.transf =') debugPrint(constructionTransf)
-                        -- print('nodeBetween =') debugPrint(nodeBetween)
-
-                        _actions.splitEdge(
-                            nearestEdgeId,
-                            node0.position,
-                            oldEdge.tangent0,
-                            node1.position,
-                            oldEdge.tangent1,
-                            nodeBetween
-                        )
-                    end
+                    _actions.splitEdge(nearestEdgeId, nodeBetween)
                 elseif name == _eventProperties.lollo_street_changer.eventName then
                     local nearestEdgeId = edgeUtils.street.getNearestEdgeId(
                         constructionTransf
