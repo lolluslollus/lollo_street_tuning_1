@@ -389,9 +389,13 @@ local _actions = {
         local node1 = api.engine.getComponent(oldBaseEdge.node1, api.type.ComponentType.BASE_NODE)
         if node0 == nil or node1 == nil then return end
 
-        local isNodeBetweenOrientatedLikeMyEdge = edgeUtils.isXYZVeryClose(nodeBetween.refPosition0, node0.position)
+        if not(edgeUtils.isXYZSame(nodeBetween.refPosition0, node0.position)) and not(edgeUtils.isXYZSame(nodeBetween.refPosition0, node1.position)) then
+            print('WARNING: splitEdge cannot find the nodes')
+        end
+        local isNodeBetweenOrientatedLikeMyEdge = edgeUtils.isXYZSame(nodeBetween.refPosition0, node0.position)
         local distance0 = isNodeBetweenOrientatedLikeMyEdge and nodeBetween.refDistance0 or nodeBetween.refDistance1
         local distance1 = isNodeBetweenOrientatedLikeMyEdge and nodeBetween.refDistance1 or nodeBetween.refDistance0
+        local tanSign = isNodeBetweenOrientatedLikeMyEdge and 1 or -1
 
         local oldTan0Length = edgeUtils.getVectorLength(oldBaseEdge.tangent0)
         local oldTan1Length = edgeUtils.getVectorLength(oldBaseEdge.tangent1)
@@ -414,9 +418,9 @@ local _actions = {
             oldBaseEdge.tangent0.z * distance0 / oldTan0Length
         )
         newEdge0.comp.tangent1 = api.type.Vec3f.new(
-            nodeBetween.tangent.x * distance0,
-            nodeBetween.tangent.y * distance0,
-            nodeBetween.tangent.z * distance0
+            nodeBetween.tangent.x * distance0 * tanSign,
+            nodeBetween.tangent.y * distance0 * tanSign,
+            nodeBetween.tangent.z * distance0 * tanSign
         )
         newEdge0.comp.type = oldBaseEdge.type -- respect bridge or tunnel
         newEdge0.comp.typeIndex = oldBaseEdge.typeIndex -- respect bridge or tunnel type
@@ -429,9 +433,9 @@ local _actions = {
         newEdge1.comp.node0 = -3
         newEdge1.comp.node1 = oldBaseEdge.node1
         newEdge1.comp.tangent0 = api.type.Vec3f.new(
-            nodeBetween.tangent.x * distance1,
-            nodeBetween.tangent.y * distance1,
-            nodeBetween.tangent.z * distance1
+            nodeBetween.tangent.x * distance1 * tanSign,
+            nodeBetween.tangent.y * distance1 * tanSign,
+            nodeBetween.tangent.z * distance1 * tanSign
         )
         newEdge1.comp.tangent1 = api.type.Vec3f.new(
             oldBaseEdge.tangent1.x * distance1 / oldTan1Length,
