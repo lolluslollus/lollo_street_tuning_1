@@ -8,20 +8,20 @@ function data()
 				This mod adds a selection of streets with multiple lanes, to allow overtaking, but with the same width, so you can try different road types without destroying your buildings. Some road types reserve the right lane for passenger or cargo vehicles, they carry extra signs on the pavement.
 				Use the categories to select the right street type, for ease of navigation.
 				[h1]Problem B: little control destroying pieces of road[/h1]
-				This mod adds two slicers into the street construction menu. They split a piece of road in two segments.
+				This mod adds two slicers to the street construction menu. They split a piece of road in two segments.
 				- The automatic slicer preserves all buildings, just plop it where you want.
 				- The manual slicer is a backup. Place it on the roadside and rotate it with <m>, <shift> + <m>, <n> or <shift> + <n>, carefully adjusting its location.
 				Both slicers destroy themselves after placement, leaving your road split in two segments. Debug mode and AltGr + L will reveal the effect.
-				After splitting a piece of road, you will be able to delete a segment only, preserving the rest.
+				After splitting a piece of road, you can alter or delete a small segment only, preserving the rest.
 				[h1]Problem C: trams only run in the rightmost lane[/h1]
 				This mod adds a street construction to toggle extra tram tracks. Plop it on a road and it will add or remove extra tram tracks, if there are enough lanes.
-				Previous iterations exposed roads with many tram tracks in the street menu, but that was too crammed.
+				Previous iterations exposed roads with many tram tracks in the street menu, but that was ugly.
 				[h1]Problem D: vehicles queue up unnecessarily[/h1]
 				The game does not offer lane-bound waypoints, so routing the vehicles might involve some trial and error.
 				[h2]Solution: use dedicated roads[/h2]
-				Replace the offending road with one of the same width, that reserves the right lane for certain vehicles. Use the standard replace tool (the magic wand), helping yourself with shift to select a shorter segment of road. Select the new road with the category icon to avoid confusion. Toggle bus lanes on or off as required, using the standard tool. Toggle tram tracks in the middle as required, using the dedicated street construction tool.
+				Replace the offending road with one of the same width, that reserves the right lane for certain vehicles. Use the standard replace tool (the magic wand), helping yourself with <shift> to select a shorter segment of road. Select the new road with the category icon to avoid confusion. Toggle bus lanes on or off as required, using the standard tool. Toggle tram tracks in the middle as required, using the dedicated street construction tool.
 				[h2]Fine-grained solution: split your road into segments[/h2]
-				When you build a long enough piece of road, the game splits it into seamless segments. The joints between them allow vehicles to change lanes. The trouble is, these segments are fairly long, and crossings do not allow switching lanes.
+				When you build a long enough piece of road, the game splits it into seamless segments. The joints between them allow vehicles to change lanes. The trouble is, these segments are fairly long, and crossings do not allow switching lanes. If you have a shortish stretch of road, then a crossing, then another shortish stretch, then another crossing, chances are, vehicles cannot change lanes for a long while.
 				You can split a piece of road by adding an intersecting street and deleting it, but this often involves destroying several buildings. To keep the carnage down, use the slicer. Once you have multiple segments, you can change the road in some or all of them, selectively.
 				[h1]Problem E: little control building roads[/h1]
 				This mod adds a "street construction" to build chunks of road with useful parameters. These chunks can be single or multiple, arranged in parallel. Lock them to keep their shape pretty and prevent other roads merging in. Unlock them to treat them like ordinary roads. You cannot relock an unlocked chunk.
