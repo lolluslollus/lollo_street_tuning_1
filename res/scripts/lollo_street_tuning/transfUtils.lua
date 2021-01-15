@@ -192,6 +192,21 @@ utils.oneTwoThree2XYZ = function(arr)
     }
 end
 
+utils.getPositionRaisedBy = function(position, raiseBy)
+    -- faster than calling mul()
+    if position == nil or type(raiseBy) ~= 'number' then return position end
+
+    if position.x ~= nil and position.y ~= nil and position.z ~= nil then
+        return {
+            x = position.x, y = position.y, z = position.z + raiseBy
+        }
+    else
+        return {
+            position[1], position[2], position[3] + raiseBy
+        }
+    end
+end
+
 utils.getVectorLength = function(xyz)
     if type(xyz) ~= 'table' and type(xyz) ~= 'userdata' then return nil end
     local x = xyz.x or xyz[1] or 0.0
