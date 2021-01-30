@@ -87,7 +87,7 @@ helper.getNearbyObjectIds = function(transf, searchRadius, componentType)
         api.type.Vec3f.new(_position[1] + _searchRadius, _position[2] + _searchRadius, 9999)
     )
     local results = {}
-    local callback0 = function(entity, boundingVolume)
+    local callbackDefault = function(entity, boundingVolume)
         -- print('callback0 found entity', entity)
         -- print('boundingVolume =')
         -- debugPrint(boundingVolume)
@@ -98,7 +98,25 @@ helper.getNearbyObjectIds = function(transf, searchRadius, componentType)
 
         results[#results+1] = entity
     end
-    api.engine.system.octreeSystem.findIntersectingEntities(_box0, callback0)
+    -- LOLLO NOTE nodes may have a bounding box: for them, we check the position only
+    local callback4Nodes = function(entity, boundingVolume)
+        -- print('callback0 found entity', entity)
+        -- print('boundingVolume =')
+        -- debugPrint(boundingVolume)
+        if not(entity) then return {} end
+
+        local node = api.engine.getComponent(entity, api.type.ComponentType.BASE_NODE)
+        if node == nil then return {} end
+        -- print('the entity has the right component type')
+
+        if math.abs(node.position.x - _position[1]) > _searchRadius then return {} end
+        if math.abs(node.position.y - _position[2]) > _searchRadius then return {} end
+        if math.abs(node.position.z - _position[3]) > _searchRadius then return {} end
+
+        results[#results+1] = entity
+    end
+    local callbackInUse = componentType == api.type.ComponentType.BASE_NODE and callback4Nodes or callbackDefault
+    api.engine.system.octreeSystem.findIntersectingEntities(_box0, callbackInUse)
 
     return results
 end
@@ -628,24 +646,7 @@ helper.getConnectedEdgeIds = function(nodeIds)
 end
 
 helper.isNumVeryClose = function(num1, num2, significantFigures)
-    if type(num1) ~= 'number' or type(num2) ~= 'number' then return false end
-
-    if not(significantFigures) then significantFigures = 5
-    elseif type(significantFigures) ~= 'number' then return false
-    elseif significantFigures < 1 or significantFigures > 10 then return false
-    end
-
-    local _formatString = "%." .. math.floor(significantFigures) .. "g"
-
-    -- wrong (less accurate):
-    -- local roundedNum1 = math.ceil(num1 * roundingFactor)
-    -- local roundedNum2 = math.ceil(num2 * roundingFactor)
-    -- better:
-    -- local roundedNum1 = math.floor(num1 * roundingFactor + 0.5)
-    -- local roundedNum2 = math.floor(num2 * roundingFactor + 0.5)
-    -- return roundedNum1 == roundedNum2
-    -- but what I really want are the first significant figures, never mind how big the number is
-    return (_formatString):format(num1) == (_formatString):format(num2)
+    return transfUtils.isNumVeryClose(num1, num2, significantFigures)
 end
 
 helper.isXYZVeryClose = function(xyz1, xyz2, roundingFactor)
@@ -755,6 +756,30 @@ helper.street.getNearestEdgeId = function(transf)
 end
 
 helper.track = {}
+helper.track.getConnectedEdgeIds = function(nodeIds)
+    -- print('getConnectedEdgeIds starting')
+    if type(nodeIds) ~= 'table' or #nodeIds < 1 then return {} end
+
+    local _map = api.engine.system.streetSystem.getNode2TrackEdgeMap()
+    local results = {}
+
+    for _, nodeId in pairs(nodeIds) do
+        if helper.isValidAndExistingId(nodeId) then
+            local connectedEdgeIdsUserdata = _map[nodeId] -- userdata
+            if connectedEdgeIdsUserdata ~= nil then
+                for _, edgeId in pairs(connectedEdgeIdsUserdata) do -- cannot use connectedEdgeIdsUserdata[index] here
+                    -- getNode2TrackEdgeMap returns the same as getNode2SegmentMap, so we check it ourselves
+                    if api.engine.getComponent(edgeId, api.type.ComponentType.BASE_EDGE_TRACK) ~= nil then
+                        arrayUtils.addUnique(results, edgeId)
+                    end
+                end
+            end
+        end
+    end
+
+    -- print('getConnectedEdgeIds is about to return') debugPrint(results)
+    return results
+end
 helper.track.getContiguousEdges = function(edgeId, acceptedTrackTypes)
     local _calcContiguousEdges = function(firstEdgeId, firstNodeId, map, isInsertFirst, results)
         local refEdgeId = firstEdgeId
@@ -809,7 +834,7 @@ helper.track.getContiguousEdges = function(edgeId, acceptedTrackTypes)
 
     local _baseEdge = api.engine.getComponent(edgeId, api.type.ComponentType.BASE_EDGE)
     local _edgeId = edgeId
-    local _map = api.engine.system.streetSystem.getNode2SegmentMap()
+    local _map = api.engine.system.streetSystem.getNode2TrackEdgeMap()
     local results = { edgeId }
 
     _calcContiguousEdges(_edgeId, _baseEdge.node0, _map, true, results)
