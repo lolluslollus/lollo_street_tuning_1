@@ -236,7 +236,7 @@ local _actions = {
         -- proposal.constructionsToRemove:add(constructionId) -- fails to add
 
         api.cmd.sendCommand(
-            api.cmd.make.buildProposal(proposal, nil, false), -- the 3rd param is "ignore errors"; wrong proposals will be discarded anyway
+            api.cmd.make.buildProposal(proposal, nil, true), -- the 3rd param is "ignore errors"; wrong proposals will be discarded anyway
             function(res, success)
                 -- print('LOLLO _bulldozeConstruction res = ')
                 -- debugPrint(res)
@@ -314,21 +314,24 @@ local _actions = {
         } ]]
 
         api.cmd.sendCommand(
-            api.cmd.make.buildProposal(proposal, nil, false),
+            api.cmd.make.buildProposal(proposal, nil, true),
             function(res, success)
                 -- print('LOLLO res = ')
                 -- debugPrint(res)
                 --for _, v in pairs(res.entities) do print(v) end
                 -- print('LOLLO success = ')
                 -- debugPrint(success)
+                if not(success) then
+                    print('Warning: streetTuning.replageEdgeWithSame failed, proposal = ') debugPrint(proposal)
+                end
             end
         )
     end,
 
     replaceEdgeWithStreetType = function(oldEdgeId, newStreetTypeId)
         -- replaces the street without destroying the buildings
-        if type(oldEdgeId) ~= 'number' or oldEdgeId < 0
-        or type(newStreetTypeId) ~= 'number' or newStreetTypeId < 0 then return end
+        if not(edgeUtils.isValidAndExistingId(oldEdgeId))
+        or not(edgeUtils.isValidId(newStreetTypeId)) then return end
 
         local oldEdge = api.engine.getComponent(oldEdgeId, api.type.ComponentType.BASE_EDGE)
         local oldEdgeStreet = api.engine.getComponent(oldEdgeId, api.type.ComponentType.BASE_EDGE_STREET)
@@ -367,12 +370,15 @@ local _actions = {
         proposal.streetProposal.edgesToAdd[1] = newEdge
 
         api.cmd.sendCommand(
-            api.cmd.make.buildProposal(proposal, nil, false),
+            api.cmd.make.buildProposal(proposal, nil, true),
             function(res, success)
                 -- print('LOLLO res = ')
                 -- debugPrint(res)
                 -- print('LOLLO _replaceEdgeWithStreetType success = ')
                 -- debugPrint(success)
+                if not(success) then
+                    print('Warning: streetTuning.replaceEdgeWithStreetType failed, proposal = ') debugPrint(proposal)
+                end
             end
         )
     end,
@@ -503,13 +509,13 @@ local _actions = {
         context.player = api.engine.util.getPlayer() -- default is -1
 
         api.cmd.sendCommand(
-            api.cmd.make.buildProposal(proposal, context, false), -- the 3rd param is "ignore errors"; wrong proposals will be discarded anyway
+            api.cmd.make.buildProposal(proposal, context, true), -- the 3rd param is "ignore errors"; wrong proposals will be discarded anyway
             function(result, success)
                 -- print('LOLLO street splitter callback returned result = ')
                 -- debugPrint(result)
                 -- print('LOLLO street splitter callback returned success = ', success)
                 if not(success) then
-                    print('splitEdge failed, proposal = ') debugPrint(proposal)
+                    print('Warning: streetTuning.splitEdge failed, proposal = ') debugPrint(proposal)
                 end
             end
         )
@@ -523,7 +529,7 @@ function data()
         handleEvent = function(src, id, name, param)
             if (id ~= _eventId) then return end
             if type(param) ~= 'table' then return end
-            if type(param.constructionEntityId) == 'number' and param.constructionEntityId >= 0 then
+            if edgeUtils.isValidAndExistingId(param.constructionEntityId) then
                 -- print('param.constructionEntityId =', param.constructionEntityId or 'NIL')
                 local constructionTransf = api.engine.getComponent(param.constructionEntityId, api.type.ComponentType.CONSTRUCTION).transf
                 constructionTransf = transfUtilUG.new(constructionTransf:cols(0), constructionTransf:cols(1), constructionTransf:cols(2), constructionTransf:cols(3))
@@ -568,7 +574,7 @@ function data()
                         constructionTransf
                     )
                     -- print('nearestEdgeId =', nearestEdgeId or 'NIL')
-                    if edgeUtils.isValidId(nearestEdgeId) then
+                    if edgeUtils.isValidAndExistingId(nearestEdgeId) then
                         local oldEdgeStreet = api.engine.getComponent(nearestEdgeId, api.type.ComponentType.BASE_EDGE_STREET)
                         if oldEdgeStreet and oldEdgeStreet.streetType then
                             local newStreetTypeFileName = _utils.getToggledAllTramTracksStreetTypeFileName(
@@ -607,7 +613,7 @@ function data()
 
                 -- game.interface.bulldoze(param.constructionEntityId)
                 _actions.bulldozeConstruction(param.constructionEntityId)
-            elseif edgeUtils.isValidId(param.edgeId) then
+            elseif edgeUtils.isValidAndExistingId(param.edgeId) and edgeUtils.isValidId(param.streetTypeId) then
                 -- print('param.edgeId =', param.edgeId or 'NIL')
                 if name == _eventProperties.noTramRightRoadBuilt.eventName then
                     _actions.replaceEdgeWithStreetType(
@@ -746,7 +752,7 @@ function data()
                             )
                         end
 
-                        -- add bus lane right if requiored for current road
+                        -- add bus lane right if required for current road
                         local addBusLaneEventParams = {}
                         for _, addedSegment in pairs(addedSegments) do
                             if addedSegment and addedSegment.streetEdge
