@@ -596,7 +596,7 @@ helper.getNodeIdsBetweenEdgeIds = function(edgeIds, isIncludeExclusiveOuterNodes
 end
 
 helper.getObjectPosition = function(objectId)
-    print('getObjectPosition starting')
+    -- print('getObjectPosition starting')
     if not(helper.isValidAndExistingId(objectId)) then return nil end
 
     local modelInstanceList = api.engine.getComponent(objectId, api.type.ComponentType.MODEL_INSTANCE_LIST)
@@ -623,6 +623,30 @@ helper.getObjectPosition = function(objectId)
     }
 end
 
+helper.getObjectTransf = function(objectId)
+    -- print('getObjectTransf starting')
+    if not(helper.isValidAndExistingId(objectId)) then return nil end
+
+    local modelInstanceList = api.engine.getComponent(objectId, api.type.ComponentType.MODEL_INSTANCE_LIST)
+    if not(modelInstanceList) then return nil end
+
+    local fatInstances = modelInstanceList.fatInstances
+    if not(fatInstances) or not(fatInstances[1]) or not(fatInstances[1].transf) or not(fatInstances[1].transf.cols) then return nil end
+
+    local objectTransf = transfUtilsUG.new(
+        fatInstances[1].transf:cols(0),
+        fatInstances[1].transf:cols(1),
+        fatInstances[1].transf:cols(2),
+        fatInstances[1].transf:cols(3)
+    )
+    local result = {}
+    for _, value in pairs(objectTransf) do
+        result[#result+1] = value
+    end
+
+    return result
+end
+
 helper.getConnectedEdgeIds = function(nodeIds)
     -- print('getConnectedEdgeIds starting')
     if type(nodeIds) ~= 'table' or #nodeIds < 1 then return {} end
@@ -635,13 +659,43 @@ helper.getConnectedEdgeIds = function(nodeIds)
             local connectedEdgeIdsUserdata = _map[nodeId] -- userdata
             if connectedEdgeIdsUserdata ~= nil then
                 for _, edgeId in pairs(connectedEdgeIdsUserdata) do -- cannot use connectedEdgeIdsUserdata[index] here
-                    arrayUtils.addUnique(results, edgeId)
+                    if helper.isValidAndExistingId(edgeId) then
+                        arrayUtils.addUnique(results, edgeId)
+                    end
                 end
             end
         end
     end
 
     -- print('getConnectedEdgeIds is about to return') debugPrint(results)
+    return results
+end
+
+helper.getEdgeIdsConnectedToEdgeId = function(edgeId)
+    -- print('getEdgeIdsConnectedToEdgeId starting')
+    if not(helper.isValidAndExistingId(edgeId)) then return {} end
+    local baseEdge = api.engine.getComponent(edgeId, api.type.ComponentType.BASE_EDGE)
+    if baseEdge == nil then return {} end
+
+    local nodeIds = { baseEdge.node0, baseEdge.node1 }
+
+    local _map = api.engine.system.streetSystem.getNode2SegmentMap()
+    local results = {}
+
+    for _, nodeId in pairs(nodeIds) do
+        if helper.isValidAndExistingId(nodeId) then
+            local connectedEdgeIdsUserdata = _map[nodeId] -- userdata
+            if connectedEdgeIdsUserdata ~= nil then
+                for _, connectedEdgeId in pairs(connectedEdgeIdsUserdata) do -- cannot use connectedEdgeIdsUserdata[index] here
+                    if connectedEdgeId ~= edgeId and helper.isValidAndExistingId(connectedEdgeId) then
+                        arrayUtils.addUnique(results, connectedEdgeId)
+                    end
+                end
+            end
+        end
+    end
+
+    -- print('getEdgeIdsConnectedToEdgeId is about to return') debugPrint(results)
     return results
 end
 
