@@ -314,6 +314,7 @@ local function _getStreetTypesWithApi()
     local results = {}
     local streetTypes = api.res.streetTypeRep.getAll()
     for ii, fileName in pairs(streetTypes) do
+        -- LOLLO TODO see if a different loop returns the sequence with better consistency
         local streetProperties = api.res.streetTypeRep.get(ii)
         results[#results+1] = {
             categories = _cloneCategories(streetProperties.categories),
