@@ -247,7 +247,7 @@ local _actions = {
         )
     end,
 
-    replageEdgeWithSame = function(oldEdgeId)
+    replaceEdgeWithSame = function(oldEdgeId)
         -- only for testing
         -- replaces a street segment with an identical one, without destroying the buildings
         if type(oldEdgeId) ~= 'number' or oldEdgeId < 0 then return end
@@ -322,7 +322,7 @@ local _actions = {
                 -- print('LOLLO success = ')
                 -- debugPrint(success)
                 if not(success) then
-                    print('Warning: streetTuning.replageEdgeWithSame failed, proposal = ') debugPrint(proposal)
+                    print('Warning: streetTuning.replaceEdgeWithSame failed, proposal = ') debugPrint(proposal)
                 end
             end
         )
@@ -540,26 +540,26 @@ function data()
                 elseif name == _eventProperties.lollo_street_splitter_w_api.eventName then
                     local nearestEdgeId = edgeUtils.street.getNearestEdgeId(constructionTransf)
                     -- print('street splitter got nearestEdge =', nearestEdgeId or 'NIL')
-                    if not(edgeUtils.isValidAndExistingId(nearestEdgeId)) then return end
+                    if edgeUtils.isValidAndExistingId(nearestEdgeId) then
+                        local nodeBetween = edgeUtils.getNodeBetweenByPosition(
+                            nearestEdgeId,
+                            -- LOLLO NOTE position and transf are always very similar
+                            {
+                                x = constructionTransf[13],
+                                y = constructionTransf[14],
+                                z = constructionTransf[15],
+                            }
+                        )
 
-                    local nodeBetween = edgeUtils.getNodeBetweenByPosition(
-                        nearestEdgeId,
-                        -- LOLLO NOTE position and transf are always very similar
-                        {
-                            x = constructionTransf[13],
-                            y = constructionTransf[14],
-                            z = constructionTransf[15],
-                        }
-                    )
+                        -- print('node0 =') debugPrint(node0)
+                        -- print('oldEdge.tangent0 =') debugPrint(oldEdge.tangent0)
+                        -- print('node1 =') debugPrint(node1)
+                        -- print('oldEdge.tangent1 =') debugPrint(oldEdge.tangent1)
+                        -- print('splitterConstruction.transf =') debugPrint(constructionTransf)
+                        -- print('nodeBetween =') debugPrint(nodeBetween)
 
-                    -- print('node0 =') debugPrint(node0)
-                    -- print('oldEdge.tangent0 =') debugPrint(oldEdge.tangent0)
-                    -- print('node1 =') debugPrint(node1)
-                    -- print('oldEdge.tangent1 =') debugPrint(oldEdge.tangent1)
-                    -- print('splitterConstruction.transf =') debugPrint(constructionTransf)
-                    -- print('nodeBetween =') debugPrint(nodeBetween)
-
-                    _actions.splitEdge(nearestEdgeId, nodeBetween)
+                        _actions.splitEdge(nearestEdgeId, nodeBetween)
+                    end
                 elseif name == _eventProperties.lollo_street_changer.eventName then
                     local nearestEdgeId = edgeUtils.street.getNearestEdgeId(
                         constructionTransf
@@ -567,7 +567,7 @@ function data()
                     -- print('nearestEdge =', nearestEdgeId or 'NIL')
                     if type(nearestEdgeId) == 'number' and nearestEdgeId >= 0 then
                         -- print('LOLLO nearestEdgeId = ', nearestEdgeId or 'NIL')
-                        _actions.replageEdgeWithSame(nearestEdgeId)
+                        _actions.replaceEdgeWithSame(nearestEdgeId)
                     end
                 elseif name == _eventProperties.lollo_toggle_all_tram_tracks.eventName then
                     local nearestEdgeId = edgeUtils.street.getNearestEdgeId(
