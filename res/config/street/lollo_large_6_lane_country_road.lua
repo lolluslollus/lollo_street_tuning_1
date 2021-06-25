@@ -17,7 +17,7 @@ function data()
         sidewalkHeight = .02,
         yearFrom = 1925,
         yearTo = 0,
-        upgrade = false,
+        aiLock = false,
         country = true,
         speed = 100.0,
         -- priority = this crashes 7, -- LOLLO NOTE this is copied from airports, it should give priority to this street

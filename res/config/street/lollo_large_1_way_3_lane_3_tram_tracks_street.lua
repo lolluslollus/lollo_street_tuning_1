@@ -13,7 +13,7 @@ function data()
         sidewalkHeight = .3,
         yearFrom = 1925,
         yearTo = 0,	
-        upgrade = true,
+        aiLock = true,
         country = false,
         speed = 60.0,
         type = "lollo_large_1_way_3_lane_3_tram_tracks_street",

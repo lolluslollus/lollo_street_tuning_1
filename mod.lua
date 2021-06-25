@@ -232,7 +232,7 @@ function data()
         newStreet.yearFrom = oldStreet.yearFrom or 0
         newStreet.yearTo = oldStreet.yearTo or 0
         newStreet.priority = oldStreet.priority
-        newStreet.upgrade = oldStreet.upgrade -- false makes it visible in the construction menu
+        newStreet.aiLock = oldStreet.aiLock -- false makes it visible in the construction menu
         newStreet.country = oldStreet.country or false
         -- LOLLO NOTE busAndTramRight has no effect if cars are not allowed
         -- the upgrade status (nothing to do with the flag above) may show false, but the lane is blocked for cars,
@@ -330,7 +330,7 @@ function data()
 
     return {
         info = {
-            minorVersion = 40,
+            minorVersion = 41,
             severityAdd = 'NONE',
             severityRemove = 'WARNING',
             name = _('_NAME'),

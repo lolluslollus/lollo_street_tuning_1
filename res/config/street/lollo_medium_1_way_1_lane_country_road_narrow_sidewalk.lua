@@ -10,7 +10,7 @@
         sidewalkHeight = 0.0,
         yearFrom = 1925,
         yearTo = 0,
-        upgrade = false,
+        aiLock = false,
         country = true,
         speed = 80.0,
         type = 'lollo_medium_1_way_1_lane_country_road_narrow_sidewalk.lua',

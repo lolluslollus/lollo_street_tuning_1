@@ -176,12 +176,12 @@ local function _getStreetFilesContents(streetDirPath, fileNamePrefix)
         -- debugPrint(streetFiles[i])
         if isOk then
             local newRecord = {
+                aiLock = fileData.aiLock, -- true means, do not show this street in the menu
                 categories = fileData.categories or {},
                 fileName = (fileNamePrefix or '') .. fileUtils.getFileNameFromPath(streetFiles[i]),
                 name = fileData.name or '',
                 sidewalkWidth = fileData.sidewalkWidth or 0.2,
                 streetWidth = fileData.streetWidth or 0.2,
-                upgrade = fileData.upgrade, -- true means, do not show this street in the menu
                 yearTo = fileData.yearTo or 1925
             }
             if type(newRecord.fileName) == 'string' and newRecord.fileName:len() > 0
@@ -250,7 +250,7 @@ local function _getStreetDataFiltered_Stock(streetDataTable)
 
     local results = {}
     for _, strDataRecord in pairs(streetDataTable) do
-        if strDataRecord.yearTo == 0 and (strDataRecord.upgrade == false or strDataRecord.isAllTramTracks == true) then
+        if strDataRecord.yearTo == 0 and (not(strDataRecord.aiLock) or strDataRecord.isAllTramTracks == true) then
             if arrayUtils.arrayHasValue(strDataRecord.categories, helper.getStreetCategories().COUNTRY)
             or arrayUtils.arrayHasValue(strDataRecord.categories, helper.getStreetCategories().HIGHWAY)
             or arrayUtils.arrayHasValue(strDataRecord.categories, helper.getStreetCategories().ONE_WAY)
@@ -267,7 +267,7 @@ local function _getStreetDataFiltered_StockAndReservedLanes(streetDataTable)
 
     local results = {}
     for _, strDataRecord in pairs(streetDataTable) do
-        if strDataRecord.yearTo == 0 and (strDataRecord.upgrade == false or strDataRecord.isAllTramTracks == true) then
+        if strDataRecord.yearTo == 0 and (not(strDataRecord.aiLock) or strDataRecord.isAllTramTracks == true) then
             if arrayUtils.arrayHasValue(strDataRecord.categories, helper.getStreetCategories().COUNTRY)
             or arrayUtils.arrayHasValue(strDataRecord.categories, helper.getStreetCategories().COUNTRY_BUS_RIGHT)
             or arrayUtils.arrayHasValue(strDataRecord.categories, helper.getStreetCategories().COUNTRY_CARGO_RIGHT)
@@ -317,6 +317,7 @@ local function _getStreetTypesWithApi()
         -- LOLLO TODO see if a different loop returns the sequence with better consistency
         local streetProperties = api.res.streetTypeRep.get(ii)
         results[#results+1] = {
+            aiLock = streetProperties.aiLock,
             categories = _cloneCategories(streetProperties.categories),
             fileName = fileName,
             icon = streetProperties.icon,
@@ -326,7 +327,6 @@ local function _getStreetTypesWithApi()
             rightLaneWidth = (streetProperties.laneConfigs[2] or {}).width or 0,
             sidewalkWidth = streetProperties.sidewalkWidth,
             streetWidth = streetProperties.streetWidth,
-            upgrade = streetProperties.upgrade,
             yearTo = streetProperties.yearTo
         }
     end

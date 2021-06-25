@@ -8,7 +8,7 @@ function data()
         streetWidth = 0.2,
         yearFrom = game.config.busLaneYearFrom,
         yearTo = 0,
-        upgrade = false,
+        aiLock = false,
         country = false,
         speed = 20.0,
         type = 'lollo_1m_path',
