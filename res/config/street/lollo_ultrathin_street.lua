@@ -6,7 +6,8 @@ function data()
         streetWidth = 0.1,
         yearFrom = 65535, -- LOLLO NOTE this bars the street from the street menu -- this street is for the slicer only
         yearTo = 0,
-        aiLock = true, -- do not display in the menu, this street is for the slicer only
+        aiLock = true,
+        visibility = false, -- do not display in the menu, this street is for the slicer only - unreliable
         country = false,
         speed = 100.0,
         type = 'lollo_ultrathin_street',

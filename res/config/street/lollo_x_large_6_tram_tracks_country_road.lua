@@ -8,6 +8,7 @@ function data()
         yearFrom = 1925,
         yearTo = 0,
         aiLock = true,
+        visibility = true,
         country = true,
         speed = 100.0,
         type = "lollo_x_large_6_tram_tracks_country_road",

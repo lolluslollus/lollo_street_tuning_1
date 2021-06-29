@@ -11,7 +11,8 @@
         sidewalkHeight = 0,
         yearFrom = 65535, -- LOLLO NOTE this bars the street from the street menu
         yearTo = 0,
-        aiLock = true, -- do not display this street in the menu
+        aiLock = true,
+        visibility = false, -- do not display this street in the menu, unreliable
         country = false,
         speed = 100.0, -- was 50.0,
         type = 'lollo_internal_only_tyres_right.lua',

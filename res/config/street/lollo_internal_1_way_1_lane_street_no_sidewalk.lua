@@ -14,7 +14,8 @@
         sidewalkHeight = 0,
         yearFrom = 65535, -- LOLLO NOTE this bars the street from the street menu
         yearTo = 0,
-        aiLock = true, -- do not display this street in the menu
+        aiLock = true,
+        visibility = false, -- do not display this street in the menu, unreliable
         country = false,
         speed = 100.0, -- was 50.0,
         -- priority = this crashes 4, -- LOLLO NOTE this is copied from airports, it should give priority to this street

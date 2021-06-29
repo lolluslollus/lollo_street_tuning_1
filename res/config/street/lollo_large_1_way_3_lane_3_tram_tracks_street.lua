@@ -14,6 +14,7 @@ function data()
         yearFrom = 1925,
         yearTo = 0,	
         aiLock = true,
+        visibility = true,
         country = false,
         speed = 60.0,
         type = "lollo_large_1_way_3_lane_3_tram_tracks_street",

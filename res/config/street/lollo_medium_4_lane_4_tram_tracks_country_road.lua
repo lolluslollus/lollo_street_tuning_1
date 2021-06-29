@@ -15,6 +15,7 @@ function data()
         yearFrom = 1925,
         yearTo = 0,
         aiLock = true,
+        visibility = true,
         country = true,
         speed = 80.0,
         -- priority = this crashes 5, -- LOLLO NOTE this is copied from airports, it should give priority to this street

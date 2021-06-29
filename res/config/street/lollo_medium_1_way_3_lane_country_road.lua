@@ -17,7 +17,8 @@
         sidewalkHeight = .00,
         yearFrom = 1925,
         yearTo = 0,
-        aiLock = false,
+        aiLock = true,
+        visibility = true,
         country = true,
         speed = 80.0,
         -- priority = this crashes 4, -- LOLLO NOTE this is copied from airports, it should give priority to this street
