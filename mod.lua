@@ -232,7 +232,8 @@ function data()
         newStreet.yearFrom = oldStreet.yearFrom or 0
         newStreet.yearTo = oldStreet.yearTo or 0
         newStreet.priority = oldStreet.priority
-        newStreet.aiLock = oldStreet.aiLock -- false makes it visible in the construction menu
+        newStreet.aiLock = oldStreet.aiLock or false
+        -- LOLLO NOTE the api cannot read or write visibility, use the third parameter of the add function instead.
         newStreet.country = oldStreet.country or false
         -- LOLLO NOTE busAndTramRight has no effect if cars are not allowed
         -- the upgrade status (nothing to do with the flag above) may show false, but the lane is blocked for cars,
@@ -265,7 +266,6 @@ function data()
         newStreet.embankmentSlopeLow = oldStreet.embankmentSlopeLow
         newStreet.embankmentSlopeHigh = oldStreet.embankmentSlopeHigh
         newStreet.maintenanceCost = oldStreet.maintenanceCost
-
         newStreet.laneConfigs = oldStreet.laneConfigs
         -- print('LOLLO fileName=', fileName)
         if _tryReplaceOuterLanes(newStreet, targetTransportModes) == true then
@@ -279,12 +279,24 @@ function data()
         local streetDataTable = streetUtils.getGlobalStreetData()
         for _, streetDataRecordSmall in pairs(streetDataTable) do
             -- print('LOLLO fileName =', streetDataRecordSmall.fileName or '')
+            -- if stringUtils.stringContains(streetDataRecordSmall.fileName, 'town_medium_one_way_new') then
+            --     print('about 1 to add variants to ', streetDataRecordSmall.fileName)
+            -- end
+
             local streetId = api.res.streetTypeRep.find(streetDataRecordSmall.fileName)
             if type(streetId) == 'number' and streetId > 0 then
                 local streetDataRecordFull = api.res.streetTypeRep.get(streetId)
+
+                -- if stringUtils.stringContains(streetDataRecordSmall.fileName, 'town_medium_one_way_new') then
+                --     print('about 2 to add variants to ', streetDataRecordSmall.fileName)
+                -- end
+
                 if streetDataRecordFull ~= nil
                 and streetDataRecordFull.laneConfigs ~= nil
                 and #streetDataRecordFull.laneConfigs > 2 then
+                    -- if stringUtils.stringContains(streetDataRecordSmall.fileName, 'town_medium_one_way_new') then
+                    --     print('about 3 to add variants to ', streetDataRecordSmall.fileName, 'nearly there')
+                    -- end
                     _addOneStreetWithOuterReservedLanes(
                         streetDataRecordFull,
                         streetDataRecordSmall.fileName,
@@ -378,6 +390,16 @@ function data()
                 streetChunksHelper.getStreetHairpinParams()
             )
             _addStreetsWithReservedLanes()
+
+            -- print('street types:')
+            -- local streetTypes = api.res.streetTypeRep.getAll()
+            -- for ii, fileName in pairs(streetTypes) do
+            --     -- LOLLO TODO see if a different loop returns the sequence with better consistency
+            --     local streetProperties = api.res.streetTypeRep.get(ii)
+            --     print('street file name: ', fileName or 'NIL')
+            --     debugPrint(streetProperties)
+            -- end
+            -- print('end of street types')
         end
     }
 end
