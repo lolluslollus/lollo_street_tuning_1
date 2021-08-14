@@ -44,7 +44,7 @@ function data()
 				[b]I would love lorry-only or tram-only lanes, but the game does not allow this for now.[/b]
 				[h2]Word of warning[/h2]
 				The game won't allow changing or removing a piece of road, whose sizes have changed in a mod update.
-				This affects the "Medium 1-way street with 1 lane and extra narrow pavement" and the "Medium 1-way street with 1 lane".
+				This affects the "Medium 1-way street with 1 lane and extra narrow pavement" and the "Medium 1-way street with 1 lane", which I shipped before Summer 2020.
 				To fix this:
 				- locate the mod in your folder "C:\Program Files (x86)\Steam\steamapps\workshop\content\1066780"
 				- locate the file "lollo_medium_1_way_1_lane_street.lua"
