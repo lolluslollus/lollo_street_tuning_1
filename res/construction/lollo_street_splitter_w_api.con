@@ -4,6 +4,10 @@ local transf = require 'transf'
 function data()
     return {
         type = 'STREET_CONSTRUCTION',
+        -- type = 'STREET_TOOL',
+        -- type = 'STREET_UPGRADE',
+        -- type = 'STREET_TOOLS',
+        -- type = 'STREET_UPGRADES',
         description = {
             name = _('Smart street splitter'),
             description = _(
