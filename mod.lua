@@ -342,6 +342,23 @@ function data()
         end
     end
 
+    local function _hideAllTramTracksStreets()
+        -- print('_hideAllTramTracksStreets starting')
+        local streetTypeFileNames = api.res.streetTypeRep.getAll()
+        for streetTypeId, streetTypeFileName in pairs(streetTypeFileNames) do
+            if type(streetTypeId) == 'number' and streetTypeId > 0 then
+                local streetDataRecordFull = api.res.streetTypeRep.get(streetTypeId)
+                -- print('working on streetID =', streetTypeId)
+                if streetDataRecordFull ~= nil
+                and streetDataRecordFull.laneConfigs ~= nil
+                and streetUtils.isStreetAllTramTracks(streetDataRecordFull.laneConfigs) then
+                    -- print('about to set street with id =', streetTypeId, ' and name =', streetTypeFileName, ' to invisible')
+                    api.res.streetTypeRep.setVisible(streetTypeId, false)
+                end
+            end
+        end
+    end
+
     return {
         info = {
             minorVersion = 42,
@@ -392,16 +409,7 @@ function data()
                 streetChunksHelper.getStreetHairpinParams()
             )
             _addStreetsWithReservedLanes()
-
-            -- print('street types:')
-            -- local streetTypes = api.res.streetTypeRep.getAll()
-            -- for ii, fileName in pairs(streetTypes) do
-            --     -- LOLLO TODO see if a different loop returns the sequence with better consistency
-            --     local streetProperties = api.res.streetTypeRep.get(ii)
-            --     print('street file name: ', fileName or 'NIL')
-            --     debugPrint(streetProperties)
-            -- end
-            -- print('end of street types')
+            _hideAllTramTracksStreets()
         end
     }
 end
