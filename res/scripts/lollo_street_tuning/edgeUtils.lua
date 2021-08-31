@@ -77,8 +77,54 @@ local function swap(num1, num2)
     num2 = swapTemp
 end
 
+helper.getNearbyObjectIds = function(transf, searchRadius, componentType)
+    if type(transf) ~= 'table' then return {} end
+
+    if not(componentType) then componentType = api.type.ComponentType.BASE_EDGE end
+
+    local _position = transfUtils.getVec123Transformed({0, 0, 0}, transf)
+    local _searchRadius = searchRadius or 0.5
+    local _box0 = api.type.Box3.new(
+        api.type.Vec3f.new(_position[1] - _searchRadius, _position[2] - _searchRadius, -9999),
+        api.type.Vec3f.new(_position[1] + _searchRadius, _position[2] + _searchRadius, 9999)
+    )
+    local results = {}
+    local callbackDefault = function(entity, boundingVolume)
+        -- print('callback0 found entity', entity)
+        -- print('boundingVolume =')
+        -- debugPrint(boundingVolume)
+        if not(entity) then return end
+
+        if not(api.engine.getComponent(entity, componentType)) then return end
+        -- print('the entity has the right component type')
+
+        results[#results+1] = entity
+    end
+    -- LOLLO NOTE nodes may have a bounding box: for them, we check the position only
+    local callback4Nodes = function(entity, boundingVolume)
+        -- print('callback0 found entity', entity)
+        -- print('boundingVolume =')
+        -- debugPrint(boundingVolume)
+        if not(entity) then return {} end
+
+        local node = api.engine.getComponent(entity, api.type.ComponentType.BASE_NODE)
+        if node == nil then return {} end
+        -- print('the entity has the right component type')
+
+        if math.abs(node.position.x - _position[1]) > _searchRadius then return end
+        if math.abs(node.position.y - _position[2]) > _searchRadius then return end
+        if math.abs(node.position.z - _position[3]) > _searchRadius then return end
+
+        results[#results+1] = entity
+    end
+    local callbackInUse = componentType == api.type.ComponentType.BASE_NODE and callback4Nodes or callbackDefault
+    api.engine.system.octreeSystem.findIntersectingEntities(_box0, callbackInUse)
+
+    return results
+end
+
 helper.getNearbyObjects = function(transf, searchRadius, componentType)
-    if type(transf) ~= 'table' then return end
+    if type(transf) ~= 'table' then return {} end
 
     if not(componentType) then componentType = api.type.ComponentType.BASE_EDGE end
 

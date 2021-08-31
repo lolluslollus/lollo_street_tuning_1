@@ -123,6 +123,76 @@ utils.getVecTransformed = function(vecXYZ, transf)
     }
 end
 
+utils.getSkewTransf = function(oldPosNW, oldPosNE, oldPosSE, oldPosSW, newPosNW, newPosNE, newPosSE, newPosSW)
+    -- oldPosNW.x * transf[1] + oldPosNW.y * transf[5] + oldPosNW.z * transf[9] + transf[13] = newPosNW.x
+    -- oldPosNW.x * transf[2] + oldPosNW.y * transf[6] + oldPosNW.z * transf[10] + transf[14] = newPosNW.y
+    -- oldPosNW.x * transf[3] + oldPosNW.y * transf[7] + oldPosNW.z * transf[11] + transf[15] = newPosNW.z
+
+    -- oldPosNE.x * transf[1] + oldPosNE.y * transf[5] + oldPosNE.z * transf[9] + transf[13] = newPosNE.x
+    -- oldPosNE.x * transf[2] + oldPosNE.y * transf[6] + oldPosNE.z * transf[10] + transf[14] = newPosNE.y
+    -- oldPosNE.x * transf[3] + oldPosNE.y * transf[7] + oldPosNE.z * transf[11] + transf[15] = newPosNE.z
+
+    -- oldPosSE.x * transf[1] + oldPosSE.y * transf[5] + oldPosSE.z * transf[9] + transf[13] = newPosSE.x
+    -- oldPosSE.x * transf[2] + oldPosSE.y * transf[6] + oldPosSE.z * transf[10] + transf[14] = newPosSE.y
+    -- oldPosSE.x * transf[3] + oldPosSE.y * transf[7] + oldPosSE.z * transf[11] + transf[15] = newPosSE.z
+
+    -- oldPosSW.x * transf[1] + oldPosSW.y * transf[5] + oldPosSW.z * transf[9] + transf[13] = newPosSW.x
+    -- oldPosSW.x * transf[2] + oldPosSW.y * transf[6] + oldPosSW.z * transf[10] + transf[14] = newPosSW.y
+    -- oldPosSW.x * transf[3] + oldPosSW.y * transf[7] + oldPosSW.z * transf[11] + transf[15] = newPosSW.z
+
+    -- 12 equations, 12 unknowns, it could work
+
+    local matrix = {
+        { oldPosNW.x, 0, 0,  oldPosNW.y, 0, 0,  oldPosNW.z, 0, 0,  1, 0, 0 },
+        { oldPosNE.x, 0, 0,  oldPosNE.y, 0, 0,  oldPosNE.z, 0, 0,  1, 0, 0 },
+        { oldPosSE.x, 0, 0,  oldPosSE.y, 0, 0,  oldPosSE.z, 0, 0,  1, 0, 0 },
+        { oldPosSW.x, 0, 0,  oldPosSW.y, 0, 0,  oldPosSW.z, 0, 0,  1, 0, 0 },
+
+        { 0, oldPosNW.x, 0,  0, oldPosNW.y, 0,  0, oldPosNW.z, 0,  0, 1, 0 },
+        { 0, oldPosNE.x, 0,  0, oldPosNE.y, 0,  0, oldPosNE.z, 0,  0, 1, 0 },
+        { 0, oldPosSE.x, 0,  0, oldPosSE.y, 0,  0, oldPosSE.z, 0,  0, 1, 0 },
+        { 0, oldPosSW.x, 0,  0, oldPosSW.y, 0,  0, oldPosSW.z, 0,  0, 1, 0 },
+
+        { 0, 0, oldPosNW.x,  0, 0, oldPosNW.y,  0, 0, oldPosNW.z,  0, 0, 1 },
+        { 0, 0, oldPosNE.x,  0, 0, oldPosNE.y,  0, 0, oldPosNE.z,  0, 0, 1 },
+        { 0, 0, oldPosSE.x,  0, 0, oldPosSE.y,  0, 0, oldPosSE.z,  0, 0, 1 },
+        { 0, 0, oldPosSW.x,  0, 0, oldPosSW.y,  0, 0, oldPosSW.z,  0, 0, 1 },
+    }
+
+    -- M * transf = newPos => Minv * M * transf = Minv * newPos => transf = Minv * newPos
+    -- sadly, it does not work: the matrix has rank 6
+    local invertedMatrix = matrixUtils.invert(matrix)
+    if invertedMatrix == nil then return nil end
+
+    local bitsOfTransf = matrixUtils.mul(
+        invertedMatrix,
+        {
+            {newPosNW.x},
+            {newPosNE.x},
+            {newPosSE.x},
+            {newPosSW.x},
+
+            {newPosNW.y},
+            {newPosNE.y},
+            {newPosSE.y},
+            {newPosSW.y},
+
+            {newPosNW.z},
+            {newPosNE.z},
+            {newPosSE.z},
+            {newPosSW.z},
+        }
+    )
+
+    local result = {
+        bitsOfTransf[1], bitsOfTransf[2], bitsOfTransf[3], 0,
+        bitsOfTransf[4], bitsOfTransf[5], bitsOfTransf[6], 0,
+        bitsOfTransf[7], bitsOfTransf[8], bitsOfTransf[9], 0,
+        bitsOfTransf[10], bitsOfTransf[11], bitsOfTransf[12], 1,
+    }
+    return result
+end
+
 utils.getVec123Transformed = function(vec123, transf)
     return {
         vec123[1] * transf[1] + vec123[2] * transf[5] + vec123[3] * transf[9] + transf[13],
@@ -329,10 +399,57 @@ utils.get1MLaneTransf = function(pos1, pos2)
     return result
 end
 
-utils.getPosTanX2Normalised = function(posTanX2)
+utils.get1MModelTransf = function(pos1, pos2)
+    -- gets a transf to fit a 1 m long model (with a non-zero width) between two points
+    -- using transfUtils.getVecTransformed(), solve this system:
+    -- first point: 0, 0, 0 => pos1
+    -- transf[13] = pos1[1]
+    -- transf[14] = pos1[2]
+    -- transf[15] = pos1[3]
+    -- second point: 1, 0, 0 => pos2
+    -- transf[1] + transf[13] = pos2[1]
+    -- transf[2] + transf[14] = pos2[2]
+    -- transf[3] + transf[15] = pos2[3]
+    -- third point: 0, 1, 0 => pos1 + {(pos2[2] - pos1[2]) / xyLength, (pos1[1] - pos2[1]) / xyLength, 0}
+    -- transf[5] + transf[13] = pos1[1] + (pos2[2] - pos1[2]) / xyLength
+    -- transf[6] + transf[14] = pos1[2] + (pos1[1] - pos2[1]) / xyLength
+    -- transf[7] + transf[15] = pos1[3]
+    -- fourth point: 0, 0, 1 => pos1 + { 0, 0, 1 }
+    -- transf[9] + transf[13] = pos1[1]
+    -- transf[10] + transf[14] = pos1[2]
+    -- transf[11] + transf[15] = pos1[3] + 1
+    local xyLength = utils.getVectorLength({pos1[1] - pos2[1], pos1[2] - pos2[2], 0})
+    if not(xyLength) or xyLength == 0 then return {1, 0, 0, 0,  0, 1, 0, 0,  0, 0, 1, 0,  0, 0, 0, 1} end
+
+    local result = {
+        pos2[1] - pos1[1],
+        pos2[2] - pos1[2],
+        pos2[3] - pos1[3],
+        0,
+
+        (pos2[2] - pos1[2]) / xyLength,
+        (pos1[1] - pos2[1]) / xyLength,
+        0,
+        0,
+
+        0,
+        0,
+        1,
+        0,
+
+        pos1[1],
+        pos1[2],
+        pos1[3],
+        1
+    }
+    -- print('unitaryLaneTransf =') debugPrint(result)
+    return result
+end
+
+utils.getPosTanX2Normalised = function(posTanX2, targetLength)
     local pos1 = {posTanX2[1][1][1], posTanX2[1][1][2], posTanX2[1][1][3]}
-    local tan1 = utils.getVectorNormalised(posTanX2[1][2], 2)
-    local tan2 = utils.getVectorNormalised(posTanX2[2][2], 2)
+    local tan1 = utils.getVectorNormalised(posTanX2[1][2], targetLength)
+    local tan2 = utils.getVectorNormalised(posTanX2[2][2], targetLength)
     local pos2 = {
         posTanX2[1][1][1] + tan1[1],
         posTanX2[1][1][2] + tan1[2],
@@ -397,6 +514,29 @@ utils.getExtrapolatedPosX2Continuation = function(pos1, pos2, length)
             pos2[3] + pos3Delta[3],
         }
     end
+end
+
+utils.getPosTanX2Reversed = function(posTanX2)
+    if type(posTanX2) ~= 'table' then return posTanX2 end
+
+    return {
+        {
+            {
+                posTanX2[2][1][1], posTanX2[2][1][2], posTanX2[2][1][3],
+            },
+            {
+                -posTanX2[2][2][1], -posTanX2[2][2][2], -posTanX2[2][2][3],
+            },
+        },
+        {
+            {
+                posTanX2[1][1][1], posTanX2[1][1][2], posTanX2[1][1][3],
+            },
+            {
+                -posTanX2[1][2][1], -posTanX2[1][2][2], -posTanX2[1][2][3],
+            },
+        },
+    }
 end
 
 utils.isNumVeryClose = function(num1, num2, significantFigures)
