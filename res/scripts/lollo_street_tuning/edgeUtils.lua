@@ -458,6 +458,22 @@ helper.getNodeBetweenOLD = function(position0, tangent0, position1, tangent1, be
     return nodeBetween
 end
 
+helper.isEdgeFrozen = function(edgeId)
+    if not(helper.isValidAndExistingId(edgeId)) then return false end
+
+    local conId = api.engine.system.streetConnectorSystem.getConstructionEntityForEdge(edgeId)
+    if not(helper.isValidAndExistingId(conId)) then return false end
+
+    local conData = api.engine.getComponent(conId, api.type.ComponentType.CONSTRUCTION)
+    if not(conData) or not(conData.frozenEdges) then return false end
+
+    for _, value in pairs(conData.frozenEdges) do
+        if value == edgeId then return true end
+    end
+
+    return false
+end
+
 helper.getEdgeObjectsIdsWithModelId = function(edgeObjects, refModelId)
     local results = {}
     if type(edgeObjects) ~= 'table' or not(helper.isValidId(refModelId)) then return results end

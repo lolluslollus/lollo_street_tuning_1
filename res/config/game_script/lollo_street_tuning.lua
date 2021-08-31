@@ -540,7 +540,7 @@ function data()
                 elseif name == _eventProperties.lollo_street_splitter_w_api.eventName then
                     local nearestEdgeId = edgeUtils.street.getNearestEdgeId(constructionTransf)
                     -- print('street splitter got nearestEdge =', nearestEdgeId or 'NIL')
-                    if edgeUtils.isValidAndExistingId(nearestEdgeId) then
+                    if edgeUtils.isValidAndExistingId(nearestEdgeId) and not(edgeUtils.isEdgeFrozen(nearestEdgeId)) then
                         local nodeBetween = edgeUtils.getNodeBetweenByPosition(
                             nearestEdgeId,
                             -- LOLLO NOTE position and transf are always very similar
@@ -550,14 +550,7 @@ function data()
                                 z = constructionTransf[15],
                             }
                         )
-
-                        -- print('node0 =') debugPrint(node0)
-                        -- print('oldEdge.tangent0 =') debugPrint(oldEdge.tangent0)
-                        -- print('node1 =') debugPrint(node1)
-                        -- print('oldEdge.tangent1 =') debugPrint(oldEdge.tangent1)
-                        -- print('splitterConstruction.transf =') debugPrint(constructionTransf)
                         -- print('nodeBetween =') debugPrint(nodeBetween)
-
                         _actions.splitEdge(nearestEdgeId, nodeBetween)
                     end
                 elseif name == _eventProperties.lollo_street_changer.eventName then
