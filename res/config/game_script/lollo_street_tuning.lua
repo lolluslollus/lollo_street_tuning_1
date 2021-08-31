@@ -604,7 +604,6 @@ function data()
                     end
                 end
 
-                -- game.interface.bulldoze(param.constructionEntityId)
                 _actions.bulldozeConstruction(param.constructionEntityId)
             elseif edgeUtils.isValidAndExistingId(param.edgeId) and edgeUtils.isValidId(param.streetTypeId) then
                 -- print('param.edgeId =', param.edgeId or 'NIL')
@@ -633,47 +632,51 @@ function data()
                     function()
                         if not param.result or not param.result[1] then return end
 
-                        -- game.interface.bulldoze(constructionEntity.id) -- cannot call it from this thread, so I raise and call it in the worker thread
                         if _isBuildingStreetSplitter(param) then
-                            game.interface.sendScriptEvent(
+                            api.cmd.sendCommand(api.cmd.make.sendScriptEvent(
+                                string.sub(debug.getinfo(1, 'S').source, 1),
                                 _eventId,
                                 _eventProperties.lollo_street_splitter.eventName,
                                 {
                                     constructionEntityId = param.result[1]
                                 }
-                            )
+                            ))
                         elseif _isBuildingStreetSplitterWithApi(param) then
-                            game.interface.sendScriptEvent(
+                            api.cmd.sendCommand(api.cmd.make.sendScriptEvent(
+                                string.sub(debug.getinfo(1, 'S').source, 1),
                                 _eventId,
                                 _eventProperties.lollo_street_splitter_w_api.eventName,
                                 {
                                     constructionEntityId = param.result[1]
                                 }
-                            )
+                            ))
                         elseif _isBuildingStreetGetInfo(param) then
-                            game.interface.sendScriptEvent(
+                            api.cmd.sendCommand(api.cmd.make.sendScriptEvent(
+                                string.sub(debug.getinfo(1, 'S').source, 1),
                                 _eventId,
                                 _eventProperties.lollo_street_get_info.eventName,
                                 {
                                     constructionEntityId = param.result[1]
                                 }
-                            )
+                            ))
                         elseif _isBuildingStreetChanger(param) then
-                            game.interface.sendScriptEvent(
+                            api.cmd.sendCommand(api.cmd.make.sendScriptEvent(
+                                string.sub(debug.getinfo(1, 'S').source, 1),
                                 _eventId,
                                 _eventProperties.lollo_street_changer.eventName,
                                 {
                                     constructionEntityId = param.result[1]
                                 }
-                            )
+                            ))
                         elseif _isBuildingToggleAllTracks(param) then
-                            game.interface.sendScriptEvent(
+                            api.cmd.sendCommand(api.cmd.make.sendScriptEvent(
+                                string.sub(debug.getinfo(1, 'S').source, 1),
                                 _eventId,
                                 _eventProperties.lollo_toggle_all_tram_tracks.eventName,
                                 {
                                     constructionEntityId = param.result[1]
                                 }
-                            )
+                            ))
                         end
                     end,
                     _myErrorHandler
@@ -738,11 +741,12 @@ function data()
                             end
                         end
                         for i = 1, #removeTramTrackEventParams do
-                            game.interface.sendScriptEvent(
+                            api.cmd.sendCommand(api.cmd.make.sendScriptEvent(
+                                string.sub(debug.getinfo(1, 'S').source, 1),
                                 _eventId,
                                 _eventProperties.noTramRightRoadBuilt.eventName,
                                 removeTramTrackEventParams[i]
-                            )
+                            ))
                         end
 
                         -- add bus lane right if required for current road
@@ -760,22 +764,24 @@ function data()
                             end
                         end
                         for i = 1, #addBusLaneEventParams do
-                            game.interface.sendScriptEvent(
+                            -- game.interface.sendScriptEvent(
+                            --     _eventId,
+                            --     _eventProperties.pathBuilt.eventName,
+                            --     addBusLaneEventParams[i]
+                            -- )
+                            api.cmd.sendCommand(api.cmd.make.sendScriptEvent(
+                                string.sub(debug.getinfo(1, 'S').source, 1),
                                 _eventId,
                                 _eventProperties.pathBuilt.eventName,
                                 addBusLaneEventParams[i]
-                            )
+                            ))
                         end
+
+                        -- we don't change any more stuff, the rest is ok as it is
                     end,
                     _myErrorHandler
                 )
             end
-            -- if (name == "select") then -- clicking a street won't select it
-            --     -- with this event, param is the selected item id
-            --     local entity = game.interface.getEntity(param)
-            --     print('selected entity =')
-            --     debugPrint(entity)
-            -- end
         end,
         update = function()
         end,
