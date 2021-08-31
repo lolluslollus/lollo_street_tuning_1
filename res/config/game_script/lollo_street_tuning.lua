@@ -13,7 +13,7 @@ local transfUtilUG = require('transf')
 -- To solve the issue, replace those stations with some others available in your game.
 
 local function _myErrorHandler(err)
-    print('lollo street tuning error caught: ', err)
+    print('lollo street tuning caught error: ', err)
 end
 
 local _eventId = '__lolloStreetTuningEvent__'
@@ -583,25 +583,30 @@ function data()
                         end
                     end
                 elseif name == _eventProperties.lollo_street_get_info.eventName then
-                    local nearbyEntities = edgeUtils.getNearbyEntities(constructionTransf)
-                    if type(nearbyEntities) == 'table' then
-                        debugPrint('<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<')
-                        print('LOLLO GET INFO found nearby entities = ')
-                        for _, entity in pairs(nearbyEntities) do
-                            debugPrint('<<<<<<<<')
-                            debugPrint(entity)
-                            if entity.type == 'BASE_EDGE' and not(stringUtils.isNullOrEmptyString(entity.streetType)) then
-                                print('base edge component =')
-                                debugPrint(api.engine.getComponent(entity.id, api.type.ComponentType.BASE_EDGE))
-                                print('base edge street component =')
-                                debugPrint(api.engine.getComponent(entity.id, api.type.ComponentType.BASE_EDGE_STREET))
-                                print('street properties =')
-                                debugPrint(api.res.streetTypeRep.get(api.res.streetTypeRep.find(entity.streetType)))
+                    xpcall( -- { 386681, 688570, 552461, }
+                        function()
+                            local nearbyEdges = edgeUtils.getNearbyObjects(constructionTransf, 0.5, api.type.ComponentType.BASE_EDGE)
+                            local nearbyConstructions = edgeUtils.getNearbyObjects(constructionTransf, 0.5, api.type.ComponentType.CONSTRUCTION)
+                            print('nearby edges = <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<')
+                            for edgeId, props in pairs(nearbyEdges) do
+                                if edgeUtils.isValidId(edgeId) then
+                                    print('edge id =', edgeId)
+                                    debugPrint(props)
+                                end
                             end
-                            debugPrint('>>>>>>>>')
-                        end
-                        debugPrint('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>')
-                    end
+                            print('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>')
+                            -- The following can freeze the game when pointed at a freestyle station
+                            -- print('nearby constructions = <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<')
+                            -- for conId, props in pairs(nearbyConstructions) do
+                            --     if edgeUtils.isValidId(conId) then
+                            --         print('construction id =', conId)
+                            --         debugPrint(props)
+                            --     end
+                            -- end
+                            -- print('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>')
+                        end,
+                        _myErrorHandler
+                )
                 end
 
                 _actions.bulldozeConstruction(param.constructionEntityId)
