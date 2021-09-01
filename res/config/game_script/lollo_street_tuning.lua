@@ -743,7 +743,7 @@ function data()
                             and addedSegment.streetEdge.streetType ~= nil then
                                 if streetUtils.isTramRightBarred(addedSegment.streetEdge.streetType) then
                                     removeTramTrackEventParams[#removeTramTrackEventParams+1] = {
-                                        edgeId = edgeUtils.getLastBuiltEdgeId(param.data.entity2tn, addedSegment),
+                                        edgeId = addedSegment.entity,
                                         streetTypeId = addedSegment.streetEdge.streetType
                                     }
                                 end
@@ -766,7 +766,7 @@ function data()
                             and addedSegment.streetEdge.streetType ~= nil then
                                 if streetUtils.isPath(addedSegment.streetEdge.streetType) then
                                     addBusLaneEventParams[#addBusLaneEventParams+1] = {
-                                        edgeId = edgeUtils.getLastBuiltEdgeId(param.data.entity2tn, addedSegment),
+                                        edgeId = addedSegment.entity,
                                         streetTypeId = addedSegment.streetEdge.streetType
                                     }
                                 end
