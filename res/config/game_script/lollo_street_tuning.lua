@@ -592,6 +592,10 @@ function data()
                                 if edgeUtils.isValidId(edgeId) then
                                     print('edge id =', edgeId)
                                     debugPrint(props)
+                                    print('street edge props =')
+                                    debugPrint(api.engine.getComponent(edgeId, api.type.ComponentType.BASE_EDGE_STREET))
+                                    print('track edge props =')
+                                    debugPrint(api.engine.getComponent(edgeId, api.type.ComponentType.BASE_EDGE_TRACK))
                                 end
                             end
                             print('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>')
