@@ -1,3 +1,5 @@
+-- LOLLO NOTE this is obsolete, we keep the model so it won't break old games
+
 local idTransf = {1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1}
 local laneutil = require('laneutil')
 
