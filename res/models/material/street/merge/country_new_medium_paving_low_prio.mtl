@@ -38,7 +38,7 @@ return {
 			wrapT = "REPEAT",
 		},
 		normal_scale = {
-			normalScale = 1,
+			normalScale = 10,
 		},
 		operation_1 = {
 			mode = "WORLD_XY",
