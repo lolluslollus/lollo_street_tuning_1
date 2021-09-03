@@ -58,10 +58,10 @@ local function updateFn_2_1_lane_narrow_sidewalk_to_2_lane_one_way(params)
     local _pitchAngle = pitchHelper.getPitchAngle(params)
 
     local connectorFace = {
-        {2, -8.0, 0.0, 1.0},
-        {2, 8.0, 0.0, 1.0},
-        {-2, 6.0, 0.0, 1.0},
-        {-2, -6.0, 0.0, 1.0},
+        {2.1, -8.0, 0.0, 1.0},
+        {2.1, 8.0, 0.0, 1.0},
+        {-2.1, 6.0, 0.0, 1.0},
+        {-2.1, -6.0, 0.0, 1.0},
     }
     result.groundFaces = _getGroundFaces(connectorFace)
 
@@ -168,10 +168,10 @@ local function updateFn_2_1_lane_narrow_sidewalk_to_2_lane(params)
     local result = { cost = 0, skipCollision = true, }
 
     local connectorFace = {
-        {2, -8.0, 0.0, 1.0},
-        {2, 8.0, 0.0, 1.0},
-        {-2, 6.0, 0.0, 1.0},
-        {-2, -6.0, 0.0, 1.0},
+        {2.1, -8.0, 0.0, 1.0},
+        {2.1, 8.0, 0.0, 1.0},
+        {-2.1, 6.0, 0.0, 1.0},
+        {-2.1, -6.0, 0.0, 1.0},
     }
     result.groundFaces = _getGroundFaces(connectorFace)
 
@@ -260,10 +260,10 @@ local function updateFn_2_1_lane_medium_sidewalk_to_2_lane_one_way(params)
     local _pitchAngle = pitchHelper.getPitchAngle(params)
 
     local connectorFace = {
-        {2, -8.0, 0.0, 1.0},
-        {2, 8.0, 0.0, 1.0},
-        {-2, 8.0, 0.0, 1.0},
-        {-2, -8.0, 0.0, 1.0}
+        {2.1, -8.0, 0.0, 1.0},
+        {2.1, 8.0, 0.0, 1.0},
+        {-2.1, 8.0, 0.0, 1.0},
+        {-2.1, -8.0, 0.0, 1.0}
     }
     result.groundFaces = _getGroundFaces(connectorFace)
 
@@ -354,10 +354,10 @@ local function updateFn_2_1_lane_medium_sidewalk_to_2_lane(params)
     local result = { cost = 0, skipCollision = true, }
 
     local connectorFace = {
-        {2, -8.0, 0.0, 1.0},
-        {2, 8.0, 0.0, 1.0},
-        {-2, 8.0, 0.0, 1.0},
-        {-2, -8.0, 0.0, 1.0}
+        {2.1, -8.0, 0.0, 1.0},
+        {2.1, 8.0, 0.0, 1.0},
+        {-2.1, 8.0, 0.0, 1.0},
+        {-2.1, -8.0, 0.0, 1.0}
     }
     result.groundFaces = _getGroundFaces(connectorFace)
 
@@ -447,10 +447,10 @@ local function updateFn_3_1_lane_narrow_sidewalk_to_3_lane_one_way(params)
     local _pitchAngle = pitchHelper.getPitchAngle(params)
 
     local connectorFace = {
-        {2, -8.0, 0.0, 1.0},
-        {2, 8.0, 0.0, 1.0},
-        {-2, 8.0, 0.0, 1.0},
-        {-2, -8.0, 0.0, 1.0}
+        {5.1, -8.0, 0.0, 1.0},
+        {5.1, 8.0, 0.0, 1.0},
+        {-2.1, 8.0, 0.0, 1.0},
+        {-2.1, -8.0, 0.0, 1.0}
     }
     result.groundFaces = _getGroundFaces(connectorFace)
 
@@ -560,8 +560,8 @@ local function updateFn_3_1_lane_medium_sidewalk_to_3_lane_one_way(params)
     local _pitchAngle = pitchHelper.getPitchAngle(params)
 
     local connectorFace = {
-        {2, -12.0, 0.0, 1.0},
-        {2, 12.0, 0.0, 1.0},
+        {2.1, -12.0, 0.0, 1.0},
+        {2.1, 12.0, 0.0, 1.0},
         {-10, 12.0, 0.0, 1.0},
         {-10, -12.0, 0.0, 1.0}
     }
@@ -674,8 +674,8 @@ local function updateFn_4_1_lane_narrow_sidewalk_to_4_lane_one_way(params)
     local _pitchAngle = pitchHelper.getPitchAngle(params)
 
     local connectorFace = {
-        {2, -8.0, 0.0, 1.0},
-        {2, 8.0, 0.0, 1.0},
+        {2.1, -8.0, 0.0, 1.0},
+        {2.1, 8.0, 0.0, 1.0},
         {-6, 8.0, 0.0, 1.0},
         {-6, -8.0, 0.0, 1.0}
     }
@@ -812,8 +812,8 @@ local function updateFn_4_1_lane_narrow_sidewalk_to_4_lane(params)
     local result = { cost = 0, skipCollision = true, }
 
     local connectorFace = {
-        {2, -8.0, 0.0, 1.0},
-        {2, 8.0, 0.0, 1.0},
+        {2.1, -8.0, 0.0, 1.0},
+        {2.1, 8.0, 0.0, 1.0},
         {-6, 8.0, 0.0, 1.0},
         {-6, -8.0, 0.0, 1.0}
     }
@@ -1089,10 +1089,10 @@ local function updateFn_2_2_lane_one_way_to_6_lane_x_large(params)
     local result = { cost = 0, skipCollision = true, }
 
     local connectorFace = {
-        {2, -16.0, 0.0, 1.0},
-        {2, 16.0, 0.0, 1.0},
-        {-2, 16.0, 0.0, 1.0},
-        {-2, -16.0, 0.0, 1.0}
+        {9.1, -16.0, 0.0, 1.0},
+        {9.1, 16.0, 0.0, 1.0},
+        {-2.1, 16.0, 0.0, 1.0},
+        {-2.1, -16.0, 0.0, 1.0}
     }
     result.groundFaces = _getGroundFaces(connectorFace)
 
@@ -1227,10 +1227,10 @@ local function updateFn_6_1_lane_one_way_to_6_lane_x_large(params)
     local result = { cost = 0, skipCollision = true, }
 
     local connectorFace = {
-        {2, -14.0, 0.0, 1.0},
-        {2, 14.0, 0.0, 1.0},
-        {-2, 12.0, 0.0, 1.0},
-        {-2, -12.0, 0.0, 1.0}
+        {9.1, -14.0, 0.0, 1.0},
+        {9.1, 14.0, 0.0, 1.0},
+        {-2.1, 12.0, 0.0, 1.0},
+        {-2.1, -12.0, 0.0, 1.0}
     }
     result.groundFaces = _getGroundFaces(connectorFace)
 
@@ -1408,10 +1408,10 @@ local function updateFn_Motorway_6_1_lane_one_way_to_6_lane_x_large(params)
     local result = { cost = 0, skipCollision = true, }
 
     local connectorFace = {
-        {2, -14.0, 0.0, 1.0},
-        {2, 14.0, 0.0, 1.0},
-        {-2, 12.0, 0.0, 1.0},
-        {-2, -12.0, 0.0, 1.0}
+        {9.1, -14.0, 0.0, 1.0},
+        {9.1, 14.0, 0.0, 1.0},
+        {-2.1, 12.0, 0.0, 1.0},
+        {-2.1, -12.0, 0.0, 1.0}
     }
     result.groundFaces = _getGroundFaces(connectorFace)
 
@@ -1589,10 +1589,10 @@ local function updateFn_Motorway_2_2_lane_one_way_to_6_lane_x_large(params)
     local result = { cost = 0, skipCollision = true, }
 
     local connectorFace = {
-        {2, -12.0, 0.0, 1.0},
-        {2, 12.0, 0.0, 1.0},
-        {-2, 12.0, 0.0, 1.0},
-        {-2, -12.0, 0.0, 1.0}
+        {9.1, -12.0, 0.0, 1.0},
+        {9.1, 12.0, 0.0, 1.0},
+        {-2.1, 12.0, 0.0, 1.0},
+        {-2.1, -12.0, 0.0, 1.0}
     }
     result.groundFaces = _getGroundFaces(connectorFace)
 
@@ -1704,10 +1704,10 @@ local function updateFn_Motorway_4_1_lane_one_way_to_4_lane_large(params)
     local result = { cost = 0, skipCollision = true, }
 
     local connectorFace = {
-        {2, -8.0, 0.0, 1.0},
-        {2, 8.0, 0.0, 1.0},
-        {-2, 6.0, 0.0, 1.0},
-        {-2, -6.0, 0.0, 1.0}
+        {9.1, -8.0, 0.0, 1.0},
+        {9.1, 8.0, 0.0, 1.0},
+        {-2.1, 6.0, 0.0, 1.0},
+        {-2.1, -6.0, 0.0, 1.0}
     }
     result.groundFaces = _getGroundFaces(connectorFace)
 
