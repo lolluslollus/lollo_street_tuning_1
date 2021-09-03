@@ -1,4 +1,4 @@
-local pitchUtil = require('lollo_street_tuning/lolloPitchHelper')
+local pitchHelper = require('lollo_street_tuning/pitchHelper')
 local streetChunksHelper = require('lollo_street_tuning/lolloStreetChunksHelper')
 local debugger = require('debugger')
 
@@ -12,11 +12,12 @@ function data()
             -- otherwise the game will say "hello there" or "easter egg" or other rubbish,
             -- then point away (to some animal) and do nothing,
             -- when the user clicks on a done construction to configure it.
+            local _pitchAngle = pitchHelper.getPitchAngle(params)
             result.models = {
                 {
                     id = 'lollo_assets/lollo_dummy.mdl',
                     skipCollision = true,
-                    transf = pitchUtil.getIdTransfPitched(params.pitch)
+                    transf = pitchHelper.getIdTransfPitched(_pitchAngle)
                 }
             }
             -- LOLLO NOTE I cannot use KEEP here
@@ -25,11 +26,11 @@ function data()
             -- This is required if we want to make them snappable at all, to avoid crashes.
             -- We free all edges, so they can be freely converted to whatever one needs.
             -- We could make a lot of combinations and upgrade them with the construction params instead, but that would be a mess to use.
-            local pitchAdjusted = pitchUtil.adjustParamsPitch(params)
+            
             -- local streetData = streetUtils.getGlobalStreetData()[params.streetType_ + 1] -- this calls the api, which is not available here!
             result.edgeLists = streetChunksHelper.getStreetChunksSnapEdgeLists(
                 params,
-                pitchAdjusted,
+                _pitchAngle,
                 two.globalStreetData[params.streetType_ + 1],
                 tramTrackType
             )

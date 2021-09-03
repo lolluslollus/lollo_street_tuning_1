@@ -1,4 +1,3 @@
-local pitchUtil = require('lollo_street_tuning/lolloPitchHelper')
 local streetChunksHelper = require('lollo_street_tuning/lolloStreetChunksHelper')
 local debugger = require('debugger')
 
@@ -16,7 +15,7 @@ function data()
                 {
                     id = 'lollo_assets/lollo_dummy.mdl',
                     skipCollision = true,
-                    transf = pitchUtil.getIdTransfPitched(params.pitch)
+                    transf = {1, 0, 0, 0,  0, 1, 0, 0,  0, 0, 1, 0,  0, 0, 0, 1}
                 }
             }
             -- LOLLO NOTE I cannot use KEEP here
@@ -30,10 +29,8 @@ function data()
             -- clicking the bend won't bring up the construction menu (once plopped).
             -- Otherwise, the construction will stay isolated from the rest,
             -- and clicking it will bring up the params menu.
-            local pitchAdjusted = pitchUtil.adjustParamsPitch(params)
             result.edgeLists = streetChunksHelper.getStreetHairpinSnapEdgeLists(
                 params,
-                pitchAdjusted,
                 two.globalStreetData[params.streetType_ + 1],
                 tramTrackType
             )
@@ -46,13 +43,13 @@ function data()
             debugPrint(closureParams)
             return {}
         end,
-        preProcessFn = function(one, two, three)
-            print('LOLLO preProcessFn') -- never fires
-            debugger()
-            debugPrint(one)
-            debugPrint(two)
-            debugPrint(three)
-        end,
+        -- preProcessFn = function(one, two, three)
+        --     print('LOLLO preProcessFn') -- never fires coz construction is not modular
+        --     debugger()
+        --     debugPrint(one)
+        --     debugPrint(two)
+        --     debugPrint(three)
+        -- end,
         upgradeFn = function(_)
             print('LOLLO upgradeFn') -- never fires
             debugger()
@@ -61,12 +58,12 @@ function data()
             -- (Bus lanes don't work anyway.)
             return {}
         end,
-        createTemplateFn = function(one, two, three)
-            print('LOLLO createTemplateFn') -- never fires
-            debugger()
-            debugPrint(one)
-            debugPrint(two)
-            debugPrint(three)
-        end,
+        -- createTemplateFn = function(one, two, three)
+        --     print('LOLLO createTemplateFn') -- never fires
+        --     debugger()
+        --     debugPrint(one)
+        --     debugPrint(two)
+        --     debugPrint(three)
+        -- end,
     }
 end

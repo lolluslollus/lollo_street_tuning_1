@@ -3,7 +3,7 @@ function data()
         type = 'STREET_CONSTRUCTION',
         description = {
             name = _('Street hairpin curves'),
-            description = _('Lays streets as tightly bent as the game allows. Use O and P to adjust the pitch.')
+            description = _('Lays streets as tightly bent as the game allows.')
         },
         availability = {
             yearFrom = -1, --1925,
@@ -12,45 +12,5 @@ function data()
         -- params = streetChunksHelper.getStreetHairpinParams(),
         order = 1242,
         skipCollision = true,
---[[         updateFn = function(params)
-            local pitchAdjusted = pitchUtil.adjustParamsPitch(params)
-            local streetData = streetUtils.getGlobalStreetData()[params.streetType_ + 1]
-
-            local result = { cost = 0 }
-            result.groundFaces = {}
-            -- result.colliders = {}
-            -- LOLLO NOTE If some edges are not free, I will need a dummy model,
-            -- otherwise the game will say "hello there" or "easter egg" or other rubbish,
-            -- then point away (to some animal) and do nothing,
-            -- when the user clicks on a done construction to configure it.
-            result.models = {
-                {
-                    id = 'lollo_assets/lollo_dummy.mdl',
-                    skipCollision = true,
-                    transf = pitchUtil.getIdTransfPitched(params.pitch)
-                }
-            }
-
-            -- LOLLO NOTE I cannot use KEEP here
-            local tramTrackType = params.tramTrack and (({'NO', 'YES', 'ELECTRIC'})[params.tramTrack + 1]) or 'NO'
-            -- LOLLO NOTE we have 3 edges for every hairpin bend. The inner nodes do not snap, the outer ones do.
-            -- This is required if we want to make them snappable at all and avoid crashes.
-            -- The 2 outer nodes are always free, otherwise the curve cannot join the other streets.
-            -- If I make the 4 inner nodes free, the curve will become a street like all the others once plopped:
-            -- I can upgrade them later with common street tools,
-            -- I can join other streets into the curve
-            -- clicking the bend won't bring up the construction menu (once plopped).
-            -- Otherwise, the construction will stay isolated from the rest,
-            -- and clicking it will bring up the params menu.
-            result.edgeLists = streetChunksHelper.getStreetHairpinSnapEdgeLists(params, pitchAdjusted, streetData, tramTrackType)
-
-            return result
-        end,
-        upgradeFn = function(_)
-            -- LOLLO NOTE the game wants this function to be defined, even if it returns an empty table.
-            -- If you leave it out, adding and removing tram tracks won't work.
-            -- (Bus lanes don't work anyway.)
-            return {}
-        end ]]
     }
 end

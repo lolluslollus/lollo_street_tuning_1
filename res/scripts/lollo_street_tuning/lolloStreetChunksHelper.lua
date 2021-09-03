@@ -1,10 +1,9 @@
 local arrayUtils = require('lollo_street_tuning/arrayUtils')
 local edgeUtils = require('lollo_street_tuning.edgeUtils')
-local pitchUtil = require('lollo_street_tuning/lolloPitchHelper')
+local pitchHelper = require('lollo_street_tuning/pitchHelper')
 local streetUtil = require('streetutil')
 local streetUtils = require('lollo_street_tuning/streetUtils')
 local vec3 = require('vec3')
-local debugger = require('debugger')
 local helper = {}
 
 -- --------------- parameters ------------------------
@@ -59,16 +58,7 @@ local function _getWidthFactor(streetHalfWidth)
     return result
 end
 
-local function _makeEdges(direction, pitch, node0, node1, isRightOfIsland, tan0, tan1)
-    -- return params.direction == 0 and
-    --     {
-    --         {pitchUtil.getXYZPitched(pitch, {-6, -3, .0}), {1, .0, .0}}, -- node 0
-    --         {pitchUtil.getXYZPitched(pitch, {-2, -3, .0}), {1, .0, .0}} -- node 1
-    --     } or
-    --     {
-    --         {pitchUtil.getXYZPitched(pitch, {-2, -3, .0}), {-1, .0, .0}}, -- node 0
-    --         {pitchUtil.getXYZPitched(pitch, {-6, -3, .0}), {-1, .0, .0}} -- node 1
-    --     }
+local function _makeEdges(direction, node0, node1, isRightOfIsland, tan0, tan1)
     if tan0 == nil or tan1 == nil then
         local edgeLength = edgeUtils.getVectorLength({node1[1] - node0[1], node1[2] - node0[2], node1[3] - node0[3]})
         if tan0 == nil then tan0 = {edgeLength, 0, 0} end
@@ -77,13 +67,32 @@ local function _makeEdges(direction, pitch, node0, node1, isRightOfIsland, tan0,
 
     if direction == 0 or (direction == 2 and isRightOfIsland) then return
         {
-            {pitchUtil.getXYZPitched(pitch, node0), tan0}, -- node 0
-            {pitchUtil.getXYZPitched(pitch, node1), tan1} -- node 1
+            {node0, tan0}, -- node 0
+            {node1, tan1} -- node 1
         }
     else return
         {
-            {pitchUtil.getXYZPitched(pitch, node1), {-tan1[1], -tan1[2], -tan1[3]}}, -- node 0
-            {pitchUtil.getXYZPitched(pitch, node0), {-tan0[1], -tan0[2], -tan0[3]}} -- node 1
+            {node1, {-tan1[1], -tan1[2], -tan1[3]}}, -- node 0
+            {node0, {-tan0[1], -tan0[2], -tan0[3]}} -- node 1
+        }
+    end
+end
+
+local function _makeEdgesWithPitch(direction, pitchAngle, node0, node1, isRightOfIsland, tan0, tan1)
+    if tan0 == nil or tan1 == nil then
+        local edgeLength = edgeUtils.getVectorLength({node1[1] - node0[1], node1[2] - node0[2], node1[3] - node0[3]})
+        if tan0 == nil then tan0 = {edgeLength, 0, 0} end
+        if tan1 == nil then tan1 = {edgeLength, 0, 0} end
+    end
+    if direction == 0 or (direction == 2 and isRightOfIsland) then return
+        {
+            pitchHelper.getPosTanPitched(pitchAngle, node0, tan0), -- node 0
+            pitchHelper.getPosTanPitched(pitchAngle, node1, tan1) -- node 1
+        }
+    else return
+        {
+            pitchHelper.getPosTanPitched(pitchAngle, node1, {-tan1[1], -tan1[2], -tan1[3]}), -- node 0
+            pitchHelper.getPosTanPitched(pitchAngle, node0, {-tan0[1], -tan0[2], -tan0[3]}) -- node 1
         }
     end
 end
@@ -259,8 +268,8 @@ helper.getStreetChunksParams = function()
         {
             key = 'pitch',
             name = _('Pitch (adjust it with O and P while building)'),
-            values = pitchUtil.getPitchParamValues(),
-            defaultIndex = pitchUtil.getDefaultPitchParamValue(),
+            values = pitchHelper.getPitchParamValues(),
+            defaultIndex = pitchHelper.getDefaultPitchParamValue(),
             uiType = 'SLIDER'
         }
     }
@@ -324,17 +333,17 @@ helper.getStreetHairpinParams = function()
             },
             defaultIndex = 0
         },
-        {
-            key = 'pitch',
-            name = _('Pitch (adjust it with O and P while building)'),
-            values = pitchUtil.getPitchParamValues(),
-            defaultIndex = pitchUtil.getDefaultPitchParamValue(),
-            uiType = 'SLIDER'
-        }
+        -- {
+        --     key = 'pitch',
+        --     name = _('Pitch (adjust it with O and P while building)'),
+        --     values = pitchUtil.getPitchParamValues(),
+        --     defaultIndex = pitchUtil.getDefaultPitchParamValue(),
+        --     uiType = 'SLIDER'
+        -- }
     }
 end
 
-helper.getStreetChunksSnapEdgeLists = function(params, pitchAdjusted, streetData, tramTrackType)
+helper.getStreetChunksSnapEdgeLists = function(params, pitchAngle, streetData, tramTrackType)
     local streetHalfWidth = _getStreetHalfWidth(streetData)
     local streetFullWidth = _getStreetFullWidth(streetData)
 
@@ -368,9 +377,9 @@ helper.getStreetChunksSnapEdgeLists = function(params, pitchAdjusted, streetData
             {
                 type = 'STREET',
                 params = edgeParams,
-                edges = _makeEdges(
+                edges = _makeEdgesWithPitch(
                     params.direction,
-                    pitchAdjusted,
+                    pitchAngle,
                     {x0, 0, 0},
                     {x1, 0, 0}
                 ),
@@ -383,9 +392,9 @@ helper.getStreetChunksSnapEdgeLists = function(params, pitchAdjusted, streetData
             {
                 type = 'STREET',
                 params = edgeParams,
-                edges = _makeEdges(
+                edges = _makeEdgesWithPitch(
                     params.direction,
-                    pitchAdjusted,
+                    pitchAngle,
                     {x1, 0, 0},
                     {x2, 0, 0}
                 ),
@@ -396,9 +405,9 @@ helper.getStreetChunksSnapEdgeLists = function(params, pitchAdjusted, streetData
             {
                 type = 'STREET',
                 params = edgeParams,
-                edges = _makeEdges(
+                edges = _makeEdgesWithPitch(
                     params.direction,
-                    pitchAdjusted,
+                    pitchAngle,
                     {x2, 0, 0},
                     {x3, 0, 0}
                 ),
@@ -412,9 +421,9 @@ helper.getStreetChunksSnapEdgeLists = function(params, pitchAdjusted, streetData
             {
                 type = 'STREET',
                 params = edgeParams,
-                edges = _makeEdges(
+                edges = _makeEdgesWithPitch(
                     params.direction,
-                    pitchAdjusted,
+                    pitchAngle,
                     {x0, -streetHalfWidth - halfDistance - halfIslandWidth, 0},
                     {x1, -streetHalfWidth - halfDistance - halfIslandWidth, 0},
                     true
@@ -425,9 +434,9 @@ helper.getStreetChunksSnapEdgeLists = function(params, pitchAdjusted, streetData
             {
                 type = 'STREET',
                 params = edgeParams,
-                edges = _makeEdges(
+                edges = _makeEdgesWithPitch(
                     params.direction,
-                    pitchAdjusted,
+                    pitchAngle,
                     {x0, streetHalfWidth + halfDistance + halfIslandWidth, 0},
                     {x1, streetHalfWidth + halfDistance + halfIslandWidth, 0}
                 ),
@@ -438,9 +447,9 @@ helper.getStreetChunksSnapEdgeLists = function(params, pitchAdjusted, streetData
             {
                 type = 'STREET',
                 params = edgeParams,
-                edges = _makeEdges(
+                edges = _makeEdgesWithPitch(
                     params.direction,
-                    pitchAdjusted,
+                    pitchAngle,
                     {x1, -streetHalfWidth - halfDistance - halfIslandWidth, 0},
                     {x2, -streetHalfWidth - halfDistance - halfIslandWidth, 0},
                     true
@@ -451,9 +460,9 @@ helper.getStreetChunksSnapEdgeLists = function(params, pitchAdjusted, streetData
             {
                 type = 'STREET',
                 params = edgeParams,
-                edges = _makeEdges(
+                edges = _makeEdgesWithPitch(
                     params.direction,
-                    pitchAdjusted,
+                    pitchAngle,
                     {x1, streetHalfWidth + halfDistance + halfIslandWidth, 0},
                     {x2, streetHalfWidth + halfDistance + halfIslandWidth, 0}
                 ),
@@ -464,9 +473,9 @@ helper.getStreetChunksSnapEdgeLists = function(params, pitchAdjusted, streetData
             {
                 type = 'STREET',
                 params = edgeParams,
-                edges = _makeEdges(
+                edges = _makeEdgesWithPitch(
                     params.direction,
-                    pitchAdjusted,
+                    pitchAngle,
                     {x2, -streetHalfWidth - halfDistance - halfIslandWidth, 0},
                     {x3, -streetHalfWidth - halfDistance - halfIslandWidth, 0},
                     true
@@ -477,9 +486,9 @@ helper.getStreetChunksSnapEdgeLists = function(params, pitchAdjusted, streetData
             {
                 type = 'STREET',
                 params = edgeParams,
-                edges = _makeEdges(
+                edges = _makeEdgesWithPitch(
                     params.direction,
-                    pitchAdjusted,
+                    pitchAngle,
                     {x2, streetHalfWidth + halfDistance + halfIslandWidth, 0},
                     {x3, streetHalfWidth + halfDistance + halfIslandWidth, 0}
                 ),
@@ -493,9 +502,9 @@ helper.getStreetChunksSnapEdgeLists = function(params, pitchAdjusted, streetData
             {
                 type = 'STREET',
                 params = edgeParams,
-                edges = _makeEdges(
+                edges = _makeEdgesWithPitch(
                     params.direction,
-                    pitchAdjusted,
+                    pitchAngle,
                     {x0, -streetFullWidth - distance - halfIslandWidth, 0},
                     {x1, -streetFullWidth - distance - halfIslandWidth, 0},
                     true
@@ -506,9 +515,9 @@ helper.getStreetChunksSnapEdgeLists = function(params, pitchAdjusted, streetData
             {
                 type = 'STREET',
                 params = edgeParams,
-                edges = _makeEdges(
+                edges = _makeEdgesWithPitch(
                     params.direction,
-                    pitchAdjusted,
+                    pitchAngle,
                     {x0, halfIslandWidth, 0},
                     {x1, halfIslandWidth, 0}
                 ),
@@ -518,9 +527,9 @@ helper.getStreetChunksSnapEdgeLists = function(params, pitchAdjusted, streetData
             {
                 type = 'STREET',
                 params = edgeParams,
-                edges = _makeEdges(
+                edges = _makeEdgesWithPitch(
                     params.direction,
-                    pitchAdjusted,
+                    pitchAngle,
                     {x0, streetFullWidth + distance + halfIslandWidth, 0},
                     {x1, streetFullWidth + distance + halfIslandWidth, 0}
                 ),
@@ -531,9 +540,9 @@ helper.getStreetChunksSnapEdgeLists = function(params, pitchAdjusted, streetData
             {
                 type = 'STREET',
                 params = edgeParams,
-                edges = _makeEdges(
+                edges = _makeEdgesWithPitch(
                     params.direction,
-                    pitchAdjusted,
+                    pitchAngle,
                     {x1, -streetFullWidth - distance - halfIslandWidth, 0},
                     {x2, -streetFullWidth - distance - halfIslandWidth, 0},
                     true
@@ -544,9 +553,9 @@ helper.getStreetChunksSnapEdgeLists = function(params, pitchAdjusted, streetData
             {
                 type = 'STREET',
                 params = edgeParams,
-                edges = _makeEdges(
+                edges = _makeEdgesWithPitch(
                     params.direction,
-                    pitchAdjusted,
+                    pitchAngle,
                     {x1, halfIslandWidth, 0},
                     {x2, halfIslandWidth, 0}
                 ),
@@ -556,9 +565,9 @@ helper.getStreetChunksSnapEdgeLists = function(params, pitchAdjusted, streetData
             {
                 type = 'STREET',
                 params = edgeParams,
-                edges = _makeEdges(
+                edges = _makeEdgesWithPitch(
                     params.direction,
-                    pitchAdjusted,
+                    pitchAngle,
                     {x1, streetFullWidth + distance + halfIslandWidth, 0},
                     {x2, streetFullWidth + distance + halfIslandWidth, 0}
                 ),
@@ -569,9 +578,9 @@ helper.getStreetChunksSnapEdgeLists = function(params, pitchAdjusted, streetData
             {
                 type = 'STREET',
                 params = edgeParams,
-                edges = _makeEdges(
+                edges = _makeEdgesWithPitch(
                     params.direction,
-                    pitchAdjusted,
+                    pitchAngle,
                     {x2, -streetFullWidth - distance - halfIslandWidth, 0},
                     {x3, -streetFullWidth - distance - halfIslandWidth, 0},
                     true
@@ -582,9 +591,9 @@ helper.getStreetChunksSnapEdgeLists = function(params, pitchAdjusted, streetData
             {
                 type = 'STREET',
                 params = edgeParams,
-                edges = _makeEdges(
+                edges = _makeEdgesWithPitch(
                     params.direction,
-                    pitchAdjusted,
+                    pitchAngle,
                     {x2, halfIslandWidth, 0},
                     {x3, halfIslandWidth, 0}
                 ),
@@ -594,9 +603,9 @@ helper.getStreetChunksSnapEdgeLists = function(params, pitchAdjusted, streetData
             {
                 type = 'STREET',
                 params = edgeParams,
-                edges = _makeEdges(
+                edges = _makeEdgesWithPitch(
                     params.direction,
-                    pitchAdjusted,
+                    pitchAngle,
                     {x2, streetFullWidth + distance + halfIslandWidth, 0},
                     {x3, streetFullWidth + distance + halfIslandWidth, 0}
                 ),
@@ -610,9 +619,9 @@ helper.getStreetChunksSnapEdgeLists = function(params, pitchAdjusted, streetData
             {
                 type = 'STREET',
                 params = edgeParams,
-                edges = _makeEdges(
+                edges = _makeEdgesWithPitch(
                     params.direction,
-                    pitchAdjusted,
+                    pitchAngle,
                     {x0, -3.0 * streetHalfWidth - 3.0 * halfDistance - halfIslandWidth, 0},
                     {x1, -3.0 * streetHalfWidth - 3.0 * halfDistance - halfIslandWidth, 0},
                     true
@@ -623,9 +632,9 @@ helper.getStreetChunksSnapEdgeLists = function(params, pitchAdjusted, streetData
             {
                 type = 'STREET',
                 params = edgeParams,
-                edges = _makeEdges(
+                edges = _makeEdgesWithPitch(
                     params.direction,
-                    pitchAdjusted,
+                    pitchAngle,
                     {x0, -streetHalfWidth - halfDistance - halfIslandWidth, 0},
                     {x1, -streetHalfWidth - halfDistance - halfIslandWidth, 0},
                     true
@@ -636,9 +645,9 @@ helper.getStreetChunksSnapEdgeLists = function(params, pitchAdjusted, streetData
             {
                 type = 'STREET',
                 params = edgeParams,
-                edges = _makeEdges(
+                edges = _makeEdgesWithPitch(
                     params.direction,
-                    pitchAdjusted,
+                    pitchAngle,
                     {x0, streetHalfWidth + halfDistance + halfIslandWidth, 0},
                     {x1, streetHalfWidth + halfDistance + halfIslandWidth, 0}
                 ),
@@ -648,9 +657,9 @@ helper.getStreetChunksSnapEdgeLists = function(params, pitchAdjusted, streetData
             {
                 type = 'STREET',
                 params = edgeParams,
-                edges = _makeEdges(
+                edges = _makeEdgesWithPitch(
                     params.direction,
-                    pitchAdjusted,
+                    pitchAngle,
                     {x0, 3.0 * streetHalfWidth + 3.0 * halfDistance + halfIslandWidth, 0},
                     {x1, 3.0 * streetHalfWidth + 3.0 * halfDistance + halfIslandWidth, 0}
                 ),
@@ -661,9 +670,9 @@ helper.getStreetChunksSnapEdgeLists = function(params, pitchAdjusted, streetData
             {
                 type = 'STREET',
                 params = edgeParams,
-                edges = _makeEdges(
+                edges = _makeEdgesWithPitch(
                     params.direction,
-                    pitchAdjusted,
+                    pitchAngle,
                     {x1, -3.0 * streetHalfWidth - 3.0 * halfDistance - halfIslandWidth, 0},
                     {x2, -3.0 * streetHalfWidth - 3.0 * halfDistance - halfIslandWidth, 0},
                     true
@@ -674,9 +683,9 @@ helper.getStreetChunksSnapEdgeLists = function(params, pitchAdjusted, streetData
             {
                 type = 'STREET',
                 params = edgeParams,
-                edges = _makeEdges(
+                edges = _makeEdgesWithPitch(
                     params.direction,
-                    pitchAdjusted,
+                    pitchAngle,
                     {x1, -streetHalfWidth - halfDistance - halfIslandWidth, 0},
                     {x2, -streetHalfWidth - halfDistance - halfIslandWidth, 0},
                     true
@@ -687,9 +696,9 @@ helper.getStreetChunksSnapEdgeLists = function(params, pitchAdjusted, streetData
             {
                 type = 'STREET',
                 params = edgeParams,
-                edges = _makeEdges(
+                edges = _makeEdgesWithPitch(
                     params.direction,
-                    pitchAdjusted,
+                    pitchAngle,
                     {x1, streetHalfWidth + halfDistance + halfIslandWidth, 0},
                     {x2, streetHalfWidth + halfDistance + halfIslandWidth, 0}
                 ),
@@ -699,9 +708,9 @@ helper.getStreetChunksSnapEdgeLists = function(params, pitchAdjusted, streetData
             {
                 type = 'STREET',
                 params = edgeParams,
-                edges = _makeEdges(
+                edges = _makeEdgesWithPitch(
                     params.direction,
-                    pitchAdjusted,
+                    pitchAngle,
                     {x1, 3.0 * streetHalfWidth + 3.0 * halfDistance + halfIslandWidth, 0},
                     {x2, 3.0 * streetHalfWidth + 3.0 * halfDistance + halfIslandWidth, 0}
                 ),
@@ -712,9 +721,9 @@ helper.getStreetChunksSnapEdgeLists = function(params, pitchAdjusted, streetData
             {
                 type = 'STREET',
                 params = edgeParams,
-                edges = _makeEdges(
+                edges = _makeEdgesWithPitch(
                     params.direction,
-                    pitchAdjusted,
+                    pitchAngle,
                     {x2, -3.0 * streetHalfWidth - 3.0 * halfDistance - halfIslandWidth, 0},
                     {x3, -3.0 * streetHalfWidth - 3.0 * halfDistance - halfIslandWidth, 0},
                     true
@@ -725,9 +734,9 @@ helper.getStreetChunksSnapEdgeLists = function(params, pitchAdjusted, streetData
             {
                 type = 'STREET',
                 params = edgeParams,
-                edges = _makeEdges(
+                edges = _makeEdgesWithPitch(
                     params.direction,
-                    pitchAdjusted,
+                    pitchAngle,
                     {x2, -streetHalfWidth - halfDistance - halfIslandWidth, 0},
                     {x3, -streetHalfWidth - halfDistance - halfIslandWidth, 0},
                     true
@@ -738,9 +747,9 @@ helper.getStreetChunksSnapEdgeLists = function(params, pitchAdjusted, streetData
             {
                 type = 'STREET',
                 params = edgeParams,
-                edges = _makeEdges(
+                edges = _makeEdgesWithPitch(
                     params.direction,
-                    pitchAdjusted,
+                    pitchAngle,
                     {x2, streetHalfWidth + halfDistance + halfIslandWidth, 0},
                     {x3, streetHalfWidth + halfDistance + halfIslandWidth, 0}
                 ),
@@ -750,9 +759,9 @@ helper.getStreetChunksSnapEdgeLists = function(params, pitchAdjusted, streetData
             {
                 type = 'STREET',
                 params = edgeParams,
-                edges = _makeEdges(
+                edges = _makeEdgesWithPitch(
                     params.direction,
-                    pitchAdjusted,
+                    pitchAngle,
                     {x2, 3.0 * streetHalfWidth + 3.0 * halfDistance + halfIslandWidth, 0},
                     {x3, 3.0 * streetHalfWidth + 3.0 * halfDistance + halfIslandWidth, 0}
                 ),
@@ -766,9 +775,9 @@ helper.getStreetChunksSnapEdgeLists = function(params, pitchAdjusted, streetData
             {
                 type = 'STREET',
                 params = edgeParams,
-                edges = _makeEdges(
+                edges = _makeEdgesWithPitch(
                     params.direction,
-                    pitchAdjusted,
+                    pitchAngle,
                     {x0, - 2.0 * streetFullWidth - 2.0 * distance - halfIslandWidth, 0},
                     {x1, - 2.0 * streetFullWidth - 2.0 * distance - halfIslandWidth, 0},
                     true
@@ -779,9 +788,9 @@ helper.getStreetChunksSnapEdgeLists = function(params, pitchAdjusted, streetData
             {
                 type = 'STREET',
                 params = edgeParams,
-                edges = _makeEdges(
+                edges = _makeEdgesWithPitch(
                     params.direction,
-                    pitchAdjusted,
+                    pitchAngle,
                     {x0, -streetFullWidth - distance - halfIslandWidth, 0},
                     {x1, -streetFullWidth - distance - halfIslandWidth, 0},
                     true
@@ -792,9 +801,9 @@ helper.getStreetChunksSnapEdgeLists = function(params, pitchAdjusted, streetData
             {
                 type = 'STREET',
                 params = edgeParams,
-                edges = _makeEdges(
+                edges = _makeEdgesWithPitch(
                     params.direction,
-                    pitchAdjusted,
+                    pitchAngle,
                     {x0, halfIslandWidth, 0},
                     {x1, halfIslandWidth, 0}
                 ),
@@ -804,9 +813,9 @@ helper.getStreetChunksSnapEdgeLists = function(params, pitchAdjusted, streetData
             {
                 type = 'STREET',
                 params = edgeParams,
-                edges = _makeEdges(
+                edges = _makeEdgesWithPitch(
                     params.direction,
-                    pitchAdjusted,
+                    pitchAngle,
                     {x0, streetFullWidth + distance + halfIslandWidth, 0},
                     {x1, streetFullWidth + distance + halfIslandWidth, 0}
                 ),
@@ -816,9 +825,9 @@ helper.getStreetChunksSnapEdgeLists = function(params, pitchAdjusted, streetData
             {
                 type = 'STREET',
                 params = edgeParams,
-                edges = _makeEdges(
+                edges = _makeEdgesWithPitch(
                     params.direction,
-                    pitchAdjusted,
+                    pitchAngle,
                     {x0, 2.0 * streetFullWidth + 2.0 * distance + halfIslandWidth, 0},
                     {x1, 2.0 * streetFullWidth + 2.0 * distance + halfIslandWidth, 0}
                 ),
@@ -829,9 +838,9 @@ helper.getStreetChunksSnapEdgeLists = function(params, pitchAdjusted, streetData
             {
                 type = 'STREET',
                 params = edgeParams,
-                edges = _makeEdges(
+                edges = _makeEdgesWithPitch(
                     params.direction,
-                    pitchAdjusted,
+                    pitchAngle,
                     {x1, - 2.0 * streetFullWidth - 2.0 * distance - halfIslandWidth, 0},
                     {x2, - 2.0 * streetFullWidth - 2.0 * distance - halfIslandWidth, 0},
                     true
@@ -842,9 +851,9 @@ helper.getStreetChunksSnapEdgeLists = function(params, pitchAdjusted, streetData
             {
                 type = 'STREET',
                 params = edgeParams,
-                edges = _makeEdges(
+                edges = _makeEdgesWithPitch(
                     params.direction,
-                    pitchAdjusted,
+                    pitchAngle,
                     {x1, -streetFullWidth - distance - halfIslandWidth, 0},
                     {x2, -streetFullWidth - distance - halfIslandWidth, 0},
                     true
@@ -855,9 +864,9 @@ helper.getStreetChunksSnapEdgeLists = function(params, pitchAdjusted, streetData
             {
                 type = 'STREET',
                 params = edgeParams,
-                edges = _makeEdges(
+                edges = _makeEdgesWithPitch(
                     params.direction,
-                    pitchAdjusted,
+                    pitchAngle,
                     {x1, halfIslandWidth, 0},
                     {x2, halfIslandWidth, 0}
                 ),
@@ -867,9 +876,9 @@ helper.getStreetChunksSnapEdgeLists = function(params, pitchAdjusted, streetData
             {
                 type = 'STREET',
                 params = edgeParams,
-                edges = _makeEdges(
+                edges = _makeEdgesWithPitch(
                     params.direction,
-                    pitchAdjusted,
+                    pitchAngle,
                     {x1, streetFullWidth + distance + halfIslandWidth, 0},
                     {x2, streetFullWidth + distance + halfIslandWidth, 0}
                 ),
@@ -879,9 +888,9 @@ helper.getStreetChunksSnapEdgeLists = function(params, pitchAdjusted, streetData
             {
                 type = 'STREET',
                 params = edgeParams,
-                edges = _makeEdges(
+                edges = _makeEdgesWithPitch(
                     params.direction,
-                    pitchAdjusted,
+                    pitchAngle,
                     {x1, 2.0 * streetFullWidth + 2.0 * distance + halfIslandWidth, 0},
                     {x2, 2.0 * streetFullWidth + 2.0 * distance + halfIslandWidth, 0}
                 ),
@@ -892,9 +901,9 @@ helper.getStreetChunksSnapEdgeLists = function(params, pitchAdjusted, streetData
             {
                 type = 'STREET',
                 params = edgeParams,
-                edges = _makeEdges(
+                edges = _makeEdgesWithPitch(
                     params.direction,
-                    pitchAdjusted,
+                    pitchAngle,
                     {x2, - 2.0 * streetFullWidth - 2.0 * distance - halfIslandWidth, 0},
                     {x3, - 2.0 * streetFullWidth - 2.0 * distance - halfIslandWidth, 0},
                     true
@@ -905,9 +914,9 @@ helper.getStreetChunksSnapEdgeLists = function(params, pitchAdjusted, streetData
             {
                 type = 'STREET',
                 params = edgeParams,
-                edges = _makeEdges(
+                edges = _makeEdgesWithPitch(
                     params.direction,
-                    pitchAdjusted,
+                    pitchAngle,
                     {x2, -streetFullWidth - distance - halfIslandWidth, 0},
                     {x3, -streetFullWidth - distance - halfIslandWidth, 0},
                     true
@@ -918,9 +927,9 @@ helper.getStreetChunksSnapEdgeLists = function(params, pitchAdjusted, streetData
             {
                 type = 'STREET',
                 params = edgeParams,
-                edges = _makeEdges(
+                edges = _makeEdgesWithPitch(
                     params.direction,
-                    pitchAdjusted,
+                    pitchAngle,
                     {x2, halfIslandWidth, 0},
                     {x3, halfIslandWidth, 0}
                 ),
@@ -930,9 +939,9 @@ helper.getStreetChunksSnapEdgeLists = function(params, pitchAdjusted, streetData
             {
                 type = 'STREET',
                 params = edgeParams,
-                edges = _makeEdges(
+                edges = _makeEdgesWithPitch(
                     params.direction,
-                    pitchAdjusted,
+                    pitchAngle,
                     {x2, streetFullWidth + distance + halfIslandWidth, 0},
                     {x3, streetFullWidth + distance + halfIslandWidth, 0}
                 ),
@@ -942,9 +951,9 @@ helper.getStreetChunksSnapEdgeLists = function(params, pitchAdjusted, streetData
             {
                 type = 'STREET',
                 params = edgeParams,
-                edges = _makeEdges(
+                edges = _makeEdgesWithPitch(
                     params.direction,
-                    pitchAdjusted,
+                    pitchAngle,
                     {x2, 2.0 * streetFullWidth + 2.0 * distance + halfIslandWidth, 0},
                     {x3, 2.0 * streetFullWidth + 2.0 * distance + halfIslandWidth, 0}
                 ),
@@ -958,9 +967,9 @@ helper.getStreetChunksSnapEdgeLists = function(params, pitchAdjusted, streetData
             {
                 type = 'STREET',
                 params = edgeParams,
-                edges = _makeEdges(
+                edges = _makeEdgesWithPitch(
                     params.direction,
-                    pitchAdjusted,
+                    pitchAngle,
                     {x0, - 5.0 * streetHalfWidth - 5.0 * halfDistance - halfIslandWidth, 0},
                     {x1, - 5.0 * streetHalfWidth - 5.0 * halfDistance - halfIslandWidth, 0},
                     true
@@ -971,9 +980,9 @@ helper.getStreetChunksSnapEdgeLists = function(params, pitchAdjusted, streetData
             {
                 type = 'STREET',
                 params = edgeParams,
-                edges = _makeEdges(
+                edges = _makeEdgesWithPitch(
                     params.direction,
-                    pitchAdjusted,
+                    pitchAngle,
                     {x0, - 3.0 * streetHalfWidth - 3.0 * halfDistance - halfIslandWidth, 0},
                     {x1, - 3.0 * streetHalfWidth - 3.0 * halfDistance - halfIslandWidth, 0},
                     true
@@ -984,9 +993,9 @@ helper.getStreetChunksSnapEdgeLists = function(params, pitchAdjusted, streetData
             {
                 type = 'STREET',
                 params = edgeParams,
-                edges = _makeEdges(
+                edges = _makeEdgesWithPitch(
                     params.direction,
-                    pitchAdjusted,
+                    pitchAngle,
                     {x0, -streetHalfWidth - halfDistance - halfIslandWidth, 0},
                     {x1, -streetHalfWidth - halfDistance - halfIslandWidth, 0},
                     true
@@ -997,9 +1006,9 @@ helper.getStreetChunksSnapEdgeLists = function(params, pitchAdjusted, streetData
             {
                 type = 'STREET',
                 params = edgeParams,
-                edges = _makeEdges(
+                edges = _makeEdgesWithPitch(
                     params.direction,
-                    pitchAdjusted,
+                    pitchAngle,
                     {x0, streetHalfWidth + halfDistance + halfIslandWidth, 0},
                     {x1, streetHalfWidth + halfDistance + halfIslandWidth, 0}
                 ),
@@ -1009,9 +1018,9 @@ helper.getStreetChunksSnapEdgeLists = function(params, pitchAdjusted, streetData
             {
                 type = 'STREET',
                 params = edgeParams,
-                edges = _makeEdges(
+                edges = _makeEdgesWithPitch(
                     params.direction,
-                    pitchAdjusted,
+                    pitchAngle,
                     {x0, 3.0 * streetHalfWidth + 3.0 * halfDistance + halfIslandWidth, 0},
                     {x1, 3.0 * streetHalfWidth + 3.0 * halfDistance + halfIslandWidth, 0}
                 ),
@@ -1021,9 +1030,9 @@ helper.getStreetChunksSnapEdgeLists = function(params, pitchAdjusted, streetData
             {
                 type = 'STREET',
                 params = edgeParams,
-                edges = _makeEdges(
+                edges = _makeEdgesWithPitch(
                     params.direction,
-                    pitchAdjusted,
+                    pitchAngle,
                     {x0, 5.0 * streetHalfWidth + 5.0 * halfDistance + halfIslandWidth, 0},
                     {x1, 5.0 * streetHalfWidth + 5.0 * halfDistance + halfIslandWidth, 0}
                 ),
@@ -1034,9 +1043,9 @@ helper.getStreetChunksSnapEdgeLists = function(params, pitchAdjusted, streetData
             {
                 type = 'STREET',
                 params = edgeParams,
-                edges = _makeEdges(
+                edges = _makeEdgesWithPitch(
                     params.direction,
-                    pitchAdjusted,
+                    pitchAngle,
                     {x1, - 5.0 * streetHalfWidth - 5.0 * halfDistance - halfIslandWidth, 0},
                     {x2, - 5.0 * streetHalfWidth - 5.0 * halfDistance - halfIslandWidth, 0},
                     true
@@ -1047,9 +1056,9 @@ helper.getStreetChunksSnapEdgeLists = function(params, pitchAdjusted, streetData
             {
                 type = 'STREET',
                 params = edgeParams,
-                edges = _makeEdges(
+                edges = _makeEdgesWithPitch(
                     params.direction,
-                    pitchAdjusted,
+                    pitchAngle,
                     {x1, - 3.0 * streetHalfWidth - 3.0 * halfDistance - halfIslandWidth, 0},
                     {x2, - 3.0 * streetHalfWidth - 3.0 * halfDistance - halfIslandWidth, 0},
                     true
@@ -1060,9 +1069,9 @@ helper.getStreetChunksSnapEdgeLists = function(params, pitchAdjusted, streetData
             {
                 type = 'STREET',
                 params = edgeParams,
-                edges = _makeEdges(
+                edges = _makeEdgesWithPitch(
                     params.direction,
-                    pitchAdjusted,
+                    pitchAngle,
                     {x1, -streetHalfWidth - halfDistance - halfIslandWidth, 0},
                     {x2, -streetHalfWidth - halfDistance - halfIslandWidth, 0},
                     true
@@ -1073,9 +1082,9 @@ helper.getStreetChunksSnapEdgeLists = function(params, pitchAdjusted, streetData
             {
                 type = 'STREET',
                 params = edgeParams,
-                edges = _makeEdges(
+                edges = _makeEdgesWithPitch(
                     params.direction,
-                    pitchAdjusted,
+                    pitchAngle,
                     {x1, streetHalfWidth + halfDistance + halfIslandWidth, 0},
                     {x2, streetHalfWidth + halfDistance + halfIslandWidth, 0}
                 ),
@@ -1085,9 +1094,9 @@ helper.getStreetChunksSnapEdgeLists = function(params, pitchAdjusted, streetData
             {
                 type = 'STREET',
                 params = edgeParams,
-                edges = _makeEdges(
+                edges = _makeEdgesWithPitch(
                     params.direction,
-                    pitchAdjusted,
+                    pitchAngle,
                     {x1, 3.0 * streetHalfWidth + 3.0 * halfDistance + halfIslandWidth, 0},
                     {x2, 3.0 * streetHalfWidth + 3.0 * halfDistance + halfIslandWidth, 0}
                 ),
@@ -1097,9 +1106,9 @@ helper.getStreetChunksSnapEdgeLists = function(params, pitchAdjusted, streetData
             {
                 type = 'STREET',
                 params = edgeParams,
-                edges = _makeEdges(
+                edges = _makeEdgesWithPitch(
                     params.direction,
-                    pitchAdjusted,
+                    pitchAngle,
                     {x1, 5.0 * streetHalfWidth + 5.0 * halfDistance + halfIslandWidth, 0},
                     {x2, 5.0 * streetHalfWidth + 5.0 * halfDistance + halfIslandWidth, 0}
                 ),
@@ -1110,9 +1119,9 @@ helper.getStreetChunksSnapEdgeLists = function(params, pitchAdjusted, streetData
             {
                 type = 'STREET',
                 params = edgeParams,
-                edges = _makeEdges(
+                edges = _makeEdgesWithPitch(
                     params.direction,
-                    pitchAdjusted,
+                    pitchAngle,
                     {x2, - 5.0 * streetHalfWidth - 5.0 * halfDistance - halfIslandWidth, 0},
                     {x3, - 5.0 * streetHalfWidth - 5.0 * halfDistance - halfIslandWidth, 0},
                     true
@@ -1123,9 +1132,9 @@ helper.getStreetChunksSnapEdgeLists = function(params, pitchAdjusted, streetData
             {
                 type = 'STREET',
                 params = edgeParams,
-                edges = _makeEdges(
+                edges = _makeEdgesWithPitch(
                     params.direction,
-                    pitchAdjusted,
+                    pitchAngle,
                     {x2, - 3.0 * streetHalfWidth - 3.0 * halfDistance - halfIslandWidth, 0},
                     {x3, - 3.0 * streetHalfWidth - 3.0 * halfDistance - halfIslandWidth, 0},
                     true
@@ -1136,9 +1145,9 @@ helper.getStreetChunksSnapEdgeLists = function(params, pitchAdjusted, streetData
             {
                 type = 'STREET',
                 params = edgeParams,
-                edges = _makeEdges(
+                edges = _makeEdgesWithPitch(
                     params.direction,
-                    pitchAdjusted,
+                    pitchAngle,
                     {x2, -streetHalfWidth - halfDistance - halfIslandWidth, 0},
                     {x3, -streetHalfWidth - halfDistance - halfIslandWidth, 0},
                     true
@@ -1149,9 +1158,9 @@ helper.getStreetChunksSnapEdgeLists = function(params, pitchAdjusted, streetData
             {
                 type = 'STREET',
                 params = edgeParams,
-                edges = _makeEdges(
+                edges = _makeEdgesWithPitch(
                     params.direction,
-                    pitchAdjusted,
+                    pitchAngle,
                     {x2, streetHalfWidth + halfDistance + halfIslandWidth, 0},
                     {x3, streetHalfWidth + halfDistance + halfIslandWidth, 0}
                 ),
@@ -1161,9 +1170,9 @@ helper.getStreetChunksSnapEdgeLists = function(params, pitchAdjusted, streetData
             {
                 type = 'STREET',
                 params = edgeParams,
-                edges = _makeEdges(
+                edges = _makeEdgesWithPitch(
                     params.direction,
-                    pitchAdjusted,
+                    pitchAngle,
                     {x2, 3.0 * streetHalfWidth + 3.0 * halfDistance + halfIslandWidth, 0},
                     {x3, 3.0 * streetHalfWidth + 3.0 * halfDistance + halfIslandWidth, 0}
                 ),
@@ -1173,9 +1182,9 @@ helper.getStreetChunksSnapEdgeLists = function(params, pitchAdjusted, streetData
             {
                 type = 'STREET',
                 params = edgeParams,
-                edges = _makeEdges(
+                edges = _makeEdgesWithPitch(
                     params.direction,
-                    pitchAdjusted,
+                    pitchAngle,
                     {x2, 5.0 * streetHalfWidth + 5.0 * halfDistance + halfIslandWidth, 0},
                     {x3, 5.0 * streetHalfWidth + 5.0 * halfDistance + halfIslandWidth, 0}
                 ),
@@ -1187,7 +1196,7 @@ helper.getStreetChunksSnapEdgeLists = function(params, pitchAdjusted, streetData
     return edgeLists
 end
 
-helper.getStreetHairpinSnapEdgeLists = function(params, pitchAdjusted, streetData, tramTrackType)
+helper.getStreetHairpinSnapEdgeLists = function(params, streetData, tramTrackType)
     local streetHalfWidth = _getStreetHalfWidth(streetData)
     local widthFactorBend = _getWidthFactor(streetHalfWidth)
     -- this is the fruit of trial and error, see the notes
@@ -1204,7 +1213,6 @@ helper.getStreetHairpinSnapEdgeLists = function(params, pitchAdjusted, streetDat
             params = edgeParams,
             edges = _makeEdges(
                 params.direction,
-                pitchAdjusted,
                 {-xMax, -widthFactorBend * streetHalfWidth, 0},
                 {0, -widthFactorBend * streetHalfWidth, 0},
                 false,
@@ -1226,7 +1234,6 @@ helper.getStreetHairpinSnapEdgeLists = function(params, pitchAdjusted, streetDat
             params = edgeParams,
             edges = _makeEdges(
                 params.direction,
-                pitchAdjusted,
                 {0, widthFactorBend * streetHalfWidth, 0},
                 {-xMax, widthFactorBend * streetHalfWidth, 0},
                 false,
@@ -1237,7 +1244,7 @@ helper.getStreetHairpinSnapEdgeLists = function(params, pitchAdjusted, streetDat
             snapNodes = _getSnapNodesHighX(params)
         }
     }
-    -- the pitch plays no part in the bend as long as it is centred on x = 0
+
     if params.direction == 0 then
         streetUtil.addEdgeAutoTangents(
             edgeLists[2].edges,
