@@ -63,6 +63,12 @@ results.getStreetLods = function()
                             name = 'straight_spcl2_l',
                             transf = {-1, 0, 0, 0, 0, -1, 0, 0, 0, 0, 1, 0, -5, -10, 0, 1}
                         },
+                        -- ground
+                        {
+                            materials = { 'street/merge/country_new_medium_paving_low_prio.mtl'},
+                            mesh = 'merge/square_16x5.msh',
+                            transf = {1.5, 0, 0, 0,  0, 0.938, 0, 0,  0, 0, 1, 0,  -1.25, 0, 0, 1}
+                        },
                     },
                     transf = {.8, 0, 0, 0, 0, .8, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1}
                 },
@@ -76,7 +82,17 @@ end
 results.getCountryRoadLods = function()
     return {
             {
-                node = {},
+                node = {
+                    children = {
+                        -- ground
+                        {
+                            materials = { 'street/merge/country_new_medium_paving_low_prio.mtl'},
+                            mesh = 'merge/square_16x5.msh',
+                            transf = {1.5, 0, 0, 0,  0, 0.938, 0, 0,  0, 0, 1, 0,  -1.25, 0, 0, 1}
+                        },
+                    },
+                    transf = {.8, 0, 0, 0, 0, .8, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1}
+                },
                 static = false,
                 visibleFrom = 0,
                 visibleTo = 1000

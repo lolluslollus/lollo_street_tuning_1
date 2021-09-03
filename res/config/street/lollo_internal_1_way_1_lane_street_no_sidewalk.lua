@@ -25,10 +25,10 @@
         --categories = {},
         --borderGroundTex = 'street_border.lua',
         materials = {
-            streetPaving = {
-                name = 'street/country_new_medium_paving.mtl',
-                size = {8.0, 8.0}
-            },
+            -- streetPaving = {
+            --     name = 'street/country_new_medium_paving.mtl',
+            --     size = {8.0, 8.0}
+            -- },
             -- streetBorder = {
             --     name = 'street/new_medium_border.mtl',
             --     size = {2.0, .3}

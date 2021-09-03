@@ -86,36 +86,6 @@ function data()
                             transf = { -1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 2.5, 15, 0, 1, },
                         },
                         -- ground
-                        -- {
-                        --     materials = {'street/country_new_medium_paving.mtl'},
-                        --     mesh = 'station/rail/era_c/station_1_main/station_1_main_perron_lod0.msh',
-                        --     transf = {.48, 0, 0, 0, 0, .99, 0, 0, 0, 0, 1, 0, -3.2, 13.7, -.795, 1}
-                        -- },
-                        -- {
-                        --     materials = {'street/country_new_medium_paving.mtl'},
-                        --     mesh = 'station/rail/era_c/station_1_main/station_1_main_perron_lod0.msh',
-                        --     transf = {.54, 0, 0, 0, 0, .99, 0, 0, 0, 0, 1, 0, -2.6, 9.8, -.795, 1}
-                        -- },
-                        -- {
-                        --     materials = {'street/country_new_medium_paving.mtl'},
-                        --     mesh = 'station/rail/era_c/station_1_main/station_1_main_perron_lod0.msh',
-                        --     transf = {.54, 0, 0, 0, 0, .99, 0, 0, 0, 0, 1, 0, -2.6, 4.9, -.795, 1}
-                        -- },
-                        -- {
-                        --     materials = {'street/country_new_medium_paving.mtl'},
-                        --     mesh = 'station/rail/era_c/station_1_main/station_1_main_perron_lod0.msh',
-                        --     transf = {.54, 0, 0, 0, 0, .99, 0, 0, 0, 0, 1, 0, -2.6, 0, -.795, 1}
-                        -- },
-                        -- {
-                        --     materials = {'street/country_new_medium_paving.mtl'},
-                        --     mesh = 'station/rail/era_c/station_1_main/station_1_main_perron_lod0.msh',
-                        --     transf = {.54, 0, 0, 0, 0, .99, 0, 0, 0, 0, 1, 0, -2.6, -4.9, -.795, 1}
-                        -- },
-                        -- {
-                        --     materials = {'street/country_new_medium_paving.mtl'},
-                        --     mesh = 'station/rail/era_c/station_1_main/station_1_main_perron_lod0.msh',
-                        --     transf = {.48, 0, 0, 0, 0, .99, 0, 0, 0, 0, 1, 0, -3.2, -8.8, -.795, 1}
-                        -- },
                     },
                     transf = {.8, 0, 0, 0, 0, .8, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1}
                 },

@@ -92,6 +92,12 @@ results.getStreetLods = function()
                         name = 'straight_spcl2_l',
                         transf = {0.8, 0, 0, 0, 0, -0.8, 0, 0, 0, 0, 1, 0, -2.0, -16, 0, 1}
                     },
+                    -- ground
+                    {
+                        materials = { 'street/merge/country_new_medium_paving_low_prio.mtl'},
+                        mesh = 'merge/square_16x5.msh',
+                        transf = {1, 0, 0, 0,  0, 1, 0, 0,  0, 0, 1, 0,  0, 0, 0, 1}
+                    },
                     -- -- bevel the pavement inside
                     -- {
                     --     --materials = {'station/road/streetstation/streetstation_perron_border.mtl', 'station/road/streetstation/streetstation_perron_base_new.mtl'},

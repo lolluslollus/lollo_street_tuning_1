@@ -54,6 +54,12 @@ results.getStreetLods = function()
                         name = 'straight_spcl2_l',
                         transf = {1, 0, 0, 0, 0, -1, 0, 0, 0, 0, 1, 0, -2.5, -10, 0, 1}
                     },
+                    -- ground
+                    {
+                        materials = { 'street/merge/country_new_medium_paving_low_prio.mtl'},
+                        mesh = 'merge/square_16x5.msh',
+                        transf = {1, 0, 0, 0,  0, 0.625, 0, 0,  0, 0, 1, 0,  0, 0, 0, 1}
+                    },
                     -- -- bevel the pavement inside
                     -- {
                     --     --materials = {'station/road/streetstation/streetstation_perron_border.mtl', 'station/road/streetstation/streetstation_perron_base_new.mtl'},
@@ -71,17 +77,6 @@ results.getStreetLods = function()
                     --     name = 'straight_spcl2_l',
                     --     transf = {-0.4, 0, 0, 0, 0, -0.4, 0, 0, 0, 0, 1, 0, -1.6, 4, 0, 1}
                     -- },
-                    -- ground
-                    -- {
-                    --     materials = {'street/country_new_medium_paving.mtl'},
-                    --     mesh = 'station/rail/era_c/station_1_main/station_1_main_perron_lod0.msh',
-                    --     transf = {0.26, 0, 0, 0, 0, .99, 0, 0, 0, 0, 1, 0, 0.0, 4.9, -.795, 1}
-                    -- },
-                    -- {
-                    --     materials = {'street/country_new_medium_paving.mtl'},
-                    --     mesh = 'station/rail/era_c/station_1_main/station_1_main_perron_lod0.msh',
-                    --     transf = {0.26, 0, 0, 0, 0, .99, 0, 0, 0, 0, 1, 0, 0.0, 0, -.795, 1}
-                    -- },
                 },
                 transf = {.8, 0, 0, 0, 0, .8, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1}
             },
@@ -96,20 +91,15 @@ results.getCountryRoadLods = function()
     return {
         {
             node = {
-                -- children = {
-                --     -- ground
-                --     -- {
-                --     --     materials = {'street/country_new_medium_paving.mtl'},
-                --     --     mesh = 'station/rail/era_c/station_1_main/station_1_main_perron_lod0.msh',
-                --     --     transf = {0.26, 0, 0, 0, 0, .99, 0, 0, 0, 0, 1, 0, 0.0, 4.9, -.795, 1}
-                --     -- },
-                --     -- {
-                --     --     materials = {'street/country_new_medium_paving.mtl'},
-                --     --     mesh = 'station/rail/era_c/station_1_main/station_1_main_perron_lod0.msh',
-                --     --     transf = {0.26, 0, 0, 0, 0, .99, 0, 0, 0, 0, 1, 0, 0.0, 0, -.795, 1}
-                --     -- },
-                -- },
-                -- transf = {.8, 0, 0, 0, 0, .8, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1}
+                children = {
+                    -- ground
+                    {
+                        materials = { 'street/merge/country_new_medium_paving_low_prio.mtl'},
+                        mesh = 'merge/square_16x5.msh',
+                        transf = {1, 0, 0, 0,  0, 0.625, 0, 0,  0, 0, 1, 0,  0, 0, 0, 1}
+                    },
+                },
+                transf = {.8, 0, 0, 0, 0, .8, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1}
             },
             static = false,
             visibleFrom = 0,
