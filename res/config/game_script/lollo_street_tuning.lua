@@ -120,8 +120,7 @@ local _utils = {
 
     getWhichEdgeGetsEdgeObjectAfterSplit = function(edgeObjPosition, node0pos, node1pos, nodeBetween)
         local result = {
-            -- assignToFirstEstimate = nil,
-            assignToSecondEstimate = nil,
+            assignToSide = nil,
         }
         -- print('LOLLO attempting to place edge object with position =')
         -- debugPrint(edgeObjPosition)
@@ -133,30 +132,7 @@ local _utils = {
         -- debugPrint(nodeBetween.tangent)
         -- print('wholeEdge.node1pos =')
         -- debugPrint(node1pos)
-        -- first estimator
-        -- local nodeBetween_Node0_Distance = edgeUtils.getVectorLength({
-        --     nodeBetween.position.x - node0pos[1],
-        --     nodeBetween.position.y - node0pos[2]
-        -- })
-        -- local nodeBetween_Node1_Distance = edgeUtils.getVectorLength({
-        --     nodeBetween.position.x - node1pos[1],
-        --     nodeBetween.position.y - node1pos[2]
-        -- })
-        -- local edgeObj_Node0_Distance = edgeUtils.getVectorLength({
-        --     edgeObjPosition.x - node0pos[1],
-        --     edgeObjPosition.y - node0pos[2]
-        -- })
-        -- local edgeObj_Node1_Distance = edgeUtils.getVectorLength({
-        --     edgeObjPosition.x - node1pos[1],
-        --     edgeObjPosition.y - node1pos[2]
-        -- })
-        -- if edgeObj_Node0_Distance < nodeBetween_Node0_Distance then
-        --     result.assignToFirstEstimate = 0
-        -- elseif edgeObj_Node1_Distance < nodeBetween_Node1_Distance then
-        --     result.assignToFirstEstimate = 1
-        -- end
 
-        -- second estimator
         local edgeObjPosition_assignTo = nil
         local node0_assignTo = nil
         local node1_assignTo = nil
@@ -207,9 +183,9 @@ local _utils = {
         end
 
         if edgeObjPosition_assignTo == node0_assignTo then
-            result.assignToSecondEstimate = 0
+            result.assignToSide = 0
         elseif edgeObjPosition_assignTo == node1_assignTo then
-            result.assignToSecondEstimate = 1
+            result.assignToSide = 1
         end
 
         -- print('LOLLO assignment =')
@@ -460,9 +436,7 @@ local _actions = {
             local edge1Objects = {}
             for _, edgeObj in pairs(oldBaseEdge.objects) do
                 local edgeObjPosition = edgeUtils.getObjectPosition(edgeObj[1])
-                -- print('edge object position: old and new way')
-                -- debugPrint(edgeObjPositionOld)
-                -- debugPrint(edgeObjPosition)
+                -- print('edge object position =') debugPrint(edgeObjPosition)
                 if type(edgeObjPosition) ~= 'table' then return end -- change nothing and leave
                 local assignment = _utils.getWhichEdgeGetsEdgeObjectAfterSplit(
                     edgeObjPosition,
@@ -470,24 +444,22 @@ local _actions = {
                     {node1.position.x, node1.position.y, node1.position.z},
                     nodeBetween
                 )
-                -- if assignment.assignToFirstEstimate == 0 then
-                if assignment.assignToSecondEstimate == 0 then
-                    table.insert(edge0Objects, { edgeObj[1], edgeObj[2] })
+                if assignment.assignToSide == 0 then
+                    -- LOLLO NOTE if we skip this check,
+                    -- one can split a road between left and right terminals of a streetside staion
+                    -- and add more terminals on the new segments.
                     -- local stationGroupId = api.engine.system.stationGroupSystem.getStationGroup(edgeObj[1])
-                    -- LOLLO TODO do we really need this check? Now we know that the crash happens with removed mod stations!
                     -- if arrayUtils.arrayHasValue(edge1StationGroups, stationGroupId) then return end -- don't split station groups
-                    -- if type(stationGroupId) == 'number' and stationGroupId > 0 then table.insert(edge0StationGroups, stationGroupId) end
-                -- elseif assignment.assignToFirstEstimate == 1 then
-                elseif assignment.assignToSecondEstimate == 1 then
-                    table.insert(edge1Objects, { edgeObj[1], edgeObj[2] })
+                    -- if edgeUtils.isValidId(stationGroupId) then table.insert(edge0StationGroups, stationGroupId) end
+                    table.insert(edge0Objects, { edgeObj[1], edgeObj[2] })
+                elseif assignment.assignToSide == 1 then
                     -- local stationGroupId = api.engine.system.stationGroupSystem.getStationGroup(edgeObj[1])
-                    -- LOLLO TODO do we really need this check? Now we know that the crash happens with removed mod stations!
                     -- if arrayUtils.arrayHasValue(edge0StationGroups, stationGroupId) then return end -- don't split station groups
-                    -- if type(stationGroupId) == 'number' and stationGroupId > 0 then table.insert(edge1StationGroups, stationGroupId) end
+                    -- if edgeUtils.isValidId(stationGroupId) then table.insert(edge1StationGroups, stationGroupId) end
+                    table.insert(edge1Objects, { edgeObj[1], edgeObj[2] })
                 else
                     -- print('don\'t change anything and leave')
-                    -- print('LOLLO error, assignment.assignToFirstEstimate =', assignment.assignToFirstEstimate)
-                    -- print('LOLLO error, assignment.assignToSecondEstimate =', assignment.assignToSecondEstimate)
+                    -- print('LOLLO error, assignment.assignToSide =', assignment.assignToSide)
                     return -- change nothing and leave
                 end
             end
