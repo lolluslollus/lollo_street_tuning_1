@@ -222,7 +222,7 @@ helper.getStreetChunksParams = function()
                 _('No'),
                 _('Yes')
             },
-            defaultIndex = 0
+            defaultIndex = 1
         },
         {
             key = 'distance',
@@ -331,7 +331,7 @@ helper.getStreetHairpinParams = function()
                 _('No'),
                 _('Yes')
             },
-            defaultIndex = 0
+            defaultIndex = 1
         },
         -- {
         --     key = 'pitch',
