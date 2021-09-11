@@ -1,3 +1,4 @@
+local pitchHelper = require('lollo_street_tuning/pitchHelper')
 local streetChunksHelper = require('lollo_street_tuning/lolloStreetChunksHelper')
 local debugger = require('debugger')
 
@@ -31,6 +32,7 @@ function data()
             -- and clicking it will bring up the params menu.
             result.edgeLists = streetChunksHelper.getStreetHairpinSnapEdgeLists(
                 params,
+                pitchHelper.getPitchAngle(params),
                 two.globalStreetData[params.streetType_ + 1],
                 tramTrackType
             )

@@ -3,7 +3,7 @@ function data()
         type = 'STREET_CONSTRUCTION',
         description = {
             name = _('Street hairpin curves'),
-            description = _('Lays streets as tightly bent as the game allows.')
+            description = _('Lays streets as tightly bent as the game allows. Use O and P to adjust the pitch.')
         },
         availability = {
             yearFrom = -1, --1925,

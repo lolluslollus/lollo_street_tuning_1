@@ -58,23 +58,37 @@ local function _getWidthFactor(streetHalfWidth)
     return result
 end
 
-local function _makeEdges(direction, node0, node1, isRightOfIsland, tan0, tan1)
+local function _makeHairpinEdges(direction, pitchAngle, nodeIndexToBePitchedBase1, node0, node1, tan0, tan1)
     if tan0 == nil or tan1 == nil then
         local edgeLength = edgeUtils.getVectorLength({node1[1] - node0[1], node1[2] - node0[2], node1[3] - node0[3]})
         if tan0 == nil then tan0 = {edgeLength, 0, 0} end
         if tan1 == nil then tan1 = {edgeLength, 0, 0} end
     end
 
-    if direction == 0 or (direction == 2 and isRightOfIsland) then return
-        {
-            {node0, tan0}, -- node 0
-            {node1, tan1} -- node 1
-        }
-    else return
-        {
-            {node1, {-tan1[1], -tan1[2], -tan1[3]}}, -- node 0
-            {node0, {-tan0[1], -tan0[2], -tan0[3]}} -- node 1
-        }
+    if direction == 0 then
+        if nodeIndexToBePitchedBase1 == 1 then
+            return {
+                pitchHelper.getPosTanPitched(pitchAngle, node0, tan0), -- node 0
+                {node1, tan1} -- node 1
+            }
+        else
+            return {
+                {node0, tan0}, -- node 0
+                pitchHelper.getPosTanPitched(pitchAngle, node1, tan1), -- node 1
+            }
+        end
+    else
+        if nodeIndexToBePitchedBase1 == 1 then
+            return {
+                {node1, {-tan1[1], -tan1[2], -tan1[3]}}, -- node 0
+                pitchHelper.getPosTanPitched(pitchAngle, node0, {-tan0[1], -tan0[2], -tan0[3]}), -- node 1
+            }
+        else
+            return {
+                pitchHelper.getPosTanPitched(pitchAngle, node1, {-tan1[1], -tan1[2], -tan1[3]}), -- node 0
+                {node0, {-tan0[1], -tan0[2], -tan0[3]}} -- node 1
+            }
+        end
     end
 end
 
@@ -333,13 +347,13 @@ helper.getStreetHairpinParams = function()
             },
             defaultIndex = 1
         },
-        -- {
-        --     key = 'pitch',
-        --     name = _('Pitch (adjust it with O and P while building)'),
-        --     values = pitchUtil.getPitchParamValues(),
-        --     defaultIndex = pitchUtil.getDefaultPitchParamValue(),
-        --     uiType = 'SLIDER'
-        -- }
+        {
+            key = 'pitch',
+            name = _('Pitch (adjust it with O and P while building)'),
+            values = pitchHelper.getPitchParamValues(),
+            defaultIndex = pitchHelper.getDefaultPitchParamValue(),
+            uiType = 'SLIDER'
+        }
     }
 end
 
@@ -1196,7 +1210,7 @@ helper.getStreetChunksSnapEdgeLists = function(params, pitchAngle, streetData, t
     return edgeLists
 end
 
-helper.getStreetHairpinSnapEdgeLists = function(params, streetData, tramTrackType)
+helper.getStreetHairpinSnapEdgeLists = function(params, pitchAngle, streetData, tramTrackType)
     local streetHalfWidth = _getStreetHalfWidth(streetData)
     local widthFactorBend = _getWidthFactor(streetHalfWidth)
     -- this is the fruit of trial and error, see the notes
@@ -1211,11 +1225,12 @@ helper.getStreetHairpinSnapEdgeLists = function(params, streetData, tramTrackTyp
         {
             type = 'STREET',
             params = edgeParams,
-            edges = _makeEdges(
+            edges = _makeHairpinEdges(
                 params.direction,
+                pitchAngle,
+                1,
                 {-xMax, -widthFactorBend * streetHalfWidth, 0},
                 {0, -widthFactorBend * streetHalfWidth, 0},
-                false,
                 {xMax, 0, 0},
                 {xMax, 0, 0}
             ),
@@ -1232,11 +1247,12 @@ helper.getStreetHairpinSnapEdgeLists = function(params, streetData, tramTrackTyp
         {
             type = 'STREET',
             params = edgeParams,
-            edges = _makeEdges(
+            edges = _makeHairpinEdges(
                 params.direction,
+                -pitchAngle,
+                2,
                 {0, widthFactorBend * streetHalfWidth, 0},
                 {-xMax, widthFactorBend * streetHalfWidth, 0},
-                false,
                 {-xMax, 0, 0},
                 {-xMax, 0, 0}
             ),
