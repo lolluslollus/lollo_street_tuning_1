@@ -20,7 +20,7 @@ function data()
                 }
             }
             -- LOLLO NOTE I cannot use KEEP here
-            local tramTrackType = params.tramTrack and (({'NO', 'YES', 'ELECTRIC'})[params.tramTrack + 1]) or 'NO'
+            local tramTrackType = params.tramTrack_ and (({'NO', 'YES', 'ELECTRIC'})[params.tramTrack_ + 1]) or 'NO'
             -- LOLLO NOTE we have 3 edges for every hairpin bend. The inner nodes do not snap, the outer ones do.
             -- This is required if we want to make them snappable at all and avoid crashes.
             -- The 2 outer nodes are always free, otherwise the curve cannot join the other streets.
