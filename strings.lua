@@ -33,7 +33,7 @@ function data()
 				[h1]Problem H: no footpaths[/h1]
 				This mod adds some thin footpaths, nearly invisible. You can use them to perform various tricks, eg connecting stations to roads or having people walk across a park. Give them a bus lane to pedestrianise them.
 				There is also a 1 metre footpath if you want something that looks the part.
-				[h1]Some handy tips:[/h1]
+				[h1]Tips:[/h1]
 				- To better visualise the lanes, start the game in debug mode and press <AltGr> + <L>.
 				- Press and hold <shift> to replace a short road segment between two joints.
 				- Select street - upgrade and right-click a one-way road to reverse its direction.
