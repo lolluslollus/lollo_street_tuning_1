@@ -387,6 +387,9 @@ function data()
         },
         runFn = function(settings, modParams)
             modSettings.setModParamsFromRunFn(modParams[getCurrentModId()])
+            -- LOLLO TODO try setting g_allowApplyWithErrorsHack
+            -- in a proper lua state, to see if you can avoid some pointless game crashes
+            -- when bad luck strikes
         end,
         -- Unlike runFn, postRunFn runs after all resources have been loaded.
         -- It is the only place where we can define a dynamic construction,
