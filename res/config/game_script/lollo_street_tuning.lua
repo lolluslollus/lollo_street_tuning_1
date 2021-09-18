@@ -316,7 +316,7 @@ local _actions = {
 
         local newEdge = api.type.SegmentAndEntity.new()
         newEdge.entity = -1
-        newEdge.type = 0
+        newEdge.type = 0 -- 0 is ROAD, 1 is TRACK
         newEdge.comp = oldEdge
         -- newEdge.playerOwned = {player = api.engine.util.getPlayer()}
         newEdge.playerOwned = api.engine.getComponent(oldEdgeId, api.type.ComponentType.PLAYER_OWNED)
@@ -348,10 +348,8 @@ local _actions = {
         api.cmd.sendCommand(
             api.cmd.make.buildProposal(proposal, nil, true),
             function(res, success)
-                -- print('LOLLO res = ')
-                -- debugPrint(res)
-                -- print('LOLLO _replaceEdgeWithStreetType success = ')
-                -- debugPrint(success)
+                -- print('LOLLO res = ') -- debugPrint(res)
+                -- print('LOLLO _replaceEdgeWithStreetType success = ') -- debugPrint(success)
                 if not(success) then
                     print('Warning: streetTuning.replaceEdgeWithStreetType failed, proposal = ') debugPrint(proposal)
                 end
@@ -582,7 +580,7 @@ function data()
                             -- print('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>')
                         end,
                         _myErrorHandler
-                )
+                    )
                 end
 
                 _actions.bulldozeConstruction(param.constructionEntityId)
