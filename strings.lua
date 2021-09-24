@@ -64,7 +64,8 @@ function data()
 				This happens with single as well as double-sided stations. You can tell those stations because the game shows a placeholder at their location.
 				This seems to be a UG problem. To solve it, replace those stations with some others available in your game.
 				B) The game always draws the tram track on the outer lane(s), even if trams are barred there. Take this as a graphical glitch.
-				C) The game always expects buses to be allowed in the outer lane(s)
+				C) The game always expects buses to be allowed in the outer lane(s).
+                D) Adding a bus lane to a road can break your multi-lane paths. Trial and error is the way out of this game limitation.
 			]],
 			["_NAME"] = "Street fine tuning"
 		},
