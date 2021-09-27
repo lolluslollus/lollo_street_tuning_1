@@ -1,6 +1,7 @@
 function data()
     return {
         name = _('Asphalt like street'),
+        categories = {'asphalt'},
         detailColorTexture = 'terrain/new_medium_paving_albedo_bc1a.dds',
         detailMetalGlossAoHTexture = 'terrain/new_medium_paving_metall_gloss_ao_bc3.dds',
         detailNormalTexture = 'terrain/new_medium_paving_normal_bc5.dds',
