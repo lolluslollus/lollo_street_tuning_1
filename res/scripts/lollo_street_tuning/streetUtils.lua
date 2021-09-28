@@ -332,9 +332,10 @@ local function _getStreetTypesWithApi()
             rightLaneWidth = (streetProperties.laneConfigs[2] or {}).width or 0,
             sidewalkWidth = streetProperties.sidewalkWidth,
             streetWidth = streetProperties.streetWidth,
-            -- LOLLO UG TODO isVisible may return true even if street.visibility = false.
-            -- I use yearFrom to get around this.
-            visibility = (streetProperties.yearFrom < 65535 and api.res.streetTypeRep.isVisible(ii)) or false,
+            -- LOLLO NOTE isVisible may return true even if street.visibility = false.
+            -- The reason is, visibility was introduced with a beta and quickly taken back.
+            -- I use yearFrom = 65535 to get around this.
+            visibility = (streetProperties.yearFrom < 65535 and streetProperties.yearTo == 0 and api.res.streetTypeRep.isVisible(ii)) or false,
             yearTo = streetProperties.yearTo
         }
     end
