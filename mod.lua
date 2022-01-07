@@ -359,22 +359,9 @@ function data()
         end
     end
 
-    local function _aiLockSmallStreets (fileName, data)
-        if modSettings.get('lolloStreetTuning_aiLockSmallStreets') == 1 then
-            if stringUtils.stringContains(fileName, 'standard/town_small_old.lua') then
-                data.aiLock = true
-            end
-            if stringUtils.stringContains(fileName, 'standard/town_small_new.lua') then
-                data.aiLock = true
-            end
-        end
-
-        return data
-    end
-
     return {
         info = {
-            minorVersion = 46,
+            minorVersion = 45,
             severityAdd = 'NONE',
             severityRemove = 'WARNING',
             name = _('_NAME'),
@@ -396,12 +383,6 @@ function data()
                     values = { _("No"), _("Yes"), },
                     defaultIndex = 1,
                 },
-                {
-                    key = "lolloStreetTuning_aiLockSmallStreets",
-                    name = _("Bar AI building small streets"),
-                    values = { _("No"), _("Yes"), },
-                    defaultIndex = 1,
-                },
             },
         },
         runFn = function(settings, modParams)
@@ -409,13 +390,13 @@ function data()
             -- LOLLO TODO try setting g_allowApplyWithErrorsHack
             -- in a proper lua state, to see if you can avoid some pointless game crashes
             -- when bad luck strikes
-            addModifier('loadStreet', _aiLockSmallStreets)
         end,
         -- Unlike runFn, postRunFn runs after all resources have been loaded.
         -- It is the only place where we can define a dynamic construction,
         -- which is the only way we can define dynamic parameters.
         -- Here, the dynamic parameters are the street types.
         postRunFn = function(settings, params)
+            -- if true then return end
             _addAvailableConstruction(
                 'lollo_street_chunks.con',
                 'lollo_street_chunks_2.con',
