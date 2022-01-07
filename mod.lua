@@ -390,13 +390,15 @@ function data()
             -- LOLLO TODO try setting g_allowApplyWithErrorsHack
             -- in a proper lua state, to see if you can avoid some pointless game crashes
             -- when bad luck strikes
+            -- LOLLO NOTE I could set aiLock = true for small streets,
+            -- to prevent the town automatically using them,
+            -- but the game will crash when creating a new town.
         end,
         -- Unlike runFn, postRunFn runs after all resources have been loaded.
         -- It is the only place where we can define a dynamic construction,
         -- which is the only way we can define dynamic parameters.
         -- Here, the dynamic parameters are the street types.
         postRunFn = function(settings, params)
-            -- if true then return end
             _addAvailableConstruction(
                 'lollo_street_chunks.con',
                 'lollo_street_chunks_2.con',
