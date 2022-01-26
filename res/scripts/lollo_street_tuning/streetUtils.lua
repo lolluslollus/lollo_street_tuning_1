@@ -248,6 +248,21 @@ local function _getStreetFilesContents(streetDirPath, fileNamePrefix)
     -- end
 end
 
+local function _getStreetDataFiltered_ForceBridge(streetDataTable)
+    if type(streetDataTable) ~= 'table' then return {} end
+
+    local results = {}
+    for _, strDataRecord in pairs(streetDataTable) do
+        -- if strDataRecord.yearTo == 0 and (strDataRecord.visibility == true or strDataRecord.isAllTramTracks == true) then
+        if strDataRecord.visibility == true or strDataRecord.isAllTramTracks == true then
+            if arrayUtils.arrayHasValue(strDataRecord.categories, helper.getStreetCategories().FORCE_BRIDGE) then
+                table.insert(results, #results + 1, strDataRecord)
+            end
+        end
+    end
+    return results
+end
+
 local function _getStreetDataFiltered_Stock(streetDataTable)
     if type(streetDataTable) ~= 'table' then return {} end
 
@@ -474,6 +489,7 @@ helper.getStreetCategories = function()
         COUNTRY_PERSON_RIGHT = 'country-person-right',
         COUNTRY_TRAM_RIGHT = 'country-tram-right',
         COUNTRY_TYRES_RIGHT = 'country-tyres-right',
+        FORCE_BRIDGE = 'force-bridge',
         HIGHWAY = 'highway',
         HIGHWAY_BUS_RIGHT = 'highway-bus-right',
         HIGHWAY_CARGO_RIGHT = 'highway-cargo-right',
@@ -507,6 +523,7 @@ end
 
 helper.getStreetDataFilters = function()
     return {
+        FORCE_BRIDGE = { id = 'force-bridge', func = _getStreetDataFiltered_ForceBridge },
         STOCK = { id = 'stock', func = _getStreetDataFiltered_Stock },
         STOCK_AND_RESERVED_LANES = { id = 'stock-and-reserved-lanes', func = _getStreetDataFiltered_StockAndReservedLanes },
     }
