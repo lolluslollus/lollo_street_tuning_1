@@ -27,10 +27,10 @@ local _eventProperties = {
     pathBuilt = { conName = '', eventName = 'pathBuilt' },
 }
 
-local function _isBuildingConstructionWithFileName(param, fileName)
+local function _isBuildingConstructionWithFileName(args, fileName)
     local toAdd =
-        type(param) == 'table' and type(param.proposal) == 'userdata' and type(param.proposal.toAdd) == 'userdata' and
-        param.proposal.toAdd
+        type(args) == 'table' and type(args.proposal) == 'userdata' and type(args.proposal.toAdd) == 'userdata' and
+        args.proposal.toAdd
 
     if toAdd and #toAdd > 0 then
         for i = 1, #toAdd do
@@ -43,24 +43,24 @@ local function _isBuildingConstructionWithFileName(param, fileName)
     return false
 end
 
-local function _isBuildingStreetChanger(param)
-    return _isBuildingConstructionWithFileName(param, _eventProperties.lollo_street_changer.conName)
+local function _isBuildingStreetChanger(args)
+    return _isBuildingConstructionWithFileName(args, _eventProperties.lollo_street_changer.conName)
 end
 
-local function _isBuildingStreetGetInfo(param)
-    return _isBuildingConstructionWithFileName(param, _eventProperties.lollo_street_get_info.conName)
+local function _isBuildingStreetGetInfo(args)
+    return _isBuildingConstructionWithFileName(args, _eventProperties.lollo_street_get_info.conName)
 end
 
-local function _isBuildingStreetSplitter(param)
-    return _isBuildingConstructionWithFileName(param, _eventProperties.lollo_street_splitter.conName)
+local function _isBuildingStreetSplitter(args)
+    return _isBuildingConstructionWithFileName(args, _eventProperties.lollo_street_splitter.conName)
 end
 
-local function _isBuildingStreetSplitterWithApi(param)
-    return _isBuildingConstructionWithFileName(param, _eventProperties.lollo_street_splitter_w_api.conName)
+local function _isBuildingStreetSplitterWithApi(args)
+    return _isBuildingConstructionWithFileName(args, _eventProperties.lollo_street_splitter_w_api.conName)
 end
 
-local function _isBuildingToggleAllTracks(param)
-    return _isBuildingConstructionWithFileName(param, _eventProperties.lollo_toggle_all_tram_tracks.conName)
+local function _isBuildingToggleAllTracks(args)
+    return _isBuildingConstructionWithFileName(args, _eventProperties.lollo_toggle_all_tram_tracks.conName)
 end
 
 local _utils = {
@@ -496,12 +496,12 @@ function data()
     return {
         ini = function()
         end,
-        handleEvent = function(src, id, name, param)
+        handleEvent = function(src, id, name, args)
             if (id ~= _eventId) then return end
-            if type(param) ~= 'table' then return end
-            if edgeUtils.isValidAndExistingId(param.constructionEntityId) then
-                -- print('param.constructionEntityId =', param.constructionEntityId or 'NIL')
-                local constructionTransf = api.engine.getComponent(param.constructionEntityId, api.type.ComponentType.CONSTRUCTION).transf
+            if type(args) ~= 'table' then return end
+            if edgeUtils.isValidAndExistingId(args.constructionEntityId) then
+                -- print('args.constructionEntityId =', args.constructionEntityId or 'NIL')
+                local constructionTransf = api.engine.getComponent(args.constructionEntityId, api.type.ComponentType.CONSTRUCTION).transf
                 constructionTransf = transfUtilUG.new(constructionTransf:cols(0), constructionTransf:cols(1), constructionTransf:cols(2), constructionTransf:cols(3))
                 -- print('type(constructionTransf) =', type(constructionTransf))
                 -- debugPrint(constructionTransf)
@@ -583,77 +583,77 @@ function data()
                     )
                 end
 
-                _actions.bulldozeConstruction(param.constructionEntityId)
-            elseif edgeUtils.isValidAndExistingId(param.edgeId) and edgeUtils.isValidId(param.streetTypeId) then
-                -- print('param.edgeId =', param.edgeId or 'NIL')
+                _actions.bulldozeConstruction(args.constructionEntityId)
+            elseif edgeUtils.isValidAndExistingId(args.edgeId) and edgeUtils.isValidId(args.streetTypeId) then
+                -- print('args.edgeId =', args.edgeId or 'NIL')
                 if name == _eventProperties.noTramRightRoadBuilt.eventName then
                     _actions.replaceEdgeWithStreetType(
-                        param.edgeId,
-                        param.streetTypeId
+                        args.edgeId,
+                        args.streetTypeId
                     )
                 elseif name == _eventProperties.pathBuilt.eventName then
                     _actions.replaceEdgeWithStreetType(
-                        param.edgeId,
-                        param.streetTypeId
+                        args.edgeId,
+                        args.streetTypeId
                     )
                 end
             -- else
-            --     print('id =', id or 'NIL', 'name =', name or 'NIL', 'param =')
-            --     debugPrint(param)
+            --     print('id =', id or 'NIL', 'name =', name or 'NIL', 'args =')
+            --     debugPrint(args)
             end
         end,
-        guiHandleEvent = function(id, name, param)
-            -- LOLLO NOTE param can have different types, even boolean, depending on the event id and name
+        guiHandleEvent = function(id, name, args)
+            -- LOLLO NOTE args can have different types, even boolean, depending on the event id and name
             if id == 'constructionBuilder' and name == 'builder.apply' then
                 -- if name == "builder.proposalCreate" then return end
                 -- print('guiHandleEvent caught id = constructionBuilder and name = builder.apply')
                 xpcall(
                     function()
-                        if not param.result or not param.result[1] then return end
+                        if not args.result or not args.result[1] then return end
 
-                        if _isBuildingStreetSplitter(param) then
+                        if _isBuildingStreetSplitter(args) then
                             api.cmd.sendCommand(api.cmd.make.sendScriptEvent(
                                 string.sub(debug.getinfo(1, 'S').source, 1),
                                 _eventId,
                                 _eventProperties.lollo_street_splitter.eventName,
                                 {
-                                    constructionEntityId = param.result[1]
+                                    constructionEntityId = args.result[1]
                                 }
                             ))
-                        elseif _isBuildingStreetSplitterWithApi(param) then
+                        elseif _isBuildingStreetSplitterWithApi(args) then
                             api.cmd.sendCommand(api.cmd.make.sendScriptEvent(
                                 string.sub(debug.getinfo(1, 'S').source, 1),
                                 _eventId,
                                 _eventProperties.lollo_street_splitter_w_api.eventName,
                                 {
-                                    constructionEntityId = param.result[1]
+                                    constructionEntityId = args.result[1]
                                 }
                             ))
-                        elseif _isBuildingStreetGetInfo(param) then
+                        elseif _isBuildingStreetGetInfo(args) then
                             api.cmd.sendCommand(api.cmd.make.sendScriptEvent(
                                 string.sub(debug.getinfo(1, 'S').source, 1),
                                 _eventId,
                                 _eventProperties.lollo_street_get_info.eventName,
                                 {
-                                    constructionEntityId = param.result[1]
+                                    constructionEntityId = args.result[1]
                                 }
                             ))
-                        elseif _isBuildingStreetChanger(param) then
+                        elseif _isBuildingStreetChanger(args) then
                             api.cmd.sendCommand(api.cmd.make.sendScriptEvent(
                                 string.sub(debug.getinfo(1, 'S').source, 1),
                                 _eventId,
                                 _eventProperties.lollo_street_changer.eventName,
                                 {
-                                    constructionEntityId = param.result[1]
+                                    constructionEntityId = args.result[1]
                                 }
                             ))
-                        elseif _isBuildingToggleAllTracks(param) then
+                        elseif _isBuildingToggleAllTracks(args) then
                             api.cmd.sendCommand(api.cmd.make.sendScriptEvent(
                                 string.sub(debug.getinfo(1, 'S').source, 1),
                                 _eventId,
                                 _eventProperties.lollo_toggle_all_tram_tracks.eventName,
                                 {
-                                    constructionEntityId = param.result[1]
+                                    constructionEntityId = args.result[1]
                                 }
                             ))
                         end
@@ -699,11 +699,11 @@ function data()
                 -- end
                 xpcall(
                     function()
-                        if not(param) or not(param.proposal) or not(param.proposal.proposal)
-                        or not(param.proposal.proposal.addedSegments) or not(param.proposal.proposal.addedSegments[1])
-                        or not(param.data) or not(param.data.entity2tn) then return end
+                        if not(args) or not(args.proposal) or not(args.proposal.proposal)
+                        or not(args.proposal.proposal.addedSegments) or not(args.proposal.proposal.addedSegments[1])
+                        or not(args.data) or not(args.data.entity2tn) then return end
 
-                        local addedSegments = param.proposal.proposal.addedSegments
+                        local addedSegments = args.proposal.proposal.addedSegments
 
                         -- remove right lane tram tracks if forbidden for current road
                         local removeTramTrackEventParams = {}
