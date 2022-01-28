@@ -5,7 +5,7 @@ function data()
         sidewalkWidth = 0.2,
         sidewalkHeight = .0,
         streetWidth = 0.1,
-        yearFrom = game.config.busLaneYearFrom,
+        yearFrom = 1925,
         yearTo = 0,
         aiLock = true,
         visibility = true,
