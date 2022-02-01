@@ -424,7 +424,6 @@ helper.getStreetChunksSnapEdgeLists = function(params, pitchAngle, streetData, t
                 freeNodes = _getFreeNodesLowX(params),
                 snapNodes = _getSnapNodesLowX(params)
                 --					snapNodes = { 0, 1 },  -- node 0 and 1 are allowed to snap to other edges of the same type --crashes
-                --					tag2nodes = {},
             },
             -- centre x
             {
