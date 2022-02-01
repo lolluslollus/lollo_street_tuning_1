@@ -67,7 +67,13 @@ function data()
 				C) The game always expects buses to be allowed in the outer lane(s).
                 D) Adding a bus lane to a road can break your multi-lane paths. Trial and error is the way out of this game limitation.
 			]],
-			["_NAME"] = "Street fine tuning"
+			["_NAME"] = "Street fine tuning",
+			["snapNodesName"] = "Snap to neighbours",
+			["snapNodesDesc"] = "Cycle through these values to help configure a station once it is built",
+			["No"] = "No",
+			["Left"] = "End A",
+			["Right"] = "End B",
+			["Both"] = "Both Ends",
 		},
 	}
 end

@@ -148,7 +148,7 @@ local function _getSnapNodesCentre(params, isRightOfIsland)
 end
 
 local function _getSnapNodesHighX(params, isRightOfIsland)
-    if params.snapNodes_ == 1 then
+    if params.snapNodes_ == 2 or params.snapNodes_ == 3 then
         if params.direction == 2 and isRightOfIsland then
             return params.direction == 0 and {0} or {1}
         else
@@ -160,7 +160,7 @@ local function _getSnapNodesHighX(params, isRightOfIsland)
 end
 
 local function _getSnapNodesLowX(params, isRightOfIsland)
-    if params.snapNodes_ == 1 then
+    if params.snapNodes_ == 1 or params.snapNodes_ == 3 then
         if params.direction == 2 and isRightOfIsland then
             return params.direction == 0 and {1} or {0}
         else
@@ -208,14 +208,26 @@ helper.getStreetChunksParams = function()
             },
             defaultIndex = 0
         },
+        -- {
+        --     key = 'snapNodes_',
+        --     name = _('Snap to neighbours'),
+        --     values = {
+        --         _('No'),
+        --         _('Yes')
+        --     },
+        --     defaultIndex = 0
+        -- },
         {
             key = 'snapNodes_',
-            name = _('Snap to neighbours'),
+            name = _('snapNodesName'),
+            tooltip = _('snapNodesDesc'),
             values = {
                 _('No'),
-                _('Yes')
+                _('Left'),
+                _('Right'),
+                _('Both')
             },
-            defaultIndex = 0
+            defaultIndex = 3
         },
         {
             key = 'tramTrack_',
@@ -317,14 +329,26 @@ helper.getStreetHairpinParams = function()
             },
             defaultIndex = 0
         },
+        -- {
+        --     key = 'snapNodes_',
+        --     name = _('Snap to neighbours'),
+        --     values = {
+        --         _('No'),
+        --         _('Yes')
+        --     },
+        --     defaultIndex = 0
+        -- },
         {
             key = 'snapNodes_',
-            name = _('Snap to neighbours'),
+            name = _('snapNodesName'),
+            tooltip = _('snapNodesDesc'),
             values = {
                 _('No'),
-                _('Yes')
+                _('Left'),
+                _('Right'),
+                _('Both')
             },
-            defaultIndex = 0
+            defaultIndex = 3
         },
         {
             key = 'tramTrack_',
