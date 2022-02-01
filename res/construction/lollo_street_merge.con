@@ -122,9 +122,6 @@ local function updateFn_2_1_lane_narrow_sidewalk_to_2_lane_one_way(params)
             edges = _makeEdges(_pitchAngle, params, {-4, -2, .0}, {-2, -2, .0}),
             -- edgeType = "BRIDGE", "TUNNEL"
             -- edgeTypeName = "cement.lua",
-            --freeNodes = { 0, 1 },
-            --freeNodes = { 1 },
-            -- freeNodes = {},
             freeNodes = params.direction == 0 and {0} or {1},
             snapNodes = _getSnapNodes01(params, true)
         },
