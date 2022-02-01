@@ -5,6 +5,13 @@ local debugger = require('debugger')
 function data()
     return {
         updateFn = function(params, two)
+            local function _initParams()
+				if not(params.streetType_) or not(two.globalStreetData[params.streetType_ + 1]) then
+					params.streetType_ = 0
+				end
+			end
+			_initParams()
+
             local result = { cost = 0 }
             result.groundFaces = {}
             -- result.colliders = {}
