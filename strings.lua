@@ -38,6 +38,7 @@ function data()
 				- Press and hold <shift> to replace a short road segment between two joints.
 				- Select street - upgrade and right-click a one-way road to reverse its direction.
 				- Use the categories in the street menu to avoid headaches.
+				- The construction mover helps adjust constructions easily after plopping them.
 				
 				[b]This mod may break your game if you use it and then remove it.[/b]
 				[b]Thanks to Enzojz for luadump![/b]
