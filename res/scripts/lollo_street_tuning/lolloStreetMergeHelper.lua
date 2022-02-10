@@ -4,14 +4,14 @@ local streetUtils = require('lollo_street_tuning/streetUtils')
 
 local helper = {
     getParams = function()
-        print('globalBridgeData at getParams =') debugPrint(
-            arrayUtils.map(
-                    streetUtils.getGlobalBridgeDataPlusNoBridge(),
-                    function(str)
-                        return str
-                    end
-            )
-        )
+        -- print('globalBridgeData at getParams =') debugPrint(
+        --     arrayUtils.map(
+        --             streetUtils.getGlobalBridgeDataPlusNoBridge(),
+        --             function(str)
+        --                 return str
+        --             end
+        --     )
+        -- )
         return {
             {
                 key = 'mergingType',

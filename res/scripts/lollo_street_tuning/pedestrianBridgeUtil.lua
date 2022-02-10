@@ -1,20 +1,20 @@
 local bridgeutilUG = require 'bridgeutil'
 
 local _lod0_skinMaterials_era_c_rep = {
-	'lollo_street_tuning/metal/rough_iron_skinned.mtl',
-	'lollo_street_tuning/station_concrete_1_low_prio_skinned.mtl',
+	'lollo_street_tuning/asphalt_low_prio_skinned.mtl',
+	'lollo_street_tuning/asphalt_low_prio_skinned.mtl',
 }
 local _lod0_skinMaterials_era_c_side = {
-	'lollo_street_tuning/station_concrete_1_low_prio_skinned.mtl',
-	'lollo_street_tuning/metal/rough_iron_skinned.mtl',
-	'lollo_street_tuning/metal/rough_iron_skinned.mtl',
+	'lollo_street_tuning/asphalt_low_prio_skinned.mtl',
+	'lollo_street_tuning/asphalt_low_prio_skinned.mtl',
+	'lollo_street_tuning/asphalt_low_prio_skinned.mtl',
 }
 local _lod0_skinMaterials_era_c_side_no_railing = {
-	'lollo_street_tuning/station_concrete_1_low_prio_skinned.mtl',
-	'lollo_street_tuning/metal/rough_iron_skinned.mtl',
+	'lollo_street_tuning/asphalt_low_prio_skinned.mtl',
+	'lollo_street_tuning/asphalt_low_prio_skinned.mtl',
 }
 local _lod1_materials_era_c = {
-	'lollo_street_tuning/station_concrete_1.mtl',
+	'lollo_street_tuning/asphalt_low_prio.mtl',
 }
 
 local function getDynamicProps()
@@ -118,8 +118,8 @@ local funcs = {
 
 		return {
 			name = _('InternalBridgeNoPillarsNoSides'),
-			yearFrom = 0, -- same as concrete paths
-			yearTo = 0,
+			yearFrom = -1, -- invisible
+			yearTo = -1, -- invisible
 			carriers = { 'ROAD' },
 			speedLimit = 320.0 / 3.6,
 			pillarLen = _pillarLength,
@@ -148,7 +148,7 @@ local funcs = {
 				-- sidewalkPaving = { -- this fills small gaps at junctions but also draws tangent stripes outside sharp bends
 				--     -- name = 'lollo_street_tuning/totally_transparent.mtl'
 				--     -- name = 'lollo_street_tuning/icon/green.mtl'
-				--     -- name = 'lollo_street_tuning/station_concrete_1_low_prio.mtl'
+				--     -- name = 'lollo_street_tuning/asphalt_low_prio.mtl'
 				--     name = 'street/country_new_medium_paving.mtl',
 				--     size = { 2, 2 },
 				-- },

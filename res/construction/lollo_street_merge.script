@@ -2468,9 +2468,9 @@ function data()
     return {
         updateFn = function(params, two)
             local _bridgeData = two.globalBridgeData[params.bridgeType_ + 1]
-            print('updateFn starting; two.globalBridgeData =') debugPrint(two.globalBridgeData)
-            print('updateFn starting; _bridgeData =') debugPrint(_bridgeData)
-            print('updateFn starting; params.bridgeType_ =', params.bridgeType_)
+            -- print('updateFn starting; two.globalBridgeData =') debugPrint(two.globalBridgeData)
+            -- print('updateFn starting; _bridgeData =') debugPrint(_bridgeData)
+            -- print('updateFn starting; params.bridgeType_ =', params.bridgeType_)
             if params.mergingType == 0 then
                 return updateFn_2_1_lane_narrow_sidewalk_to_2_lane_one_way(params, _bridgeData)
             elseif params.mergingType == 1 then
