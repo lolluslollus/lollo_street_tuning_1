@@ -22,7 +22,11 @@ local function _getInternalEdgeTypeName()
     return 'lollo_street_tuning/pedestrian_basic_no_pillars_no_sides_era_c.lua'
 end
 
-local function _getGroundFaces(face)
+local function _getGroundFaces(face, params)
+    if params.bridgeType_ and params.bridgeType_ ~= 0 then
+        return {}
+    end
+
     return {
         {
             face = face,
@@ -109,7 +113,7 @@ local function updateFn_2_1_lane_narrow_sidewalk_to_2_lane_one_way(params, bridg
         {-2.1, 6.0, 0.0, 1.0},
         {-2.1, -6.0, 0.0, 1.0},
     }
-    result.groundFaces = _getGroundFaces(connectorFace)
+    result.groundFaces = _getGroundFaces(connectorFace, params)
 
     result.colliders = {
         {
@@ -223,7 +227,7 @@ local function updateFn_2_1_lane_narrow_sidewalk_to_2_lane(params, bridgeData)
         {-2.1, 6.0, 0.0, 1.0},
         {-2.1, -6.0, 0.0, 1.0},
     }
-    result.groundFaces = _getGroundFaces(connectorFace)
+    result.groundFaces = _getGroundFaces(connectorFace, params)
 
     result.colliders = {
         {
@@ -326,7 +330,7 @@ local function updateFn_2_1_lane_medium_sidewalk_to_2_lane_one_way(params, bridg
         {-2.1, 7.0, 0.0, 1.0},
         {-2.1, -7.0, 0.0, 1.0}
     }
-    result.groundFaces = _getGroundFaces(connectorFace)
+    result.groundFaces = _getGroundFaces(connectorFace, params)
 
     result.colliders = {
         {
@@ -431,7 +435,7 @@ local function updateFn_2_1_lane_medium_sidewalk_to_2_lane(params, bridgeData)
         {-2.1, 7.0, 0.0, 1.0},
         {-2.1, -7.0, 0.0, 1.0}
     }
-    result.groundFaces = _getGroundFaces(connectorFace)
+    result.groundFaces = _getGroundFaces(connectorFace, params)
 
     result.colliders = {
         {
@@ -535,7 +539,7 @@ local function updateFn_3_1_lane_narrow_sidewalk_to_3_lane_one_way(params, bridg
         {-2.1, 7.0, 0.0, 1.0},
         {-2.1, -7.0, 0.0, 1.0}
     }
-    result.groundFaces = _getGroundFaces(connectorFace)
+    result.groundFaces = _getGroundFaces(connectorFace, params)
 
     result.colliders = {
         {
@@ -663,7 +667,7 @@ end
 --         {-10, 12.0, 0.0, 1.0},
 --         {-10, -12.0, 0.0, 1.0}
 --     }
---     result.groundFaces = _getGroundFaces(connectorFace)
+--     result.groundFaces = _getGroundFaces(connectorFace, params)
 
 --     result.colliders = {
 --         {
@@ -791,7 +795,7 @@ local function updateFn_4_1_lane_narrow_sidewalk_to_4_lane_one_way(params, bridg
         {-6, 7.0, 0.0, 1.0},
         {-6, -7.0, 0.0, 1.0}
     }
-    result.groundFaces = _getGroundFaces(connectorFace)
+    result.groundFaces = _getGroundFaces(connectorFace, params)
 
     result.colliders = {
         {
@@ -948,7 +952,7 @@ local function updateFn_4_1_lane_narrow_sidewalk_to_4_lane(params, bridgeData)
         {-6, 7.0, 0.0, 1.0},
         {-6, -7.0, 0.0, 1.0}
     }
-    result.groundFaces = _getGroundFaces(connectorFace)
+    result.groundFaces = _getGroundFaces(connectorFace, params)
 
     result.colliders = {
         {
@@ -1107,7 +1111,7 @@ local function updateFn_4_1_lane_narrow_sidewalk_to_4_lane_large(params, bridgeD
         {-2, 8.0, 0.0, 1.0},
         {-2, -8.0, 0.0, 1.0}
     }
-    result.groundFaces = _getGroundFaces(connectorFace)
+    result.groundFaces = _getGroundFaces(connectorFace, params)
 
     result.colliders = {
         {
@@ -1263,7 +1267,7 @@ local function updateFn_2_2_lane_one_way_to_6_lane_x_large(params, bridgeData)
         {-2.1, 15.0, 0.0, 1.0},
         {-2.1, -15.0, 0.0, 1.0}
     }
-    result.groundFaces = _getGroundFaces(connectorFace)
+    result.groundFaces = _getGroundFaces(connectorFace, params)
 
     result.colliders = {
         {
@@ -1420,7 +1424,7 @@ local function updateFn_6_1_lane_one_way_to_6_lane_x_large(params, bridgeData)
         {-2.1, 12.0, 0.0, 1.0},
         {-2.1, -12.0, 0.0, 1.0}
     }
-    result.groundFaces = _getGroundFaces(connectorFace)
+    result.groundFaces = _getGroundFaces(connectorFace, params)
 
     result.colliders = {
         {
@@ -1628,7 +1632,7 @@ local function updateFn_Motorway_6_1_lane_one_way_to_6_lane_x_large(params, brid
         {-2.1, 12.0, 0.0, 1.0},
         {-2.1, -12.0, 0.0, 1.0}
     }
-    result.groundFaces = _getGroundFaces(connectorFace)
+    result.groundFaces = _getGroundFaces(connectorFace, params)
 
     result.colliders = {
         {
@@ -1836,7 +1840,7 @@ local function updateFn_Motorway_2_2_lane_one_way_to_6_lane_x_large(params, brid
         {-2.1, 12.0, 0.0, 1.0},
         {-2.1, -12.0, 0.0, 1.0}
     }
-    result.groundFaces = _getGroundFaces(connectorFace)
+    result.groundFaces = _getGroundFaces(connectorFace, params)
 
     result.colliders = {
         {
@@ -1966,7 +1970,7 @@ local function updateFn_Motorway_4_1_lane_one_way_to_4_lane_large(params, bridge
         {-2.1, 6.0, 0.0, 1.0},
         {-2.1, -6.0, 0.0, 1.0}
     }
-    result.groundFaces = _getGroundFaces(connectorFace)
+    result.groundFaces = _getGroundFaces(connectorFace, params)
 
     result.colliders = {
         {
@@ -2122,7 +2126,7 @@ local function updateFn_Motorway_2_1_lane_narrow_sidewalk_to_2_lane(params, brid
         {-2, 4.0, 0.0, 1.0},
         {-2, -4.0, 0.0, 1.0}
     }
-    result.groundFaces = _getGroundFaces(connectorFace)
+    result.groundFaces = _getGroundFaces(connectorFace, params)
 
     result.colliders = {
         {
@@ -2225,7 +2229,7 @@ local function updateFn_Motorway_3_1_lane_narrow_sidewalk_to_3_lane_one_way(para
         {-2, 6.0, 0.0, 1.0},
         {-2, -6.0, 0.0, 1.0}
     }
-    result.groundFaces = _getGroundFaces(connectorFace)
+    result.groundFaces = _getGroundFaces(connectorFace, params)
 
     result.colliders = {
         {
@@ -2361,7 +2365,7 @@ local function updateFn_Motorway_2_1_lane_narrow_sidewalk_to_2_lane_one_way(para
         {-2, 4.0, 0.0, 1.0},
         {-2, -4.0, 0.0, 1.0}
     }
-    result.groundFaces = _getGroundFaces(connectorFace)
+    result.groundFaces = _getGroundFaces(connectorFace, params)
 
     result.colliders = {
         {
@@ -2512,4 +2516,4 @@ function data()
     }
 end
 
--- LOLLO TODO get rid of ground textures if on a bridge
+-- LOLLO TODO get rid of glitch on bridges
