@@ -18,6 +18,10 @@ local function _getEdgeTypeName(params, bridgeData)
     return nil
 end
 
+local function _getInternalEdgeTypeName()
+    return 'lollo_street_tuning/pedestrian_basic_no_pillars_no_sides_era_c.lua'
+end
+
 local function _getGroundFaces(face)
     return {
         {
@@ -169,7 +173,7 @@ local function updateFn_2_1_lane_narrow_sidewalk_to_2_lane_one_way(params, bridg
             },
             edges = _makeEdges(_pitchAngle, params, {-1.8, 2, 0}, {1.8, 2, 0}),
             edgeType = _getEdgeType(params),
-            edgeTypeName = _getEdgeTypeName(params, bridgeData),
+            edgeTypeName = _getInternalEdgeTypeName(),
             freeNodes = {},
             snapNodes = {}
         },
@@ -183,7 +187,7 @@ local function updateFn_2_1_lane_narrow_sidewalk_to_2_lane_one_way(params, bridg
             },
             edges = _makeEdges(_pitchAngle, params, {-1.8, -2, 0}, {1.8, -2, 0}),
             edgeType = _getEdgeType(params),
-            edgeTypeName = _getEdgeTypeName(params, bridgeData),
+            edgeTypeName = _getInternalEdgeTypeName(),
             freeNodes = {},
             snapNodes = {}
         },
@@ -275,7 +279,7 @@ local function updateFn_2_1_lane_narrow_sidewalk_to_2_lane(params, bridgeData)
             },
             edges = _makeEdges(_pitchAngle, params, {-1.8, -2, 0}, {1.8, -2, 0}),
             edgeType = _getEdgeType(params),
-            edgeTypeName = _getEdgeTypeName(params, bridgeData),
+            edgeTypeName = _getInternalEdgeTypeName(),
             freeNodes = {},
             snapNodes = {}
         },
@@ -288,7 +292,7 @@ local function updateFn_2_1_lane_narrow_sidewalk_to_2_lane(params, bridgeData)
             },
             edges = _makeEdges(_pitchAngle, params, {1.8, 2, 0}, {-1.8, 2, 0}, {-3.6, 0, 0}, {-3.6, 0, 0}),
             edgeType = _getEdgeType(params),
-            edgeTypeName = _getEdgeTypeName(params, bridgeData),
+            edgeTypeName = _getInternalEdgeTypeName(),
             freeNodes = {},
             snapNodes = {}
         },
@@ -378,7 +382,7 @@ local function updateFn_2_1_lane_medium_sidewalk_to_2_lane_one_way(params, bridg
             },
             edges = _makeEdges(_pitchAngle, params, {-1.8, 4, 0}, {1.8, 3, 0}, {4, -0.1, 0}, {4, -0.1, 0}),
             edgeType = _getEdgeType(params),
-            edgeTypeName = _getEdgeTypeName(params, bridgeData),
+            edgeTypeName = _getInternalEdgeTypeName(),
             freeNodes = {},
             snapNodes = {}
         },
@@ -391,7 +395,7 @@ local function updateFn_2_1_lane_medium_sidewalk_to_2_lane_one_way(params, bridg
             },
             edges = _makeEdges(_pitchAngle, params, {-1.8, -4, 0}, {1.8, -3, 0}, {4, 0.1, 0}, {4, 0.1, 0}),
             edgeType = _getEdgeType(params),
-            edgeTypeName = _getEdgeTypeName(params, bridgeData),
+            edgeTypeName = _getInternalEdgeTypeName(),
             freeNodes = {},
             snapNodes = {}
         },
@@ -483,7 +487,7 @@ local function updateFn_2_1_lane_medium_sidewalk_to_2_lane(params, bridgeData)
             },
             edges = _makeEdges(_pitchAngle, params, {-1.8, -4, 0}, {1.8, -3, 0}, {4, 0.1, 0}, {4, 0.1, 0}),
             edgeType = _getEdgeType(params),
-            edgeTypeName = _getEdgeTypeName(params, bridgeData),
+            edgeTypeName = _getInternalEdgeTypeName(),
             freeNodes = {},
             snapNodes = {}
         },
@@ -496,7 +500,7 @@ local function updateFn_2_1_lane_medium_sidewalk_to_2_lane(params, bridgeData)
             },
             edges = _makeEdges(_pitchAngle, params, {1.8, 3, 0}, {-1.8, 4, 0}, {-4, 0.1, 0}, {-4, 0.1, 0}),
             edgeType = _getEdgeType(params),
-            edgeTypeName = _getEdgeTypeName(params, bridgeData),
+            edgeTypeName = _getInternalEdgeTypeName(),
             freeNodes = {},
             snapNodes = {}
         },
@@ -600,7 +604,7 @@ local function updateFn_3_1_lane_narrow_sidewalk_to_3_lane_one_way(params, bridg
             },
             edges = _makeEdges(_pitchAngle, params, {-1.8, 4, 0}, {1.8, 4, 0}),
             edgeType = _getEdgeType(params),
-            edgeTypeName = _getEdgeTypeName(params, bridgeData),
+            edgeTypeName = _getInternalEdgeTypeName(),
             freeNodes = {},
             snapNodes = {}
         },
@@ -613,7 +617,7 @@ local function updateFn_3_1_lane_narrow_sidewalk_to_3_lane_one_way(params, bridg
             },
             edges = _makeEdges(_pitchAngle, params, {-1.8, 0, 0}, {1.8, 0, 0}),
             edgeType = _getEdgeType(params),
-            edgeTypeName = _getEdgeTypeName(params, bridgeData),
+            edgeTypeName = _getInternalEdgeTypeName(),
             freeNodes = {},
             snapNodes = {}
         },
@@ -626,7 +630,7 @@ local function updateFn_3_1_lane_narrow_sidewalk_to_3_lane_one_way(params, bridg
             },
             edges = _makeEdges(_pitchAngle, params, {-1.8, -4, 0}, {1.8, -4, 0}),
             edgeType = _getEdgeType(params),
-            edgeTypeName = _getEdgeTypeName(params, bridgeData),
+            edgeTypeName = _getInternalEdgeTypeName(),
             freeNodes = {},
             snapNodes = {}
         },
@@ -728,7 +732,7 @@ end
 --             },
 --             edges = _makeEdges(_pitchAngle, params, {-5.8, 8, 0}, {1.8, 4, 0}, {8, -0.1, 0}, {8, -0.1, 0}),
 -- edgeType = _getEdgeType(params),
---             edgeTypeName = _getEdgeTypeName(params, bridgeData),
+--             edgeTypeName = _getInternalEdgeTypeName(),
 --             freeNodes = {},
 --             snapNodes = {}
 --         },
@@ -741,7 +745,7 @@ end
 --             },
 --             edges = _makeEdges(_pitchAngle, params, {-5.8, 0, 0}, {1.8, 0, 0}),
 -- edgeType = _getEdgeType(params),
---             edgeTypeName = _getEdgeTypeName(params, bridgeData),
+--             edgeTypeName = _getInternalEdgeTypeName(),
 --             freeNodes = {},
 --             snapNodes = {}
 --         },
@@ -754,7 +758,7 @@ end
 --             },
 --             edges = _makeEdges(_pitchAngle, params, {-5.8, -8, 0}, {1.8, -4, 0}, {8, 0.1, 0}, {8, 0.1, 0}),
 -- edgeType = _getEdgeType(params),
---             edgeTypeName = _getEdgeTypeName(params, bridgeData),
+--             edgeTypeName = _getInternalEdgeTypeName(),
 --             freeNodes = {},
 --             snapNodes = {}
 --         },
@@ -869,7 +873,7 @@ local function updateFn_4_1_lane_narrow_sidewalk_to_4_lane_one_way(params, bridg
             },
             edges = _makeEdges(_pitchAngle, params, {-5.8, 6, 0}, {1.8, 4.5, 0}, {8, -0.1, 0}, {8, -0.1, 0}),
             edgeType = _getEdgeType(params),
-            edgeTypeName = _getEdgeTypeName(params, bridgeData),
+            edgeTypeName = _getInternalEdgeTypeName(),
             freeNodes = {},
             snapNodes = {}
         },
@@ -882,7 +886,7 @@ local function updateFn_4_1_lane_narrow_sidewalk_to_4_lane_one_way(params, bridg
             },
             edges = _makeEdges(_pitchAngle, params, {-5.8, 2, 0}, {1.8, 1.5, 0}, {8, -0.1, 0}, {8, -0.1, 0}),
             edgeType = _getEdgeType(params),
-            edgeTypeName = _getEdgeTypeName(params, bridgeData),
+            edgeTypeName = _getInternalEdgeTypeName(),
             freeNodes = {},
             snapNodes = {}
         },
@@ -895,7 +899,7 @@ local function updateFn_4_1_lane_narrow_sidewalk_to_4_lane_one_way(params, bridg
             },
             edges = _makeEdges(_pitchAngle, params, {-5.8, -2, 0}, {1.8, -1.5, 0}, {8, 0.1, 0}, {8, 0.1, 0}),
             edgeType = _getEdgeType(params),
-            edgeTypeName = _getEdgeTypeName(params, bridgeData),
+            edgeTypeName = _getInternalEdgeTypeName(),
             freeNodes = {},
             snapNodes = {}
         },
@@ -908,7 +912,7 @@ local function updateFn_4_1_lane_narrow_sidewalk_to_4_lane_one_way(params, bridg
             },
             edges = _makeEdges(_pitchAngle, params, {-5.8, -6, 0}, {1.8, -4.5, 0}, {8, 0.1, 0}, {8, 0.1, 0}),
             edgeType = _getEdgeType(params),
-            edgeTypeName = _getEdgeTypeName(params, bridgeData),
+            edgeTypeName = _getInternalEdgeTypeName(),
             freeNodes = {},
             snapNodes = {}
         },
@@ -1027,7 +1031,7 @@ local function updateFn_4_1_lane_narrow_sidewalk_to_4_lane(params, bridgeData)
             },
             edges = _makeEdges(_pitchAngle, params, {-5.8, -6, 0}, {1.8, -4.5, 0}, {8, 0.1, 0}, {8, 0.1, 0}),
             edgeType = _getEdgeType(params),
-            edgeTypeName = _getEdgeTypeName(params, bridgeData),
+            edgeTypeName = _getInternalEdgeTypeName(),
             freeNodes = {},
             snapNodes = {}
         },
@@ -1040,7 +1044,7 @@ local function updateFn_4_1_lane_narrow_sidewalk_to_4_lane(params, bridgeData)
             },
             edges = _makeEdges(_pitchAngle, params, {-5.8, -2, 0}, {1.8, -1.5, 0}, {8, 0.1, 0}, {8, 0.1, 0}),
             edgeType = _getEdgeType(params),
-            edgeTypeName = _getEdgeTypeName(params, bridgeData),
+            edgeTypeName = _getInternalEdgeTypeName(),
             freeNodes = {},
             snapNodes = {}
         },
@@ -1053,7 +1057,7 @@ local function updateFn_4_1_lane_narrow_sidewalk_to_4_lane(params, bridgeData)
             },
             edges = _makeEdges(_pitchAngle, params, {1.8, 1.5, 0}, {-5.8, 2, 0}, {-8, 0.1, 0}, {-8, 0.1, 0}),
             edgeType = _getEdgeType(params),
-            edgeTypeName = _getEdgeTypeName(params, bridgeData),
+            edgeTypeName = _getInternalEdgeTypeName(),
             freeNodes = {},
             snapNodes = {}
         },
@@ -1066,7 +1070,7 @@ local function updateFn_4_1_lane_narrow_sidewalk_to_4_lane(params, bridgeData)
             },
             edges = _makeEdges(_pitchAngle, params, {1.8, 4.5, 0}, {-5.8, 6, 0}, {-8, 0.1, 0}, {-8, 0.1, 0}),
             edgeType = _getEdgeType(params),
-            edgeTypeName = _getEdgeTypeName(params, bridgeData),
+            edgeTypeName = _getInternalEdgeTypeName(),
             freeNodes = {},
             snapNodes = {}
         },
@@ -1185,7 +1189,7 @@ local function updateFn_4_1_lane_narrow_sidewalk_to_4_lane_large(params, bridgeD
             },
             edges = _makeEdges(_pitchAngle, params, {-1.8, -6, 0}, {1.8, -6, 0}),
             edgeType = _getEdgeType(params),
-            edgeTypeName = _getEdgeTypeName(params, bridgeData),
+            edgeTypeName = _getInternalEdgeTypeName(),
             freeNodes = {},
             snapNodes = {}
         },
@@ -1198,7 +1202,7 @@ local function updateFn_4_1_lane_narrow_sidewalk_to_4_lane_large(params, bridgeD
             },
             edges = _makeEdges(_pitchAngle, params, {-1.8, -2, 0}, {1.8, -2, 0}),
             edgeType = _getEdgeType(params),
-            edgeTypeName = _getEdgeTypeName(params, bridgeData),
+            edgeTypeName = _getInternalEdgeTypeName(),
             freeNodes = {},
             snapNodes = {}
         },
@@ -1211,7 +1215,7 @@ local function updateFn_4_1_lane_narrow_sidewalk_to_4_lane_large(params, bridgeD
             },
             edges = _makeEdges(_pitchAngle, params, {1.8, 2, 0}, {-1.8, 2, 0}, {-3.6, 0, 0}, {-3.6, 0, 0}),
             edgeType = _getEdgeType(params),
-            edgeTypeName = _getEdgeTypeName(params, bridgeData),
+            edgeTypeName = _getInternalEdgeTypeName(),
             freeNodes = {},
             snapNodes = {}
         },
@@ -1224,7 +1228,7 @@ local function updateFn_4_1_lane_narrow_sidewalk_to_4_lane_large(params, bridgeD
             },
             edges = _makeEdges(_pitchAngle, params, {1.8, 6, 0}, {-1.8, 6, 0}, {-3.6, 0, 0}, {-3.6, 0, 0}),
             edgeType = _getEdgeType(params),
-            edgeTypeName = _getEdgeTypeName(params, bridgeData),
+            edgeTypeName = _getInternalEdgeTypeName(),
             freeNodes = {},
             snapNodes = {}
         },
@@ -1315,7 +1319,7 @@ local function updateFn_2_2_lane_one_way_to_6_lane_x_large(params, bridgeData)
             },
             edges = _makeEdges(_pitchAngle, params, {-1.8, -10, 0}, {1.8, -10, 0}),
             edgeType = _getEdgeType(params),
-            edgeTypeName = _getEdgeTypeName(params, bridgeData),
+            edgeTypeName = _getInternalEdgeTypeName(),
             freeNodes = {},
             snapNodes = {}
         },
@@ -1328,7 +1332,7 @@ local function updateFn_2_2_lane_one_way_to_6_lane_x_large(params, bridgeData)
             },
             edges = _makeEdges(_pitchAngle, params, {-1.8, -6, 0}, {1.8, -6, 0}),
             edgeType = _getEdgeType(params),
-            edgeTypeName = _getEdgeTypeName(params, bridgeData),
+            edgeTypeName = _getInternalEdgeTypeName(),
             freeNodes = {},
             snapNodes = {}
         },
@@ -1342,7 +1346,7 @@ local function updateFn_2_2_lane_one_way_to_6_lane_x_large(params, bridgeData)
         --     },
         --     edges = _makeEdges(_pitchAngle, params, {-1.8, -6, 0}, {1.8, -2, 0}, {4, 0.1, 0}, {4, 0.1, 0}),
         --     edgeType = _getEdgeType(params),
-        --     edgeTypeName = _getEdgeTypeName(params, bridgeData),
+        --     edgeTypeName = _getInternalEdgeTypeName(),
         --     freeNodes = {},
         --     snapNodes = {}
         -- },
@@ -1355,7 +1359,7 @@ local function updateFn_2_2_lane_one_way_to_6_lane_x_large(params, bridgeData)
         --     },
         --     edges = _makeEdges(_pitchAngle, params, {1.8, 2, 0}, {-1.8, 6, 0}, {-4, 0.1, 0}, {-4, 0.1, 0}),
         --     edgeType = _getEdgeType(params),
-        --     edgeTypeName = _getEdgeTypeName(params, bridgeData),
+        --     edgeTypeName = _getInternalEdgeTypeName(),
         --     freeNodes = {},
         --     snapNodes = {}
         -- },
@@ -1368,7 +1372,7 @@ local function updateFn_2_2_lane_one_way_to_6_lane_x_large(params, bridgeData)
             },
             edges = _makeEdges(_pitchAngle, params, {1.8, 6, 0}, {-1.8, 6, 0}, {-3.6, 0, 0}, {-3.6, 0, 0}),
             edgeType = _getEdgeType(params),
-            edgeTypeName = _getEdgeTypeName(params, bridgeData),
+            edgeTypeName = _getInternalEdgeTypeName(),
             freeNodes = {},
             snapNodes = {}
         },
@@ -1381,7 +1385,7 @@ local function updateFn_2_2_lane_one_way_to_6_lane_x_large(params, bridgeData)
             },
             edges = _makeEdges(_pitchAngle, params, {1.8, 10, 0}, {-1.8, 10, 0}, {-3.6, 0, 0}, {-3.6, 0, 0}),
             edgeType = _getEdgeType(params),
-            edgeTypeName = _getEdgeTypeName(params, bridgeData),
+            edgeTypeName = _getInternalEdgeTypeName(),
             freeNodes = {},
             snapNodes = {}
         },
@@ -1524,7 +1528,7 @@ local function updateFn_6_1_lane_one_way_to_6_lane_x_large(params, bridgeData)
             },
             edges = _makeEdges(_pitchAngle, params, {-1.8, -10, 0}, {1.8, -10, 0}, {3.6, 0, 0}, {3.6, 0, 0}),
             edgeType = _getEdgeType(params),
-            edgeTypeName = _getEdgeTypeName(params, bridgeData),
+            edgeTypeName = _getInternalEdgeTypeName(),
             freeNodes = {},
             snapNodes = {}
         },
@@ -1537,7 +1541,7 @@ local function updateFn_6_1_lane_one_way_to_6_lane_x_large(params, bridgeData)
             },
             edges = _makeEdges(_pitchAngle, params, {-1.8, -6, 0}, {1.8, -6, 0}, {3.6, 0, 0}, {3.6, 0, 0}),
             edgeType = _getEdgeType(params),
-            edgeTypeName = _getEdgeTypeName(params, bridgeData),
+            edgeTypeName = _getInternalEdgeTypeName(),
             freeNodes = {},
             snapNodes = {}
         },
@@ -1550,7 +1554,7 @@ local function updateFn_6_1_lane_one_way_to_6_lane_x_large(params, bridgeData)
             },
             edges = _makeEdges(_pitchAngle, params, {-1.8, -2, 0}, {1.8, -2, 0}, {3.6, 0, 0}, {3.6, 0, 0}),
             edgeType = _getEdgeType(params),
-            edgeTypeName = _getEdgeTypeName(params, bridgeData),
+            edgeTypeName = _getInternalEdgeTypeName(),
             freeNodes = {},
             snapNodes = {}
         },
@@ -1563,7 +1567,7 @@ local function updateFn_6_1_lane_one_way_to_6_lane_x_large(params, bridgeData)
             },
             edges = _makeEdges(_pitchAngle, params, {1.8, 2, 0}, {-1.8, 2, 0}, {-3.6, 0, 0}, {-3.6, 0, 0}),
             edgeType = _getEdgeType(params),
-            edgeTypeName = _getEdgeTypeName(params, bridgeData),
+            edgeTypeName = _getInternalEdgeTypeName(),
             freeNodes = {},
             snapNodes = {}
         },
@@ -1576,7 +1580,7 @@ local function updateFn_6_1_lane_one_way_to_6_lane_x_large(params, bridgeData)
             },
             edges = _makeEdges(_pitchAngle, params, {1.8, 6, 0}, {-1.8, 6, 0}, {-3.6, 0, 0}, {-3.6, 0, 0}),
             edgeType = _getEdgeType(params),
-            edgeTypeName = _getEdgeTypeName(params, bridgeData),
+            edgeTypeName = _getInternalEdgeTypeName(),
             freeNodes = {},
             snapNodes = {}
         },
@@ -1589,7 +1593,7 @@ local function updateFn_6_1_lane_one_way_to_6_lane_x_large(params, bridgeData)
             },
             edges = _makeEdges(_pitchAngle, params, {1.8, 10, 0}, {-1.8, 10, 0}, {-3.6, 0, 0}, {-3.6, 0, 0}),
             edgeType = _getEdgeType(params),
-            edgeTypeName = _getEdgeTypeName(params, bridgeData),
+            edgeTypeName = _getInternalEdgeTypeName(),
             freeNodes = {},
             snapNodes = {}
         },
@@ -1732,7 +1736,7 @@ local function updateFn_Motorway_6_1_lane_one_way_to_6_lane_x_large(params, brid
             },
             edges = _makeEdges(_pitchAngle, params, {-1.8, -10, 0}, {1.8, -10, 0}, {3.6, 0, 0}, {3.6, 0, 0}),
             edgeType = _getEdgeType(params),
-            edgeTypeName = _getEdgeTypeName(params, bridgeData),
+            edgeTypeName = _getInternalEdgeTypeName(),
             freeNodes = {},
             snapNodes = {}
         },
@@ -1745,7 +1749,7 @@ local function updateFn_Motorway_6_1_lane_one_way_to_6_lane_x_large(params, brid
             },
             edges = _makeEdges(_pitchAngle, params, {-1.8, -6, 0}, {1.8, -6, 0}, {3.6, 0, 0}, {3.6, 0, 0}),
             edgeType = _getEdgeType(params),
-            edgeTypeName = _getEdgeTypeName(params, bridgeData),
+            edgeTypeName = _getInternalEdgeTypeName(),
             freeNodes = {},
             snapNodes = {}
         },
@@ -1758,7 +1762,7 @@ local function updateFn_Motorway_6_1_lane_one_way_to_6_lane_x_large(params, brid
             },
             edges = _makeEdges(_pitchAngle, params, {-1.8, -2, 0}, {1.8, -2, 0}, {3.6, 0, 0}, {3.6, 0, 0}),
             edgeType = _getEdgeType(params),
-            edgeTypeName = _getEdgeTypeName(params, bridgeData),
+            edgeTypeName = _getInternalEdgeTypeName(),
             freeNodes = {},
             snapNodes = {}
         },
@@ -1771,7 +1775,7 @@ local function updateFn_Motorway_6_1_lane_one_way_to_6_lane_x_large(params, brid
             },
             edges = _makeEdges(_pitchAngle, params, {1.8, 2, 0}, {-1.8, 2, 0}, {-3.6, 0, 0}, {-3.6, 0, 0}),
             edgeType = _getEdgeType(params),
-            edgeTypeName = _getEdgeTypeName(params, bridgeData),
+            edgeTypeName = _getInternalEdgeTypeName(),
             freeNodes = {},
             snapNodes = {}
         },
@@ -1784,7 +1788,7 @@ local function updateFn_Motorway_6_1_lane_one_way_to_6_lane_x_large(params, brid
             },
             edges = _makeEdges(_pitchAngle, params, {1.8, 6, 0}, {-1.8, 6, 0}, {-3.6, 0, 0}, {-3.6, 0, 0}),
             edgeType = _getEdgeType(params),
-            edgeTypeName = _getEdgeTypeName(params, bridgeData),
+            edgeTypeName = _getInternalEdgeTypeName(),
             freeNodes = {},
             snapNodes = {}
         },
@@ -1797,7 +1801,7 @@ local function updateFn_Motorway_6_1_lane_one_way_to_6_lane_x_large(params, brid
             },
             edges = _makeEdges(_pitchAngle, params, {1.8, 10, 0}, {-1.8, 10, 0}, {-3.6, 0, 0}, {-3.6, 0, 0}),
             edgeType = _getEdgeType(params),
-            edgeTypeName = _getEdgeTypeName(params, bridgeData),
+            edgeTypeName = _getInternalEdgeTypeName(),
             freeNodes = {},
             snapNodes = {}
         },
@@ -1888,7 +1892,7 @@ local function updateFn_Motorway_2_2_lane_one_way_to_6_lane_x_large(params, brid
             },
             edges = _makeEdges(_pitchAngle, params, {-1.8, -10, 0}, {1.8, -10, 0}),
             edgeType = _getEdgeType(params),
-            edgeTypeName = _getEdgeTypeName(params, bridgeData),
+            edgeTypeName = _getInternalEdgeTypeName(),
             freeNodes = {},
             snapNodes = {}
         },
@@ -1901,7 +1905,7 @@ local function updateFn_Motorway_2_2_lane_one_way_to_6_lane_x_large(params, brid
             },
             edges = _makeEdges(_pitchAngle, params, {-1.8, -6, 0}, {1.8, -6, 0}),
             edgeType = _getEdgeType(params),
-            edgeTypeName = _getEdgeTypeName(params, bridgeData),
+            edgeTypeName = _getInternalEdgeTypeName(),
             freeNodes = {},
             snapNodes = {}
         },
@@ -1914,7 +1918,7 @@ local function updateFn_Motorway_2_2_lane_one_way_to_6_lane_x_large(params, brid
             },
             edges = _makeEdges(_pitchAngle, params, {1.8, 6, 0}, {-1.8, 6, 0}, {-3.6, 0, 0}, {-3.6, 0, 0}),
             edgeType = _getEdgeType(params),
-            edgeTypeName = _getEdgeTypeName(params, bridgeData),
+            edgeTypeName = _getInternalEdgeTypeName(),
             freeNodes = {},
             snapNodes = {}
         },
@@ -1927,7 +1931,7 @@ local function updateFn_Motorway_2_2_lane_one_way_to_6_lane_x_large(params, brid
             },
             edges = _makeEdges(_pitchAngle, params, {1.8, 10, 0}, {-1.8, 10, 0}, {-3.6, 0, 0}, {-3.6, 0, 0}),
             edgeType = _getEdgeType(params),
-            edgeTypeName = _getEdgeTypeName(params, bridgeData),
+            edgeTypeName = _getInternalEdgeTypeName(),
             freeNodes = {},
             snapNodes = {}
         },
@@ -2044,7 +2048,7 @@ local function updateFn_Motorway_4_1_lane_one_way_to_4_lane_large(params, bridge
             },
             edges = _makeEdges(_pitchAngle, params, {-1.8, -6, 0}, {1.8, -6, 0}, {3.6, 0, 0}, {3.6, 0, 0}),
             edgeType = _getEdgeType(params),
-            edgeTypeName = _getEdgeTypeName(params, bridgeData),
+            edgeTypeName = _getInternalEdgeTypeName(),
             freeNodes = {},
             snapNodes = {}
         },
@@ -2057,7 +2061,7 @@ local function updateFn_Motorway_4_1_lane_one_way_to_4_lane_large(params, bridge
             },
             edges = _makeEdges(_pitchAngle, params, {-1.8, -2, 0}, {1.8, -2, 0}, {3.6, 0, 0}, {3.6, 0, 0}),
             edgeType = _getEdgeType(params),
-            edgeTypeName = _getEdgeTypeName(params, bridgeData),
+            edgeTypeName = _getInternalEdgeTypeName(),
             freeNodes = {},
             snapNodes = {}
         },
@@ -2070,7 +2074,7 @@ local function updateFn_Motorway_4_1_lane_one_way_to_4_lane_large(params, bridge
             },
             edges = _makeEdges(_pitchAngle, params, {1.8, 2, 0}, {-1.8, 2, 0}, {-3.6, 0, 0}, {-3.6, 0, 0}),
             edgeType = _getEdgeType(params),
-            edgeTypeName = _getEdgeTypeName(params, bridgeData),
+            edgeTypeName = _getInternalEdgeTypeName(),
             freeNodes = {},
             snapNodes = {}
         },
@@ -2083,7 +2087,7 @@ local function updateFn_Motorway_4_1_lane_one_way_to_4_lane_large(params, bridge
             },
             edges = _makeEdges(_pitchAngle, params, {1.8, 6, 0}, {-1.8, 6, 0}, {-3.6, 0, 0}, {-3.6, 0, 0}),
             edgeType = _getEdgeType(params),
-            edgeTypeName = _getEdgeTypeName(params, bridgeData),
+            edgeTypeName = _getInternalEdgeTypeName(),
             freeNodes = {},
             snapNodes = {}
         },
@@ -2174,7 +2178,7 @@ local function updateFn_Motorway_2_1_lane_narrow_sidewalk_to_2_lane(params, brid
             },
             edges = _makeEdges(_pitchAngle, params, {-1.8, -2, 0}, {1.8, -2, 0}),
             edgeType = _getEdgeType(params),
-            edgeTypeName = _getEdgeTypeName(params, bridgeData),
+            edgeTypeName = _getInternalEdgeTypeName(),
             freeNodes = {},
             snapNodes = {}
         },
@@ -2187,7 +2191,7 @@ local function updateFn_Motorway_2_1_lane_narrow_sidewalk_to_2_lane(params, brid
             },
             edges = _makeEdges(_pitchAngle, params, {1.8, 2, 0}, {-1.8, 2, 0}, {-3.6, 0, 0}, {-3.6, 0, 0}),
             edgeType = _getEdgeType(params),
-            edgeTypeName = _getEdgeTypeName(params, bridgeData),
+            edgeTypeName = _getInternalEdgeTypeName(),
             freeNodes = {},
             snapNodes = {}
         },
@@ -2295,7 +2299,7 @@ local function updateFn_Motorway_3_1_lane_narrow_sidewalk_to_3_lane_one_way(para
             },
             edges = _makeEdges(_pitchAngle, params, {-1.8, 4, 0}, {1.8, 4, 0}),
             edgeType = _getEdgeType(params),
-            edgeTypeName = _getEdgeTypeName(params, bridgeData),
+            edgeTypeName = _getInternalEdgeTypeName(),
             freeNodes = {},
             snapNodes = {}
         },
@@ -2309,7 +2313,7 @@ local function updateFn_Motorway_3_1_lane_narrow_sidewalk_to_3_lane_one_way(para
             },
             edges = _makeEdges(_pitchAngle, params, {-1.8, 0, 0}, {1.8, 0, 0}),
             edgeType = _getEdgeType(params),
-            edgeTypeName = _getEdgeTypeName(params, bridgeData),
+            edgeTypeName = _getInternalEdgeTypeName(),
             freeNodes = {},
             snapNodes = {}
         },
@@ -2323,7 +2327,7 @@ local function updateFn_Motorway_3_1_lane_narrow_sidewalk_to_3_lane_one_way(para
             },
             edges = _makeEdges(_pitchAngle, params, {-1.8, -4, 0}, {1.8, -4, 0}),
             edgeType = _getEdgeType(params),
-            edgeTypeName = _getEdgeTypeName(params, bridgeData),
+            edgeTypeName = _getInternalEdgeTypeName(),
             freeNodes = {},
             snapNodes = {}
         },
@@ -2417,7 +2421,7 @@ local function updateFn_Motorway_2_1_lane_narrow_sidewalk_to_2_lane_one_way(para
             },
             edges = _makeEdges(_pitchAngle, params, {-1.8, 2, 0}, {1.8, 2, 0}),
             edgeType = _getEdgeType(params),
-            edgeTypeName = _getEdgeTypeName(params, bridgeData),
+            edgeTypeName = _getInternalEdgeTypeName(),
             freeNodes = {},
             snapNodes = {}
         },
@@ -2431,7 +2435,7 @@ local function updateFn_Motorway_2_1_lane_narrow_sidewalk_to_2_lane_one_way(para
             },
             edges = _makeEdges(_pitchAngle, params, {-1.8, -2, 0}, {1.8, -2, 0}),
             edgeType = _getEdgeType(params),
-            edgeTypeName = _getEdgeTypeName(params, bridgeData),
+            edgeTypeName = _getInternalEdgeTypeName(),
             freeNodes = {},
             snapNodes = {}
         },
@@ -2508,5 +2512,4 @@ function data()
     }
 end
 
--- LOLLO TODO use a neutral bridge with internal atreet types
 -- LOLLO TODO get rid of ground textures if on a bridge
