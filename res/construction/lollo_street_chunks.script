@@ -39,12 +39,11 @@ function data()
                 params,
                 _pitchAngle,
                 two.globalStreetData[params.streetType_ + 1],
+                two.globalBridgeData[params.bridgeType_ + 1],
                 tramTrackType
             )
-            -- LOLLO TODO copying from the groundTextureBuilder, we could make the terrain flat to ease the pain when building junctions
-            -- if params.terrainAlignment == 1 then
-            --     result.terrainAlignmentLists = { { type = "EQUAL", faces =  { } } }
-            -- end
+            -- LOLLO NOTE this thing with the empty faces is required , otherwise the game will make its own alignments, with spikes and all on bridges or tunnels.
+            result.terrainAlignmentLists = { { type = "EQUAL", optional = true, faces =  { } } }
 
             return result
         end,

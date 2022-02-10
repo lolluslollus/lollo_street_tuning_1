@@ -41,8 +41,11 @@ function data()
                 params,
                 pitchHelper.getPitchAngle(params),
                 two.globalStreetData[params.streetType_ + 1],
+                two.globalBridgeData[params.bridgeType_ + 1],
                 tramTrackType
             )
+            -- LOLLO NOTE this thing with the empty faces is required , otherwise the game will make its own alignments, with spikes and all on bridges or tunnels.
+            result.terrainAlignmentLists = { { type = "EQUAL", optional = true, faces =  { } } }
 
             return result
         end,

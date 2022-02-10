@@ -47,9 +47,8 @@ function data()
                 autoRemovable = true,
                 skipCollision = true,
                 skipCollisionCheck = true,
-            --		result.stations = {}
-            --		result.terminalGroups = {}
-            --		result.terrainAlignmentLists = {}
+                -- LOLLO NOTE this thing with the empty faces is required , otherwise the game will make its own alignments, with spikes and all on bridges or tunnels.
+                terrainAlignmentLists = { { type = "EQUAL", optional = true, faces =  { } } }
             }
 
             return result

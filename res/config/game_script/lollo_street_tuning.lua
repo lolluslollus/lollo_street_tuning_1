@@ -316,7 +316,7 @@ local _actions = {
 
         local newEdge = api.type.SegmentAndEntity.new()
         newEdge.entity = -1
-        newEdge.type = 0 -- 0 is ROAD, 1 is TRACK
+        newEdge.type = 0 -- 0 is api.type.enum.Carrier.ROAD, 1 is api.type.enum.Carrier.RAIL
         newEdge.comp = oldEdge
         -- newEdge.playerOwned = {player = api.engine.util.getPlayer()}
         newEdge.playerOwned = api.engine.getComponent(oldEdgeId, api.type.ComponentType.PLAYER_OWNED)
@@ -389,7 +389,7 @@ local _actions = {
 
         local newEdge0 = api.type.SegmentAndEntity.new()
         newEdge0.entity = -1
-        newEdge0.type = 0 -- ROAD
+        newEdge0.type = 0 -- 0 is api.type.enum.Carrier.ROAD, 1 is api.type.enum.Carrier.RAIL
         newEdge0.comp.node0 = oldBaseEdge.node0
         newEdge0.comp.node1 = -3
         newEdge0.comp.tangent0 = api.type.Vec3f.new(
@@ -409,7 +409,7 @@ local _actions = {
 
         local newEdge1 = api.type.SegmentAndEntity.new()
         newEdge1.entity = -2
-        newEdge1.type = 0 -- ROAD
+        newEdge1.type = 0 -- 0 is api.type.enum.Carrier.ROAD, 1 is api.type.enum.Carrier.RAIL
         newEdge1.comp.node0 = -3
         newEdge1.comp.node1 = oldBaseEdge.node1
         newEdge1.comp.tangent0 = api.type.Vec3f.new(

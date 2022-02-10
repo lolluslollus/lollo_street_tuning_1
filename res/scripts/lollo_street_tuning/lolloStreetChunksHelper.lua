@@ -1,8 +1,8 @@
 local arrayUtils = require('lollo_street_tuning/arrayUtils')
 local edgeUtils = require('lollo_street_tuning.edgeUtils')
 local pitchHelper = require('lollo_street_tuning/pitchHelper')
-local streetUtil = require('streetutil')
 local streetUtils = require('lollo_street_tuning/streetUtils')
+local streetUtilUG = require('streetutil')
 local vec3 = require('vec3')
 local helper = {}
 
@@ -171,6 +171,20 @@ local function _getSnapNodesLowX(params, isRightOfIsland)
     end
 end
 
+local function _getEdgeType(params)
+    if params.bridgeType_ and params.bridgeType_ ~= 0 then
+        return 'BRIDGE'
+    end
+    return nil
+end
+
+local function _getEdgeTypeName(params, bridgeData)
+    if params.bridgeType_ and params.bridgeType_ ~= 0 then
+        if bridgeData then return bridgeData.fileName end -- eg "cement.lua",
+    end
+    return nil
+end
+
 helper.getStreetChunksParams = function()
     local defaultStreetTypeIndex = arrayUtils.findIndex(streetUtils.getGlobalStreetData(), 'fileName', 'lollo_medium_1_way_1_lane_street_narrow_sidewalk.lua') - 1
     if defaultStreetTypeIndex < 0 then defaultStreetTypeIndex = 0 end
@@ -178,7 +192,7 @@ helper.getStreetChunksParams = function()
     return {
         {
             key = 'streetType_',
-            name = _('Street type'),
+            name = _('StreetType'),
             values = arrayUtils.map(
                 streetUtils.getGlobalStreetData(),
                 function(str)
@@ -189,6 +203,19 @@ helper.getStreetChunksParams = function()
             defaultIndex = defaultStreetTypeIndex
             -- yearFrom = 1925,
             -- yearTo = 0
+        },
+        {
+            key = 'bridgeType_',
+            name = _('BridgeType'),
+            values = arrayUtils.map(
+                streetUtils.getGlobalBridgeDataPlusNoBridge(),
+                function(str)
+                    return str.name
+                    -- return str.icon
+                end
+            ),
+            uiType = 'COMBOBOX',
+            -- uiType = 'ICON_BUTTON',
         },
         {
             key = 'howManyStreetsBase0',
@@ -308,7 +335,7 @@ helper.getStreetHairpinParams = function()
     return {
         {
             key = 'streetType_',
-            name = _('Street type'),
+            name = _('StreetType'),
             values = arrayUtils.map(
                 streetUtils.getGlobalStreetData(),
                 function(str)
@@ -319,6 +346,19 @@ helper.getStreetHairpinParams = function()
             defaultIndex = defaultStreetTypeIndex
             -- yearFrom = 1925,
             -- yearTo = 0
+        },
+        {
+            key = 'bridgeType_',
+            name = _('BridgeType'),
+            values = arrayUtils.map(
+                streetUtils.getGlobalBridgeDataPlusNoBridge(),
+                function(str)
+                    return str.name
+                    -- return str.icon
+                end
+            ),
+            uiType = 'COMBOBOX',
+            -- uiType = 'ICON_BUTTON',
         },
         {
             key = 'direction',
@@ -381,7 +421,7 @@ helper.getStreetHairpinParams = function()
     }
 end
 
-helper.getStreetChunksSnapEdgeLists = function(params, pitchAngle, streetData, tramTrackType)
+helper.getStreetChunksSnapEdgeLists = function(params, pitchAngle, streetData, bridgeData, tramTrackType)
     local streetHalfWidth = _getStreetHalfWidth(streetData)
     local streetFullWidth = _getStreetFullWidth(streetData)
 
@@ -421,6 +461,8 @@ helper.getStreetChunksSnapEdgeLists = function(params, pitchAngle, streetData, t
                     {x0, 0, 0},
                     {x1, 0, 0}
                 ),
+                edgeType = _getEdgeType(params),
+                edgeTypeName = _getEdgeTypeName(params, bridgeData),
                 freeNodes = _getFreeNodesLowX(params),
                 snapNodes = _getSnapNodesLowX(params)
                 --					snapNodes = { 0, 1 },  -- node 0 and 1 are allowed to snap to other edges of the same type --crashes
@@ -435,6 +477,8 @@ helper.getStreetChunksSnapEdgeLists = function(params, pitchAngle, streetData, t
                     {x1, 0, 0},
                     {x2, 0, 0}
                 ),
+                edgeType = _getEdgeType(params),
+                edgeTypeName = _getEdgeTypeName(params, bridgeData),
                 freeNodes = _getFreeNodesCentre(params),
                 snapNodes = _getSnapNodesCentre(params)
             },
@@ -448,6 +492,8 @@ helper.getStreetChunksSnapEdgeLists = function(params, pitchAngle, streetData, t
                     {x2, 0, 0},
                     {x3, 0, 0}
                 ),
+                edgeType = _getEdgeType(params),
+                edgeTypeName = _getEdgeTypeName(params, bridgeData),
                 freeNodes = _getFreeNodesHighX(params),
                 snapNodes = _getSnapNodesHighX(params)
             }
@@ -465,6 +511,8 @@ helper.getStreetChunksSnapEdgeLists = function(params, pitchAngle, streetData, t
                     {x1, -streetHalfWidth - halfDistance - halfIslandWidth, 0},
                     true
                 ),
+                edgeType = _getEdgeType(params),
+                edgeTypeName = _getEdgeTypeName(params, bridgeData),
                 freeNodes = _getFreeNodesLowX(params, true),
                 snapNodes = _getSnapNodesLowX(params, true)
             },
@@ -477,6 +525,8 @@ helper.getStreetChunksSnapEdgeLists = function(params, pitchAngle, streetData, t
                     {x0, streetHalfWidth + halfDistance + halfIslandWidth, 0},
                     {x1, streetHalfWidth + halfDistance + halfIslandWidth, 0}
                 ),
+                edgeType = _getEdgeType(params),
+                edgeTypeName = _getEdgeTypeName(params, bridgeData),
                 freeNodes = _getFreeNodesLowX(params),
                 snapNodes = _getSnapNodesLowX(params)
             },
@@ -491,6 +541,8 @@ helper.getStreetChunksSnapEdgeLists = function(params, pitchAngle, streetData, t
                     {x2, -streetHalfWidth - halfDistance - halfIslandWidth, 0},
                     true
                 ),
+                edgeType = _getEdgeType(params),
+                edgeTypeName = _getEdgeTypeName(params, bridgeData),
                 freeNodes = _getFreeNodesCentre(params, true),
                 snapNodes = _getSnapNodesCentre(params, true)
             },
@@ -503,6 +555,8 @@ helper.getStreetChunksSnapEdgeLists = function(params, pitchAngle, streetData, t
                     {x1, streetHalfWidth + halfDistance + halfIslandWidth, 0},
                     {x2, streetHalfWidth + halfDistance + halfIslandWidth, 0}
                 ),
+                edgeType = _getEdgeType(params),
+                edgeTypeName = _getEdgeTypeName(params, bridgeData),
                 freeNodes = _getFreeNodesCentre(params),
                 snapNodes = _getSnapNodesCentre(params)
             },
@@ -517,6 +571,8 @@ helper.getStreetChunksSnapEdgeLists = function(params, pitchAngle, streetData, t
                     {x3, -streetHalfWidth - halfDistance - halfIslandWidth, 0},
                     true
                 ),
+                edgeType = _getEdgeType(params),
+                edgeTypeName = _getEdgeTypeName(params, bridgeData),
                 freeNodes = _getFreeNodesHighX(params, true),
                 snapNodes = _getSnapNodesHighX(params, true)
             },
@@ -529,6 +585,8 @@ helper.getStreetChunksSnapEdgeLists = function(params, pitchAngle, streetData, t
                     {x2, streetHalfWidth + halfDistance + halfIslandWidth, 0},
                     {x3, streetHalfWidth + halfDistance + halfIslandWidth, 0}
                 ),
+                edgeType = _getEdgeType(params),
+                edgeTypeName = _getEdgeTypeName(params, bridgeData),
                 freeNodes = _getFreeNodesHighX(params),
                 snapNodes = _getSnapNodesHighX(params)
             }
@@ -546,6 +604,8 @@ helper.getStreetChunksSnapEdgeLists = function(params, pitchAngle, streetData, t
                     {x1, -streetFullWidth - distance - halfIslandWidth, 0},
                     true
                 ),
+                edgeType = _getEdgeType(params),
+                edgeTypeName = _getEdgeTypeName(params, bridgeData),
                 freeNodes = _getFreeNodesLowX(params, true),
                 snapNodes = _getSnapNodesLowX(params, true)
             },
@@ -558,6 +618,8 @@ helper.getStreetChunksSnapEdgeLists = function(params, pitchAngle, streetData, t
                     {x0, halfIslandWidth, 0},
                     {x1, halfIslandWidth, 0}
                 ),
+                edgeType = _getEdgeType(params),
+                edgeTypeName = _getEdgeTypeName(params, bridgeData),
                 freeNodes = _getFreeNodesLowX(params),
                 snapNodes = _getSnapNodesLowX(params)
             },
@@ -570,6 +632,8 @@ helper.getStreetChunksSnapEdgeLists = function(params, pitchAngle, streetData, t
                     {x0, streetFullWidth + distance + halfIslandWidth, 0},
                     {x1, streetFullWidth + distance + halfIslandWidth, 0}
                 ),
+                edgeType = _getEdgeType(params),
+                edgeTypeName = _getEdgeTypeName(params, bridgeData),
                 freeNodes = _getFreeNodesLowX(params),
                 snapNodes = _getSnapNodesLowX(params)
             },
@@ -584,6 +648,8 @@ helper.getStreetChunksSnapEdgeLists = function(params, pitchAngle, streetData, t
                     {x2, -streetFullWidth - distance - halfIslandWidth, 0},
                     true
                 ),
+                edgeType = _getEdgeType(params),
+                edgeTypeName = _getEdgeTypeName(params, bridgeData),
                 freeNodes = _getFreeNodesCentre(params, true),
                 snapNodes = _getSnapNodesCentre(params, true)
             },
@@ -596,6 +662,8 @@ helper.getStreetChunksSnapEdgeLists = function(params, pitchAngle, streetData, t
                     {x1, halfIslandWidth, 0},
                     {x2, halfIslandWidth, 0}
                 ),
+                edgeType = _getEdgeType(params),
+                edgeTypeName = _getEdgeTypeName(params, bridgeData),
                 freeNodes = _getFreeNodesCentre(params),
                 snapNodes = _getSnapNodesCentre(params)
             },
@@ -608,6 +676,8 @@ helper.getStreetChunksSnapEdgeLists = function(params, pitchAngle, streetData, t
                     {x1, streetFullWidth + distance + halfIslandWidth, 0},
                     {x2, streetFullWidth + distance + halfIslandWidth, 0}
                 ),
+                edgeType = _getEdgeType(params),
+                edgeTypeName = _getEdgeTypeName(params, bridgeData),
                 freeNodes = _getFreeNodesCentre(params),
                 snapNodes = _getSnapNodesCentre(params)
             },
@@ -622,6 +692,8 @@ helper.getStreetChunksSnapEdgeLists = function(params, pitchAngle, streetData, t
                     {x3, -streetFullWidth - distance - halfIslandWidth, 0},
                     true
                 ),
+                edgeType = _getEdgeType(params),
+                edgeTypeName = _getEdgeTypeName(params, bridgeData),
                 freeNodes = _getFreeNodesHighX(params, true),
                 snapNodes = _getSnapNodesHighX(params, true)
             },
@@ -634,6 +706,8 @@ helper.getStreetChunksSnapEdgeLists = function(params, pitchAngle, streetData, t
                     {x2, halfIslandWidth, 0},
                     {x3, halfIslandWidth, 0}
                 ),
+                edgeType = _getEdgeType(params),
+                edgeTypeName = _getEdgeTypeName(params, bridgeData),
                 freeNodes = _getFreeNodesHighX(params),
                 snapNodes = _getSnapNodesHighX(params)
             },
@@ -646,6 +720,8 @@ helper.getStreetChunksSnapEdgeLists = function(params, pitchAngle, streetData, t
                     {x2, streetFullWidth + distance + halfIslandWidth, 0},
                     {x3, streetFullWidth + distance + halfIslandWidth, 0}
                 ),
+                edgeType = _getEdgeType(params),
+                edgeTypeName = _getEdgeTypeName(params, bridgeData),
                 freeNodes = _getFreeNodesHighX(params),
                 snapNodes = _getSnapNodesHighX(params)
             }
@@ -663,6 +739,8 @@ helper.getStreetChunksSnapEdgeLists = function(params, pitchAngle, streetData, t
                     {x1, -3.0 * streetHalfWidth - 3.0 * halfDistance - halfIslandWidth, 0},
                     true
                 ),
+                edgeType = _getEdgeType(params),
+                edgeTypeName = _getEdgeTypeName(params, bridgeData),
                 freeNodes = _getFreeNodesLowX(params, true),
                 snapNodes = _getSnapNodesLowX(params, true)
             },
@@ -676,6 +754,8 @@ helper.getStreetChunksSnapEdgeLists = function(params, pitchAngle, streetData, t
                     {x1, -streetHalfWidth - halfDistance - halfIslandWidth, 0},
                     true
                 ),
+                edgeType = _getEdgeType(params),
+                edgeTypeName = _getEdgeTypeName(params, bridgeData),
                 freeNodes = _getFreeNodesLowX(params, true),
                 snapNodes = _getSnapNodesLowX(params, true)
             },
@@ -688,6 +768,8 @@ helper.getStreetChunksSnapEdgeLists = function(params, pitchAngle, streetData, t
                     {x0, streetHalfWidth + halfDistance + halfIslandWidth, 0},
                     {x1, streetHalfWidth + halfDistance + halfIslandWidth, 0}
                 ),
+                edgeType = _getEdgeType(params),
+                edgeTypeName = _getEdgeTypeName(params, bridgeData),
                 freeNodes = _getFreeNodesLowX(params),
                 snapNodes = _getSnapNodesLowX(params)
             },
@@ -700,6 +782,8 @@ helper.getStreetChunksSnapEdgeLists = function(params, pitchAngle, streetData, t
                     {x0, 3.0 * streetHalfWidth + 3.0 * halfDistance + halfIslandWidth, 0},
                     {x1, 3.0 * streetHalfWidth + 3.0 * halfDistance + halfIslandWidth, 0}
                 ),
+                edgeType = _getEdgeType(params),
+                edgeTypeName = _getEdgeTypeName(params, bridgeData),
                 freeNodes = _getFreeNodesLowX(params),
                 snapNodes = _getSnapNodesLowX(params)
             },
@@ -714,6 +798,8 @@ helper.getStreetChunksSnapEdgeLists = function(params, pitchAngle, streetData, t
                     {x2, -3.0 * streetHalfWidth - 3.0 * halfDistance - halfIslandWidth, 0},
                     true
                 ),
+                edgeType = _getEdgeType(params),
+                edgeTypeName = _getEdgeTypeName(params, bridgeData),
                 freeNodes = _getFreeNodesCentre(params, true),
                 snapNodes = _getSnapNodesCentre(params, true)
             },
@@ -727,6 +813,8 @@ helper.getStreetChunksSnapEdgeLists = function(params, pitchAngle, streetData, t
                     {x2, -streetHalfWidth - halfDistance - halfIslandWidth, 0},
                     true
                 ),
+                edgeType = _getEdgeType(params),
+                edgeTypeName = _getEdgeTypeName(params, bridgeData),
                 freeNodes = _getFreeNodesCentre(params, true),
                 snapNodes = _getSnapNodesCentre(params, true)
             },
@@ -739,6 +827,8 @@ helper.getStreetChunksSnapEdgeLists = function(params, pitchAngle, streetData, t
                     {x1, streetHalfWidth + halfDistance + halfIslandWidth, 0},
                     {x2, streetHalfWidth + halfDistance + halfIslandWidth, 0}
                 ),
+                edgeType = _getEdgeType(params),
+                edgeTypeName = _getEdgeTypeName(params, bridgeData),
                 freeNodes = _getFreeNodesCentre(params),
                 snapNodes = _getSnapNodesCentre(params)
             },
@@ -751,6 +841,8 @@ helper.getStreetChunksSnapEdgeLists = function(params, pitchAngle, streetData, t
                     {x1, 3.0 * streetHalfWidth + 3.0 * halfDistance + halfIslandWidth, 0},
                     {x2, 3.0 * streetHalfWidth + 3.0 * halfDistance + halfIslandWidth, 0}
                 ),
+                edgeType = _getEdgeType(params),
+                edgeTypeName = _getEdgeTypeName(params, bridgeData),
                 freeNodes = _getFreeNodesCentre(params),
                 snapNodes = _getSnapNodesCentre(params)
             },
@@ -765,6 +857,8 @@ helper.getStreetChunksSnapEdgeLists = function(params, pitchAngle, streetData, t
                     {x3, -3.0 * streetHalfWidth - 3.0 * halfDistance - halfIslandWidth, 0},
                     true
                 ),
+                edgeType = _getEdgeType(params),
+                edgeTypeName = _getEdgeTypeName(params, bridgeData),
                 freeNodes = _getFreeNodesHighX(params, true),
                 snapNodes = _getSnapNodesHighX(params, true)
             },
@@ -778,6 +872,8 @@ helper.getStreetChunksSnapEdgeLists = function(params, pitchAngle, streetData, t
                     {x3, -streetHalfWidth - halfDistance - halfIslandWidth, 0},
                     true
                 ),
+                edgeType = _getEdgeType(params),
+                edgeTypeName = _getEdgeTypeName(params, bridgeData),
                 freeNodes = _getFreeNodesHighX(params, true),
                 snapNodes = _getSnapNodesHighX(params, true)
             },
@@ -790,6 +886,8 @@ helper.getStreetChunksSnapEdgeLists = function(params, pitchAngle, streetData, t
                     {x2, streetHalfWidth + halfDistance + halfIslandWidth, 0},
                     {x3, streetHalfWidth + halfDistance + halfIslandWidth, 0}
                 ),
+                edgeType = _getEdgeType(params),
+                edgeTypeName = _getEdgeTypeName(params, bridgeData),
                 freeNodes = _getFreeNodesHighX(params),
                 snapNodes = _getSnapNodesHighX(params)
             },
@@ -802,6 +900,8 @@ helper.getStreetChunksSnapEdgeLists = function(params, pitchAngle, streetData, t
                     {x2, 3.0 * streetHalfWidth + 3.0 * halfDistance + halfIslandWidth, 0},
                     {x3, 3.0 * streetHalfWidth + 3.0 * halfDistance + halfIslandWidth, 0}
                 ),
+                edgeType = _getEdgeType(params),
+                edgeTypeName = _getEdgeTypeName(params, bridgeData),
                 freeNodes = _getFreeNodesHighX(params),
                 snapNodes = _getSnapNodesHighX(params)
             }
@@ -819,6 +919,8 @@ helper.getStreetChunksSnapEdgeLists = function(params, pitchAngle, streetData, t
                     {x1, - 2.0 * streetFullWidth - 2.0 * distance - halfIslandWidth, 0},
                     true
                 ),
+                edgeType = _getEdgeType(params),
+                edgeTypeName = _getEdgeTypeName(params, bridgeData),
                 freeNodes = _getFreeNodesLowX(params, true),
                 snapNodes = _getSnapNodesLowX(params, true)
             },
@@ -832,6 +934,8 @@ helper.getStreetChunksSnapEdgeLists = function(params, pitchAngle, streetData, t
                     {x1, -streetFullWidth - distance - halfIslandWidth, 0},
                     true
                 ),
+                edgeType = _getEdgeType(params),
+                edgeTypeName = _getEdgeTypeName(params, bridgeData),
                 freeNodes = _getFreeNodesLowX(params, true),
                 snapNodes = _getSnapNodesLowX(params, true)
             },
@@ -844,6 +948,8 @@ helper.getStreetChunksSnapEdgeLists = function(params, pitchAngle, streetData, t
                     {x0, halfIslandWidth, 0},
                     {x1, halfIslandWidth, 0}
                 ),
+                edgeType = _getEdgeType(params),
+                edgeTypeName = _getEdgeTypeName(params, bridgeData),
                 freeNodes = _getFreeNodesLowX(params),
                 snapNodes = _getSnapNodesLowX(params)
             },
@@ -856,6 +962,8 @@ helper.getStreetChunksSnapEdgeLists = function(params, pitchAngle, streetData, t
                     {x0, streetFullWidth + distance + halfIslandWidth, 0},
                     {x1, streetFullWidth + distance + halfIslandWidth, 0}
                 ),
+                edgeType = _getEdgeType(params),
+                edgeTypeName = _getEdgeTypeName(params, bridgeData),
                 freeNodes = _getFreeNodesLowX(params),
                 snapNodes = _getSnapNodesLowX(params)
             },
@@ -868,6 +976,8 @@ helper.getStreetChunksSnapEdgeLists = function(params, pitchAngle, streetData, t
                     {x0, 2.0 * streetFullWidth + 2.0 * distance + halfIslandWidth, 0},
                     {x1, 2.0 * streetFullWidth + 2.0 * distance + halfIslandWidth, 0}
                 ),
+                edgeType = _getEdgeType(params),
+                edgeTypeName = _getEdgeTypeName(params, bridgeData),
                 freeNodes = _getFreeNodesLowX(params),
                 snapNodes = _getSnapNodesLowX(params)
             },
@@ -882,6 +992,8 @@ helper.getStreetChunksSnapEdgeLists = function(params, pitchAngle, streetData, t
                     {x2, - 2.0 * streetFullWidth - 2.0 * distance - halfIslandWidth, 0},
                     true
                 ),
+                edgeType = _getEdgeType(params),
+                edgeTypeName = _getEdgeTypeName(params, bridgeData),
                 freeNodes = _getFreeNodesCentre(params, true),
                 snapNodes = _getSnapNodesCentre(params, true)
             },
@@ -895,6 +1007,8 @@ helper.getStreetChunksSnapEdgeLists = function(params, pitchAngle, streetData, t
                     {x2, -streetFullWidth - distance - halfIslandWidth, 0},
                     true
                 ),
+                edgeType = _getEdgeType(params),
+                edgeTypeName = _getEdgeTypeName(params, bridgeData),
                 freeNodes = _getFreeNodesCentre(params, true),
                 snapNodes = _getSnapNodesCentre(params, true)
             },
@@ -907,6 +1021,8 @@ helper.getStreetChunksSnapEdgeLists = function(params, pitchAngle, streetData, t
                     {x1, halfIslandWidth, 0},
                     {x2, halfIslandWidth, 0}
                 ),
+                edgeType = _getEdgeType(params),
+                edgeTypeName = _getEdgeTypeName(params, bridgeData),
                 freeNodes = _getFreeNodesCentre(params),
                 snapNodes = _getSnapNodesCentre(params)
             },
@@ -919,6 +1035,8 @@ helper.getStreetChunksSnapEdgeLists = function(params, pitchAngle, streetData, t
                     {x1, streetFullWidth + distance + halfIslandWidth, 0},
                     {x2, streetFullWidth + distance + halfIslandWidth, 0}
                 ),
+                edgeType = _getEdgeType(params),
+                edgeTypeName = _getEdgeTypeName(params, bridgeData),
                 freeNodes = _getFreeNodesCentre(params),
                 snapNodes = _getSnapNodesCentre(params)
             },
@@ -931,6 +1049,8 @@ helper.getStreetChunksSnapEdgeLists = function(params, pitchAngle, streetData, t
                     {x1, 2.0 * streetFullWidth + 2.0 * distance + halfIslandWidth, 0},
                     {x2, 2.0 * streetFullWidth + 2.0 * distance + halfIslandWidth, 0}
                 ),
+                edgeType = _getEdgeType(params),
+                edgeTypeName = _getEdgeTypeName(params, bridgeData),
                 freeNodes = _getFreeNodesCentre(params),
                 snapNodes = _getSnapNodesCentre(params)
             },
@@ -945,6 +1065,8 @@ helper.getStreetChunksSnapEdgeLists = function(params, pitchAngle, streetData, t
                     {x3, - 2.0 * streetFullWidth - 2.0 * distance - halfIslandWidth, 0},
                     true
                 ),
+                edgeType = _getEdgeType(params),
+                edgeTypeName = _getEdgeTypeName(params, bridgeData),
                 freeNodes = _getFreeNodesHighX(params, true),
                 snapNodes = _getSnapNodesHighX(params, true)
             },
@@ -958,6 +1080,8 @@ helper.getStreetChunksSnapEdgeLists = function(params, pitchAngle, streetData, t
                     {x3, -streetFullWidth - distance - halfIslandWidth, 0},
                     true
                 ),
+                edgeType = _getEdgeType(params),
+                edgeTypeName = _getEdgeTypeName(params, bridgeData),
                 freeNodes = _getFreeNodesHighX(params, true),
                 snapNodes = _getSnapNodesHighX(params, true)
             },
@@ -970,6 +1094,8 @@ helper.getStreetChunksSnapEdgeLists = function(params, pitchAngle, streetData, t
                     {x2, halfIslandWidth, 0},
                     {x3, halfIslandWidth, 0}
                 ),
+                edgeType = _getEdgeType(params),
+                edgeTypeName = _getEdgeTypeName(params, bridgeData),
                 freeNodes = _getFreeNodesHighX(params),
                 snapNodes = _getSnapNodesHighX(params)
             },
@@ -982,6 +1108,8 @@ helper.getStreetChunksSnapEdgeLists = function(params, pitchAngle, streetData, t
                     {x2, streetFullWidth + distance + halfIslandWidth, 0},
                     {x3, streetFullWidth + distance + halfIslandWidth, 0}
                 ),
+                edgeType = _getEdgeType(params),
+                edgeTypeName = _getEdgeTypeName(params, bridgeData),
                 freeNodes = _getFreeNodesHighX(params),
                 snapNodes = _getSnapNodesHighX(params)
             },
@@ -994,6 +1122,8 @@ helper.getStreetChunksSnapEdgeLists = function(params, pitchAngle, streetData, t
                     {x2, 2.0 * streetFullWidth + 2.0 * distance + halfIslandWidth, 0},
                     {x3, 2.0 * streetFullWidth + 2.0 * distance + halfIslandWidth, 0}
                 ),
+                edgeType = _getEdgeType(params),
+                edgeTypeName = _getEdgeTypeName(params, bridgeData),
                 freeNodes = _getFreeNodesHighX(params),
                 snapNodes = _getSnapNodesHighX(params)
             }
@@ -1011,6 +1141,8 @@ helper.getStreetChunksSnapEdgeLists = function(params, pitchAngle, streetData, t
                     {x1, - 5.0 * streetHalfWidth - 5.0 * halfDistance - halfIslandWidth, 0},
                     true
                 ),
+                edgeType = _getEdgeType(params),
+                edgeTypeName = _getEdgeTypeName(params, bridgeData),
                 freeNodes = _getFreeNodesLowX(params, true),
                 snapNodes = _getSnapNodesLowX(params, true)
             },
@@ -1024,6 +1156,8 @@ helper.getStreetChunksSnapEdgeLists = function(params, pitchAngle, streetData, t
                     {x1, - 3.0 * streetHalfWidth - 3.0 * halfDistance - halfIslandWidth, 0},
                     true
                 ),
+                edgeType = _getEdgeType(params),
+                edgeTypeName = _getEdgeTypeName(params, bridgeData),
                 freeNodes = _getFreeNodesLowX(params, true),
                 snapNodes = _getSnapNodesLowX(params, true)
             },
@@ -1037,6 +1171,8 @@ helper.getStreetChunksSnapEdgeLists = function(params, pitchAngle, streetData, t
                     {x1, -streetHalfWidth - halfDistance - halfIslandWidth, 0},
                     true
                 ),
+                edgeType = _getEdgeType(params),
+                edgeTypeName = _getEdgeTypeName(params, bridgeData),
                 freeNodes = _getFreeNodesLowX(params, true),
                 snapNodes = _getSnapNodesLowX(params, true)
             },
@@ -1049,6 +1185,8 @@ helper.getStreetChunksSnapEdgeLists = function(params, pitchAngle, streetData, t
                     {x0, streetHalfWidth + halfDistance + halfIslandWidth, 0},
                     {x1, streetHalfWidth + halfDistance + halfIslandWidth, 0}
                 ),
+                edgeType = _getEdgeType(params),
+                edgeTypeName = _getEdgeTypeName(params, bridgeData),
                 freeNodes = _getFreeNodesLowX(params),
                 snapNodes = _getSnapNodesLowX(params)
             },
@@ -1061,6 +1199,8 @@ helper.getStreetChunksSnapEdgeLists = function(params, pitchAngle, streetData, t
                     {x0, 3.0 * streetHalfWidth + 3.0 * halfDistance + halfIslandWidth, 0},
                     {x1, 3.0 * streetHalfWidth + 3.0 * halfDistance + halfIslandWidth, 0}
                 ),
+                edgeType = _getEdgeType(params),
+                edgeTypeName = _getEdgeTypeName(params, bridgeData),
                 freeNodes = _getFreeNodesLowX(params),
                 snapNodes = _getSnapNodesLowX(params)
             },
@@ -1073,6 +1213,8 @@ helper.getStreetChunksSnapEdgeLists = function(params, pitchAngle, streetData, t
                     {x0, 5.0 * streetHalfWidth + 5.0 * halfDistance + halfIslandWidth, 0},
                     {x1, 5.0 * streetHalfWidth + 5.0 * halfDistance + halfIslandWidth, 0}
                 ),
+                edgeType = _getEdgeType(params),
+                edgeTypeName = _getEdgeTypeName(params, bridgeData),
                 freeNodes = _getFreeNodesLowX(params),
                 snapNodes = _getSnapNodesLowX(params)
             },
@@ -1087,6 +1229,8 @@ helper.getStreetChunksSnapEdgeLists = function(params, pitchAngle, streetData, t
                     {x2, - 5.0 * streetHalfWidth - 5.0 * halfDistance - halfIslandWidth, 0},
                     true
                 ),
+                edgeType = _getEdgeType(params),
+                edgeTypeName = _getEdgeTypeName(params, bridgeData),
                 freeNodes = _getFreeNodesCentre(params, true),
                 snapNodes = _getSnapNodesCentre(params, true)
             },
@@ -1100,6 +1244,8 @@ helper.getStreetChunksSnapEdgeLists = function(params, pitchAngle, streetData, t
                     {x2, - 3.0 * streetHalfWidth - 3.0 * halfDistance - halfIslandWidth, 0},
                     true
                 ),
+                edgeType = _getEdgeType(params),
+                edgeTypeName = _getEdgeTypeName(params, bridgeData),
                 freeNodes = _getFreeNodesCentre(params, true),
                 snapNodes = _getSnapNodesCentre(params, true)
             },
@@ -1113,6 +1259,8 @@ helper.getStreetChunksSnapEdgeLists = function(params, pitchAngle, streetData, t
                     {x2, -streetHalfWidth - halfDistance - halfIslandWidth, 0},
                     true
                 ),
+                edgeType = _getEdgeType(params),
+                edgeTypeName = _getEdgeTypeName(params, bridgeData),
                 freeNodes = _getFreeNodesCentre(params, true),
                 snapNodes = _getSnapNodesCentre(params, true)
             },
@@ -1125,6 +1273,8 @@ helper.getStreetChunksSnapEdgeLists = function(params, pitchAngle, streetData, t
                     {x1, streetHalfWidth + halfDistance + halfIslandWidth, 0},
                     {x2, streetHalfWidth + halfDistance + halfIslandWidth, 0}
                 ),
+                edgeType = _getEdgeType(params),
+                edgeTypeName = _getEdgeTypeName(params, bridgeData),
                 freeNodes = _getFreeNodesCentre(params),
                 snapNodes = _getSnapNodesCentre(params)
             },
@@ -1137,6 +1287,8 @@ helper.getStreetChunksSnapEdgeLists = function(params, pitchAngle, streetData, t
                     {x1, 3.0 * streetHalfWidth + 3.0 * halfDistance + halfIslandWidth, 0},
                     {x2, 3.0 * streetHalfWidth + 3.0 * halfDistance + halfIslandWidth, 0}
                 ),
+                edgeType = _getEdgeType(params),
+                edgeTypeName = _getEdgeTypeName(params, bridgeData),
                 freeNodes = _getFreeNodesCentre(params),
                 snapNodes = _getSnapNodesCentre(params)
             },
@@ -1149,6 +1301,8 @@ helper.getStreetChunksSnapEdgeLists = function(params, pitchAngle, streetData, t
                     {x1, 5.0 * streetHalfWidth + 5.0 * halfDistance + halfIslandWidth, 0},
                     {x2, 5.0 * streetHalfWidth + 5.0 * halfDistance + halfIslandWidth, 0}
                 ),
+                edgeType = _getEdgeType(params),
+                edgeTypeName = _getEdgeTypeName(params, bridgeData),
                 freeNodes = _getFreeNodesCentre(params),
                 snapNodes = _getSnapNodesCentre(params)
             },
@@ -1163,6 +1317,8 @@ helper.getStreetChunksSnapEdgeLists = function(params, pitchAngle, streetData, t
                     {x3, - 5.0 * streetHalfWidth - 5.0 * halfDistance - halfIslandWidth, 0},
                     true
                 ),
+                edgeType = _getEdgeType(params),
+                edgeTypeName = _getEdgeTypeName(params, bridgeData),
                 freeNodes = _getFreeNodesHighX(params, true),
                 snapNodes = _getSnapNodesHighX(params, true)
             },
@@ -1176,6 +1332,8 @@ helper.getStreetChunksSnapEdgeLists = function(params, pitchAngle, streetData, t
                     {x3, - 3.0 * streetHalfWidth - 3.0 * halfDistance - halfIslandWidth, 0},
                     true
                 ),
+                edgeType = _getEdgeType(params),
+                edgeTypeName = _getEdgeTypeName(params, bridgeData),
                 freeNodes = _getFreeNodesHighX(params, true),
                 snapNodes = _getSnapNodesHighX(params, true)
             },
@@ -1189,6 +1347,8 @@ helper.getStreetChunksSnapEdgeLists = function(params, pitchAngle, streetData, t
                     {x3, -streetHalfWidth - halfDistance - halfIslandWidth, 0},
                     true
                 ),
+                edgeType = _getEdgeType(params),
+                edgeTypeName = _getEdgeTypeName(params, bridgeData),
                 freeNodes = _getFreeNodesHighX(params, true),
                 snapNodes = _getSnapNodesHighX(params, true)
             },
@@ -1201,6 +1361,8 @@ helper.getStreetChunksSnapEdgeLists = function(params, pitchAngle, streetData, t
                     {x2, streetHalfWidth + halfDistance + halfIslandWidth, 0},
                     {x3, streetHalfWidth + halfDistance + halfIslandWidth, 0}
                 ),
+                edgeType = _getEdgeType(params),
+                edgeTypeName = _getEdgeTypeName(params, bridgeData),
                 freeNodes = _getFreeNodesHighX(params),
                 snapNodes = _getSnapNodesHighX(params)
             },
@@ -1213,6 +1375,8 @@ helper.getStreetChunksSnapEdgeLists = function(params, pitchAngle, streetData, t
                     {x2, 3.0 * streetHalfWidth + 3.0 * halfDistance + halfIslandWidth, 0},
                     {x3, 3.0 * streetHalfWidth + 3.0 * halfDistance + halfIslandWidth, 0}
                 ),
+                edgeType = _getEdgeType(params),
+                edgeTypeName = _getEdgeTypeName(params, bridgeData),
                 freeNodes = _getFreeNodesHighX(params),
                 snapNodes = _getSnapNodesHighX(params)
             },
@@ -1225,6 +1389,8 @@ helper.getStreetChunksSnapEdgeLists = function(params, pitchAngle, streetData, t
                     {x2, 5.0 * streetHalfWidth + 5.0 * halfDistance + halfIslandWidth, 0},
                     {x3, 5.0 * streetHalfWidth + 5.0 * halfDistance + halfIslandWidth, 0}
                 ),
+                edgeType = _getEdgeType(params),
+                edgeTypeName = _getEdgeTypeName(params, bridgeData),
                 freeNodes = _getFreeNodesHighX(params),
                 snapNodes = _getSnapNodesHighX(params)
             }
@@ -1233,7 +1399,7 @@ helper.getStreetChunksSnapEdgeLists = function(params, pitchAngle, streetData, t
     return edgeLists
 end
 
-helper.getStreetHairpinSnapEdgeLists = function(params, pitchAngle, streetData, tramTrackType)
+helper.getStreetHairpinSnapEdgeLists = function(params, pitchAngle, streetData, bridgeData, tramTrackType)
     local streetHalfWidth = _getStreetHalfWidth(streetData)
     local widthFactorBend = _getWidthFactor(streetHalfWidth)
     -- this is the fruit of trial and error, see the notes
@@ -1257,6 +1423,8 @@ helper.getStreetHairpinSnapEdgeLists = function(params, pitchAngle, streetData, 
                 {xMax, 0, 0},
                 {xMax, 0, 0}
             ),
+            edgeType = _getEdgeType(params),
+            edgeTypeName = _getEdgeTypeName(params, bridgeData),
             freeNodes = _getFreeNodesLowX(params),
             snapNodes = _getSnapNodesLowX(params)
         },
@@ -1264,6 +1432,8 @@ helper.getStreetHairpinSnapEdgeLists = function(params, pitchAngle, streetData, 
             type = 'STREET',
             params = edgeParams,
             edges = {},
+            edgeType = _getEdgeType(params),
+            edgeTypeName = _getEdgeTypeName(params, bridgeData),
             freeNodes = _getFreeNodesCentre(params),
             snapNodes = _getSnapNodesCentre(params),
         },
@@ -1279,13 +1449,15 @@ helper.getStreetHairpinSnapEdgeLists = function(params, pitchAngle, streetData, 
                 {-xMax, 0, 0},
                 {-xMax, 0, 0}
             ),
+            edgeType = _getEdgeType(params),
+            edgeTypeName = _getEdgeTypeName(params, bridgeData),
             freeNodes = _getFreeNodesHighX(params),
             snapNodes = _getSnapNodesHighX(params)
         }
     }
 
     if params.direction == 0 then
-        streetUtil.addEdgeAutoTangents(
+        streetUtilUG.addEdgeAutoTangents(
             edgeLists[2].edges,
             vec3.new(0, -widthFactorBend * streetHalfWidth, 0),
             vec3.new(0, widthFactorBend * streetHalfWidth, 0),
@@ -1293,7 +1465,7 @@ helper.getStreetHairpinSnapEdgeLists = function(params, pitchAngle, streetData, 
             vec3.new(-1, 0, 0)
         )
     else
-        streetUtil.addEdgeAutoTangents(
+        streetUtilUG.addEdgeAutoTangents(
             edgeLists[2].edges,
             vec3.new(0, widthFactorBend * streetHalfWidth, 0),
             vec3.new(0, -widthFactorBend * streetHalfWidth, 0),

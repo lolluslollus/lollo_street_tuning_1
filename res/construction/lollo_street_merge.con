@@ -75,6 +75,11 @@ local function _getSnapNodes10(params, isFirstEnd)
     end
 end
 
+local function _addDummyTerrainAlignmentLists(result)
+    -- LOLLO NOTE this thing with the empty faces is required , otherwise the game will make its own alignments, with spikes and all on bridges or tunnels.
+    result.terrainAlignmentLists = { { type = "EQUAL", optional = true, faces =  { } } }
+end
+
 local function updateFn_2_1_lane_narrow_sidewalk_to_2_lane_one_way(params)
     local result = { cost = 0, skipCollision = true, }
     local _pitchAngle = pitchHelper.getPitchAngle(params)
@@ -175,6 +180,7 @@ local function updateFn_2_1_lane_narrow_sidewalk_to_2_lane_one_way(params)
         }
     }
 
+    _addDummyTerrainAlignmentLists(result)
     return result
 end
 
@@ -269,6 +275,7 @@ local function updateFn_2_1_lane_narrow_sidewalk_to_2_lane(params)
         }
     }
 
+    _addDummyTerrainAlignmentLists(result)
     return result
 end
 
@@ -361,6 +368,7 @@ local function updateFn_2_1_lane_medium_sidewalk_to_2_lane_one_way(params)
         }
     }
 
+    _addDummyTerrainAlignmentLists(result)
     return result
 end
 
@@ -456,6 +464,7 @@ local function updateFn_2_1_lane_medium_sidewalk_to_2_lane(params)
         }
     }
 
+    _addDummyTerrainAlignmentLists(result)
     return result
 end
 
@@ -569,6 +578,7 @@ local function updateFn_3_1_lane_narrow_sidewalk_to_3_lane_one_way(params)
         }
     }
 
+    _addDummyTerrainAlignmentLists(result)
     return result
 end
 
@@ -682,7 +692,7 @@ end
 --             snapNodes = params.snapNodes_ == 0 and {} or (params.direction == 0 and {1} or {0})
 --         }
 --     }
-
+--     _addDummyTerrainAlignmentLists(result)
 --     return result
 -- end
 
@@ -819,6 +829,7 @@ local function updateFn_4_1_lane_narrow_sidewalk_to_4_lane_one_way(params)
         }
     }
 
+    _addDummyTerrainAlignmentLists(result)
     return result
 end
 
@@ -958,7 +969,8 @@ local function updateFn_4_1_lane_narrow_sidewalk_to_4_lane(params)
             snapNodes = _getSnapNodes10(params, false)
         }
     }
--- debugPrint(result)
+
+    _addDummyTerrainAlignmentLists(result)
     return result
 end
 
@@ -1096,6 +1108,7 @@ local function updateFn_4_1_lane_narrow_sidewalk_to_4_lane_large(params)
         }
     }
 
+    _addDummyTerrainAlignmentLists(result)
     return result
 end
 
@@ -1234,6 +1247,7 @@ local function updateFn_2_2_lane_one_way_to_6_lane_x_large(params)
         }
     }
 
+    _addDummyTerrainAlignmentLists(result)
     return result
 end
 
@@ -1415,6 +1429,7 @@ local function updateFn_6_1_lane_one_way_to_6_lane_x_large(params)
         }
     }
 
+    _addDummyTerrainAlignmentLists(result)
     return result
 end
 
@@ -1596,6 +1611,7 @@ local function updateFn_Motorway_6_1_lane_one_way_to_6_lane_x_large(params)
         }
     }
 
+    _addDummyTerrainAlignmentLists(result)
     return result
 end
 
@@ -1711,6 +1727,7 @@ local function updateFn_Motorway_2_2_lane_one_way_to_6_lane_x_large(params)
         }
     }
 
+    _addDummyTerrainAlignmentLists(result)
     return result
 end
 
@@ -1848,6 +1865,7 @@ local function updateFn_Motorway_4_1_lane_one_way_to_4_lane_large(params)
         }
     }
 
+    _addDummyTerrainAlignmentLists(result)
     return result
 end
 
@@ -1942,6 +1960,7 @@ local function updateFn_Motorway_2_1_lane_narrow_sidewalk_to_2_lane(params)
         }
     }
 
+    _addDummyTerrainAlignmentLists(result)
     return result
 end
 
@@ -2063,6 +2082,7 @@ local function updateFn_Motorway_3_1_lane_narrow_sidewalk_to_3_lane_one_way(para
         }
     }
 
+    _addDummyTerrainAlignmentLists(result)
     return result
 end
 
@@ -2160,6 +2180,7 @@ local function updateFn_Motorway_2_1_lane_narrow_sidewalk_to_2_lane_one_way(para
         }
     }
 
+    _addDummyTerrainAlignmentLists(result)
     return result
 end
 

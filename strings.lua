@@ -75,6 +75,9 @@ function data()
 			["Left"] = "End A",
 			["Right"] = "End B",
 			["Both"] = "Both Ends",
+			["BridgeType"] = "Bridge Type",
+			["NoBridge"] = "No Bridge",
+			["StreetType"] = "Street Type",
 		},
 	}
 end

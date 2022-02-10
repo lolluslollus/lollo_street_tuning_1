@@ -104,7 +104,8 @@ function data()
 
         newCon.updateScript.fileName = scriptFileName .. '.updateFn'
         newCon.updateScript.params = {
-            globalStreetData = streetUtils.getGlobalStreetData()
+            globalBridgeData = streetUtils.getGlobalBridgeData(),
+            globalStreetData = streetUtils.getGlobalStreetData(),
         }
         newCon.preProcessScript.fileName = scriptFileName .. '.preProcessFn'
         newCon.upgradeScript.fileName = scriptFileName .. '.upgradeFn'
