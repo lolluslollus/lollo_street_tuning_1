@@ -1,6 +1,5 @@
 local pitchHelper = require('lollo_street_tuning/pitchHelper')
 local streetChunksHelper = require('lollo_street_tuning/lolloStreetChunksHelper')
-local debugger = require('debugger')
 
 function data()
     return {
@@ -64,7 +63,6 @@ function data()
         -- end,
         upgradeFn = function(_)
             print('LOLLO upgradeFn') -- never fires
-            debugger()
             -- LOLLO NOTE the game wants this function to be defined, even if it returns an empty table.
             -- If you leave it out, adding and removing tram tracks won't work.
             -- (Bus lanes don't work anyway.)

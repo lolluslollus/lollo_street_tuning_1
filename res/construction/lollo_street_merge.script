@@ -1,0 +1,2512 @@
+-- local laneutil = require('laneutil')
+local edgeUtils = require('lollo_street_tuning.edgeUtils')
+local pitchHelper = require('lollo_street_tuning/pitchHelper')
+-- local transf = require 'transf'
+-- LOLLO TODO see if you can ease the pain when reconfiguring an existing merger. maybe skip collisions? It is not enough.
+
+local function _getEdgeType(params)
+    if params.bridgeType_ and params.bridgeType_ ~= 0 then
+        return 'BRIDGE'
+    end
+    return nil
+end
+
+local function _getEdgeTypeName(params, bridgeData)
+    if params.bridgeType_ and params.bridgeType_ ~= 0 then
+        if bridgeData then return bridgeData.fileName end -- eg "cement.lua",
+    end
+    return nil
+end
+
+local function _getGroundFaces(face)
+    return {
+        {
+            face = face,
+            modes = {
+                {
+                    type = 'FILL',
+                    key = 'asphalt_like_street.lua', -- 'shared/asphalt_01.gtex.lua' --'shared/gravel_03.gtex.lua'
+                }
+            }
+        },
+        {
+            face = face,
+            modes = {
+                {
+                    type = 'STROKE_OUTER',
+                    key = 'shared/asphalt_01.gtex.lua' --'shared/gravel_03.gtex.lua'
+                }
+            }
+        },
+    }
+end
+
+local function _getHasBus(params)
+    return params.hasBus == 1
+end
+
+local function _getTramTrackType(params)
+    return params.tramTrack_ == 0 and "NO" or params.tramTrack_ == 1 and "YES" or "ELECTRIC"
+    -- return params.tramTrack_ and (({'NO', 'YES', 'ELECTRIC'})[params.tramTrack_ + 1]) or 'NO'
+end
+
+local function _makeEdges(pitchAngle, params, node0, node1, tan0, tan1)
+    if tan0 == nil or tan1 == nil then
+        local edgeLength = edgeUtils.getVectorLength({node1[1] - node0[1], node1[2] - node0[2], node1[3] - node0[3]})
+        if tan0 == nil then tan0 = {edgeLength, 0, 0} end
+        if tan1 == nil then tan1 = {edgeLength, 0, 0} end
+    end
+
+    return params.direction == 0 and
+        {
+            pitchHelper.getPosTanPitched(pitchAngle, node0, tan0), -- node 0
+            pitchHelper.getPosTanPitched(pitchAngle, node1, tan1) -- node 1
+        } or
+        {
+            pitchHelper.getPosTanPitched(pitchAngle, node1, {-tan1[1], -tan1[2], -tan1[3]}), -- node 0
+            pitchHelper.getPosTanPitched(pitchAngle, node0, {-tan0[1], -tan0[2], -tan0[3]}) -- node 1
+        }
+end
+
+local function _getSnapNodes01(params, isFirstEnd)
+    if params.snapNodes_ == 0 then
+        return {}
+    elseif params.snapNodes_ == 3
+    or (isFirstEnd and params.snapNodes_ == 1)
+    or (not(isFirstEnd) and params.snapNodes_ == 2) then
+        return params.direction == 0 and {0} or {1}
+    else return {}
+    end
+end
+
+local function _getSnapNodes10(params, isFirstEnd)
+    if params.snapNodes_ == 0 then
+        return {}
+    elseif params.snapNodes_ == 3
+    or (isFirstEnd and params.snapNodes_ == 1)
+    or (not(isFirstEnd) and params.snapNodes_ == 2) then
+        return params.direction == 0 and {1} or {0}
+    else return {}
+    end
+end
+
+local function _addDummyTerrainAlignmentLists(result)
+    -- LOLLO NOTE this thing with the empty faces is required , otherwise the game will make its own alignments, with spikes and all on bridges or tunnels.
+    result.terrainAlignmentLists = { { type = "EQUAL", optional = true, faces =  { } } }
+end
+
+local function updateFn_2_1_lane_narrow_sidewalk_to_2_lane_one_way(params, bridgeData)
+    local result = { cost = 0, skipCollision = true, }
+    local _pitchAngle = pitchHelper.getPitchAngle(params)
+
+    local connectorFace = {
+        {2.1, -8.0, 0.0, 1.0},
+        {2.1, 8.0, 0.0, 1.0},
+        {-2.1, 6.0, 0.0, 1.0},
+        {-2.1, -6.0, 0.0, 1.0},
+    }
+    result.groundFaces = _getGroundFaces(connectorFace)
+
+    result.colliders = {
+        {
+            type = 'BOX',
+            params = {
+                halfExtents = {2, 8.0, 0.15}
+            }
+        }
+    }
+
+    result.models = {
+        {
+            id = 'lollo_assets/lollo_street_confluence_2_lanes_narrow_sidewalk.mdl',
+            skipCollision = true,
+            transf = pitchHelper.getIdTransfPitched(_pitchAngle)
+        }
+    }
+
+    -- LOLLO NOTE hasBus has no effect, neither do hasBusLane, busLane or hasBus, with true or false
+    -- local busLaneType = params.busLane and (({'NO', 'YES'})[params.busLane + 1]) or 'NO'
+    local tramTrackType = _getTramTrackType(params)
+    local hasBus = _getHasBus(params)
+    result.edgeLists = {
+        {
+            type = 'STREET',
+            params = {
+                -- busLaneType = busLaneType, -- does not pull, neither do hasBusLane and busLane, with true or false
+                hasBus = hasBus,
+                skipCollision = true,
+                --skipCollisionCheck = true,
+                type = 'lollo_medium_1_way_1_lane_street_narrow_sidewalk.lua',
+                tramTrackType = tramTrackType
+            },
+            edges = _makeEdges(_pitchAngle, params, {-4, -2, .0}, {-2, -2, .0}),
+            edgeType = _getEdgeType(params),
+            edgeTypeName = _getEdgeTypeName(params, bridgeData),
+            freeNodes = params.direction == 0 and {0} or {1},
+            snapNodes = _getSnapNodes01(params, true)
+        },
+        {
+            type = 'STREET',
+            params = {
+                hasBus = hasBus,
+                skipCollision = true,
+                type = 'lollo_medium_1_way_1_lane_street_narrow_sidewalk.lua',
+                tramTrackType = tramTrackType
+            },
+            edges = _makeEdges(_pitchAngle, params, {-4, 2, 0}, {-2, 2, 0}),
+            edgeType = _getEdgeType(params),
+            edgeTypeName = _getEdgeTypeName(params, bridgeData),
+            freeNodes = params.direction == 0 and {0} or {1},
+            snapNodes = _getSnapNodes01(params, true)
+        },
+        {
+            type = 'STREET',
+            params = {
+                hasBus = hasBus,
+                skipCollision = true,
+                type = 'lollo_internal_1_way_1_lane_street_no_sidewalk.lua',
+                tramTrackType = tramTrackType
+            },
+            edges = _makeEdges(_pitchAngle, params, {-1.8, 2, 0}, {1.8, 2, 0}),
+            edgeType = _getEdgeType(params),
+            edgeTypeName = _getEdgeTypeName(params, bridgeData),
+            freeNodes = {},
+            snapNodes = {}
+        },
+        {
+            type = 'STREET',
+            params = {
+                hasBus = hasBus,
+                skipCollision = true,
+                type = 'lollo_internal_1_way_1_lane_street_no_sidewalk.lua',
+                tramTrackType = tramTrackType
+            },
+            edges = _makeEdges(_pitchAngle, params, {-1.8, -2, 0}, {1.8, -2, 0}),
+            edgeType = _getEdgeType(params),
+            edgeTypeName = _getEdgeTypeName(params, bridgeData),
+            freeNodes = {},
+            snapNodes = {}
+        },
+        {
+            type = 'STREET',
+            params = {
+                hasBus = hasBus,
+                skipCollision = true,
+                type = tramTrackType == 'NO' and 'standard/town_medium_one_way_new.lua' or 'lollo_medium_1_way_2_lane_2_tram_tracks_street.lua',
+                tramTrackType = tramTrackType
+            },
+            edges = _makeEdges(_pitchAngle, params, {2, 0, 0}, {6, 0, 0}),
+            edgeType = _getEdgeType(params),
+            edgeTypeName = _getEdgeTypeName(params, bridgeData),
+            freeNodes = params.direction == 0 and {1} or {0},
+            snapNodes = _getSnapNodes10(params, false)
+        }
+    }
+
+    _addDummyTerrainAlignmentLists(result)
+    return result
+end
+
+local function updateFn_2_1_lane_narrow_sidewalk_to_2_lane(params, bridgeData)
+    local _pitchAngle = pitchHelper.getPitchAngle(params)
+    params.direction = 0 -- 2-way streets cannot be reversed, the game is like that
+
+    local result = { cost = 0, skipCollision = true, }
+
+    local connectorFace = {
+        {2.1, -8.0, 0.0, 1.0},
+        {2.1, 8.0, 0.0, 1.0},
+        {-2.1, 6.0, 0.0, 1.0},
+        {-2.1, -6.0, 0.0, 1.0},
+    }
+    result.groundFaces = _getGroundFaces(connectorFace)
+
+    result.colliders = {
+        {
+            type = 'BOX',
+            params = {
+                halfExtents = {2, 8.0, 0.15}
+            }
+        }
+    }
+
+    result.models = {
+        {
+            id = 'lollo_assets/lollo_street_confluence_2_lanes_narrow_sidewalk_allow_reversal.mdl',
+            skipCollision = true,
+            transf = pitchHelper.getIdTransfPitched(_pitchAngle)
+        }
+    }
+
+    local tramTrackType = _getTramTrackType(params)
+    result.edgeLists = {
+        {
+            type = 'STREET',
+            params = {
+                skipCollision = true,
+                type = 'lollo_medium_1_way_1_lane_street_narrow_sidewalk.lua',
+                tramTrackType = tramTrackType
+            },
+            edges = _makeEdges(_pitchAngle, params, {-4, -2, .0}, {-2, -2, .0}),
+            edgeType = _getEdgeType(params),
+            edgeTypeName = _getEdgeTypeName(params, bridgeData),
+            freeNodes = params.direction == 0 and {0} or {1},
+            snapNodes = _getSnapNodes01(params, true)
+        },
+        {
+            type = 'STREET',
+            params = {
+                skipCollision = true,
+                type = 'lollo_medium_1_way_1_lane_street_narrow_sidewalk.lua',
+                tramTrackType = tramTrackType
+            },
+            edges = _makeEdges(_pitchAngle, params, {-2, 2, 0}, {-4, 2, 0}, {-2, 0, 0}, {-2, 0, 0}),
+            edgeType = _getEdgeType(params),
+            edgeTypeName = _getEdgeTypeName(params, bridgeData),
+            freeNodes = params.direction == 0 and {1} or {0},
+            snapNodes = _getSnapNodes10(params, true)
+        },
+        {
+            type = 'STREET',
+            params = {
+                skipCollision = true,
+                type = 'lollo_internal_1_way_1_lane_street_no_sidewalk.lua',
+                tramTrackType = tramTrackType
+            },
+            edges = _makeEdges(_pitchAngle, params, {-1.8, -2, 0}, {1.8, -2, 0}),
+            edgeType = _getEdgeType(params),
+            edgeTypeName = _getEdgeTypeName(params, bridgeData),
+            freeNodes = {},
+            snapNodes = {}
+        },
+        {
+            type = 'STREET',
+            params = {
+                skipCollision = true,
+                type = 'lollo_internal_1_way_1_lane_street_no_sidewalk.lua',
+                tramTrackType = tramTrackType
+            },
+            edges = _makeEdges(_pitchAngle, params, {1.8, 2, 0}, {-1.8, 2, 0}, {-3.6, 0, 0}, {-3.6, 0, 0}),
+            edgeType = _getEdgeType(params),
+            edgeTypeName = _getEdgeTypeName(params, bridgeData),
+            freeNodes = {},
+            snapNodes = {}
+        },
+        -- the reversal edge is too tight for streets, so we make a reversal lane in the model instead
+        {
+            type = 'STREET',
+            params = {
+                skipCollision = true,
+                type = 'standard/town_medium_new.lua',
+                tramTrackType = tramTrackType
+            },
+            edges = _makeEdges(_pitchAngle, params, {2, 0, 0}, {6, 0, 0}),
+            edgeType = _getEdgeType(params),
+            edgeTypeName = _getEdgeTypeName(params, bridgeData),
+            freeNodes = params.direction == 0 and {1} or {0},
+            snapNodes = _getSnapNodes10(params, false)
+        }
+    }
+
+    _addDummyTerrainAlignmentLists(result)
+    return result
+end
+
+local function updateFn_2_1_lane_medium_sidewalk_to_2_lane_one_way(params, bridgeData)
+    local result = { cost = 0, skipCollision = true, }
+    local _pitchAngle = pitchHelper.getPitchAngle(params)
+
+    local connectorFace = {
+        {2.1, -7.0, 0.0, 1.0},
+        {2.1, 7.0, 0.0, 1.0},
+        {-2.1, 7.0, 0.0, 1.0},
+        {-2.1, -7.0, 0.0, 1.0}
+    }
+    result.groundFaces = _getGroundFaces(connectorFace)
+
+    result.colliders = {
+        {
+            type = 'BOX',
+            params = {
+                halfExtents = {2, 8.0, 0.15}
+            }
+        }
+    }
+
+    result.models = {
+        {
+            id = 'lollo_assets/lollo_street_confluence_2_lanes_medium_sidewalk.mdl',
+            skipCollision = true,
+            transf = pitchHelper.getIdTransfPitched(_pitchAngle)
+        }
+    }
+
+    local tramTrackType = _getTramTrackType(params)
+    result.edgeLists = {
+        {
+            type = 'STREET',
+            params = {
+                skipCollision = true,
+                type = 'lollo_medium_1_way_1_lane_street.lua',
+                tramTrackType = tramTrackType
+            },
+            edges = _makeEdges(_pitchAngle, params, {-4, -4, 0}, {-2, -4, 0}),
+            edgeType = _getEdgeType(params),
+            edgeTypeName = _getEdgeTypeName(params, bridgeData),
+            freeNodes = params.direction == 0 and {0} or {1},
+            snapNodes = _getSnapNodes01(params, true)
+        },
+        {
+            type = 'STREET',
+            params = {
+                skipCollision = true,
+                type = 'lollo_medium_1_way_1_lane_street.lua',
+                tramTrackType = tramTrackType
+            },
+            edges = _makeEdges(_pitchAngle, params, {-4, 4, 0}, {-2, 4, 0}),
+            edgeType = _getEdgeType(params),
+            edgeTypeName = _getEdgeTypeName(params, bridgeData),
+            freeNodes = params.direction == 0 and {0} or {1},
+            snapNodes = _getSnapNodes01(params, true)
+        },
+        {
+            type = 'STREET',
+            params = {
+                skipCollision = true,
+                type = 'lollo_internal_1_way_1_lane_street_no_sidewalk.lua',
+                tramTrackType = tramTrackType
+            },
+            edges = _makeEdges(_pitchAngle, params, {-1.8, 4, 0}, {1.8, 3, 0}, {4, -0.1, 0}, {4, -0.1, 0}),
+            edgeType = _getEdgeType(params),
+            edgeTypeName = _getEdgeTypeName(params, bridgeData),
+            freeNodes = {},
+            snapNodes = {}
+        },
+        {
+            type = 'STREET',
+            params = {
+                skipCollision = true,
+                type = 'lollo_internal_1_way_1_lane_street_no_sidewalk.lua',
+                tramTrackType = tramTrackType
+            },
+            edges = _makeEdges(_pitchAngle, params, {-1.8, -4, 0}, {1.8, -3, 0}, {4, 0.1, 0}, {4, 0.1, 0}),
+            edgeType = _getEdgeType(params),
+            edgeTypeName = _getEdgeTypeName(params, bridgeData),
+            freeNodes = {},
+            snapNodes = {}
+        },
+        {
+            type = 'STREET',
+            params = {
+                skipCollision = true,
+                type = tramTrackType == 'NO' and 'lollo_medium_1_way_2_lane_medium_sidewalk_street.lua' or 'lollo_medium_1_way_2_lane_2_tram_tracks_medium_sidewalk_street.lua',
+                tramTrackType = tramTrackType
+            },
+            -- this could be shortened to x = 2 to x = 6, but it dumps with no messages
+            edges = _makeEdges(_pitchAngle, params, {2, 0, 0}, {8, 0, 0}),
+            edgeType = _getEdgeType(params),
+            edgeTypeName = _getEdgeTypeName(params, bridgeData),
+            freeNodes = params.direction == 0 and {1} or {0},
+            snapNodes = _getSnapNodes10(params, false)
+        }
+    }
+
+    _addDummyTerrainAlignmentLists(result)
+    return result
+end
+
+local function updateFn_2_1_lane_medium_sidewalk_to_2_lane(params, bridgeData)
+    params.direction = 0 -- 2-way streets cannot be reversed, the game is like that
+    local _pitchAngle = pitchHelper.getPitchAngle(params)
+
+    local result = { cost = 0, skipCollision = true, }
+
+    local connectorFace = {
+        {2.1, -7.0, 0.0, 1.0},
+        {2.1, 7.0, 0.0, 1.0},
+        {-2.1, 7.0, 0.0, 1.0},
+        {-2.1, -7.0, 0.0, 1.0}
+    }
+    result.groundFaces = _getGroundFaces(connectorFace)
+
+    result.colliders = {
+        {
+            type = 'BOX',
+            params = {
+                halfExtents = {2, 8.0, 0.15}
+            }
+        }
+    }
+
+    result.models = {
+        {
+            id = 'lollo_assets/lollo_street_confluence_2_lanes_medium_sidewalk_allow_reversal.mdl',
+            skipCollision = true,
+            transf = pitchHelper.getIdTransfPitched(_pitchAngle)
+        }
+    }
+
+    local tramTrackType = _getTramTrackType(params)
+    result.edgeLists = {
+        {
+            type = 'STREET',
+            params = {
+                skipCollision = true,
+                type = 'lollo_medium_1_way_1_lane_street.lua',
+                tramTrackType = tramTrackType
+            },
+            edges = _makeEdges(_pitchAngle, params, {-4, -4, 0}, {-2, -4, 0}),
+            edgeType = _getEdgeType(params),
+            edgeTypeName = _getEdgeTypeName(params, bridgeData),
+            freeNodes = params.direction == 0 and {0} or {1},
+            snapNodes = _getSnapNodes01(params, true)
+        },
+        {
+            type = 'STREET',
+            params = {
+                skipCollision = true,
+                type = 'lollo_medium_1_way_1_lane_street.lua',
+                tramTrackType = tramTrackType
+            },
+            edges = _makeEdges(_pitchAngle, params, {-2, 4, 0}, {-4, 4, 0}, {-2, 0, 0}, {-2, 0, 0}),
+            edgeType = _getEdgeType(params),
+            edgeTypeName = _getEdgeTypeName(params, bridgeData),
+            freeNodes = params.direction == 0 and {1} or {0},
+            snapNodes = _getSnapNodes10(params, true)
+        },
+        {
+            type = 'STREET',
+            params = {
+                skipCollision = true,
+                type = 'lollo_internal_1_way_1_lane_street_no_sidewalk.lua',
+                tramTrackType = tramTrackType
+            },
+            edges = _makeEdges(_pitchAngle, params, {-1.8, -4, 0}, {1.8, -3, 0}, {4, 0.1, 0}, {4, 0.1, 0}),
+            edgeType = _getEdgeType(params),
+            edgeTypeName = _getEdgeTypeName(params, bridgeData),
+            freeNodes = {},
+            snapNodes = {}
+        },
+        {
+            type = 'STREET',
+            params = {
+                skipCollision = true,
+                type = 'lollo_internal_1_way_1_lane_street_no_sidewalk.lua',
+                tramTrackType = tramTrackType
+            },
+            edges = _makeEdges(_pitchAngle, params, {1.8, 3, 0}, {-1.8, 4, 0}, {-4, 0.1, 0}, {-4, 0.1, 0}),
+            edgeType = _getEdgeType(params),
+            edgeTypeName = _getEdgeTypeName(params, bridgeData),
+            freeNodes = {},
+            snapNodes = {}
+        },
+        -- the reversal edge is too tight for streets, so we make a reversal lane in the model instead
+        {
+            type = 'STREET',
+            params = {
+                skipCollision = true,
+                type = 'lollo_medium_2_lane_medium_sidewalk_street.lua',
+                tramTrackType = tramTrackType
+            },
+            -- this could be shortened to x = 2 to x = 6, but it dumps with no messages
+            edges = _makeEdges(_pitchAngle, params, {2, 0, 0}, {8, 0, 0}),
+            edgeType = _getEdgeType(params),
+            edgeTypeName = _getEdgeTypeName(params, bridgeData),
+            freeNodes = params.direction == 0 and {1} or {0},
+            snapNodes = _getSnapNodes10(params, false)
+        }
+    }
+
+    _addDummyTerrainAlignmentLists(result)
+    return result
+end
+
+local function updateFn_3_1_lane_narrow_sidewalk_to_3_lane_one_way(params, bridgeData)
+    local result = { cost = 0, skipCollision = true, }
+    local _pitchAngle = pitchHelper.getPitchAngle(params)
+
+    local connectorFace = {
+        {5.1, -7.0, 0.0, 1.0},
+        {5.1, 7.0, 0.0, 1.0},
+        {-2.1, 7.0, 0.0, 1.0},
+        {-2.1, -7.0, 0.0, 1.0}
+    }
+    result.groundFaces = _getGroundFaces(connectorFace)
+
+    result.colliders = {
+        {
+            type = 'BOX',
+            params = {
+                halfExtents = {2, 8.0, 0.15}
+            }
+        }
+    }
+
+    result.models = {
+        {
+            id = 'lollo_assets/lollo_street_confluence_3_lanes_narrow_sidewalk.mdl',
+            skipCollision = true,
+            transf = pitchHelper.getIdTransfPitched(_pitchAngle)
+        }
+    }
+
+    local tramTrackType = _getTramTrackType(params)
+    result.edgeLists = {
+        {
+            type = 'STREET',
+            params = {
+                skipCollision = true,
+                type = 'lollo_medium_1_way_1_lane_street_narrow_sidewalk.lua',
+                tramTrackType = tramTrackType
+            },
+            edges = _makeEdges(_pitchAngle, params, {-4, -4, 0}, {-2, -4, 0}),
+            edgeType = _getEdgeType(params),
+            edgeTypeName = _getEdgeTypeName(params, bridgeData),
+            freeNodes = params.direction == 0 and {0} or {1},
+            snapNodes = _getSnapNodes01(params, true)
+        },
+        {
+            type = 'STREET',
+            params = {
+                skipCollision = true,
+                type = 'lollo_medium_1_way_1_lane_street_narrow_sidewalk.lua',
+                tramTrackType = tramTrackType
+            },
+            edges = _makeEdges(_pitchAngle, params, {-4, 0, 0}, {-2, 0, 0}),
+            edgeType = _getEdgeType(params),
+            edgeTypeName = _getEdgeTypeName(params, bridgeData),
+            freeNodes = params.direction == 0 and {0} or {1},
+            snapNodes = _getSnapNodes01(params, true)
+        },
+        {
+            type = 'STREET',
+            params = {
+                skipCollision = true,
+                type = 'lollo_medium_1_way_1_lane_street_narrow_sidewalk.lua',
+                tramTrackType = tramTrackType
+            },
+            edges = _makeEdges(_pitchAngle, params, {-4, 4, 0}, {-2, 4, 0}),
+            edgeType = _getEdgeType(params),
+            edgeTypeName = _getEdgeTypeName(params, bridgeData),
+            freeNodes = params.direction == 0 and {0} or {1},
+            snapNodes = _getSnapNodes01(params, true)
+        },
+        {
+            type = 'STREET',
+            params = {
+                skipCollision = true,
+                type = 'lollo_internal_1_way_1_lane_street_no_sidewalk.lua',
+                tramTrackType = tramTrackType
+            },
+            edges = _makeEdges(_pitchAngle, params, {-1.8, 4, 0}, {1.8, 4, 0}),
+            edgeType = _getEdgeType(params),
+            edgeTypeName = _getEdgeTypeName(params, bridgeData),
+            freeNodes = {},
+            snapNodes = {}
+        },
+        {
+            type = 'STREET',
+            params = {
+                skipCollision = true,
+                type = 'lollo_internal_1_way_1_lane_street_no_sidewalk.lua',
+                tramTrackType = tramTrackType
+            },
+            edges = _makeEdges(_pitchAngle, params, {-1.8, 0, 0}, {1.8, 0, 0}),
+            edgeType = _getEdgeType(params),
+            edgeTypeName = _getEdgeTypeName(params, bridgeData),
+            freeNodes = {},
+            snapNodes = {}
+        },
+        {
+            type = 'STREET',
+            params = {
+                skipCollision = true,
+                type = 'lollo_internal_1_way_1_lane_street_no_sidewalk.lua',
+                tramTrackType = tramTrackType
+            },
+            edges = _makeEdges(_pitchAngle, params, {-1.8, -4, 0}, {1.8, -4, 0}),
+            edgeType = _getEdgeType(params),
+            edgeTypeName = _getEdgeTypeName(params, bridgeData),
+            freeNodes = {},
+            snapNodes = {}
+        },
+        {
+            type = 'STREET',
+            params = {
+                skipCollision = true,
+                type = tramTrackType == 'NO' and 'lollo_medium_1_way_3_lane_street.lua' or 'lollo_medium_1_way_3_lane_3_tram_tracks_street.lua',
+                tramTrackType = tramTrackType
+            },
+            edges = _makeEdges(_pitchAngle, params, {2, 0, 0}, {6, 0, 0}),
+            edgeType = _getEdgeType(params),
+            edgeTypeName = _getEdgeTypeName(params, bridgeData),
+            freeNodes = params.direction == 0 and {1} or {0},
+            snapNodes = _getSnapNodes10(params, false)
+        }
+    }
+
+    _addDummyTerrainAlignmentLists(result)
+    return result
+end
+
+-- local function updateFn_3_1_lane_medium_sidewalk_to_3_lane_one_way(params, bridgeData)
+--     local result = { cost = 0, skipCollision = true, }
+--     local _pitchAngle = pitchHelper.getPitchAngle(params)
+
+--     local connectorFace = {
+--         {2.1, -12.0, 0.0, 1.0},
+--         {2.1, 12.0, 0.0, 1.0},
+--         {-10, 12.0, 0.0, 1.0},
+--         {-10, -12.0, 0.0, 1.0}
+--     }
+--     result.groundFaces = _getGroundFaces(connectorFace)
+
+--     result.colliders = {
+--         {
+--             type = 'BOX',
+--             params = {
+--                 halfExtents = {6.0, 12.0, 0.15}
+--             }
+--         }
+--     }
+
+--     result.models = {
+--         {
+--             id = 'lollo_assets/lollo_street_confluence_3_lanes_medium_sidewalk.mdl',
+--             skipCollision = true,
+--             transf = pitchHelper.getIdTransfPitched(_pitchAngle)
+--         }
+--     }
+
+--     local tramTrackType = _getTramTrackType(params)
+--     result.edgeLists = {
+--         {
+--             type = 'STREET',
+--             params = {
+--                 skipCollision = true,
+--                 type = 'lollo_medium_1_way_1_lane_street.lua',
+--                 tramTrackType = tramTrackType
+--             },
+--             edges = _makeEdges(_pitchAngle, params, {-8, -8, 0}, {-6, -8, 0}),
+-- edgeType = _getEdgeType(params),
+--             edgeTypeName = _getEdgeTypeName(params, bridgeData),
+--             freeNodes = params.direction == 0 and {0} or {1},
+--             snapNodes = params.snapNodes_ == 0 and {} or (params.direction == 0 and {0} or {1})
+--         },
+--         {
+--             type = 'STREET',
+--             params = {
+--                 skipCollision = true,
+--                 type = 'lollo_medium_1_way_1_lane_street.lua',
+--                 tramTrackType = tramTrackType
+--             },
+--             edges = _makeEdges(_pitchAngle, params, {-8, 0, 0}, {-6, 0, 0}),
+-- edgeType = _getEdgeType(params),
+--             edgeTypeName = _getEdgeTypeName(params, bridgeData),
+--             freeNodes = params.direction == 0 and {0} or {1},
+--             snapNodes = params.snapNodes_ == 0 and {} or (params.direction == 0 and {0} or {1})
+--         },
+--         {
+--             type = 'STREET',
+--             params = {
+--                 skipCollision = true,
+--                 type = 'lollo_medium_1_way_1_lane_street.lua',
+--                 tramTrackType = tramTrackType
+--             },
+--             edges = _makeEdges(_pitchAngle, params, {-8, 8, 0}, {-6, 8, 0}),
+-- edgeType = _getEdgeType(params),
+--             edgeTypeName = _getEdgeTypeName(params, bridgeData),
+--             freeNodes = params.direction == 0 and {0} or {1},
+--             snapNodes = params.snapNodes_ == 0 and {} or (params.direction == 0 and {0} or {1})
+--         },
+--         {
+--             type = 'STREET',
+--             params = {
+--                 skipCollision = true,
+--                 type = 'lollo_internal_1_way_1_lane_street_no_sidewalk.lua',
+--                 tramTrackType = tramTrackType
+--             },
+--             edges = _makeEdges(_pitchAngle, params, {-5.8, 8, 0}, {1.8, 4, 0}, {8, -0.1, 0}, {8, -0.1, 0}),
+-- edgeType = _getEdgeType(params),
+--             edgeTypeName = _getEdgeTypeName(params, bridgeData),
+--             freeNodes = {},
+--             snapNodes = {}
+--         },
+--         {
+--             type = 'STREET',
+--             params = {
+--                 skipCollision = true,
+--                 type = 'lollo_internal_1_way_1_lane_street_no_sidewalk.lua',
+--                 tramTrackType = tramTrackType
+--             },
+--             edges = _makeEdges(_pitchAngle, params, {-5.8, 0, 0}, {1.8, 0, 0}),
+-- edgeType = _getEdgeType(params),
+--             edgeTypeName = _getEdgeTypeName(params, bridgeData),
+--             freeNodes = {},
+--             snapNodes = {}
+--         },
+--         {
+--             type = 'STREET',
+--             params = {
+--                 skipCollision = true,
+--                 type = 'lollo_internal_1_way_1_lane_street_no_sidewalk.lua',
+--                 tramTrackType = tramTrackType
+--             },
+--             edges = _makeEdges(_pitchAngle, params, {-5.8, -8, 0}, {1.8, -4, 0}, {8, 0.1, 0}, {8, 0.1, 0}),
+-- edgeType = _getEdgeType(params),
+--             edgeTypeName = _getEdgeTypeName(params, bridgeData),
+--             freeNodes = {},
+--             snapNodes = {}
+--         },
+--         {
+--             type = 'STREET',
+--             params = {
+--                 skipCollision = true,
+--                 type = tramTrackType == 'NO' and 'lollo_medium_1_way_3_lane_street.lua' or 'lollo_medium_1_way_3_lane_3_tram_tracks_street.lua',
+--                 tramTrackType = tramTrackType
+--             },
+--             -- this could be shortened to x = 2 to x = 6, but it dumps with no messages
+--             edges = _makeEdges(_pitchAngle, params, {2, 0, 0}, {8, 0, 0}),
+-- edgeType = _getEdgeType(params),
+--             edgeTypeName = _getEdgeTypeName(params, bridgeData),
+--             freeNodes = params.direction == 0 and {1} or {0},
+--             snapNodes = params.snapNodes_ == 0 and {} or (params.direction == 0 and {1} or {0})
+--         }
+--     }
+--     _addDummyTerrainAlignmentLists(result)
+--     return result
+-- end
+
+local function updateFn_4_1_lane_narrow_sidewalk_to_4_lane_one_way(params, bridgeData)
+    local result = { cost = 0, skipCollision = true, }
+    local _pitchAngle = pitchHelper.getPitchAngle(params)
+
+    local connectorFace = {
+        {2.1, -7.0, 0.0, 1.0},
+        {2.1, 7.0, 0.0, 1.0},
+        {-6, 7.0, 0.0, 1.0},
+        {-6, -7.0, 0.0, 1.0}
+    }
+    result.groundFaces = _getGroundFaces(connectorFace)
+
+    result.colliders = {
+        {
+            type = 'BOX',
+            params = {
+                halfExtents = {4, 8.0, 0.15}
+            }
+        }
+    }
+
+    result.models = {
+        {
+            id = 'lollo_assets/lollo_street_confluence_4_lanes_narrow_sidewalk.mdl',
+            skipCollision = true,
+            transf = pitchHelper.getIdTransfPitched(_pitchAngle)
+        }
+    }
+
+    local tramTrackType = _getTramTrackType(params)
+    result.edgeLists = {
+        {
+            type = 'STREET',
+            params = {
+                skipCollision = true,
+                type = 'lollo_medium_1_way_1_lane_street_narrow_sidewalk.lua',
+                tramTrackType = tramTrackType
+            },
+            edges = _makeEdges(_pitchAngle, params, {-8, -6, 0}, {-6, -6, 0}),
+            edgeType = _getEdgeType(params),
+            edgeTypeName = _getEdgeTypeName(params, bridgeData),
+            freeNodes = params.direction == 0 and {0} or {1},
+            snapNodes = _getSnapNodes01(params, true)
+        },
+        {
+            type = 'STREET',
+            params = {
+                skipCollision = true,
+                type = 'lollo_medium_1_way_1_lane_street_narrow_sidewalk.lua',
+                tramTrackType = tramTrackType
+            },
+            edges = _makeEdges(_pitchAngle, params, {-8, -2, 0}, {-6, -2, 0}),
+            edgeType = _getEdgeType(params),
+            edgeTypeName = _getEdgeTypeName(params, bridgeData),
+            freeNodes = params.direction == 0 and {0} or {1},
+            snapNodes = _getSnapNodes01(params, true)
+        },
+        {
+            type = 'STREET',
+            params = {
+                skipCollision = true,
+                type = 'lollo_medium_1_way_1_lane_street_narrow_sidewalk.lua',
+                tramTrackType = tramTrackType
+            },
+            edges = _makeEdges(_pitchAngle, params, {-8, 2, 0}, {-6, 2, 0}),
+            edgeType = _getEdgeType(params),
+            edgeTypeName = _getEdgeTypeName(params, bridgeData),
+            freeNodes = params.direction == 0 and {0} or {1},
+            snapNodes = _getSnapNodes01(params, true)
+        },
+        {
+            type = 'STREET',
+            params = {
+                skipCollision = true,
+                type = 'lollo_medium_1_way_1_lane_street_narrow_sidewalk.lua',
+                tramTrackType = tramTrackType
+            },
+            edges = _makeEdges(_pitchAngle, params, {-8, 6, 0}, {-6, 6, 0}),
+            edgeType = _getEdgeType(params),
+            edgeTypeName = _getEdgeTypeName(params, bridgeData),
+            freeNodes = params.direction == 0 and {0} or {1},
+            snapNodes = _getSnapNodes01(params, true)
+        },
+        {
+            type = 'STREET',
+            params = {
+                skipCollision = true,
+                type = 'lollo_internal_1_way_1_lane_street_no_sidewalk.lua',
+                tramTrackType = tramTrackType
+            },
+            edges = _makeEdges(_pitchAngle, params, {-5.8, 6, 0}, {1.8, 4.5, 0}, {8, -0.1, 0}, {8, -0.1, 0}),
+            edgeType = _getEdgeType(params),
+            edgeTypeName = _getEdgeTypeName(params, bridgeData),
+            freeNodes = {},
+            snapNodes = {}
+        },
+        {
+            type = 'STREET',
+            params = {
+                skipCollision = true,
+                type = 'lollo_internal_1_way_1_lane_street_no_sidewalk.lua',
+                tramTrackType = tramTrackType
+            },
+            edges = _makeEdges(_pitchAngle, params, {-5.8, 2, 0}, {1.8, 1.5, 0}, {8, -0.1, 0}, {8, -0.1, 0}),
+            edgeType = _getEdgeType(params),
+            edgeTypeName = _getEdgeTypeName(params, bridgeData),
+            freeNodes = {},
+            snapNodes = {}
+        },
+        {
+            type = 'STREET',
+            params = {
+                skipCollision = true,
+                type = 'lollo_internal_1_way_1_lane_street_no_sidewalk.lua',
+                tramTrackType = tramTrackType
+            },
+            edges = _makeEdges(_pitchAngle, params, {-5.8, -2, 0}, {1.8, -1.5, 0}, {8, 0.1, 0}, {8, 0.1, 0}),
+            edgeType = _getEdgeType(params),
+            edgeTypeName = _getEdgeTypeName(params, bridgeData),
+            freeNodes = {},
+            snapNodes = {}
+        },
+        {
+            type = 'STREET',
+            params = {
+                skipCollision = true,
+                type = 'lollo_internal_1_way_1_lane_street_no_sidewalk.lua',
+                tramTrackType = tramTrackType
+            },
+            edges = _makeEdges(_pitchAngle, params, {-5.8, -6, 0}, {1.8, -4.5, 0}, {8, 0.1, 0}, {8, 0.1, 0}),
+            edgeType = _getEdgeType(params),
+            edgeTypeName = _getEdgeTypeName(params, bridgeData),
+            freeNodes = {},
+            snapNodes = {}
+        },
+        {
+            type = 'STREET',
+            params = {
+                skipCollision = true,
+                type = tramTrackType == 'NO' and 'lollo_medium_1_way_4_lane_street.lua' or 'lollo_medium_1_way_4_lane_4_tram_tracks_street.lua',
+                tramTrackType = tramTrackType
+            },
+            -- this could be shortened to x = 2 to x = 6, but it dumps with no messages
+            edges = _makeEdges(_pitchAngle, params, {2, 0, 0}, {8, 0, 0}),
+            edgeType = _getEdgeType(params),
+            edgeTypeName = _getEdgeTypeName(params, bridgeData),
+            freeNodes = params.direction == 0 and {1} or {0},
+            snapNodes = _getSnapNodes10(params, false)
+        }
+    }
+
+    _addDummyTerrainAlignmentLists(result)
+    return result
+end
+
+local function updateFn_4_1_lane_narrow_sidewalk_to_4_lane(params, bridgeData)
+    params.direction = 0 -- 2-way streets cannot be reversed, the game is like that
+    local _pitchAngle = pitchHelper.getPitchAngle(params)
+
+    local result = { cost = 0, skipCollision = true, }
+
+    local connectorFace = {
+        {2.1, -7.0, 0.0, 1.0},
+        {2.1, 7.0, 0.0, 1.0},
+        {-6, 7.0, 0.0, 1.0},
+        {-6, -7.0, 0.0, 1.0}
+    }
+    result.groundFaces = _getGroundFaces(connectorFace)
+
+    result.colliders = {
+        {
+            type = 'BOX',
+            params = {
+                halfExtents = {4, 8.0, 0.15}
+            }
+        }
+    }
+
+    result.models = {
+        {
+            id = 'lollo_assets/lollo_street_confluence_4_lanes_narrow_sidewalk_allow_reversal.mdl',
+            skipCollision = true,
+            transf = pitchHelper.getIdTransfPitched(_pitchAngle)
+        }
+    }
+
+    local tramTrackType = _getTramTrackType(params)
+    result.edgeLists = {
+        {
+            type = 'STREET',
+            params = {
+                skipCollision = true,
+                type = 'lollo_medium_1_way_1_lane_street_narrow_sidewalk.lua',
+                tramTrackType = tramTrackType
+            },
+            edges = _makeEdges(_pitchAngle, params, {-8, -6, 0}, {-6, -6, 0}),
+            edgeType = _getEdgeType(params),
+            edgeTypeName = _getEdgeTypeName(params, bridgeData),
+            freeNodes = params.direction == 0 and {0} or {1},
+            snapNodes = _getSnapNodes01(params, true)
+        },
+        {
+            type = 'STREET',
+            params = {
+                skipCollision = true,
+                type = 'lollo_medium_1_way_1_lane_street_narrow_sidewalk.lua',
+                tramTrackType = tramTrackType
+            },
+            edges = _makeEdges(_pitchAngle, params, {-8, -2, 0}, {-6, -2, 0}),
+            edgeType = _getEdgeType(params),
+            edgeTypeName = _getEdgeTypeName(params, bridgeData),
+            freeNodes = params.direction == 0 and {0} or {1},
+            snapNodes = _getSnapNodes01(params, true)
+        },
+        {
+            type = 'STREET',
+            params = {
+                skipCollision = true,
+                type = 'lollo_medium_1_way_1_lane_street_narrow_sidewalk.lua',
+                tramTrackType = tramTrackType
+            },
+            edges = _makeEdges(_pitchAngle, params, {-6, 2, 0}, {-8, 2, 0}, {-2, 0, 0}, {-2, 0, 0}),
+            edgeType = _getEdgeType(params),
+            edgeTypeName = _getEdgeTypeName(params, bridgeData),
+            freeNodes = params.direction == 0 and {1} or {0},
+            snapNodes = _getSnapNodes10(params, true)
+        },
+        {
+            type = 'STREET',
+            params = {
+                skipCollision = true,
+                type = 'lollo_medium_1_way_1_lane_street_narrow_sidewalk.lua',
+                tramTrackType = tramTrackType
+            },
+            edges = _makeEdges(_pitchAngle, params, {-6, 6, 0}, {-8, 6, 0}, {-2, 0, 0}, {-2, 0, 0}),
+            edgeType = _getEdgeType(params),
+            edgeTypeName = _getEdgeTypeName(params, bridgeData),
+            freeNodes = params.direction == 0 and {1} or {0},
+            snapNodes = _getSnapNodes10(params, true)
+        },
+
+        {
+            type = 'STREET',
+            params = {
+                skipCollision = true,
+                type = 'lollo_internal_1_way_1_lane_street_no_sidewalk.lua',
+                tramTrackType = tramTrackType
+            },
+            edges = _makeEdges(_pitchAngle, params, {-5.8, -6, 0}, {1.8, -4.5, 0}, {8, 0.1, 0}, {8, 0.1, 0}),
+            edgeType = _getEdgeType(params),
+            edgeTypeName = _getEdgeTypeName(params, bridgeData),
+            freeNodes = {},
+            snapNodes = {}
+        },
+        {
+            type = 'STREET',
+            params = {
+                skipCollision = true,
+                type = 'lollo_internal_1_way_1_lane_street_no_sidewalk.lua',
+                tramTrackType = tramTrackType
+            },
+            edges = _makeEdges(_pitchAngle, params, {-5.8, -2, 0}, {1.8, -1.5, 0}, {8, 0.1, 0}, {8, 0.1, 0}),
+            edgeType = _getEdgeType(params),
+            edgeTypeName = _getEdgeTypeName(params, bridgeData),
+            freeNodes = {},
+            snapNodes = {}
+        },
+        {
+            type = 'STREET',
+            params = {
+                skipCollision = true,
+                type = 'lollo_internal_1_way_1_lane_street_no_sidewalk.lua',
+                tramTrackType = tramTrackType
+            },
+            edges = _makeEdges(_pitchAngle, params, {1.8, 1.5, 0}, {-5.8, 2, 0}, {-8, 0.1, 0}, {-8, 0.1, 0}),
+            edgeType = _getEdgeType(params),
+            edgeTypeName = _getEdgeTypeName(params, bridgeData),
+            freeNodes = {},
+            snapNodes = {}
+        },
+        {
+            type = 'STREET',
+            params = {
+                skipCollision = true,
+                type = 'lollo_internal_1_way_1_lane_street_no_sidewalk.lua',
+                tramTrackType = tramTrackType
+            },
+            edges = _makeEdges(_pitchAngle, params, {1.8, 4.5, 0}, {-5.8, 6, 0}, {-8, 0.1, 0}, {-8, 0.1, 0}),
+            edgeType = _getEdgeType(params),
+            edgeTypeName = _getEdgeTypeName(params, bridgeData),
+            freeNodes = {},
+            snapNodes = {}
+        },
+
+        {
+            type = 'STREET',
+            params = {
+                skipCollision = true,
+                type = tramTrackType == 'NO' and 'lollo_medium_4_lane_street.lua' or 'lollo_medium_4_lane_4_tram_tracks_street.lua',
+                tramTrackType = tramTrackType
+            },
+            -- this could be shortened to x = 2 to x = 6, but it dumps with no messages
+            edges = _makeEdges(_pitchAngle, params, {2, 0, 0}, {8, 0, 0}),
+            edgeType = _getEdgeType(params),
+            edgeTypeName = _getEdgeTypeName(params, bridgeData),
+            freeNodes = params.direction == 0 and {1} or {0},
+            snapNodes = _getSnapNodes10(params, false)
+        }
+    }
+
+    _addDummyTerrainAlignmentLists(result)
+    return result
+end
+
+local function updateFn_4_1_lane_narrow_sidewalk_to_4_lane_large(params, bridgeData)
+    params.direction = 0 -- 2-way streets cannot be reversed, the game is like that
+    local _pitchAngle = pitchHelper.getPitchAngle(params)
+
+    local result = { cost = 0, skipCollision = true, }
+
+    local connectorFace = {
+        {2, -12.0, 0.0, 1.0},
+        {2, 12.0, 0.0, 1.0},
+        {-2, 8.0, 0.0, 1.0},
+        {-2, -8.0, 0.0, 1.0}
+    }
+    result.groundFaces = _getGroundFaces(connectorFace)
+
+    result.colliders = {
+        {
+            type = 'BOX',
+            params = {
+                halfExtents = {2, 12.0, 0.15}
+            }
+        }
+    }
+
+    result.models = {
+        {
+            id = 'lollo_assets/lollo_street_confluence_4_lanes_large_street_narrow_sidewalk.mdl',
+            skipCollision = true,
+            transf = pitchHelper.getIdTransfPitched(_pitchAngle)
+        }
+    }
+
+    local tramTrackType = _getTramTrackType(params)
+    result.edgeLists = {
+        {
+            type = 'STREET',
+            params = {
+                skipCollision = true,
+                type = 'lollo_medium_1_way_1_lane_street_narrow_sidewalk.lua',
+                tramTrackType = tramTrackType
+            },
+            edges = _makeEdges(_pitchAngle, params, {-4, -6, 0}, {-2, -6, 0}),
+            edgeType = _getEdgeType(params),
+            edgeTypeName = _getEdgeTypeName(params, bridgeData),
+            freeNodes = params.direction == 0 and {0} or {1},
+            snapNodes = _getSnapNodes01(params, true)
+        },
+        {
+            type = 'STREET',
+            params = {
+                skipCollision = true,
+                type = 'lollo_medium_1_way_1_lane_street_narrow_sidewalk.lua',
+                tramTrackType = tramTrackType
+            },
+            edges = _makeEdges(_pitchAngle, params, {-4, -2, 0}, {-2, -2, 0}),
+            edgeType = _getEdgeType(params),
+            edgeTypeName = _getEdgeTypeName(params, bridgeData),
+            freeNodes = params.direction == 0 and {0} or {1},
+            snapNodes = _getSnapNodes01(params, true)
+        },
+        {
+            type = 'STREET',
+            params = {
+                skipCollision = true,
+                type = 'lollo_medium_1_way_1_lane_street_narrow_sidewalk.lua',
+                tramTrackType = tramTrackType
+            },
+            edges = _makeEdges(_pitchAngle, params, {-2, 2, 0}, {-4, 2, 0}, {-2, 0, 0}, {-2, 0, 0}),
+            edgeType = _getEdgeType(params),
+            edgeTypeName = _getEdgeTypeName(params, bridgeData),
+            freeNodes = params.direction == 0 and {1} or {0},
+            snapNodes = _getSnapNodes10(params, true)
+        },
+        {
+            type = 'STREET',
+            params = {
+                skipCollision = true,
+                type = 'lollo_medium_1_way_1_lane_street_narrow_sidewalk.lua',
+                tramTrackType = tramTrackType
+            },
+            edges = _makeEdges(_pitchAngle, params, {-2, 6, 0}, {-4, 6, 0}, {-2, 0, 0}, {-2, 0, 0}),
+            edgeType = _getEdgeType(params),
+            edgeTypeName = _getEdgeTypeName(params, bridgeData),
+            freeNodes = params.direction == 0 and {1} or {0},
+            snapNodes = _getSnapNodes10(params, true)
+        },
+        {
+            type = 'STREET',
+            params = {
+                skipCollision = true,
+                type = 'lollo_internal_1_way_1_lane_street_no_sidewalk.lua',
+                tramTrackType = tramTrackType
+            },
+            edges = _makeEdges(_pitchAngle, params, {-1.8, -6, 0}, {1.8, -6, 0}),
+            edgeType = _getEdgeType(params),
+            edgeTypeName = _getEdgeTypeName(params, bridgeData),
+            freeNodes = {},
+            snapNodes = {}
+        },
+        {
+            type = 'STREET',
+            params = {
+                skipCollision = true,
+                type = 'lollo_internal_1_way_1_lane_street_no_sidewalk.lua',
+                tramTrackType = tramTrackType
+            },
+            edges = _makeEdges(_pitchAngle, params, {-1.8, -2, 0}, {1.8, -2, 0}),
+            edgeType = _getEdgeType(params),
+            edgeTypeName = _getEdgeTypeName(params, bridgeData),
+            freeNodes = {},
+            snapNodes = {}
+        },
+        {
+            type = 'STREET',
+            params = {
+                skipCollision = true,
+                type = 'lollo_internal_1_way_1_lane_street_no_sidewalk.lua',
+                tramTrackType = tramTrackType
+            },
+            edges = _makeEdges(_pitchAngle, params, {1.8, 2, 0}, {-1.8, 2, 0}, {-3.6, 0, 0}, {-3.6, 0, 0}),
+            edgeType = _getEdgeType(params),
+            edgeTypeName = _getEdgeTypeName(params, bridgeData),
+            freeNodes = {},
+            snapNodes = {}
+        },
+        {
+            type = 'STREET',
+            params = {
+                skipCollision = true,
+                type = 'lollo_internal_1_way_1_lane_street_no_sidewalk.lua',
+                tramTrackType = tramTrackType
+            },
+            edges = _makeEdges(_pitchAngle, params, {1.8, 6, 0}, {-1.8, 6, 0}, {-3.6, 0, 0}, {-3.6, 0, 0}),
+            edgeType = _getEdgeType(params),
+            edgeTypeName = _getEdgeTypeName(params, bridgeData),
+            freeNodes = {},
+            snapNodes = {}
+        },
+        {
+            type = 'STREET',
+            params = {
+                skipCollision = true,
+                type = tramTrackType == 'NO' and 'standard/town_large_new.lua' or 'lollo_large_4_lane_4_tram_tracks_street.lua',
+                tramTrackType = tramTrackType
+            },
+            edges = _makeEdges(_pitchAngle, params, {2, 0, 0}, {8, 0, 0}),
+            edgeType = _getEdgeType(params),
+            edgeTypeName = _getEdgeTypeName(params, bridgeData),
+            freeNodes = params.direction == 0 and {1} or {0},
+            snapNodes = _getSnapNodes10(params, false)
+        }
+    }
+
+    _addDummyTerrainAlignmentLists(result)
+    return result
+end
+
+local function updateFn_2_2_lane_one_way_to_6_lane_x_large(params, bridgeData)
+    params.direction = 0 -- 2-way streets cannot be reversed, the game is like that
+    local _pitchAngle = pitchHelper.getPitchAngle(params)
+
+    local result = { cost = 0, skipCollision = true, }
+
+    local connectorFace = {
+        {9.1, -15.0, 0.0, 1.0},
+        {9.1, 15.0, 0.0, 1.0},
+        {-2.1, 15.0, 0.0, 1.0},
+        {-2.1, -15.0, 0.0, 1.0}
+    }
+    result.groundFaces = _getGroundFaces(connectorFace)
+
+    result.colliders = {
+        {
+            type = 'BOX',
+            params = {
+                halfExtents = {2, 16.0, 0.15}
+            }
+        }
+    }
+
+    result.models = {
+        {
+            id = 'lollo_assets/lollo_street_confluence_6_lanes_x_large_street.mdl',
+            skipCollision = true,
+            transf = pitchHelper.getIdTransfPitched(_pitchAngle)
+        }
+    }
+
+    local tramTrackType = _getTramTrackType(params)
+    result.edgeLists = {
+        {
+            type = 'STREET',
+            params = {
+                skipCollision = true,
+                type = tramTrackType == 'NO' and 'standard/town_medium_one_way_new.lua' or 'lollo_medium_1_way_2_lane_2_tram_tracks_street.lua',
+                tramTrackType = tramTrackType
+            },
+            edges = _makeEdges(_pitchAngle, params, {-6, -8, 0}, {-2, -8, 0}),
+            edgeType = _getEdgeType(params),
+            edgeTypeName = _getEdgeTypeName(params, bridgeData),
+            freeNodes = params.direction == 0 and {0} or {1},
+            snapNodes = _getSnapNodes01(params, true)
+        },
+        {
+            type = 'STREET',
+            params = {
+                skipCollision = true,
+                type = tramTrackType == 'NO' and 'standard/town_medium_one_way_new.lua' or 'lollo_medium_1_way_2_lane_2_tram_tracks_street.lua',
+                tramTrackType = tramTrackType
+            },
+            edges = _makeEdges(_pitchAngle, params, {-2, 8, 0}, {-6, 8, 0}, {-4, 0, 0}, {-4, 0, 0}),
+            edgeType = _getEdgeType(params),
+            edgeTypeName = _getEdgeTypeName(params, bridgeData),
+            freeNodes = params.direction == 0 and {1} or {0},
+            snapNodes = _getSnapNodes10(params, true)
+        },
+        {
+            type = 'STREET',
+            params = {
+                skipCollision = true,
+                type = 'lollo_internal_1_way_1_lane_street_no_sidewalk.lua',
+                tramTrackType = tramTrackType
+            },
+            edges = _makeEdges(_pitchAngle, params, {-1.8, -10, 0}, {1.8, -10, 0}),
+            edgeType = _getEdgeType(params),
+            edgeTypeName = _getEdgeTypeName(params, bridgeData),
+            freeNodes = {},
+            snapNodes = {}
+        },
+        {
+            type = 'STREET',
+            params = {
+                skipCollision = true,
+                type = 'lollo_internal_1_way_1_lane_street_no_sidewalk.lua',
+                tramTrackType = tramTrackType
+            },
+            edges = _makeEdges(_pitchAngle, params, {-1.8, -6, 0}, {1.8, -6, 0}),
+            edgeType = _getEdgeType(params),
+            edgeTypeName = _getEdgeTypeName(params, bridgeData),
+            freeNodes = {},
+            snapNodes = {}
+        },
+        -- cannot connect the inner lanes
+        -- {
+        --     type = 'STREET',
+        --     params = {
+        --         skipCollision = true,
+        --         type = 'lollo_internal_1_way_1_lane_street_no_sidewalk.lua',
+        --         tramTrackType = tramTrackType
+        --     },
+        --     edges = _makeEdges(_pitchAngle, params, {-1.8, -6, 0}, {1.8, -2, 0}, {4, 0.1, 0}, {4, 0.1, 0}),
+        --     edgeType = _getEdgeType(params),
+        --     edgeTypeName = _getEdgeTypeName(params, bridgeData),
+        --     freeNodes = {},
+        --     snapNodes = {}
+        -- },
+        -- {
+        --     type = 'STREET',
+        --     params = {
+        --         skipCollision = true,
+        --         type = 'lollo_internal_1_way_1_lane_street_no_sidewalk.lua',
+        --         tramTrackType = tramTrackType
+        --     },
+        --     edges = _makeEdges(_pitchAngle, params, {1.8, 2, 0}, {-1.8, 6, 0}, {-4, 0.1, 0}, {-4, 0.1, 0}),
+        --     edgeType = _getEdgeType(params),
+        --     edgeTypeName = _getEdgeTypeName(params, bridgeData),
+        --     freeNodes = {},
+        --     snapNodes = {}
+        -- },
+        {
+            type = 'STREET',
+            params = {
+                skipCollision = true,
+                type = 'lollo_internal_1_way_1_lane_street_no_sidewalk.lua',
+                tramTrackType = tramTrackType
+            },
+            edges = _makeEdges(_pitchAngle, params, {1.8, 6, 0}, {-1.8, 6, 0}, {-3.6, 0, 0}, {-3.6, 0, 0}),
+            edgeType = _getEdgeType(params),
+            edgeTypeName = _getEdgeTypeName(params, bridgeData),
+            freeNodes = {},
+            snapNodes = {}
+        },
+        {
+            type = 'STREET',
+            params = {
+                skipCollision = true,
+                type = 'lollo_internal_1_way_1_lane_street_no_sidewalk.lua',
+                tramTrackType = tramTrackType
+            },
+            edges = _makeEdges(_pitchAngle, params, {1.8, 10, 0}, {-1.8, 10, 0}, {-3.6, 0, 0}, {-3.6, 0, 0}),
+            edgeType = _getEdgeType(params),
+            edgeTypeName = _getEdgeTypeName(params, bridgeData),
+            freeNodes = {},
+            snapNodes = {}
+        },
+        {
+            type = 'STREET',
+            params = {
+                skipCollision = true,
+                type = tramTrackType == 'NO' and 'standard/town_x_large_new.lua' or 'lollo_x_large_6_tram_tracks_street.lua',
+                tramTrackType = tramTrackType
+            },
+            edges = _makeEdges(_pitchAngle, params, {2, 0, 0}, {10, 0, 0}),
+            edgeType = _getEdgeType(params),
+            edgeTypeName = _getEdgeTypeName(params, bridgeData),
+            freeNodes = params.direction == 0 and {1} or {0},
+            snapNodes = _getSnapNodes10(params, false)
+        }
+    }
+
+    _addDummyTerrainAlignmentLists(result)
+    return result
+end
+
+local function updateFn_6_1_lane_one_way_to_6_lane_x_large(params, bridgeData)
+    params.direction = 0 -- 2-way streets cannot be reversed, the game is like that
+    local _pitchAngle = pitchHelper.getPitchAngle(params)
+
+    local result = { cost = 0, skipCollision = true, }
+
+    local connectorFace = {
+        {9.1, -14.0, 0.0, 1.0},
+        {9.1, 14.0, 0.0, 1.0},
+        {-2.1, 12.0, 0.0, 1.0},
+        {-2.1, -12.0, 0.0, 1.0}
+    }
+    result.groundFaces = _getGroundFaces(connectorFace)
+
+    result.colliders = {
+        {
+            type = 'BOX',
+            params = {
+                halfExtents = {2, 16.0, 0.15}
+            }
+        }
+    }
+
+    result.models = {
+        {
+            id = 'lollo_assets/lollo_street_confluence_6_lanes_x_large_narrow_sidewalk.mdl',
+            skipCollision = true,
+            transf = pitchHelper.getIdTransfPitched(_pitchAngle)
+        }
+    }
+
+    local tramTrackType = _getTramTrackType(params)
+    result.edgeLists = {
+        {
+            type = 'STREET',
+            params = {
+                skipCollision = true,
+                type = 'lollo_medium_1_way_1_lane_street_narrow_sidewalk.lua',
+                tramTrackType = tramTrackType
+            },
+            edges = _makeEdges(_pitchAngle, params, {-4, -10, 0}, {-2, -10, 0}, {2, 0, 0}, {2, 0, 0}),
+            edgeType = _getEdgeType(params),
+            edgeTypeName = _getEdgeTypeName(params, bridgeData),
+            freeNodes = params.direction == 0 and {0} or {1},
+            snapNodes = _getSnapNodes01(params, true)
+        },
+        {
+            type = 'STREET',
+            params = {
+                skipCollision = true,
+                type = 'lollo_medium_1_way_1_lane_street_narrow_sidewalk.lua',
+                tramTrackType = tramTrackType
+            },
+            edges = _makeEdges(_pitchAngle, params, {-4, -6, 0}, {-2, -6, 0}, {2, 0, 0}, {2, 0, 0}),
+            edgeType = _getEdgeType(params),
+            edgeTypeName = _getEdgeTypeName(params, bridgeData),
+            freeNodes = params.direction == 0 and {0} or {1},
+            snapNodes = _getSnapNodes01(params, true)
+        },
+        {
+            type = 'STREET',
+            params = {
+                skipCollision = true,
+                type = 'lollo_medium_1_way_1_lane_street_narrow_sidewalk.lua',
+                tramTrackType = tramTrackType
+            },
+            edges = _makeEdges(_pitchAngle, params, {-4, -2, 0}, {-2, -2, 0}, {2, 0, 0}, {2, 0, 0}),
+            edgeType = _getEdgeType(params),
+            edgeTypeName = _getEdgeTypeName(params, bridgeData),
+            freeNodes = params.direction == 0 and {0} or {1},
+            snapNodes = _getSnapNodes01(params, true)
+        },
+        {
+            type = 'STREET',
+            params = {
+                skipCollision = true,
+                type = 'lollo_medium_1_way_1_lane_street_narrow_sidewalk.lua',
+                tramTrackType = tramTrackType
+            },
+            edges = _makeEdges(_pitchAngle, params, {-2, 2, 0}, {-4, 2, 0}, {-2, 0, 0}, {-2, 0, 0}),
+            edgeType = _getEdgeType(params),
+            edgeTypeName = _getEdgeTypeName(params, bridgeData),
+            freeNodes = params.direction == 0 and {1} or {0},
+            snapNodes = _getSnapNodes10(params, true)
+        },
+        {
+            type = 'STREET',
+            params = {
+                skipCollision = true,
+                type = 'lollo_medium_1_way_1_lane_street_narrow_sidewalk.lua',
+                tramTrackType = tramTrackType
+            },
+            edges = _makeEdges(_pitchAngle, params, {-2, 6, 0}, {-4, 6, 0}, {-2, 0, 0}, {-2, 0, 0}),
+            edgeType = _getEdgeType(params),
+            edgeTypeName = _getEdgeTypeName(params, bridgeData),
+            freeNodes = params.direction == 0 and {1} or {0},
+            snapNodes = _getSnapNodes10(params, true)
+        },
+        {
+            type = 'STREET',
+            params = {
+                skipCollision = true,
+                type = 'lollo_medium_1_way_1_lane_street_narrow_sidewalk.lua',
+                tramTrackType = tramTrackType
+            },
+            edges = _makeEdges(_pitchAngle, params, {-2, 10, 0}, {-4, 10, 0}, {-2, 0, 0}, {-2, 0, 0}),
+            edgeType = _getEdgeType(params),
+            edgeTypeName = _getEdgeTypeName(params, bridgeData),
+            freeNodes = params.direction == 0 and {1} or {0},
+            snapNodes = _getSnapNodes10(params, true)
+        },
+        {
+            type = 'STREET',
+            params = {
+                skipCollision = true,
+                type = 'lollo_internal_1_way_1_lane_street_no_sidewalk.lua',
+                tramTrackType = tramTrackType
+            },
+            edges = _makeEdges(_pitchAngle, params, {-1.8, -10, 0}, {1.8, -10, 0}, {3.6, 0, 0}, {3.6, 0, 0}),
+            edgeType = _getEdgeType(params),
+            edgeTypeName = _getEdgeTypeName(params, bridgeData),
+            freeNodes = {},
+            snapNodes = {}
+        },
+        {
+            type = 'STREET',
+            params = {
+                skipCollision = true,
+                type = 'lollo_internal_1_way_1_lane_street_no_sidewalk.lua',
+                tramTrackType = tramTrackType
+            },
+            edges = _makeEdges(_pitchAngle, params, {-1.8, -6, 0}, {1.8, -6, 0}, {3.6, 0, 0}, {3.6, 0, 0}),
+            edgeType = _getEdgeType(params),
+            edgeTypeName = _getEdgeTypeName(params, bridgeData),
+            freeNodes = {},
+            snapNodes = {}
+        },
+        {
+            type = 'STREET',
+            params = {
+                skipCollision = true,
+                type = 'lollo_internal_1_way_1_lane_street_no_sidewalk.lua',
+                tramTrackType = tramTrackType
+            },
+            edges = _makeEdges(_pitchAngle, params, {-1.8, -2, 0}, {1.8, -2, 0}, {3.6, 0, 0}, {3.6, 0, 0}),
+            edgeType = _getEdgeType(params),
+            edgeTypeName = _getEdgeTypeName(params, bridgeData),
+            freeNodes = {},
+            snapNodes = {}
+        },
+        {
+            type = 'STREET',
+            params = {
+                skipCollision = true,
+                type = 'lollo_internal_1_way_1_lane_street_no_sidewalk.lua',
+                tramTrackType = tramTrackType
+            },
+            edges = _makeEdges(_pitchAngle, params, {1.8, 2, 0}, {-1.8, 2, 0}, {-3.6, 0, 0}, {-3.6, 0, 0}),
+            edgeType = _getEdgeType(params),
+            edgeTypeName = _getEdgeTypeName(params, bridgeData),
+            freeNodes = {},
+            snapNodes = {}
+        },
+        {
+            type = 'STREET',
+            params = {
+                skipCollision = true,
+                type = 'lollo_internal_1_way_1_lane_street_no_sidewalk.lua',
+                tramTrackType = tramTrackType
+            },
+            edges = _makeEdges(_pitchAngle, params, {1.8, 6, 0}, {-1.8, 6, 0}, {-3.6, 0, 0}, {-3.6, 0, 0}),
+            edgeType = _getEdgeType(params),
+            edgeTypeName = _getEdgeTypeName(params, bridgeData),
+            freeNodes = {},
+            snapNodes = {}
+        },
+        {
+            type = 'STREET',
+            params = {
+                skipCollision = true,
+                type = 'lollo_internal_1_way_1_lane_street_no_sidewalk.lua',
+                tramTrackType = tramTrackType
+            },
+            edges = _makeEdges(_pitchAngle, params, {1.8, 10, 0}, {-1.8, 10, 0}, {-3.6, 0, 0}, {-3.6, 0, 0}),
+            edgeType = _getEdgeType(params),
+            edgeTypeName = _getEdgeTypeName(params, bridgeData),
+            freeNodes = {},
+            snapNodes = {}
+        },
+        {
+            type = 'STREET',
+            params = {
+                skipCollision = true,
+                type = tramTrackType == 'NO' and 'standard/town_x_large_new.lua' or 'lollo_x_large_6_tram_tracks_street.lua',
+                tramTrackType = tramTrackType
+            },
+            edges = _makeEdges(_pitchAngle, params, {2, 0, 0}, {10, 0, 0}),
+            edgeType = _getEdgeType(params),
+            edgeTypeName = _getEdgeTypeName(params, bridgeData),
+            freeNodes = params.direction == 0 and {1} or {0},
+            snapNodes = _getSnapNodes10(params, false)
+        }
+    }
+
+    _addDummyTerrainAlignmentLists(result)
+    return result
+end
+
+local function updateFn_Motorway_6_1_lane_one_way_to_6_lane_x_large(params, bridgeData)
+    params.direction = 0 -- 2-way streets cannot be reversed, the game is like that
+    local _pitchAngle = pitchHelper.getPitchAngle(params)
+
+    local result = { cost = 0, skipCollision = true, }
+
+    local connectorFace = {
+        {9.1, -14.0, 0.0, 1.0},
+        {9.1, 14.0, 0.0, 1.0},
+        {-2.1, 12.0, 0.0, 1.0},
+        {-2.1, -12.0, 0.0, 1.0}
+    }
+    result.groundFaces = _getGroundFaces(connectorFace)
+
+    result.colliders = {
+        {
+            type = 'BOX',
+            params = {
+                halfExtents = {2, 16.0, 0.15}
+            }
+        }
+    }
+
+    result.models = {
+        {
+            id = 'lollo_assets/lollo_street_confluence_6_lanes_x_large_country_road_narrow_sidewalk.mdl',
+            skipCollision = true,
+            transf = pitchHelper.getIdTransfPitched(_pitchAngle)
+        }
+    }
+
+    local tramTrackType = _getTramTrackType(params)
+    result.edgeLists = {
+        {
+            type = 'STREET',
+            params = {
+                skipCollision = true,
+                type = 'lollo_medium_1_way_1_lane_country_road_narrow_sidewalk.lua',
+                tramTrackType = tramTrackType
+            },
+            edges = _makeEdges(_pitchAngle, params, {-4, -10, 0}, {-2, -10, 0}, {2, 0, 0}, {2, 0, 0}),
+            edgeType = _getEdgeType(params),
+            edgeTypeName = _getEdgeTypeName(params, bridgeData),
+            freeNodes = params.direction == 0 and {0} or {1},
+            snapNodes = _getSnapNodes01(params, true)
+        },
+        {
+            type = 'STREET',
+            params = {
+                skipCollision = true,
+                type = 'lollo_medium_1_way_1_lane_country_road_narrow_sidewalk.lua',
+                tramTrackType = tramTrackType
+            },
+            edges = _makeEdges(_pitchAngle, params, {-4, -6, 0}, {-2, -6, 0}, {2, 0, 0}, {2, 0, 0}),
+            edgeType = _getEdgeType(params),
+            edgeTypeName = _getEdgeTypeName(params, bridgeData),
+            freeNodes = params.direction == 0 and {0} or {1},
+            snapNodes = _getSnapNodes01(params, true)
+        },
+        {
+            type = 'STREET',
+            params = {
+                skipCollision = true,
+                type = 'lollo_medium_1_way_1_lane_country_road_narrow_sidewalk.lua',
+                tramTrackType = tramTrackType
+            },
+            edges = _makeEdges(_pitchAngle, params, {-4, -2, 0}, {-2, -2, 0}, {2, 0, 0}, {2, 0, 0}),
+            edgeType = _getEdgeType(params),
+            edgeTypeName = _getEdgeTypeName(params, bridgeData),
+            freeNodes = params.direction == 0 and {0} or {1},
+            snapNodes = _getSnapNodes01(params, true)
+        },
+        {
+            type = 'STREET',
+            params = {
+                skipCollision = true,
+                type = 'lollo_medium_1_way_1_lane_country_road_narrow_sidewalk.lua',
+                tramTrackType = tramTrackType
+            },
+            edges = _makeEdges(_pitchAngle, params, {-2, 2, 0}, {-4, 2, 0}, {-2, 0, 0}, {-2, 0, 0}),
+            edgeType = _getEdgeType(params),
+            edgeTypeName = _getEdgeTypeName(params, bridgeData),
+            freeNodes = params.direction == 0 and {1} or {0},
+            snapNodes = _getSnapNodes10(params, true)
+        },
+        {
+            type = 'STREET',
+            params = {
+                skipCollision = true,
+                type = 'lollo_medium_1_way_1_lane_country_road_narrow_sidewalk.lua',
+                tramTrackType = tramTrackType
+            },
+            edges = _makeEdges(_pitchAngle, params, {-2, 6, 0}, {-4, 6, 0}, {-2, 0, 0}, {-2, 0, 0}),
+            edgeType = _getEdgeType(params),
+            edgeTypeName = _getEdgeTypeName(params, bridgeData),
+            freeNodes = params.direction == 0 and {1} or {0},
+            snapNodes = _getSnapNodes10(params, true)
+        },
+        {
+            type = 'STREET',
+            params = {
+                skipCollision = true,
+                type = 'lollo_medium_1_way_1_lane_country_road_narrow_sidewalk.lua',
+                tramTrackType = tramTrackType
+            },
+            edges = _makeEdges(_pitchAngle, params, {-2, 10, 0}, {-4, 10, 0}, {-2, 0, 0}, {-2, 0, 0}),
+            edgeType = _getEdgeType(params),
+            edgeTypeName = _getEdgeTypeName(params, bridgeData),
+            freeNodes = params.direction == 0 and {1} or {0},
+            snapNodes = _getSnapNodes10(params, true)
+        },
+        {
+            type = 'STREET',
+            params = {
+                skipCollision = true,
+                type = 'lollo_internal_1_way_1_lane_street_no_sidewalk.lua',
+                tramTrackType = tramTrackType
+            },
+            edges = _makeEdges(_pitchAngle, params, {-1.8, -10, 0}, {1.8, -10, 0}, {3.6, 0, 0}, {3.6, 0, 0}),
+            edgeType = _getEdgeType(params),
+            edgeTypeName = _getEdgeTypeName(params, bridgeData),
+            freeNodes = {},
+            snapNodes = {}
+        },
+        {
+            type = 'STREET',
+            params = {
+                skipCollision = true,
+                type = 'lollo_internal_1_way_1_lane_street_no_sidewalk.lua',
+                tramTrackType = tramTrackType
+            },
+            edges = _makeEdges(_pitchAngle, params, {-1.8, -6, 0}, {1.8, -6, 0}, {3.6, 0, 0}, {3.6, 0, 0}),
+            edgeType = _getEdgeType(params),
+            edgeTypeName = _getEdgeTypeName(params, bridgeData),
+            freeNodes = {},
+            snapNodes = {}
+        },
+        {
+            type = 'STREET',
+            params = {
+                skipCollision = true,
+                type = 'lollo_internal_1_way_1_lane_street_no_sidewalk.lua',
+                tramTrackType = tramTrackType
+            },
+            edges = _makeEdges(_pitchAngle, params, {-1.8, -2, 0}, {1.8, -2, 0}, {3.6, 0, 0}, {3.6, 0, 0}),
+            edgeType = _getEdgeType(params),
+            edgeTypeName = _getEdgeTypeName(params, bridgeData),
+            freeNodes = {},
+            snapNodes = {}
+        },
+        {
+            type = 'STREET',
+            params = {
+                skipCollision = true,
+                type = 'lollo_internal_1_way_1_lane_street_no_sidewalk.lua',
+                tramTrackType = tramTrackType
+            },
+            edges = _makeEdges(_pitchAngle, params, {1.8, 2, 0}, {-1.8, 2, 0}, {-3.6, 0, 0}, {-3.6, 0, 0}),
+            edgeType = _getEdgeType(params),
+            edgeTypeName = _getEdgeTypeName(params, bridgeData),
+            freeNodes = {},
+            snapNodes = {}
+        },
+        {
+            type = 'STREET',
+            params = {
+                skipCollision = true,
+                type = 'lollo_internal_1_way_1_lane_street_no_sidewalk.lua',
+                tramTrackType = tramTrackType
+            },
+            edges = _makeEdges(_pitchAngle, params, {1.8, 6, 0}, {-1.8, 6, 0}, {-3.6, 0, 0}, {-3.6, 0, 0}),
+            edgeType = _getEdgeType(params),
+            edgeTypeName = _getEdgeTypeName(params, bridgeData),
+            freeNodes = {},
+            snapNodes = {}
+        },
+        {
+            type = 'STREET',
+            params = {
+                skipCollision = true,
+                type = 'lollo_internal_1_way_1_lane_street_no_sidewalk.lua',
+                tramTrackType = tramTrackType
+            },
+            edges = _makeEdges(_pitchAngle, params, {1.8, 10, 0}, {-1.8, 10, 0}, {-3.6, 0, 0}, {-3.6, 0, 0}),
+            edgeType = _getEdgeType(params),
+            edgeTypeName = _getEdgeTypeName(params, bridgeData),
+            freeNodes = {},
+            snapNodes = {}
+        },
+        {
+            type = 'STREET',
+            params = {
+                skipCollision = true,
+                type = tramTrackType == 'NO' and 'standard/country_x_large_new.lua' or 'lollo_x_large_6_tram_tracks_country_road.lua',
+                tramTrackType = tramTrackType
+            },
+            edges = _makeEdges(_pitchAngle, params, {2, 0, 0}, {10, 0, 0}),
+            edgeType = _getEdgeType(params),
+            edgeTypeName = _getEdgeTypeName(params, bridgeData),
+            freeNodes = params.direction == 0 and {1} or {0},
+            snapNodes = _getSnapNodes10(params, false)
+        }
+    }
+
+    _addDummyTerrainAlignmentLists(result)
+    return result
+end
+
+local function updateFn_Motorway_2_2_lane_one_way_to_6_lane_x_large(params, bridgeData)
+    params.direction = 0 -- 2-way streets cannot be reversed, the game is like that
+    local _pitchAngle = pitchHelper.getPitchAngle(params)
+
+    local result = { cost = 0, skipCollision = true, }
+
+    local connectorFace = {
+        {9.1, -12.0, 0.0, 1.0},
+        {9.1, 12.0, 0.0, 1.0},
+        {-2.1, 12.0, 0.0, 1.0},
+        {-2.1, -12.0, 0.0, 1.0}
+    }
+    result.groundFaces = _getGroundFaces(connectorFace)
+
+    result.colliders = {
+        {
+            type = 'BOX',
+            params = {
+                halfExtents = {2, 16.0, 0.15}
+            }
+        }
+    }
+
+    result.models = {
+        {
+            id = 'lollo_assets/lollo_street_confluence_6_lanes_x_large_country_road.mdl',
+            skipCollision = true,
+            transf = pitchHelper.getIdTransfPitched(_pitchAngle)
+        }
+    }
+
+    local tramTrackType = _getTramTrackType(params)
+    result.edgeLists = {
+        {
+            type = 'STREET',
+            params = {
+                skipCollision = true,
+                type = tramTrackType == 'NO' and 'standard/country_medium_one_way_new.lua' or 'lollo_medium_1_way_2_lane_2_tram_tracks_country_road.lua',
+                tramTrackType = tramTrackType
+            },
+            edges = _makeEdges(_pitchAngle, params, {-6, -8, 0}, {-2, -8, 0}),
+            edgeType = _getEdgeType(params),
+            edgeTypeName = _getEdgeTypeName(params, bridgeData),
+            freeNodes = params.direction == 0 and {0} or {1},
+            snapNodes = _getSnapNodes01(params, true)
+        },
+        {
+            type = 'STREET',
+            params = {
+                skipCollision = true,
+                type = tramTrackType == 'NO' and 'standard/country_medium_one_way_new.lua' or 'lollo_medium_1_way_2_lane_2_tram_tracks_country_road.lua',
+                tramTrackType = tramTrackType
+            },
+            edges = _makeEdges(_pitchAngle, params, {-2, 8, 0}, {-6, 8, 0}, {-4, 0, 0}, {-4, 0, 0}),
+            edgeType = _getEdgeType(params),
+            edgeTypeName = _getEdgeTypeName(params, bridgeData),
+            freeNodes = params.direction == 0 and {1} or {0},
+            snapNodes = _getSnapNodes10(params, true)
+        },
+        {
+            type = 'STREET',
+            params = {
+                skipCollision = true,
+                type = 'lollo_internal_1_way_1_lane_street_no_sidewalk.lua',
+                tramTrackType = tramTrackType
+            },
+            edges = _makeEdges(_pitchAngle, params, {-1.8, -10, 0}, {1.8, -10, 0}),
+            edgeType = _getEdgeType(params),
+            edgeTypeName = _getEdgeTypeName(params, bridgeData),
+            freeNodes = {},
+            snapNodes = {}
+        },
+        {
+            type = 'STREET',
+            params = {
+                skipCollision = true,
+                type = 'lollo_internal_1_way_1_lane_street_no_sidewalk.lua',
+                tramTrackType = tramTrackType
+            },
+            edges = _makeEdges(_pitchAngle, params, {-1.8, -6, 0}, {1.8, -6, 0}),
+            edgeType = _getEdgeType(params),
+            edgeTypeName = _getEdgeTypeName(params, bridgeData),
+            freeNodes = {},
+            snapNodes = {}
+        },
+        {
+            type = 'STREET',
+            params = {
+                skipCollision = true,
+                type = 'lollo_internal_1_way_1_lane_street_no_sidewalk.lua',
+                tramTrackType = tramTrackType
+            },
+            edges = _makeEdges(_pitchAngle, params, {1.8, 6, 0}, {-1.8, 6, 0}, {-3.6, 0, 0}, {-3.6, 0, 0}),
+            edgeType = _getEdgeType(params),
+            edgeTypeName = _getEdgeTypeName(params, bridgeData),
+            freeNodes = {},
+            snapNodes = {}
+        },
+        {
+            type = 'STREET',
+            params = {
+                skipCollision = true,
+                type = 'lollo_internal_1_way_1_lane_street_no_sidewalk.lua',
+                tramTrackType = tramTrackType
+            },
+            edges = _makeEdges(_pitchAngle, params, {1.8, 10, 0}, {-1.8, 10, 0}, {-3.6, 0, 0}, {-3.6, 0, 0}),
+            edgeType = _getEdgeType(params),
+            edgeTypeName = _getEdgeTypeName(params, bridgeData),
+            freeNodes = {},
+            snapNodes = {}
+        },
+        {
+            type = 'STREET',
+            params = {
+                skipCollision = true,
+                type = tramTrackType == 'NO' and 'standard/country_x_large_new.lua' or 'lollo_x_large_6_tram_tracks_country_road.lua',
+                tramTrackType = tramTrackType
+            },
+            edges = _makeEdges(_pitchAngle, params, {2, 0, 0}, {10, 0, 0}),
+            edgeType = _getEdgeType(params),
+            edgeTypeName = _getEdgeTypeName(params, bridgeData),
+            freeNodes = params.direction == 0 and {1} or {0},
+            snapNodes = _getSnapNodes10(params, false)
+        }
+    }
+
+    _addDummyTerrainAlignmentLists(result)
+    return result
+end
+
+local function updateFn_Motorway_4_1_lane_one_way_to_4_lane_large(params, bridgeData)
+    params.direction = 0 -- 2-way streets cannot be reversed, the game is like that
+    local _pitchAngle = pitchHelper.getPitchAngle(params)
+
+    local result = { cost = 0, skipCollision = true, }
+
+    local connectorFace = {
+        {9.1, -8.0, 0.0, 1.0},
+        {9.1, 8.0, 0.0, 1.0},
+        {-2.1, 6.0, 0.0, 1.0},
+        {-2.1, -6.0, 0.0, 1.0}
+    }
+    result.groundFaces = _getGroundFaces(connectorFace)
+
+    result.colliders = {
+        {
+            type = 'BOX',
+            params = {
+                halfExtents = {2, 12.0, 0.15}
+            }
+        }
+    }
+
+    result.models = {
+        {
+            id = 'lollo_assets/lollo_street_confluence_4_lanes_large_country_road_narrow_sidewalk.mdl',
+            skipCollision = true,
+            transf = pitchHelper.getIdTransfPitched(_pitchAngle)
+        }
+    }
+
+    local tramTrackType = _getTramTrackType(params)
+    result.edgeLists = {
+        {
+            type = 'STREET',
+            params = {
+                skipCollision = true,
+                type = 'lollo_medium_1_way_1_lane_country_road_narrow_sidewalk.lua',
+                tramTrackType = tramTrackType
+            },
+            edges = _makeEdges(_pitchAngle, params, {-6, -6, 0}, {-2, -6, 0}, {4, 0, 0}, {4, 0, 0}),
+            edgeType = _getEdgeType(params),
+            edgeTypeName = _getEdgeTypeName(params, bridgeData),
+            freeNodes = params.direction == 0 and {0} or {1},
+            snapNodes = _getSnapNodes01(params, true)
+        },
+        {
+            type = 'STREET',
+            params = {
+                skipCollision = true,
+                type = 'lollo_medium_1_way_1_lane_country_road_narrow_sidewalk.lua',
+                tramTrackType = tramTrackType
+            },
+            edges = _makeEdges(_pitchAngle, params, {-6, -2, 0}, {-2, -2, 0}, {4, 0, 0}, {4, 0, 0}),
+            edgeType = _getEdgeType(params),
+            edgeTypeName = _getEdgeTypeName(params, bridgeData),
+            freeNodes = params.direction == 0 and {0} or {1},
+            snapNodes = _getSnapNodes01(params, true)
+        },
+        {
+            type = 'STREET',
+            params = {
+                skipCollision = true,
+                type = 'lollo_medium_1_way_1_lane_country_road_narrow_sidewalk.lua',
+                tramTrackType = tramTrackType
+            },
+            edges = _makeEdges(_pitchAngle, params, {-2, 2, 0}, {-6, 2, 0}, {-4, 0, 0}, {-4, 0, 0}),
+            edgeType = _getEdgeType(params),
+            edgeTypeName = _getEdgeTypeName(params, bridgeData),
+            freeNodes = params.direction == 0 and {1} or {0},
+            snapNodes = _getSnapNodes10(params, true)
+        },
+        {
+            type = 'STREET',
+            params = {
+                skipCollision = true,
+                type = 'lollo_medium_1_way_1_lane_country_road_narrow_sidewalk.lua',
+                tramTrackType = tramTrackType
+            },
+            edges = _makeEdges(_pitchAngle, params, {-2, 6, 0}, {-6, 6, 0}, {-4, 0, 0}, {-4, 0, 0}),
+            edgeType = _getEdgeType(params),
+            edgeTypeName = _getEdgeTypeName(params, bridgeData),
+            freeNodes = params.direction == 0 and {1} or {0},
+            snapNodes = _getSnapNodes10(params, true)
+        },
+        {
+            type = 'STREET',
+            params = {
+                skipCollision = true,
+                type = 'lollo_internal_1_way_1_lane_street_no_sidewalk.lua',
+                tramTrackType = tramTrackType
+            },
+            edges = _makeEdges(_pitchAngle, params, {-1.8, -6, 0}, {1.8, -6, 0}, {3.6, 0, 0}, {3.6, 0, 0}),
+            edgeType = _getEdgeType(params),
+            edgeTypeName = _getEdgeTypeName(params, bridgeData),
+            freeNodes = {},
+            snapNodes = {}
+        },
+        {
+            type = 'STREET',
+            params = {
+                skipCollision = true,
+                type = 'lollo_internal_1_way_1_lane_street_no_sidewalk.lua',
+                tramTrackType = tramTrackType
+            },
+            edges = _makeEdges(_pitchAngle, params, {-1.8, -2, 0}, {1.8, -2, 0}, {3.6, 0, 0}, {3.6, 0, 0}),
+            edgeType = _getEdgeType(params),
+            edgeTypeName = _getEdgeTypeName(params, bridgeData),
+            freeNodes = {},
+            snapNodes = {}
+        },
+        {
+            type = 'STREET',
+            params = {
+                skipCollision = true,
+                type = 'lollo_internal_1_way_1_lane_street_no_sidewalk.lua',
+                tramTrackType = tramTrackType
+            },
+            edges = _makeEdges(_pitchAngle, params, {1.8, 2, 0}, {-1.8, 2, 0}, {-3.6, 0, 0}, {-3.6, 0, 0}),
+            edgeType = _getEdgeType(params),
+            edgeTypeName = _getEdgeTypeName(params, bridgeData),
+            freeNodes = {},
+            snapNodes = {}
+        },
+        {
+            type = 'STREET',
+            params = {
+                skipCollision = true,
+                type = 'lollo_internal_1_way_1_lane_street_no_sidewalk.lua',
+                tramTrackType = tramTrackType
+            },
+            edges = _makeEdges(_pitchAngle, params, {1.8, 6, 0}, {-1.8, 6, 0}, {-3.6, 0, 0}, {-3.6, 0, 0}),
+            edgeType = _getEdgeType(params),
+            edgeTypeName = _getEdgeTypeName(params, bridgeData),
+            freeNodes = {},
+            snapNodes = {}
+        },
+        {
+            type = 'STREET',
+            params = {
+                skipCollision = true,
+                type = tramTrackType == 'NO' and 'standard/country_large_new.lua' or 'lollo_large_4_lane_4_tram_tracks_country_road.lua',
+                tramTrackType = tramTrackType
+            },
+            edges = _makeEdges(_pitchAngle, params, {2, 0, 0}, {10, 0, 0}),
+            edgeType = _getEdgeType(params),
+            edgeTypeName = _getEdgeTypeName(params, bridgeData),
+            freeNodes = params.direction == 0 and {1} or {0},
+            snapNodes = _getSnapNodes10(params, false)
+        }
+    }
+
+    _addDummyTerrainAlignmentLists(result)
+    return result
+end
+
+local function updateFn_Motorway_2_1_lane_narrow_sidewalk_to_2_lane(params, bridgeData)
+    params.direction = 0 -- 2-way streets cannot be reversed, the game is like that
+    local _pitchAngle = pitchHelper.getPitchAngle(params)
+
+    local result = { cost = 0, skipCollision = true, }
+
+    local connectorFace = {
+        {2, -4.0, 0.0, 1.0},
+        {2, 4.0, 0.0, 1.0},
+        {-2, 4.0, 0.0, 1.0},
+        {-2, -4.0, 0.0, 1.0}
+    }
+    result.groundFaces = _getGroundFaces(connectorFace)
+
+    result.colliders = {
+        {
+            type = 'BOX',
+            params = {
+                halfExtents = {2, 4.0, 0.15}
+            }
+        }
+    }
+
+    result.models = {
+        {
+            id = 'lollo_assets/lollo_street_confluence_2_lanes_country_road_narrow_sidewalk_allow_reversal.mdl',
+            skipCollision = true,
+            transf = pitchHelper.getIdTransfPitched(_pitchAngle)
+        }
+    }
+
+    local tramTrackType = _getTramTrackType(params)
+    result.edgeLists = {
+        {
+            type = 'STREET',
+            params = {
+                skipCollision = true,
+                type = 'lollo_medium_1_way_1_lane_country_road_narrow_sidewalk.lua',
+                tramTrackType = tramTrackType
+            },
+            edges = _makeEdges(_pitchAngle, params, {-4, -2, .0}, {-2, -2, .0}),
+            edgeType = _getEdgeType(params),
+            edgeTypeName = _getEdgeTypeName(params, bridgeData),
+            freeNodes = params.direction == 0 and {0} or {1},
+            snapNodes = _getSnapNodes01(params, true)
+        },
+        {
+            type = 'STREET',
+            params = {
+                skipCollision = true,
+                type = 'lollo_medium_1_way_1_lane_country_road_narrow_sidewalk.lua',
+                tramTrackType = tramTrackType
+            },
+            edges = _makeEdges(_pitchAngle, params, {-2, 2, 0}, {-4, 2, 0}, {-2, 0, 0}, {-2, 0, 0}),
+            edgeType = _getEdgeType(params),
+            edgeTypeName = _getEdgeTypeName(params, bridgeData),
+            freeNodes = params.direction == 0 and {1} or {0},
+            snapNodes = _getSnapNodes10(params, true)
+        },
+        {
+            type = 'STREET',
+            params = {
+                skipCollision = true,
+                type = 'lollo_internal_1_way_1_lane_street_no_sidewalk.lua',
+                tramTrackType = tramTrackType
+            },
+            edges = _makeEdges(_pitchAngle, params, {-1.8, -2, 0}, {1.8, -2, 0}),
+            edgeType = _getEdgeType(params),
+            edgeTypeName = _getEdgeTypeName(params, bridgeData),
+            freeNodes = {},
+            snapNodes = {}
+        },
+        {
+            type = 'STREET',
+            params = {
+                skipCollision = true,
+                type = 'lollo_internal_1_way_1_lane_street_no_sidewalk.lua',
+                tramTrackType = tramTrackType
+            },
+            edges = _makeEdges(_pitchAngle, params, {1.8, 2, 0}, {-1.8, 2, 0}, {-3.6, 0, 0}, {-3.6, 0, 0}),
+            edgeType = _getEdgeType(params),
+            edgeTypeName = _getEdgeTypeName(params, bridgeData),
+            freeNodes = {},
+            snapNodes = {}
+        },
+        -- the reversal edge is too tight for streets, so we make a reversal lane in the model instead
+        {
+            type = 'STREET',
+            params = {
+                skipCollision = true,
+                type = 'standard/country_medium_new.lua',
+                tramTrackType = tramTrackType
+            },
+            edges = _makeEdges(_pitchAngle, params, {2, 0, 0}, {6, 0, 0}),
+            edgeType = _getEdgeType(params),
+            edgeTypeName = _getEdgeTypeName(params, bridgeData),
+            freeNodes = params.direction == 0 and {1} or {0},
+            snapNodes = _getSnapNodes10(params, false)
+        }
+    }
+
+    _addDummyTerrainAlignmentLists(result)
+    return result
+end
+
+local function updateFn_Motorway_3_1_lane_narrow_sidewalk_to_3_lane_one_way(params, bridgeData)
+    local result = { cost = 0, skipCollision = true, }
+    local _pitchAngle = pitchHelper.getPitchAngle(params)
+
+    local connectorFace = {
+        {2, -6.0, 0.0, 1.0},
+        {2, 6.0, 0.0, 1.0},
+        {-2, 6.0, 0.0, 1.0},
+        {-2, -6.0, 0.0, 1.0}
+    }
+    result.groundFaces = _getGroundFaces(connectorFace)
+
+    result.colliders = {
+        {
+            type = 'BOX',
+            params = {
+                halfExtents = {2, 6.0, 0.15}
+            }
+        }
+    }
+
+    result.models = {
+        {
+            id = 'lollo_assets/lollo_street_confluence_3_lanes_country_road_narrow_sidewalk.mdl',
+            skipCollision = true,
+            transf = pitchHelper.getIdTransfPitched(_pitchAngle)
+        }
+    }
+
+    local tramTrackType = _getTramTrackType(params)
+    local hasBus = _getHasBus(params)
+    result.edgeLists = {
+        {
+            type = 'STREET',
+            params = {
+                hasBus = hasBus,
+                skipCollision = true,
+                type = 'lollo_medium_1_way_1_lane_country_road_narrow_sidewalk.lua',
+                tramTrackType = tramTrackType
+            },
+            edges = _makeEdges(_pitchAngle, params, {-4, -4, .0}, {-2, -4, .0}, {2, 0, 0}, {2, 0, 0}),
+            edgeType = _getEdgeType(params),
+            edgeTypeName = _getEdgeTypeName(params, bridgeData),
+            freeNodes = params.direction == 0 and {0} or {1},
+            snapNodes = _getSnapNodes01(params, true)
+        },
+        {
+            type = 'STREET',
+            params = {
+                hasBus = hasBus,
+                skipCollision = true,
+                type = 'lollo_medium_1_way_1_lane_country_road_narrow_sidewalk.lua',
+                tramTrackType = tramTrackType
+            },
+            edges = _makeEdges(_pitchAngle, params, {-4, 0, .0}, {-2, 0, .0}, {2, 0, 0}, {2, 0, 0}),
+            edgeType = _getEdgeType(params),
+            edgeTypeName = _getEdgeTypeName(params, bridgeData),
+            freeNodes = params.direction == 0 and {0} or {1},
+            snapNodes = _getSnapNodes01(params, true)
+        },
+        {
+            type = 'STREET',
+            params = {
+                hasBus = hasBus,
+                skipCollision = true,
+                type = 'lollo_medium_1_way_1_lane_country_road_narrow_sidewalk.lua',
+                tramTrackType = tramTrackType
+            },
+            edges = _makeEdges(_pitchAngle, params, {-4, 4, 0}, {-2, 4, 0}, {2, 0, 0}, {2, 0, 0}),
+            edgeType = _getEdgeType(params),
+            edgeTypeName = _getEdgeTypeName(params, bridgeData),
+            freeNodes = params.direction == 0 and {0} or {1},
+            snapNodes = _getSnapNodes01(params, true)
+        },
+        {
+            type = 'STREET',
+            params = {
+                hasBus = hasBus,
+                skipCollision = true,
+                type = 'lollo_internal_1_way_1_lane_street_no_sidewalk.lua',
+                tramTrackType = tramTrackType
+            },
+            edges = _makeEdges(_pitchAngle, params, {-1.8, 4, 0}, {1.8, 4, 0}),
+            edgeType = _getEdgeType(params),
+            edgeTypeName = _getEdgeTypeName(params, bridgeData),
+            freeNodes = {},
+            snapNodes = {}
+        },
+        {
+            type = 'STREET',
+            params = {
+                hasBus = hasBus,
+                skipCollision = true,
+                type = 'lollo_internal_1_way_1_lane_street_no_sidewalk.lua',
+                tramTrackType = tramTrackType
+            },
+            edges = _makeEdges(_pitchAngle, params, {-1.8, 0, 0}, {1.8, 0, 0}),
+            edgeType = _getEdgeType(params),
+            edgeTypeName = _getEdgeTypeName(params, bridgeData),
+            freeNodes = {},
+            snapNodes = {}
+        },
+        {
+            type = 'STREET',
+            params = {
+                hasBus = hasBus,
+                skipCollision = true,
+                type = 'lollo_internal_1_way_1_lane_street_no_sidewalk.lua',
+                tramTrackType = tramTrackType
+            },
+            edges = _makeEdges(_pitchAngle, params, {-1.8, -4, 0}, {1.8, -4, 0}),
+            edgeType = _getEdgeType(params),
+            edgeTypeName = _getEdgeTypeName(params, bridgeData),
+            freeNodes = {},
+            snapNodes = {}
+        },
+        {
+            type = 'STREET',
+            params = {
+                hasBus = hasBus,
+                skipCollision = true,
+                type = tramTrackType == 'NO' and 'lollo_medium_1_way_3_lane_country_road.lua' or 'lollo_medium_1_way_3_lane_3_tram_tracks_country_road.lua',
+                tramTrackType = tramTrackType
+            },
+            edges = _makeEdges(_pitchAngle, params, {2, 0, 0}, {6, 0, 0}),
+            edgeType = _getEdgeType(params),
+            edgeTypeName = _getEdgeTypeName(params, bridgeData),
+            freeNodes = params.direction == 0 and {1} or {0},
+            snapNodes = _getSnapNodes10(params, false)
+        }
+    }
+
+    _addDummyTerrainAlignmentLists(result)
+    return result
+end
+
+local function updateFn_Motorway_2_1_lane_narrow_sidewalk_to_2_lane_one_way(params, bridgeData)
+    local result = { cost = 0, skipCollision = true, }
+    local _pitchAngle = pitchHelper.getPitchAngle(params)
+
+    local connectorFace = {
+        {2, -4.0, 0.0, 1.0},
+        {2, 4.0, 0.0, 1.0},
+        {-2, 4.0, 0.0, 1.0},
+        {-2, -4.0, 0.0, 1.0}
+    }
+    result.groundFaces = _getGroundFaces(connectorFace)
+
+    result.colliders = {
+        {
+            type = 'BOX',
+            params = {
+                halfExtents = {2, 4.0, 0.15}
+            }
+        }
+    }
+
+    result.models = {
+        {
+            id = 'lollo_assets/lollo_street_confluence_2_lanes_country_road_narrow_sidewalk.mdl',
+            skipCollision = true,
+            transf = pitchHelper.getIdTransfPitched(_pitchAngle)
+        }
+    }
+
+    local tramTrackType = _getTramTrackType(params)
+    local hasBus = _getHasBus(params)
+    result.edgeLists = {
+        {
+            type = 'STREET',
+            params = {
+                hasBus = hasBus,
+                skipCollision = true,
+                type = 'lollo_medium_1_way_1_lane_country_road_narrow_sidewalk.lua',
+                tramTrackType = tramTrackType
+            },
+            edges = _makeEdges(_pitchAngle, params, {-4, -2, .0}, {-2, -2, .0}),
+            edgeType = _getEdgeType(params),
+            edgeTypeName = _getEdgeTypeName(params, bridgeData),
+            freeNodes = params.direction == 0 and {0} or {1},
+            snapNodes = _getSnapNodes01(params, true)
+        },
+        {
+            type = 'STREET',
+            params = {
+                hasBus = hasBus,
+                skipCollision = true,
+                type = 'lollo_medium_1_way_1_lane_country_road_narrow_sidewalk.lua',
+                tramTrackType = tramTrackType
+            },
+            edges = _makeEdges(_pitchAngle, params, {-4, 2, 0}, {-2, 2, 0}),
+            edgeType = _getEdgeType(params),
+            edgeTypeName = _getEdgeTypeName(params, bridgeData),
+            freeNodes = params.direction == 0 and {0} or {1},
+            snapNodes = _getSnapNodes01(params, true)
+        },
+        {
+            type = 'STREET',
+            params = {
+                hasBus = hasBus,
+                skipCollision = true,
+                type = 'lollo_internal_1_way_1_lane_street_no_sidewalk.lua',
+                tramTrackType = tramTrackType
+            },
+            edges = _makeEdges(_pitchAngle, params, {-1.8, 2, 0}, {1.8, 2, 0}),
+            edgeType = _getEdgeType(params),
+            edgeTypeName = _getEdgeTypeName(params, bridgeData),
+            freeNodes = {},
+            snapNodes = {}
+        },
+        {
+            type = 'STREET',
+            params = {
+                hasBus = hasBus,
+                skipCollision = true,
+                type = 'lollo_internal_1_way_1_lane_street_no_sidewalk.lua',
+                tramTrackType = tramTrackType
+            },
+            edges = _makeEdges(_pitchAngle, params, {-1.8, -2, 0}, {1.8, -2, 0}),
+            edgeType = _getEdgeType(params),
+            edgeTypeName = _getEdgeTypeName(params, bridgeData),
+            freeNodes = {},
+            snapNodes = {}
+        },
+        {
+            type = 'STREET',
+            params = {
+                hasBus = hasBus,
+                skipCollision = true,
+                type = tramTrackType == 'NO' and 'standard/country_medium_one_way_new.lua' or 'lollo_medium_1_way_2_lane_2_tram_tracks_country_road.lua',
+                tramTrackType = tramTrackType
+            },
+            edges = _makeEdges(_pitchAngle, params, {2, 0, 0}, {6, 0, 0}),
+            edgeType = _getEdgeType(params),
+            edgeTypeName = _getEdgeTypeName(params, bridgeData),
+            freeNodes = params.direction == 0 and {1} or {0},
+            snapNodes = _getSnapNodes10(params, false)
+        }
+    }
+
+    _addDummyTerrainAlignmentLists(result)
+    return result
+end
+
+
+function data()
+    return {
+        updateFn = function(params, two)
+            local _bridgeData = two.globalBridgeData[params.bridgeType_ + 1]
+            print('updateFn starting; two.globalBridgeData =') debugPrint(two.globalBridgeData)
+            print('updateFn starting; _bridgeData =') debugPrint(_bridgeData)
+            print('updateFn starting; params.bridgeType_ =', params.bridgeType_)
+            if params.mergingType == 0 then
+                return updateFn_2_1_lane_narrow_sidewalk_to_2_lane_one_way(params, _bridgeData)
+            elseif params.mergingType == 1 then
+                return updateFn_2_1_lane_medium_sidewalk_to_2_lane_one_way(params, _bridgeData)
+            elseif params.mergingType == 2 then
+                return updateFn_2_1_lane_narrow_sidewalk_to_2_lane(params, _bridgeData)
+            elseif params.mergingType == 3 then
+                return updateFn_2_1_lane_medium_sidewalk_to_2_lane(params, _bridgeData)
+            elseif params.mergingType == 4 then
+                return updateFn_3_1_lane_narrow_sidewalk_to_3_lane_one_way(params, _bridgeData)
+            -- elseif params.mergingType == 5 then
+            --     return updateFn_3_1_lane_medium_sidewalk_to_3_lane_one_way(params, _bridgeData)
+            elseif params.mergingType == 5 then
+                return updateFn_4_1_lane_narrow_sidewalk_to_4_lane_one_way(params, _bridgeData)
+            elseif params.mergingType == 6 then
+                return updateFn_4_1_lane_narrow_sidewalk_to_4_lane(params, _bridgeData)
+            elseif params.mergingType == 7 then
+                return updateFn_4_1_lane_narrow_sidewalk_to_4_lane_large(params, _bridgeData)
+            elseif params.mergingType == 8 then
+                return updateFn_2_2_lane_one_way_to_6_lane_x_large(params, _bridgeData)
+            elseif params.mergingType == 9 then
+                return updateFn_6_1_lane_one_way_to_6_lane_x_large(params, _bridgeData)
+            elseif params.mergingType == 10 then
+                return updateFn_Motorway_6_1_lane_one_way_to_6_lane_x_large(params, _bridgeData)
+            elseif params.mergingType == 11 then
+                return updateFn_Motorway_2_2_lane_one_way_to_6_lane_x_large(params, _bridgeData)
+            elseif params.mergingType == 12 then
+                return updateFn_Motorway_4_1_lane_one_way_to_4_lane_large(params, _bridgeData)
+            elseif params.mergingType == 13 then
+                return updateFn_Motorway_3_1_lane_narrow_sidewalk_to_3_lane_one_way(params, _bridgeData)
+            elseif params.mergingType == 14 then
+                return updateFn_Motorway_2_1_lane_narrow_sidewalk_to_2_lane_one_way(params, _bridgeData)
+            else
+                return updateFn_Motorway_2_1_lane_narrow_sidewalk_to_2_lane(params, _bridgeData)
+            end
+        end,
+        upgradeFn = function(_)
+            -- LOLLO NOTE the game wants this function to be defined, even if it returns an empty table.
+            -- If you leave it out, adding and removing tram tracks won't work.
+            -- (Bus lanes don't work anyway.)
+            return {}
+        end
+    }
+end
+
+-- LOLLO TODO use a neutral bridge with internal atreet types
+-- LOLLO TODO get rid of ground textures if on a bridge

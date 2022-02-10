@@ -1,19 +1,18 @@
+local arrayUtils = require('lollo_street_tuning/arrayUtils')
 local pitchHelper = require('lollo_street_tuning/pitchHelper')
--- LOLLO TODO see if you can ease the pain when reconfiguring an existing merger. maybe skip collisions? It is not enough.
+local streetUtils = require('lollo_street_tuning/streetUtils')
 
-function data()
-    return {
-        type = 'STREET_CONSTRUCTION',
-        description = {
-            name = _('Street merging'),
-            description = _('Merges multiple streets and a single broader street. Use O and P to adjust the pitch while building and the slider when upgrading.')
-        },
-        availability = {
-            yearFrom = -1, --1925,
-            yearTo = -1 --0
-        },
-        order = 1241,
-        params = {
+local helper = {
+    getParams = function()
+        print('globalBridgeData at getParams =') debugPrint(
+            arrayUtils.map(
+                    streetUtils.getGlobalBridgeDataPlusNoBridge(),
+                    function(str)
+                        return str
+                    end
+            )
+        )
+        return {
             {
                 key = 'mergingType',
                 name = _('Street merging type'),
@@ -46,6 +45,19 @@ function data()
                     _('↓')
                 },
                 defaultIndex = 0
+            },
+            {
+                key = 'bridgeType_',
+                name = _('BridgeType'),
+                values = arrayUtils.map(
+                    streetUtils.getGlobalBridgeDataPlusNoBridge(),
+                    function(str)
+                        return str.name
+                        -- return str.icon
+                    end
+                ),
+                uiType = 'COMBOBOX',
+                -- uiType = 'ICON_BUTTON',
             },
             -- {
             --     key = 'snapNodes_',
@@ -95,8 +107,8 @@ function data()
                 defaultIndex = pitchHelper.getDefaultPitchParamValue(),
                 uiType = 'SLIDER'
             }
-        },
-        autoRemovable = false, -- Used to allow the construction to be removed, if it collides with something else.
-        skipCollision = true,
-    }
-end
+        }
+    end,
+}
+
+return helper

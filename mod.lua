@@ -1,6 +1,7 @@
 local arrayUtils = require('lollo_street_tuning.arrayUtils')
 local modSettings = require('lollo_street_tuning.settings')
 local streetChunksHelper = require('lollo_street_tuning/lolloStreetChunksHelper')
+local streetMergeHelper = require('lollo_street_tuning/lolloStreetMergeHelper')
 local streetUtils = require('lollo_street_tuning/streetUtils')
 local stringUtils = require('lollo_street_tuning/stringUtils')
 -- local debugger = require('debugger')
@@ -104,7 +105,7 @@ function data()
 
         newCon.updateScript.fileName = scriptFileName .. '.updateFn'
         newCon.updateScript.params = {
-            globalBridgeData = streetUtils.getGlobalBridgeData(),
+            globalBridgeData = streetUtils.getGlobalBridgeDataPlusNoBridge(),
             globalStreetData = streetUtils.getGlobalStreetData(),
         }
         newCon.preProcessScript.fileName = scriptFileName .. '.preProcessFn'
@@ -413,6 +414,13 @@ function data()
                 'construction/lollo_street_hairpin',
                 {yearFrom = 1925, yearTo = 0},
                 streetChunksHelper.getStreetHairpinParams()
+            )
+            _addAvailableConstruction(
+                'lollo_street_merge.con',
+                'lollo_street_merge_2.con',
+                'construction/lollo_street_merge',
+                {yearFrom = 1925, yearTo = 0},
+                streetMergeHelper.getParams()
             )
             _addStreetsWithReservedLanes()
             _hideAllTramTracksStreets()

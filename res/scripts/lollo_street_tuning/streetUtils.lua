@@ -264,7 +264,8 @@ local function _getBridgeTypes(carrierId)
             if bridgeType
             and bridgeType.carriers
             -- this is simpler than the streets: we only want a list of visible bridges, that's all
-            and bridgeType.yearTo < 65535
+            and bridgeType.yearFrom < 65535
+            and bridgeType.yearTo == 0
             and api.res.bridgeTypeRep.isVisible(bridgeTypeId)
             then
                 local isRightCarrier = false
