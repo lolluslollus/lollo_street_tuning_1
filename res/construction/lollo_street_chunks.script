@@ -9,6 +9,9 @@ function data()
 				if not(params.streetType_) or not(two.globalStreetData[params.streetType_ + 1]) then
 					params.streetType_ = 0
 				end
+                if not(params.bridgeType_) or not(two.globalBridgeData[params.bridgeType_ + 1]) then
+					params.bridgeType_ = 0
+				end
 			end
 			_initParams()
 
