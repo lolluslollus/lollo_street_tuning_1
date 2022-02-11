@@ -1,6 +1,6 @@
-local arrayUtils = require('lollo_street_tuning/arrayUtils')
-local fileUtils = require('lollo_street_tuning/fileUtils')
-local stringUtils = require('lollo_street_tuning/stringUtils')
+local arrayUtils = require('lollo_street_tuning.arrayUtils')
+local fileUtils = require('lollo_street_tuning.fileUtils')
+local stringUtils = require('lollo_street_tuning.stringUtils')
 
 local _streetDataBuffer = {
     data = {},
