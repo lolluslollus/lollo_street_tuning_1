@@ -33,6 +33,9 @@ function data()
 				[h1]Problem H: no footpaths[/h1]
 				This mod adds some thin footpaths, nearly invisible. You can use them to perform various tricks, eg connecting stations to roads or having people walk across a park. Give them a bus lane to pedestrianise them.
 				There is also a 1 metre footpath if you want something that looks the part.
+				[h1]Problem I: vehicles make funny turns[/h1]
+				Sometimes, vehicles overshoot a crossing, then reverse, then turn where they are meant to.
+				Use the splitter to make them change lanes where you want.
 				[h1]Tips:[/h1]
 				- To better visualise the lanes, start the game in debug mode and press <AltGr> + <L>.
 				- Press and hold <shift> to replace a short road segment between two joints.
@@ -43,7 +46,7 @@ function data()
 				[b]This mod may break your game if you use it and then remove it.[/b]
 				[b]Thanks to Enzojz for luadump![/b]
 				[b]I would love lorry-only or tram-only lanes, but the game does not allow this for now.[/b]
-				[h2]Word of warning[/h2]
+				[h2]Breaking Change A[/h2]
 				The game won't allow changing or removing a piece of road, whose sizes have changed in a mod update.
 				This affects the "Medium 1-way street with 1 lane and extra narrow pavement" and the "Medium 1-way street with 1 lane", which I shipped before Summer 2020.
 				To fix this:
@@ -60,6 +63,8 @@ function data()
 				- restore the files to their previous state (ie from the latest update)
 				- reload the game and rebuild the roads you destroyed
 				Chances are, the new street merger will help you make them nicer anyway.
+				[h2]Breaking Change B[/h2]
+				The street merges can be on bridges as of February 2022. This involved an incompatible change. If you want to update an older one, bulldoze it and rebuild it.
 				[h2]Known problems[/h2]
 				A) When you split a road near a modded street station, whose mod was removed, and then apply a modifier, such as add / remove bus lane or change the street type, the game crashes.
 				This happens with single as well as double-sided stations. You can tell those stations because the game shows a placeholder at their location.
