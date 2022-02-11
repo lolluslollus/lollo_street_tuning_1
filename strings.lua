@@ -64,7 +64,7 @@ function data()
 				- reload the game and rebuild the roads you destroyed
 				Chances are, the new street merger will help you make them nicer anyway.
 				[h2]Breaking Change B[/h2]
-				The street merges can be on bridges as of February 2022. This involved an incompatible change. If you want to update an older one, bulldoze it and rebuild it.
+				The street merges can be on bridges as of February 2022. This involved an incompatible change. If you want to update an older merge, bulldoze it and rebuild it.
 				[h2]Known problems[/h2]
 				A) When you split a road near a modded street station, whose mod was removed, and then apply a modifier, such as add / remove bus lane or change the street type, the game crashes.
 				This happens with single as well as double-sided stations. You can tell those stations because the game shows a placeholder at their location.
