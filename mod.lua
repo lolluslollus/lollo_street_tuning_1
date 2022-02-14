@@ -76,8 +76,8 @@ function data()
     end
 
     local function _addAvailableConstruction(oldFileName, newFileName, scriptFileName, availability, params)
-        local staticConIdId = api.res.constructionRep.find(oldFileName)
-        local staticCon = api.res.constructionRep.get(staticConIdId)
+        local staticConId = api.res.constructionRep.find(oldFileName)
+        local staticCon = api.res.constructionRep.get(staticConId)
         local newCon = api.type.ConstructionDesc.new()
         newCon.fileName = newFileName
         newCon.type = staticCon.type
