@@ -330,9 +330,10 @@ local _actions = {
             newEdge.streetEdge.tramTrackType = 2
         end
 
-        -- add bus lane if the new street type wants so
+        -- add bus lane and bar tram if the new street type wants so (paths)
         if streetUtils.isPath(newStreetTypeId) then
             newEdge.streetEdge.hasBus = true
+            newEdge.streetEdge.tramTrackType = 0
         end
 
         -- leave if nothing changed
@@ -746,20 +747,20 @@ function data()
                         end
 
                         -- add bus lane right if required for current road
-                        local addBusLaneEventParams = {}
+                        local pathBuiltEventParams = {}
                         for _, addedSegment in pairs(addedSegments) do
                             if addedSegment and addedSegment.streetEdge
                             and not(addedSegment.streetEdge.hasBus)
                             and addedSegment.streetEdge.streetType ~= nil then
                                 if streetUtils.isPath(addedSegment.streetEdge.streetType) then
-                                    addBusLaneEventParams[#addBusLaneEventParams+1] = {
+                                    pathBuiltEventParams[#pathBuiltEventParams+1] = {
                                         edgeId = addedSegment.entity,
                                         streetTypeId = addedSegment.streetEdge.streetType
                                     }
                                 end
                             end
                         end
-                        for i = 1, #addBusLaneEventParams do
+                        for i = 1, #pathBuiltEventParams do
                             -- game.interface.sendScriptEvent(
                             --     _eventId,
                             --     _eventProperties.pathBuilt.eventName,
@@ -769,7 +770,7 @@ function data()
                                 string.sub(debug.getinfo(1, 'S').source, 1),
                                 _eventId,
                                 _eventProperties.pathBuilt.eventName,
-                                addBusLaneEventParams[i]
+                                pathBuiltEventParams[i]
                             ))
                         end
 
@@ -779,9 +780,9 @@ function data()
                 )
             end
         end,
-        update = function()
-        end,
-        guiUpdate = function()
-        end,
+        -- update = function()
+        -- end,
+        -- guiUpdate = function()
+        -- end,
     }
 end
