@@ -1,0 +1,59 @@
+function data()
+    return {
+        type = 'STREET_CONSTRUCTION',
+        description = {
+            name = _('Smart street cleaver'),
+            description = _(
+                'Automatically splits a street in many separate streets, one each lane. YOu can then use them to route your behicles or build many parallel stops.'
+            )
+        },
+        availability = {
+            yearFrom = 0,
+            yearTo = 0
+        },
+        order = 1102,
+        -- collider = {
+        --     type = 'NONE'
+        -- },
+        autoRemovable = true,
+        skipCollision = true,
+        skipCollisionCheck = true,
+        updateFn = function(params)
+            -- print('lollo street cleaver updateFn')
+            -- debugPrint(params)
+
+            local result = {
+            -- colliders = {},
+                cost = 0,
+                edgeLists = {},
+                models = {
+                    {
+                        id = 'lollo_assets/icon/pointer.mdl',
+                        collider = {
+                            type = 'NONE'
+                        },
+                        autoRemovable = true,
+                        skipCollision = true,
+                        skipCollisionCheck = true,
+                        transf = { 1, 0, 0, 0,  0, 1, 0, 0,  0, 0, 1, 0,  0, 0, 0, 1 }
+                    }
+                },
+                --		result.groundFaces = {}
+                --		result.h0 = {}
+                --		result.h1 = {}
+                -- collider = {
+                --     type = 'NONE'
+                -- },
+                -- autoRemovable = true
+                -- skipCollision = true
+                -- skipCollisionCheck = true
+                -- LOLLO NOTE this thing with the empty faces is required , otherwise the game will make its own alignments, with spikes and all on bridges or tunnels.
+                terrainAlignmentLists = { { type = "EQUAL", optional = true, faces =  { } } },
+            }
+
+            return result
+        end,
+        upgradeFn = function(_)
+        end
+    }
+end

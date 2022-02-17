@@ -534,6 +534,7 @@ utils.getExtrapolatedPosTanX2Continuation = function(posTanX2, length)
 end
 
 utils.getExtrapolatedPosX2Continuation = function(pos1, pos2, length)
+    -- the parallel will be exactly like the original, but that will entail some shifting
     if length == 0 then
         return pos2
     -- elseif length > 0 then
@@ -555,6 +556,7 @@ utils.getExtrapolatedPosX2Continuation = function(pos1, pos2, length)
 end
 
 utils.getPosTanX2Reversed = function(posTanX2)
+    -- this will stretch or compress the parallel
     if type(posTanX2) ~= 'table' then return posTanX2 end
 
     return {

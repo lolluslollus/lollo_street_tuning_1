@@ -2,6 +2,7 @@ local arrayUtils = require('lollo_street_tuning.arrayUtils')
 local edgeUtils = require('lollo_street_tuning.edgeUtils')
 local streetUtils = require('lollo_street_tuning.streetUtils')
 local stringUtils = require('lollo_street_tuning/stringUtils')
+local transfUtils = require('lollo_street_tuning.transfUtils')
 local transfUtilUG = require('transf')
 
 -- LOLLO BUG when you split a road near a modded street station, whose mod was removed,
@@ -19,6 +20,7 @@ end
 local _eventId = '__lolloStreetTuningEvent__'
 local _eventProperties = {
     lollo_street_changer = { conName = 'lollo_street_changer.con', eventName = 'streetChangerBuilt' },
+    lollo_street_cleaver = { conName = 'lollo_street_cleaver.con', eventName = 'streetCleaverBuilt' },
     lollo_street_get_info = { conName = 'lollo_street_get_info.con', eventName = 'streetGetInfoBuilt' },
     lollo_street_splitter = { conName = 'lollo_street_splitter.con', eventName = 'streetSplitterBuilt' },
     lollo_street_splitter_w_api = { conName = 'lollo_street_splitter_w_api.con', eventName = 'streetSplitterWithApiBuilt' },
@@ -45,6 +47,10 @@ end
 
 local function _isBuildingStreetChanger(args)
     return _isBuildingConstructionWithFileName(args, _eventProperties.lollo_street_changer.conName)
+end
+
+local function _isBuildingStreetCleaver(args)
+    return _isBuildingConstructionWithFileName(args, _eventProperties.lollo_street_cleaver.conName)
 end
 
 local function _isBuildingStreetGetInfo(args)
@@ -223,6 +229,206 @@ local _actions = {
         )
     end,
 
+    cleaveEdge = function(oldEdgeId)
+        -- replaces an edge with many edges, one each lane
+        if not(edgeUtils.isValidAndExistingId(oldEdgeId))
+        or not(edgeUtils.isValidId(oldEdgeId)) then return end
+
+        local oldBaseEdge = api.engine.getComponent(oldEdgeId, api.type.ComponentType.BASE_EDGE)
+        local oldBaseEdgeStreet = api.engine.getComponent(oldEdgeId, api.type.ComponentType.BASE_EDGE_STREET)
+        -- save a crash when a modded road underwent a breaking change, so it has no oldEdgeStreet
+        if oldBaseEdge == nil or oldBaseEdgeStreet == nil or type(oldBaseEdgeStreet.streetType) ~= 'number' or oldBaseEdgeStreet.streetType < 0 then return end
+        -- print('oldBaseEdge =') debugPrint(oldBaseEdge)
+
+        -- local oldEdgeStreetType = api.res.streetTypeRep.get(oldBaseEdgeStreet.streetType)
+        -- if not(oldEdgeStreetType) or not(oldEdgeStreetType.laneConfigs) then return end
+        -- local isOneWay = streetUtils.isStreetOneWay(oldEdgeStreetType.laneConfigs)
+        -- print('isOneWay =', isOneWay or 'false')
+
+        local tn = api.engine.getComponent(oldEdgeId, api.type.ComponentType.TRANSPORT_NETWORK)
+        if not(tn) or not(tn.edges) then return end
+
+        local _map = api.engine.system.streetSystem.getNode2SegmentMap()
+        local oldNode0 = api.engine.getComponent(oldBaseEdge.node0, api.type.ComponentType.BASE_NODE)
+        local oldNode1 = api.engine.getComponent(oldBaseEdge.node1, api.type.ComponentType.BASE_NODE)
+        -- these are to double-check, they work
+        -- local nodeIdsIn0 = edgeUtils.getNearbyObjectIds(transfUtils.position2Transf(oldNode0.position), 0.05, api.type.ComponentType.BASE_NODE)
+        -- print('nodeIdsIn0 =') debugPrint(nodeIdsIn0)
+        -- local nodeIdsIn1 = edgeUtils.getNearbyObjectIds(transfUtils.position2Transf(oldNode1.position), 0.05, api.type.ComponentType.BASE_NODE)
+        -- print('nodeIdsIn1 =') debugPrint(nodeIdsIn1)
+
+        local playerOwned = api.engine.getComponent(oldEdgeId, api.type.ComponentType.PLAYER_OWNED)
+        local newStreetTypeId = api.res.streetTypeRep.find('lollo_internal_1_way_1_lane_street_no_sidewalk.lua')
+        -- local newStreetTypeId = api.res.streetTypeRep.find('lollo_medium_1_way_1_lane_street_narrow_sidewalk.lua')
+
+        print('#tn.edges =', #tn.edges or 'NIL')
+        -- print('tn.edges =') debugPrint(tn.edges) -- they always have the same structure, even when they look like arcs
+        local newEdges = {}
+        local newNodes = {}
+        -- LOLLO NOTE in any case, this looks so ugly that we want nothing to do with it.
+        -- The road ends do not match optically, it looks like a mess.
+        -- We must only cleave roads without pavement and maybe materials low z priority for half-decent looks.
+        -- I could leave the old edge in place and add something invisible: that would look OK
+        -- However, the bigger problem is: even tho I calculated the nodes well,
+        -- they never connect up with the neighbouring streets.
+        -- Two-way roads look good coz they show green dots overlaying my red dots, but it's an illusion.
+        -- One-way show the problem at once.
+        -- The red dots are where they should be, but they just won't connect to their neighbours.
+        -- One way out would be: freeze the old chunk left and the old chunk right in a construction.
+        -- That means, destroy some of the buildings around. So, no.
+
+        local posTanX2 = {
+            {
+                {oldNode0.position.x, oldNode0.position.y, oldNode0.position.z},
+                {oldBaseEdge.tangent0.x, oldBaseEdge.tangent0.y, oldBaseEdge.tangent0.z}
+            },
+            {
+                {oldNode1.position.x, oldNode1.position.y, oldNode1.position.z},
+                {oldBaseEdge.tangent1.x, oldBaseEdge.tangent1.y, oldBaseEdge.tangent1.z}
+            }
+        }
+
+        for i = 2, (#tn.edges - 1), 1 do -- loop over the lanes neglecting the outer lanes, which are always pavements
+            local edge = tn.edges[i]
+            print('edge.geometry =') debugPrint(edge.geometry)
+            if edge and edge.geometry and edge.geometry.params then
+                -- take the direction into account
+                local isSwap = edge.conns[1].entity == oldBaseEdge.node1
+                print('isSwap =', isSwap or 'false')
+                local offset = edge.geometry.params.offset or 0
+                print('offset = ', offset)
+
+                local newPosTanX2 = isSwap
+                    and transfUtils.getParallelSidewaysWithRotZ(transfUtils.getPosTanX2Reversed(posTanX2), offset)
+                    or transfUtils.getParallelSidewaysWithRotZ(posTanX2, offset)
+                print('newPosTanX2 =') debugPrint(newPosTanX2)
+                if isSwap then
+                    print('distance = ') debugPrint(edgeUtils.getPositionsDistance(newPosTanX2[1][1], posTanX2[2][1]))
+                else
+                    print('distance = ') debugPrint(edgeUtils.getPositionsDistance(newPosTanX2[1][1], posTanX2[1][1]))
+                end
+
+                local getNode0Entity = function()
+                    local node0Entity
+                    -- this finds nothing with the old edge. It is useful to join sliced bits together tho.
+                    local nodeIdsAlreadyIn0 = edgeUtils.getNearbyObjectIds(transfUtils.position2Transf(newPosTanX2[1][1]), 0.1, api.type.ComponentType.BASE_NODE)
+                    print('nodeIdsAlreadyIn0 =') debugPrint(nodeIdsAlreadyIn0)
+                    if #nodeIdsAlreadyIn0 == 0 then
+                        local newNode0 = api.type.NodeAndEntity.new()
+                        newNode0.entity = -(#newNodes + 1 + #newEdges)
+                        newNode0.comp.position = api.type.Vec3f.new(newPosTanX2[1][1][1], newPosTanX2[1][1][2], newPosTanX2[1][1][3])
+                        newNodes[#newNodes+1] = newNode0
+                        node0Entity = newNode0.entity
+                    else
+                        node0Entity = nodeIdsAlreadyIn0[1]
+                    end
+
+                    return node0Entity
+                end
+                local node0Entity = getNode0Entity()
+
+                local getNode1Entity = function()
+                    local node1Entity
+                    -- this finds nothing with the old edge. It is useful to join sliced bits together tho.
+                    local nodeIdsAlreadyIn1 = edgeUtils.getNearbyObjectIds(transfUtils.position2Transf(newPosTanX2[2][1]), 0.1, api.type.ComponentType.BASE_NODE)
+                    print('nodeIdsAlreadyIn1 =') debugPrint(nodeIdsAlreadyIn1)
+                    if #nodeIdsAlreadyIn1 == 0 then
+                        local newNode1 = api.type.NodeAndEntity.new()
+                        newNode1.entity = -(#newNodes + 1 + #newEdges)
+                        newNode1.comp.position = api.type.Vec3f.new(newPosTanX2[2][1][1], newPosTanX2[2][1][2], newPosTanX2[2][1][3])
+                        newNodes[#newNodes+1] = newNode1
+                        node1Entity = newNode1.entity
+                    else
+                        node1Entity = nodeIdsAlreadyIn1[1]
+                    end
+
+                    return node1Entity
+                end
+                local node1Entity = getNode1Entity()
+
+                local newEdge = api.type.SegmentAndEntity.new()
+                newEdge.comp.node0 = node0Entity
+                newEdge.comp.tangent0 = api.type.Vec3f.new(
+                    newPosTanX2[1][2][1],
+                    newPosTanX2[1][2][2],
+                    newPosTanX2[1][2][3]
+                )
+
+                newEdge.comp.node1 = node1Entity
+                newEdge.comp.tangent1 = api.type.Vec3f.new(
+                    newPosTanX2[2][2][1],
+                    newPosTanX2[2][2][2],
+                    newPosTanX2[2][2][3]
+                )
+
+                newEdge.entity = -(#newNodes + 1 + #newEdges)
+                newEdge.type = 0 -- ROAD
+                newEdge.comp.type = oldBaseEdge.type -- bridge, tunnel or none
+                newEdge.comp.typeIndex = oldBaseEdge.typeIndex -- bridge or tunnel file or none
+                -- newEdge.comp.objects = 
+                newEdge.playerOwned = playerOwned
+                newEdge.streetEdge = oldBaseEdgeStreet
+                newEdge.streetEdge.streetType = newStreetTypeId
+                -- useless
+                -- newEdge.streetEdge.precedenceNode0 = 5 -- -5 -- 4 -- 3 -- -1 -- 0 --1 --2
+                -- newEdge.streetEdge.precedenceNode1 = 6 -- -6 -- 4 -- 3 -- -1 -- 0 -- 1 --2
+
+                newEdges[#newEdges+1] = newEdge
+            end
+        end
+
+        print('newEdges =') debugPrint(newEdges)
+        print('newNodes =') debugPrint(newNodes)
+        local proposal = api.type.SimpleProposal.new()
+        for index, newEdge in ipairs(newEdges) do
+            proposal.streetProposal.edgesToAdd[index] = newEdge
+        end
+
+        for index, newNode in ipairs(newNodes) do
+            proposal.streetProposal.nodesToAdd[index] = newNode
+        end
+
+        local function removeOld()
+            -- remove the old edge
+            proposal.streetProposal.edgesToRemove[1] = oldEdgeId
+            -- remove the old nodes if orphan
+            local nNodesToRemove = 0
+            if #_map[oldBaseEdge.node0] == 1 then
+                proposal.streetProposal.nodesToRemove[nNodesToRemove + 1] = oldBaseEdge.node0
+                nNodesToRemove = nNodesToRemove + 1
+            end
+            if #_map[oldBaseEdge.node1] == 1 then
+                proposal.streetProposal.nodesToRemove[nNodesToRemove + 1] = oldBaseEdge.node1
+                nNodesToRemove = nNodesToRemove + 1
+            end
+        end
+        removeOld()
+
+        print('streetTuning.cleaveEdge is about to make the proposal = ') debugPrint(proposal)
+
+        -- add and remove edge objects
+        -- preserve buildings
+
+        local context = api.type.Context:new()
+        -- context.checkTerrainAlignment = true -- default is false, true gives smoother Z
+        context.cleanupStreetGraph = true -- default is false, seems useless
+        -- context.gatherBuildings = true  -- default is false
+        -- context.gatherFields = true -- default is true
+        -- context.player = api.engine.util.getPlayer() -- default is -1
+
+        api.cmd.sendCommand(
+            api.cmd.make.buildProposal(proposal, context, true), -- the 3rd param is "ignore errors"; wrong proposals will be discarded anyway
+            function(result, success)
+                if not(success) then
+                    print('Warning: streetTuning.cleaveEdge failed')
+                    print('result =') debugPrint(result)
+                else
+                    print('streetTuning.cleaveEdge succeeded')
+                end
+            end
+        )
+    end,
+
     replaceEdgeWithSame = function(oldEdgeId)
         -- only for testing
         -- replaces a street segment with an identical one, without destroying the buildings
@@ -291,7 +497,7 @@ local _actions = {
 
         api.cmd.sendCommand(
             api.cmd.make.buildProposal(proposal, nil, true),
-            function(res, success)
+            function(result, success)
                 -- print('LOLLO res = ')
                 -- debugPrint(res)
                 --for _, v in pairs(res.entities) do print(v) end
@@ -299,6 +505,8 @@ local _actions = {
                 -- debugPrint(success)
                 if not(success) then
                     print('Warning: streetTuning.replaceEdgeWithSame failed, proposal = ') debugPrint(proposal)
+                else
+                    print('LOLLO street changer succeeded, result =') debugPrint(result)
                 end
             end
         )
@@ -525,6 +733,12 @@ function data()
                 -- debugPrint(constructionTransf)
                 if name == _eventProperties.lollo_street_splitter.eventName then
                 -- do nothing
+                elseif name == _eventProperties.lollo_street_cleaver.eventName then
+                    local nearestEdgeId = edgeUtils.street.getNearestEdgeId(constructionTransf)
+                    -- print('street cleaver got nearestEdge =', nearestEdgeId or 'NIL')
+                    if edgeUtils.isValidAndExistingId(nearestEdgeId) and not(edgeUtils.isEdgeFrozen(nearestEdgeId)) then
+                        _actions.cleaveEdge(nearestEdgeId)
+                    end
                 elseif name == _eventProperties.lollo_street_splitter_w_api.eventName then
                     local nearestEdgeId = edgeUtils.street.getNearestEdgeId(constructionTransf)
                     -- print('street splitter got nearestEdge =', nearestEdgeId or 'NIL')
@@ -629,7 +843,16 @@ function data()
                     function()
                         if not args.result or not args.result[1] then return end
 
-                        if _isBuildingStreetSplitter(args) then
+                        if _isBuildingStreetCleaver(args) then
+                            api.cmd.sendCommand(api.cmd.make.sendScriptEvent(
+                                string.sub(debug.getinfo(1, 'S').source, 1),
+                                _eventId,
+                                _eventProperties.lollo_street_cleaver.eventName,
+                                {
+                                    constructionEntityId = args.result[1]
+                                }
+                            ))
+                        elseif _isBuildingStreetSplitter(args) then
                             api.cmd.sendCommand(api.cmd.make.sendScriptEvent(
                                 string.sub(debug.getinfo(1, 'S').source, 1),
                                 _eventId,
