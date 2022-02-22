@@ -57,7 +57,7 @@ function data()
             --     defaultIndex = 0
             -- },
             {
-                key = 'snapNodes_',
+                key = 'snapNodes_', -- do not rename this param or chenga its values
                 name = _('snapNodesName'),
                 tooltip = _('snapNodesDesc'),
                 values = {

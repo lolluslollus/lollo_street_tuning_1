@@ -174,17 +174,8 @@ return {
                 },
                 defaultIndex = 0
             },
-            -- {
-            --     key = 'snapNodes_',
-            --     name = _('Snap to neighbours'),
-            --     values = {
-            --         _('No'),
-            --         _('Yes')
-            --     },
-            --     defaultIndex = 0
-            -- },
             {
-                key = 'snapNodes_',
+                key = 'snapNodes_', -- do not rename this param or chenga its values
                 name = _('snapNodesName'),
                 tooltip = _('snapNodesDesc'),
                 values = {
