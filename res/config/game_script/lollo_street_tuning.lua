@@ -440,7 +440,7 @@ local _actions = {
 
     replaceConWithSnappyCopy = function(oldConstructionId)
         -- rebuild the station with the same but snappy, to prevent pointless internal conflicts
-        -- that will prevent changing properties
+        -- that will prevent using the construction mover
         logger.print('replaceConWithSnappyCopy starting, oldConstructionId =', oldConstructionId)
         if not(edgeUtils.isValidAndExistingId(oldConstructionId)) then return end
 
@@ -461,8 +461,6 @@ local _actions = {
         newConstruction.params = newParams
 
         newConstruction.transf = oldConstruction.transf
-        -- some dummy name, it will be overwritten if I bulldoze before building anew
-        -- newConstruction.name = 'LOLLO snapping lorry bay'
         newConstruction.playerEntity = api.engine.util.getPlayer()
 
         local proposal = api.type.SimpleProposal.new()
