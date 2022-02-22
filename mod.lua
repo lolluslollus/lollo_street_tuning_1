@@ -75,7 +75,7 @@ function data()
         end
     end
 
-    local function _addAvailableConstruction(oldFileName, newFileName, scriptFileName, availability, params)
+    local function _addAvailableConstruction(oldFileName, newFileName, scriptFileName, availability, params, bridgeData, streetData)
         local staticConId = api.res.constructionRep.find(oldFileName)
         local staticCon = api.res.constructionRep.get(staticConId)
         local newCon = api.type.ConstructionDesc.new()
@@ -105,8 +105,8 @@ function data()
 
         newCon.updateScript.fileName = scriptFileName .. '.updateFn'
         newCon.updateScript.params = {
-            globalBridgeData = streetUtils.getGlobalBridgeDataPlusNoBridge(),
-            globalStreetData = streetUtils.getGlobalStreetData(),
+            globalBridgeData = bridgeData,
+            globalStreetData = streetData,
         }
         newCon.preProcessScript.fileName = scriptFileName .. '.preProcessFn'
         newCon.upgradeScript.fileName = scriptFileName .. '.upgradeFn'
@@ -406,21 +406,33 @@ function data()
                 'lollo_street_chunks_2.con',
                 'construction/lollo_street_chunks',
                 {yearFrom = 1925, yearTo = 0},
-                streetChunksHelper.getStreetChunksParams()
+                streetChunksHelper.getStreetChunksParams(),
+                streetUtils.getGlobalBridgeDataPlusNoBridge(),
+                streetUtils.getGlobalStreetData({
+                    streetUtils.getStreetDataFilters().PATHS,
+                    streetUtils.getStreetDataFilters().STOCK,
+                })
             )
             _addAvailableConstruction(
                 'lollo_street_hairpin.con',
                 'lollo_street_hairpin_2.con',
                 'construction/lollo_street_hairpin',
                 {yearFrom = 1925, yearTo = 0},
-                streetChunksHelper.getStreetHairpinParams()
+                streetChunksHelper.getStreetHairpinParams(),
+                streetUtils.getGlobalBridgeDataPlusNoBridge(),
+                streetUtils.getGlobalStreetData({
+                    streetUtils.getStreetDataFilters().PATHS,
+                    streetUtils.getStreetDataFilters().STOCK,
+                })
             )
             _addAvailableConstruction(
                 'lollo_street_merge.con',
                 'lollo_street_merge_2.con',
                 'construction/lollo_street_merge',
                 {yearFrom = 1925, yearTo = 0},
-                streetMergeHelper.getParams()
+                streetMergeHelper.getParams(),
+                streetUtils.getGlobalBridgeDataPlusNoBridge(),
+                streetUtils.getGlobalStreetData()
             )
             _addStreetsWithReservedLanes()
             _hideAllTramTracksStreets()

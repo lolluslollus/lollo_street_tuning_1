@@ -5,8 +5,8 @@ function data()
     return {
         updateFn = function(params, two)
             local function _initParams()
-				if not(params.streetType_) or not(two.globalStreetData[params.streetType_ + 1]) then
-					params.streetType_ = 0
+				if not(params.streetType4Hairpin) or not(two.globalStreetData[params.streetType4Hairpin + 1]) then
+					params.streetType4Hairpin = 0
 				end
                 if not(params.bridgeType_) or not(two.globalBridgeData[params.bridgeType_ + 1]) then
 					params.bridgeType_ = 0
@@ -42,7 +42,7 @@ function data()
             result.edgeLists = streetChunksHelper.getStreetHairpinSnapEdgeLists(
                 params,
                 pitchHelper.getPitchAngle(params),
-                two.globalStreetData[params.streetType_ + 1],
+                two.globalStreetData[params.streetType4Hairpin + 1],
                 two.globalBridgeData[params.bridgeType_ + 1],
                 tramTrackType
             )

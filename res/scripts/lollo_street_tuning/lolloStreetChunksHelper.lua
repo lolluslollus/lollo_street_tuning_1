@@ -118,6 +118,7 @@ local function _getFreeNodesCentre(params, isRightOfIsland)
         return {0, 1}
     end
 end
+-- LOLLO TODO make three separate direction params, one for each construction
 
 local function _getFreeNodesHighX(params, isRightOfIsland)
     if params.lockLayoutCentre == 1 then
@@ -186,15 +187,25 @@ local function _getEdgeTypeName(params, bridgeData)
 end
 
 helper.getStreetChunksParams = function()
-    local defaultStreetTypeIndex = arrayUtils.findIndex(streetUtils.getGlobalStreetData(), 'fileName', 'lollo_medium_1_way_1_lane_street_narrow_sidewalk.lua') - 1
+    local defaultStreetTypeIndex = arrayUtils.findIndex(
+        streetUtils.getGlobalStreetData({
+            streetUtils.getStreetDataFilters().PATHS,
+            streetUtils.getStreetDataFilters().STOCK,
+        }),
+        'fileName',
+        'lollo_medium_1_way_1_lane_street_narrow_sidewalk.lua'
+    ) - 1
     if defaultStreetTypeIndex < 0 then defaultStreetTypeIndex = 0 end
 -- print('LOLLO getting params for street chunk')
     return {
         {
-            key = 'streetType_',
+            key = 'streetType4Chunks',
             name = _('StreetType'),
             values = arrayUtils.map(
-                streetUtils.getGlobalStreetData(),
+                streetUtils.getGlobalStreetData({
+                    streetUtils.getStreetDataFilters().PATHS,
+                    streetUtils.getStreetDataFilters().STOCK,
+                }),
                 function(str)
                     return str.name
                 end
@@ -329,15 +340,25 @@ helper.getStreetChunksParams = function()
 end
 
 helper.getStreetHairpinParams = function()
-    local defaultStreetTypeIndex = arrayUtils.findIndex(streetUtils.getGlobalStreetData(), 'fileName', 'lollo_medium_1_way_1_lane_street_narrow_sidewalk.lua') - 1
+    local defaultStreetTypeIndex = arrayUtils.findIndex(
+        streetUtils.getGlobalStreetData({
+            streetUtils.getStreetDataFilters().PATHS,
+            streetUtils.getStreetDataFilters().STOCK,
+        }),
+        'fileName',
+        'lollo_medium_1_way_1_lane_street_narrow_sidewalk.lua'
+    ) - 1
     if defaultStreetTypeIndex < 0 then defaultStreetTypeIndex = 0 end
 -- print('LOLLO getting params for street hairpin')
     return {
         {
-            key = 'streetType_',
+            key = 'streetType4Hairpin',
             name = _('StreetType'),
             values = arrayUtils.map(
-                streetUtils.getGlobalStreetData(),
+                streetUtils.getGlobalStreetData({
+                    streetUtils.getStreetDataFilters().PATHS,
+                    streetUtils.getStreetDataFilters().STOCK,
+                }),
                 function(str)
                     return str.name
                 end

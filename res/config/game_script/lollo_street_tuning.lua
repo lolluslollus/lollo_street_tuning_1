@@ -73,9 +73,6 @@ local _utils = {
     getToggledAllTramTracksStreetTypeFileName = function(streetFileName)
         if type(streetFileName) ~= 'string' or streetFileName == '' then return nil end
 
-        -- print('KKKKKKKKKKKKKKKK')
-        -- debugPrint(streetUtils.getGlobalStreetData(streetUtils.getStreetDataFilters().STOCK))
-        -- print('KKKKKKKKKKKKKKKK')
         local allStreetsData = streetUtils.getGlobalStreetData(streetUtils.getStreetDataFilters().STOCK_AND_RESERVED_LANES)
         -- print('allStreetsData has', #allStreetsData, 'records')
         local oldStreetData = nil
