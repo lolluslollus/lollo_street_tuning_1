@@ -5,14 +5,14 @@ local pitchHelper = require('lollo_street_tuning/pitchHelper')
 -- LOLLO TODO see if you can ease the pain when reconfiguring an existing merger. maybe skip collisions? It is not enough.
 
 local function _getEdgeType(params, bridgeData)
-    if params.bridgeType_ and params.bridgeType_ ~= 0 and bridgeData and bridgeData.fileName then
+    if params.bridgeType4Merge and params.bridgeType4Merge ~= 0 and bridgeData and bridgeData.fileName then
         return 'BRIDGE'
     end
     return nil
 end
 
 local function _getEdgeTypeName(params, bridgeData)
-    if params.bridgeType_ and params.bridgeType_ ~= 0 and bridgeData and bridgeData.fileName then
+    if params.bridgeType4Merge and params.bridgeType4Merge ~= 0 and bridgeData and bridgeData.fileName then
         return bridgeData.fileName
     end -- eg "cement.lua",
     return nil
@@ -23,7 +23,7 @@ local function _getInternalEdgeTypeName()
 end
 
 local function _getGroundFaces(face, params)
-    if params.bridgeType_ and params.bridgeType_ ~= 0 then
+    if params.bridgeType4Merge and params.bridgeType4Merge ~= 0 then
         return {}
     end
 
@@ -65,7 +65,7 @@ local function _makeEdges(pitchAngle, params, node0, node1, tan0, tan1)
         if tan1 == nil then tan1 = {edgeLength, 0, 0} end
     end
 
-    return params.direction == 0 and
+    return params.direction4Merge == 0 and
         {
             pitchHelper.getPosTanPitched(pitchAngle, node0, tan0), -- node 0
             pitchHelper.getPosTanPitched(pitchAngle, node1, tan1) -- node 1
@@ -82,7 +82,7 @@ local function _getSnapNodes01(params, isFirstEnd)
     elseif params.snapNodes_ == 3
     or (isFirstEnd and params.snapNodes_ == 1)
     or (not(isFirstEnd) and params.snapNodes_ == 2) then
-        return params.direction == 0 and {0} or {1}
+        return params.direction4Merge == 0 and {0} or {1}
     else return {}
     end
 end
@@ -93,7 +93,7 @@ local function _getSnapNodes10(params, isFirstEnd)
     elseif params.snapNodes_ == 3
     or (isFirstEnd and params.snapNodes_ == 1)
     or (not(isFirstEnd) and params.snapNodes_ == 2) then
-        return params.direction == 0 and {1} or {0}
+        return params.direction4Merge == 0 and {1} or {0}
     else return {}
     end
 end
@@ -105,7 +105,7 @@ end
 
 local function updateFn_2_1_lane_narrow_sidewalk_to_2_lane_one_way(params, bridgeData)
     local result = { cost = 0, skipCollision = true, }
-    local _pitchAngle = pitchHelper.getPitchAngle(params)
+    local _pitchAngle = pitchHelper.getPitchAngle(params, params.pitch4Merge)
 
     local connectorFace = {
         {2.1, -8.0, 0.0, 1.0},
@@ -150,7 +150,7 @@ local function updateFn_2_1_lane_narrow_sidewalk_to_2_lane_one_way(params, bridg
             edges = _makeEdges(_pitchAngle, params, {-4, -2, .0}, {-2, -2, .0}),
             edgeType = _getEdgeType(params, bridgeData),
             edgeTypeName = _getEdgeTypeName(params, bridgeData),
-            freeNodes = params.direction == 0 and {0} or {1},
+            freeNodes = params.direction4Merge == 0 and {0} or {1},
             snapNodes = _getSnapNodes01(params, true)
         },
         {
@@ -164,7 +164,7 @@ local function updateFn_2_1_lane_narrow_sidewalk_to_2_lane_one_way(params, bridg
             edges = _makeEdges(_pitchAngle, params, {-4, 2, 0}, {-2, 2, 0}),
             edgeType = _getEdgeType(params, bridgeData),
             edgeTypeName = _getEdgeTypeName(params, bridgeData),
-            freeNodes = params.direction == 0 and {0} or {1},
+            freeNodes = params.direction4Merge == 0 and {0} or {1},
             snapNodes = _getSnapNodes01(params, true)
         },
         {
@@ -206,7 +206,7 @@ local function updateFn_2_1_lane_narrow_sidewalk_to_2_lane_one_way(params, bridg
             edges = _makeEdges(_pitchAngle, params, {2, 0, 0}, {6, 0, 0}),
             edgeType = _getEdgeType(params, bridgeData),
             edgeTypeName = _getEdgeTypeName(params, bridgeData),
-            freeNodes = params.direction == 0 and {1} or {0},
+            freeNodes = params.direction4Merge == 0 and {1} or {0},
             snapNodes = _getSnapNodes10(params, false)
         }
     }
@@ -216,8 +216,8 @@ local function updateFn_2_1_lane_narrow_sidewalk_to_2_lane_one_way(params, bridg
 end
 
 local function updateFn_2_1_lane_narrow_sidewalk_to_2_lane(params, bridgeData)
-    local _pitchAngle = pitchHelper.getPitchAngle(params)
-    params.direction = 0 -- 2-way streets cannot be reversed, the game is like that
+    local _pitchAngle = pitchHelper.getPitchAngle(params, params.pitch4Merge)
+    params.direction4Merge = 0 -- 2-way streets cannot be reversed, the game is like that
 
     local result = { cost = 0, skipCollision = true, }
 
@@ -258,7 +258,7 @@ local function updateFn_2_1_lane_narrow_sidewalk_to_2_lane(params, bridgeData)
             edges = _makeEdges(_pitchAngle, params, {-4, -2, .0}, {-2, -2, .0}),
             edgeType = _getEdgeType(params, bridgeData),
             edgeTypeName = _getEdgeTypeName(params, bridgeData),
-            freeNodes = params.direction == 0 and {0} or {1},
+            freeNodes = params.direction4Merge == 0 and {0} or {1},
             snapNodes = _getSnapNodes01(params, true)
         },
         {
@@ -271,7 +271,7 @@ local function updateFn_2_1_lane_narrow_sidewalk_to_2_lane(params, bridgeData)
             edges = _makeEdges(_pitchAngle, params, {-2, 2, 0}, {-4, 2, 0}, {-2, 0, 0}, {-2, 0, 0}),
             edgeType = _getEdgeType(params, bridgeData),
             edgeTypeName = _getEdgeTypeName(params, bridgeData),
-            freeNodes = params.direction == 0 and {1} or {0},
+            freeNodes = params.direction4Merge == 0 and {1} or {0},
             snapNodes = _getSnapNodes10(params, true)
         },
         {
@@ -311,7 +311,7 @@ local function updateFn_2_1_lane_narrow_sidewalk_to_2_lane(params, bridgeData)
             edges = _makeEdges(_pitchAngle, params, {2, 0, 0}, {6, 0, 0}),
             edgeType = _getEdgeType(params, bridgeData),
             edgeTypeName = _getEdgeTypeName(params, bridgeData),
-            freeNodes = params.direction == 0 and {1} or {0},
+            freeNodes = params.direction4Merge == 0 and {1} or {0},
             snapNodes = _getSnapNodes10(params, false)
         }
     }
@@ -322,7 +322,7 @@ end
 
 local function updateFn_2_1_lane_medium_sidewalk_to_2_lane_one_way(params, bridgeData)
     local result = { cost = 0, skipCollision = true, }
-    local _pitchAngle = pitchHelper.getPitchAngle(params)
+    local _pitchAngle = pitchHelper.getPitchAngle(params, params.pitch4Merge)
 
     local connectorFace = {
         {2.1, -7.0, 0.0, 1.0},
@@ -361,7 +361,7 @@ local function updateFn_2_1_lane_medium_sidewalk_to_2_lane_one_way(params, bridg
             edges = _makeEdges(_pitchAngle, params, {-4, -4, 0}, {-2, -4, 0}),
             edgeType = _getEdgeType(params, bridgeData),
             edgeTypeName = _getEdgeTypeName(params, bridgeData),
-            freeNodes = params.direction == 0 and {0} or {1},
+            freeNodes = params.direction4Merge == 0 and {0} or {1},
             snapNodes = _getSnapNodes01(params, true)
         },
         {
@@ -374,7 +374,7 @@ local function updateFn_2_1_lane_medium_sidewalk_to_2_lane_one_way(params, bridg
             edges = _makeEdges(_pitchAngle, params, {-4, 4, 0}, {-2, 4, 0}),
             edgeType = _getEdgeType(params, bridgeData),
             edgeTypeName = _getEdgeTypeName(params, bridgeData),
-            freeNodes = params.direction == 0 and {0} or {1},
+            freeNodes = params.direction4Merge == 0 and {0} or {1},
             snapNodes = _getSnapNodes01(params, true)
         },
         {
@@ -414,7 +414,7 @@ local function updateFn_2_1_lane_medium_sidewalk_to_2_lane_one_way(params, bridg
             edges = _makeEdges(_pitchAngle, params, {2, 0, 0}, {8, 0, 0}),
             edgeType = _getEdgeType(params, bridgeData),
             edgeTypeName = _getEdgeTypeName(params, bridgeData),
-            freeNodes = params.direction == 0 and {1} or {0},
+            freeNodes = params.direction4Merge == 0 and {1} or {0},
             snapNodes = _getSnapNodes10(params, false)
         }
     }
@@ -424,8 +424,8 @@ local function updateFn_2_1_lane_medium_sidewalk_to_2_lane_one_way(params, bridg
 end
 
 local function updateFn_2_1_lane_medium_sidewalk_to_2_lane(params, bridgeData)
-    params.direction = 0 -- 2-way streets cannot be reversed, the game is like that
-    local _pitchAngle = pitchHelper.getPitchAngle(params)
+    params.direction4Merge = 0 -- 2-way streets cannot be reversed, the game is like that
+    local _pitchAngle = pitchHelper.getPitchAngle(params, params.pitch4Merge)
 
     local result = { cost = 0, skipCollision = true, }
 
@@ -466,7 +466,7 @@ local function updateFn_2_1_lane_medium_sidewalk_to_2_lane(params, bridgeData)
             edges = _makeEdges(_pitchAngle, params, {-4, -4, 0}, {-2, -4, 0}),
             edgeType = _getEdgeType(params, bridgeData),
             edgeTypeName = _getEdgeTypeName(params, bridgeData),
-            freeNodes = params.direction == 0 and {0} or {1},
+            freeNodes = params.direction4Merge == 0 and {0} or {1},
             snapNodes = _getSnapNodes01(params, true)
         },
         {
@@ -479,7 +479,7 @@ local function updateFn_2_1_lane_medium_sidewalk_to_2_lane(params, bridgeData)
             edges = _makeEdges(_pitchAngle, params, {-2, 4, 0}, {-4, 4, 0}, {-2, 0, 0}, {-2, 0, 0}),
             edgeType = _getEdgeType(params, bridgeData),
             edgeTypeName = _getEdgeTypeName(params, bridgeData),
-            freeNodes = params.direction == 0 and {1} or {0},
+            freeNodes = params.direction4Merge == 0 and {1} or {0},
             snapNodes = _getSnapNodes10(params, true)
         },
         {
@@ -520,7 +520,7 @@ local function updateFn_2_1_lane_medium_sidewalk_to_2_lane(params, bridgeData)
             edges = _makeEdges(_pitchAngle, params, {2, 0, 0}, {8, 0, 0}),
             edgeType = _getEdgeType(params, bridgeData),
             edgeTypeName = _getEdgeTypeName(params, bridgeData),
-            freeNodes = params.direction == 0 and {1} or {0},
+            freeNodes = params.direction4Merge == 0 and {1} or {0},
             snapNodes = _getSnapNodes10(params, false)
         }
     }
@@ -531,7 +531,7 @@ end
 
 local function updateFn_3_1_lane_narrow_sidewalk_to_3_lane_one_way(params, bridgeData)
     local result = { cost = 0, skipCollision = true, }
-    local _pitchAngle = pitchHelper.getPitchAngle(params)
+    local _pitchAngle = pitchHelper.getPitchAngle(params, params.pitch4Merge)
 
     local connectorFace = {
         {5.1, -7.0, 0.0, 1.0},
@@ -570,7 +570,7 @@ local function updateFn_3_1_lane_narrow_sidewalk_to_3_lane_one_way(params, bridg
             edges = _makeEdges(_pitchAngle, params, {-4, -4, 0}, {-2, -4, 0}),
             edgeType = _getEdgeType(params, bridgeData),
             edgeTypeName = _getEdgeTypeName(params, bridgeData),
-            freeNodes = params.direction == 0 and {0} or {1},
+            freeNodes = params.direction4Merge == 0 and {0} or {1},
             snapNodes = _getSnapNodes01(params, true)
         },
         {
@@ -583,7 +583,7 @@ local function updateFn_3_1_lane_narrow_sidewalk_to_3_lane_one_way(params, bridg
             edges = _makeEdges(_pitchAngle, params, {-4, 0, 0}, {-2, 0, 0}),
             edgeType = _getEdgeType(params, bridgeData),
             edgeTypeName = _getEdgeTypeName(params, bridgeData),
-            freeNodes = params.direction == 0 and {0} or {1},
+            freeNodes = params.direction4Merge == 0 and {0} or {1},
             snapNodes = _getSnapNodes01(params, true)
         },
         {
@@ -596,7 +596,7 @@ local function updateFn_3_1_lane_narrow_sidewalk_to_3_lane_one_way(params, bridg
             edges = _makeEdges(_pitchAngle, params, {-4, 4, 0}, {-2, 4, 0}),
             edgeType = _getEdgeType(params, bridgeData),
             edgeTypeName = _getEdgeTypeName(params, bridgeData),
-            freeNodes = params.direction == 0 and {0} or {1},
+            freeNodes = params.direction4Merge == 0 and {0} or {1},
             snapNodes = _getSnapNodes01(params, true)
         },
         {
@@ -648,7 +648,7 @@ local function updateFn_3_1_lane_narrow_sidewalk_to_3_lane_one_way(params, bridg
             edges = _makeEdges(_pitchAngle, params, {2, 0, 0}, {6, 0, 0}),
             edgeType = _getEdgeType(params, bridgeData),
             edgeTypeName = _getEdgeTypeName(params, bridgeData),
-            freeNodes = params.direction == 0 and {1} or {0},
+            freeNodes = params.direction4Merge == 0 and {1} or {0},
             snapNodes = _getSnapNodes10(params, false)
         }
     }
@@ -659,7 +659,7 @@ end
 
 -- local function updateFn_3_1_lane_medium_sidewalk_to_3_lane_one_way(params, bridgeData)
 --     local result = { cost = 0, skipCollision = true, }
---     local _pitchAngle = pitchHelper.getPitchAngle(params)
+--     local _pitchAngle = pitchHelper.getPitchAngle(params, params.pitch4Merge)
 
 --     local connectorFace = {
 --         {2.1, -12.0, 0.0, 1.0},
@@ -698,8 +698,8 @@ end
 --             edges = _makeEdges(_pitchAngle, params, {-8, -8, 0}, {-6, -8, 0}),
 -- edgeType = _getEdgeType(params, bridgeData),
 --             edgeTypeName = _getEdgeTypeName(params, bridgeData),
---             freeNodes = params.direction == 0 and {0} or {1},
---             snapNodes = params.snapNodes_ == 0 and {} or (params.direction == 0 and {0} or {1})
+--             freeNodes = params.direction4Merge == 0 and {0} or {1},
+--             snapNodes = params.snapNodes_ == 0 and {} or (params.direction4Merge == 0 and {0} or {1})
 --         },
 --         {
 --             type = 'STREET',
@@ -711,8 +711,8 @@ end
 --             edges = _makeEdges(_pitchAngle, params, {-8, 0, 0}, {-6, 0, 0}),
 -- edgeType = _getEdgeType(params, bridgeData),
 --             edgeTypeName = _getEdgeTypeName(params, bridgeData),
---             freeNodes = params.direction == 0 and {0} or {1},
---             snapNodes = params.snapNodes_ == 0 and {} or (params.direction == 0 and {0} or {1})
+--             freeNodes = params.direction4Merge == 0 and {0} or {1},
+--             snapNodes = params.snapNodes_ == 0 and {} or (params.direction4Merge == 0 and {0} or {1})
 --         },
 --         {
 --             type = 'STREET',
@@ -724,8 +724,8 @@ end
 --             edges = _makeEdges(_pitchAngle, params, {-8, 8, 0}, {-6, 8, 0}),
 -- edgeType = _getEdgeType(params, bridgeData),
 --             edgeTypeName = _getEdgeTypeName(params, bridgeData),
---             freeNodes = params.direction == 0 and {0} or {1},
---             snapNodes = params.snapNodes_ == 0 and {} or (params.direction == 0 and {0} or {1})
+--             freeNodes = params.direction4Merge == 0 and {0} or {1},
+--             snapNodes = params.snapNodes_ == 0 and {} or (params.direction4Merge == 0 and {0} or {1})
 --         },
 --         {
 --             type = 'STREET',
@@ -777,8 +777,8 @@ end
 --             edges = _makeEdges(_pitchAngle, params, {2, 0, 0}, {8, 0, 0}),
 -- edgeType = _getEdgeType(params, bridgeData),
 --             edgeTypeName = _getEdgeTypeName(params, bridgeData),
---             freeNodes = params.direction == 0 and {1} or {0},
---             snapNodes = params.snapNodes_ == 0 and {} or (params.direction == 0 and {1} or {0})
+--             freeNodes = params.direction4Merge == 0 and {1} or {0},
+--             snapNodes = params.snapNodes_ == 0 and {} or (params.direction4Merge == 0 and {1} or {0})
 --         }
 --     }
 --     _addDummyTerrainAlignmentLists(result)
@@ -787,7 +787,7 @@ end
 
 local function updateFn_4_1_lane_narrow_sidewalk_to_4_lane_one_way(params, bridgeData)
     local result = { cost = 0, skipCollision = true, }
-    local _pitchAngle = pitchHelper.getPitchAngle(params)
+    local _pitchAngle = pitchHelper.getPitchAngle(params, params.pitch4Merge)
 
     local connectorFace = {
         {2.1, -7.0, 0.0, 1.0},
@@ -826,7 +826,7 @@ local function updateFn_4_1_lane_narrow_sidewalk_to_4_lane_one_way(params, bridg
             edges = _makeEdges(_pitchAngle, params, {-8, -6, 0}, {-6, -6, 0}),
             edgeType = _getEdgeType(params, bridgeData),
             edgeTypeName = _getEdgeTypeName(params, bridgeData),
-            freeNodes = params.direction == 0 and {0} or {1},
+            freeNodes = params.direction4Merge == 0 and {0} or {1},
             snapNodes = _getSnapNodes01(params, true)
         },
         {
@@ -839,7 +839,7 @@ local function updateFn_4_1_lane_narrow_sidewalk_to_4_lane_one_way(params, bridg
             edges = _makeEdges(_pitchAngle, params, {-8, -2, 0}, {-6, -2, 0}),
             edgeType = _getEdgeType(params, bridgeData),
             edgeTypeName = _getEdgeTypeName(params, bridgeData),
-            freeNodes = params.direction == 0 and {0} or {1},
+            freeNodes = params.direction4Merge == 0 and {0} or {1},
             snapNodes = _getSnapNodes01(params, true)
         },
         {
@@ -852,7 +852,7 @@ local function updateFn_4_1_lane_narrow_sidewalk_to_4_lane_one_way(params, bridg
             edges = _makeEdges(_pitchAngle, params, {-8, 2, 0}, {-6, 2, 0}),
             edgeType = _getEdgeType(params, bridgeData),
             edgeTypeName = _getEdgeTypeName(params, bridgeData),
-            freeNodes = params.direction == 0 and {0} or {1},
+            freeNodes = params.direction4Merge == 0 and {0} or {1},
             snapNodes = _getSnapNodes01(params, true)
         },
         {
@@ -865,7 +865,7 @@ local function updateFn_4_1_lane_narrow_sidewalk_to_4_lane_one_way(params, bridg
             edges = _makeEdges(_pitchAngle, params, {-8, 6, 0}, {-6, 6, 0}),
             edgeType = _getEdgeType(params, bridgeData),
             edgeTypeName = _getEdgeTypeName(params, bridgeData),
-            freeNodes = params.direction == 0 and {0} or {1},
+            freeNodes = params.direction4Merge == 0 and {0} or {1},
             snapNodes = _getSnapNodes01(params, true)
         },
         {
@@ -931,7 +931,7 @@ local function updateFn_4_1_lane_narrow_sidewalk_to_4_lane_one_way(params, bridg
             edges = _makeEdges(_pitchAngle, params, {2, 0, 0}, {8, 0, 0}),
             edgeType = _getEdgeType(params, bridgeData),
             edgeTypeName = _getEdgeTypeName(params, bridgeData),
-            freeNodes = params.direction == 0 and {1} or {0},
+            freeNodes = params.direction4Merge == 0 and {1} or {0},
             snapNodes = _getSnapNodes10(params, false)
         }
     }
@@ -941,8 +941,8 @@ local function updateFn_4_1_lane_narrow_sidewalk_to_4_lane_one_way(params, bridg
 end
 
 local function updateFn_4_1_lane_narrow_sidewalk_to_4_lane(params, bridgeData)
-    params.direction = 0 -- 2-way streets cannot be reversed, the game is like that
-    local _pitchAngle = pitchHelper.getPitchAngle(params)
+    params.direction4Merge = 0 -- 2-way streets cannot be reversed, the game is like that
+    local _pitchAngle = pitchHelper.getPitchAngle(params, params.pitch4Merge)
 
     local result = { cost = 0, skipCollision = true, }
 
@@ -983,7 +983,7 @@ local function updateFn_4_1_lane_narrow_sidewalk_to_4_lane(params, bridgeData)
             edges = _makeEdges(_pitchAngle, params, {-8, -6, 0}, {-6, -6, 0}),
             edgeType = _getEdgeType(params, bridgeData),
             edgeTypeName = _getEdgeTypeName(params, bridgeData),
-            freeNodes = params.direction == 0 and {0} or {1},
+            freeNodes = params.direction4Merge == 0 and {0} or {1},
             snapNodes = _getSnapNodes01(params, true)
         },
         {
@@ -996,7 +996,7 @@ local function updateFn_4_1_lane_narrow_sidewalk_to_4_lane(params, bridgeData)
             edges = _makeEdges(_pitchAngle, params, {-8, -2, 0}, {-6, -2, 0}),
             edgeType = _getEdgeType(params, bridgeData),
             edgeTypeName = _getEdgeTypeName(params, bridgeData),
-            freeNodes = params.direction == 0 and {0} or {1},
+            freeNodes = params.direction4Merge == 0 and {0} or {1},
             snapNodes = _getSnapNodes01(params, true)
         },
         {
@@ -1009,7 +1009,7 @@ local function updateFn_4_1_lane_narrow_sidewalk_to_4_lane(params, bridgeData)
             edges = _makeEdges(_pitchAngle, params, {-6, 2, 0}, {-8, 2, 0}, {-2, 0, 0}, {-2, 0, 0}),
             edgeType = _getEdgeType(params, bridgeData),
             edgeTypeName = _getEdgeTypeName(params, bridgeData),
-            freeNodes = params.direction == 0 and {1} or {0},
+            freeNodes = params.direction4Merge == 0 and {1} or {0},
             snapNodes = _getSnapNodes10(params, true)
         },
         {
@@ -1022,7 +1022,7 @@ local function updateFn_4_1_lane_narrow_sidewalk_to_4_lane(params, bridgeData)
             edges = _makeEdges(_pitchAngle, params, {-6, 6, 0}, {-8, 6, 0}, {-2, 0, 0}, {-2, 0, 0}),
             edgeType = _getEdgeType(params, bridgeData),
             edgeTypeName = _getEdgeTypeName(params, bridgeData),
-            freeNodes = params.direction == 0 and {1} or {0},
+            freeNodes = params.direction4Merge == 0 and {1} or {0},
             snapNodes = _getSnapNodes10(params, true)
         },
 
@@ -1090,7 +1090,7 @@ local function updateFn_4_1_lane_narrow_sidewalk_to_4_lane(params, bridgeData)
             edges = _makeEdges(_pitchAngle, params, {2, 0, 0}, {8, 0, 0}),
             edgeType = _getEdgeType(params, bridgeData),
             edgeTypeName = _getEdgeTypeName(params, bridgeData),
-            freeNodes = params.direction == 0 and {1} or {0},
+            freeNodes = params.direction4Merge == 0 and {1} or {0},
             snapNodes = _getSnapNodes10(params, false)
         }
     }
@@ -1100,8 +1100,8 @@ local function updateFn_4_1_lane_narrow_sidewalk_to_4_lane(params, bridgeData)
 end
 
 local function updateFn_4_1_lane_narrow_sidewalk_to_4_lane_large(params, bridgeData)
-    params.direction = 0 -- 2-way streets cannot be reversed, the game is like that
-    local _pitchAngle = pitchHelper.getPitchAngle(params)
+    params.direction4Merge = 0 -- 2-way streets cannot be reversed, the game is like that
+    local _pitchAngle = pitchHelper.getPitchAngle(params, params.pitch4Merge)
 
     local result = { cost = 0, skipCollision = true, }
 
@@ -1142,7 +1142,7 @@ local function updateFn_4_1_lane_narrow_sidewalk_to_4_lane_large(params, bridgeD
             edges = _makeEdges(_pitchAngle, params, {-4, -6, 0}, {-2, -6, 0}),
             edgeType = _getEdgeType(params, bridgeData),
             edgeTypeName = _getEdgeTypeName(params, bridgeData),
-            freeNodes = params.direction == 0 and {0} or {1},
+            freeNodes = params.direction4Merge == 0 and {0} or {1},
             snapNodes = _getSnapNodes01(params, true)
         },
         {
@@ -1155,7 +1155,7 @@ local function updateFn_4_1_lane_narrow_sidewalk_to_4_lane_large(params, bridgeD
             edges = _makeEdges(_pitchAngle, params, {-4, -2, 0}, {-2, -2, 0}),
             edgeType = _getEdgeType(params, bridgeData),
             edgeTypeName = _getEdgeTypeName(params, bridgeData),
-            freeNodes = params.direction == 0 and {0} or {1},
+            freeNodes = params.direction4Merge == 0 and {0} or {1},
             snapNodes = _getSnapNodes01(params, true)
         },
         {
@@ -1168,7 +1168,7 @@ local function updateFn_4_1_lane_narrow_sidewalk_to_4_lane_large(params, bridgeD
             edges = _makeEdges(_pitchAngle, params, {-2, 2, 0}, {-4, 2, 0}, {-2, 0, 0}, {-2, 0, 0}),
             edgeType = _getEdgeType(params, bridgeData),
             edgeTypeName = _getEdgeTypeName(params, bridgeData),
-            freeNodes = params.direction == 0 and {1} or {0},
+            freeNodes = params.direction4Merge == 0 and {1} or {0},
             snapNodes = _getSnapNodes10(params, true)
         },
         {
@@ -1181,7 +1181,7 @@ local function updateFn_4_1_lane_narrow_sidewalk_to_4_lane_large(params, bridgeD
             edges = _makeEdges(_pitchAngle, params, {-2, 6, 0}, {-4, 6, 0}, {-2, 0, 0}, {-2, 0, 0}),
             edgeType = _getEdgeType(params, bridgeData),
             edgeTypeName = _getEdgeTypeName(params, bridgeData),
-            freeNodes = params.direction == 0 and {1} or {0},
+            freeNodes = params.direction4Merge == 0 and {1} or {0},
             snapNodes = _getSnapNodes10(params, true)
         },
         {
@@ -1246,7 +1246,7 @@ local function updateFn_4_1_lane_narrow_sidewalk_to_4_lane_large(params, bridgeD
             edges = _makeEdges(_pitchAngle, params, {2, 0, 0}, {8, 0, 0}),
             edgeType = _getEdgeType(params, bridgeData),
             edgeTypeName = _getEdgeTypeName(params, bridgeData),
-            freeNodes = params.direction == 0 and {1} or {0},
+            freeNodes = params.direction4Merge == 0 and {1} or {0},
             snapNodes = _getSnapNodes10(params, false)
         }
     }
@@ -1256,8 +1256,8 @@ local function updateFn_4_1_lane_narrow_sidewalk_to_4_lane_large(params, bridgeD
 end
 
 local function updateFn_2_2_lane_one_way_to_6_lane_x_large(params, bridgeData)
-    params.direction = 0 -- 2-way streets cannot be reversed, the game is like that
-    local _pitchAngle = pitchHelper.getPitchAngle(params)
+    params.direction4Merge = 0 -- 2-way streets cannot be reversed, the game is like that
+    local _pitchAngle = pitchHelper.getPitchAngle(params, params.pitch4Merge)
 
     local result = { cost = 0, skipCollision = true, }
 
@@ -1298,7 +1298,7 @@ local function updateFn_2_2_lane_one_way_to_6_lane_x_large(params, bridgeData)
             edges = _makeEdges(_pitchAngle, params, {-6, -8, 0}, {-2, -8, 0}),
             edgeType = _getEdgeType(params, bridgeData),
             edgeTypeName = _getEdgeTypeName(params, bridgeData),
-            freeNodes = params.direction == 0 and {0} or {1},
+            freeNodes = params.direction4Merge == 0 and {0} or {1},
             snapNodes = _getSnapNodes01(params, true)
         },
         {
@@ -1311,7 +1311,7 @@ local function updateFn_2_2_lane_one_way_to_6_lane_x_large(params, bridgeData)
             edges = _makeEdges(_pitchAngle, params, {-2, 8, 0}, {-6, 8, 0}, {-4, 0, 0}, {-4, 0, 0}),
             edgeType = _getEdgeType(params, bridgeData),
             edgeTypeName = _getEdgeTypeName(params, bridgeData),
-            freeNodes = params.direction == 0 and {1} or {0},
+            freeNodes = params.direction4Merge == 0 and {1} or {0},
             snapNodes = _getSnapNodes10(params, true)
         },
         {
@@ -1403,7 +1403,7 @@ local function updateFn_2_2_lane_one_way_to_6_lane_x_large(params, bridgeData)
             edges = _makeEdges(_pitchAngle, params, {2, 0, 0}, {10, 0, 0}),
             edgeType = _getEdgeType(params, bridgeData),
             edgeTypeName = _getEdgeTypeName(params, bridgeData),
-            freeNodes = params.direction == 0 and {1} or {0},
+            freeNodes = params.direction4Merge == 0 and {1} or {0},
             snapNodes = _getSnapNodes10(params, false)
         }
     }
@@ -1413,8 +1413,8 @@ local function updateFn_2_2_lane_one_way_to_6_lane_x_large(params, bridgeData)
 end
 
 local function updateFn_6_1_lane_one_way_to_6_lane_x_large(params, bridgeData)
-    params.direction = 0 -- 2-way streets cannot be reversed, the game is like that
-    local _pitchAngle = pitchHelper.getPitchAngle(params)
+    params.direction4Merge = 0 -- 2-way streets cannot be reversed, the game is like that
+    local _pitchAngle = pitchHelper.getPitchAngle(params, params.pitch4Merge)
 
     local result = { cost = 0, skipCollision = true, }
 
@@ -1455,7 +1455,7 @@ local function updateFn_6_1_lane_one_way_to_6_lane_x_large(params, bridgeData)
             edges = _makeEdges(_pitchAngle, params, {-4, -10, 0}, {-2, -10, 0}, {2, 0, 0}, {2, 0, 0}),
             edgeType = _getEdgeType(params, bridgeData),
             edgeTypeName = _getEdgeTypeName(params, bridgeData),
-            freeNodes = params.direction == 0 and {0} or {1},
+            freeNodes = params.direction4Merge == 0 and {0} or {1},
             snapNodes = _getSnapNodes01(params, true)
         },
         {
@@ -1468,7 +1468,7 @@ local function updateFn_6_1_lane_one_way_to_6_lane_x_large(params, bridgeData)
             edges = _makeEdges(_pitchAngle, params, {-4, -6, 0}, {-2, -6, 0}, {2, 0, 0}, {2, 0, 0}),
             edgeType = _getEdgeType(params, bridgeData),
             edgeTypeName = _getEdgeTypeName(params, bridgeData),
-            freeNodes = params.direction == 0 and {0} or {1},
+            freeNodes = params.direction4Merge == 0 and {0} or {1},
             snapNodes = _getSnapNodes01(params, true)
         },
         {
@@ -1481,7 +1481,7 @@ local function updateFn_6_1_lane_one_way_to_6_lane_x_large(params, bridgeData)
             edges = _makeEdges(_pitchAngle, params, {-4, -2, 0}, {-2, -2, 0}, {2, 0, 0}, {2, 0, 0}),
             edgeType = _getEdgeType(params, bridgeData),
             edgeTypeName = _getEdgeTypeName(params, bridgeData),
-            freeNodes = params.direction == 0 and {0} or {1},
+            freeNodes = params.direction4Merge == 0 and {0} or {1},
             snapNodes = _getSnapNodes01(params, true)
         },
         {
@@ -1494,7 +1494,7 @@ local function updateFn_6_1_lane_one_way_to_6_lane_x_large(params, bridgeData)
             edges = _makeEdges(_pitchAngle, params, {-2, 2, 0}, {-4, 2, 0}, {-2, 0, 0}, {-2, 0, 0}),
             edgeType = _getEdgeType(params, bridgeData),
             edgeTypeName = _getEdgeTypeName(params, bridgeData),
-            freeNodes = params.direction == 0 and {1} or {0},
+            freeNodes = params.direction4Merge == 0 and {1} or {0},
             snapNodes = _getSnapNodes10(params, true)
         },
         {
@@ -1507,7 +1507,7 @@ local function updateFn_6_1_lane_one_way_to_6_lane_x_large(params, bridgeData)
             edges = _makeEdges(_pitchAngle, params, {-2, 6, 0}, {-4, 6, 0}, {-2, 0, 0}, {-2, 0, 0}),
             edgeType = _getEdgeType(params, bridgeData),
             edgeTypeName = _getEdgeTypeName(params, bridgeData),
-            freeNodes = params.direction == 0 and {1} or {0},
+            freeNodes = params.direction4Merge == 0 and {1} or {0},
             snapNodes = _getSnapNodes10(params, true)
         },
         {
@@ -1520,7 +1520,7 @@ local function updateFn_6_1_lane_one_way_to_6_lane_x_large(params, bridgeData)
             edges = _makeEdges(_pitchAngle, params, {-2, 10, 0}, {-4, 10, 0}, {-2, 0, 0}, {-2, 0, 0}),
             edgeType = _getEdgeType(params, bridgeData),
             edgeTypeName = _getEdgeTypeName(params, bridgeData),
-            freeNodes = params.direction == 0 and {1} or {0},
+            freeNodes = params.direction4Merge == 0 and {1} or {0},
             snapNodes = _getSnapNodes10(params, true)
         },
         {
@@ -1611,7 +1611,7 @@ local function updateFn_6_1_lane_one_way_to_6_lane_x_large(params, bridgeData)
             edges = _makeEdges(_pitchAngle, params, {2, 0, 0}, {10, 0, 0}),
             edgeType = _getEdgeType(params, bridgeData),
             edgeTypeName = _getEdgeTypeName(params, bridgeData),
-            freeNodes = params.direction == 0 and {1} or {0},
+            freeNodes = params.direction4Merge == 0 and {1} or {0},
             snapNodes = _getSnapNodes10(params, false)
         }
     }
@@ -1621,8 +1621,8 @@ local function updateFn_6_1_lane_one_way_to_6_lane_x_large(params, bridgeData)
 end
 
 local function updateFn_Motorway_6_1_lane_one_way_to_6_lane_x_large(params, bridgeData)
-    params.direction = 0 -- 2-way streets cannot be reversed, the game is like that
-    local _pitchAngle = pitchHelper.getPitchAngle(params)
+    params.direction4Merge = 0 -- 2-way streets cannot be reversed, the game is like that
+    local _pitchAngle = pitchHelper.getPitchAngle(params, params.pitch4Merge)
 
     local result = { cost = 0, skipCollision = true, }
 
@@ -1663,7 +1663,7 @@ local function updateFn_Motorway_6_1_lane_one_way_to_6_lane_x_large(params, brid
             edges = _makeEdges(_pitchAngle, params, {-4, -10, 0}, {-2, -10, 0}, {2, 0, 0}, {2, 0, 0}),
             edgeType = _getEdgeType(params, bridgeData),
             edgeTypeName = _getEdgeTypeName(params, bridgeData),
-            freeNodes = params.direction == 0 and {0} or {1},
+            freeNodes = params.direction4Merge == 0 and {0} or {1},
             snapNodes = _getSnapNodes01(params, true)
         },
         {
@@ -1676,7 +1676,7 @@ local function updateFn_Motorway_6_1_lane_one_way_to_6_lane_x_large(params, brid
             edges = _makeEdges(_pitchAngle, params, {-4, -6, 0}, {-2, -6, 0}, {2, 0, 0}, {2, 0, 0}),
             edgeType = _getEdgeType(params, bridgeData),
             edgeTypeName = _getEdgeTypeName(params, bridgeData),
-            freeNodes = params.direction == 0 and {0} or {1},
+            freeNodes = params.direction4Merge == 0 and {0} or {1},
             snapNodes = _getSnapNodes01(params, true)
         },
         {
@@ -1689,7 +1689,7 @@ local function updateFn_Motorway_6_1_lane_one_way_to_6_lane_x_large(params, brid
             edges = _makeEdges(_pitchAngle, params, {-4, -2, 0}, {-2, -2, 0}, {2, 0, 0}, {2, 0, 0}),
             edgeType = _getEdgeType(params, bridgeData),
             edgeTypeName = _getEdgeTypeName(params, bridgeData),
-            freeNodes = params.direction == 0 and {0} or {1},
+            freeNodes = params.direction4Merge == 0 and {0} or {1},
             snapNodes = _getSnapNodes01(params, true)
         },
         {
@@ -1702,7 +1702,7 @@ local function updateFn_Motorway_6_1_lane_one_way_to_6_lane_x_large(params, brid
             edges = _makeEdges(_pitchAngle, params, {-2, 2, 0}, {-4, 2, 0}, {-2, 0, 0}, {-2, 0, 0}),
             edgeType = _getEdgeType(params, bridgeData),
             edgeTypeName = _getEdgeTypeName(params, bridgeData),
-            freeNodes = params.direction == 0 and {1} or {0},
+            freeNodes = params.direction4Merge == 0 and {1} or {0},
             snapNodes = _getSnapNodes10(params, true)
         },
         {
@@ -1715,7 +1715,7 @@ local function updateFn_Motorway_6_1_lane_one_way_to_6_lane_x_large(params, brid
             edges = _makeEdges(_pitchAngle, params, {-2, 6, 0}, {-4, 6, 0}, {-2, 0, 0}, {-2, 0, 0}),
             edgeType = _getEdgeType(params, bridgeData),
             edgeTypeName = _getEdgeTypeName(params, bridgeData),
-            freeNodes = params.direction == 0 and {1} or {0},
+            freeNodes = params.direction4Merge == 0 and {1} or {0},
             snapNodes = _getSnapNodes10(params, true)
         },
         {
@@ -1728,7 +1728,7 @@ local function updateFn_Motorway_6_1_lane_one_way_to_6_lane_x_large(params, brid
             edges = _makeEdges(_pitchAngle, params, {-2, 10, 0}, {-4, 10, 0}, {-2, 0, 0}, {-2, 0, 0}),
             edgeType = _getEdgeType(params, bridgeData),
             edgeTypeName = _getEdgeTypeName(params, bridgeData),
-            freeNodes = params.direction == 0 and {1} or {0},
+            freeNodes = params.direction4Merge == 0 and {1} or {0},
             snapNodes = _getSnapNodes10(params, true)
         },
         {
@@ -1819,7 +1819,7 @@ local function updateFn_Motorway_6_1_lane_one_way_to_6_lane_x_large(params, brid
             edges = _makeEdges(_pitchAngle, params, {2, 0, 0}, {10, 0, 0}),
             edgeType = _getEdgeType(params, bridgeData),
             edgeTypeName = _getEdgeTypeName(params, bridgeData),
-            freeNodes = params.direction == 0 and {1} or {0},
+            freeNodes = params.direction4Merge == 0 and {1} or {0},
             snapNodes = _getSnapNodes10(params, false)
         }
     }
@@ -1829,8 +1829,8 @@ local function updateFn_Motorway_6_1_lane_one_way_to_6_lane_x_large(params, brid
 end
 
 local function updateFn_Motorway_2_2_lane_one_way_to_6_lane_x_large(params, bridgeData)
-    params.direction = 0 -- 2-way streets cannot be reversed, the game is like that
-    local _pitchAngle = pitchHelper.getPitchAngle(params)
+    params.direction4Merge = 0 -- 2-way streets cannot be reversed, the game is like that
+    local _pitchAngle = pitchHelper.getPitchAngle(params, params.pitch4Merge)
 
     local result = { cost = 0, skipCollision = true, }
 
@@ -1871,7 +1871,7 @@ local function updateFn_Motorway_2_2_lane_one_way_to_6_lane_x_large(params, brid
             edges = _makeEdges(_pitchAngle, params, {-6, -8, 0}, {-2, -8, 0}),
             edgeType = _getEdgeType(params, bridgeData),
             edgeTypeName = _getEdgeTypeName(params, bridgeData),
-            freeNodes = params.direction == 0 and {0} or {1},
+            freeNodes = params.direction4Merge == 0 and {0} or {1},
             snapNodes = _getSnapNodes01(params, true)
         },
         {
@@ -1884,7 +1884,7 @@ local function updateFn_Motorway_2_2_lane_one_way_to_6_lane_x_large(params, brid
             edges = _makeEdges(_pitchAngle, params, {-2, 8, 0}, {-6, 8, 0}, {-4, 0, 0}, {-4, 0, 0}),
             edgeType = _getEdgeType(params, bridgeData),
             edgeTypeName = _getEdgeTypeName(params, bridgeData),
-            freeNodes = params.direction == 0 and {1} or {0},
+            freeNodes = params.direction4Merge == 0 and {1} or {0},
             snapNodes = _getSnapNodes10(params, true)
         },
         {
@@ -1949,7 +1949,7 @@ local function updateFn_Motorway_2_2_lane_one_way_to_6_lane_x_large(params, brid
             edges = _makeEdges(_pitchAngle, params, {2, 0, 0}, {10, 0, 0}),
             edgeType = _getEdgeType(params, bridgeData),
             edgeTypeName = _getEdgeTypeName(params, bridgeData),
-            freeNodes = params.direction == 0 and {1} or {0},
+            freeNodes = params.direction4Merge == 0 and {1} or {0},
             snapNodes = _getSnapNodes10(params, false)
         }
     }
@@ -1959,8 +1959,8 @@ local function updateFn_Motorway_2_2_lane_one_way_to_6_lane_x_large(params, brid
 end
 
 local function updateFn_Motorway_4_1_lane_one_way_to_4_lane_large(params, bridgeData)
-    params.direction = 0 -- 2-way streets cannot be reversed, the game is like that
-    local _pitchAngle = pitchHelper.getPitchAngle(params)
+    params.direction4Merge = 0 -- 2-way streets cannot be reversed, the game is like that
+    local _pitchAngle = pitchHelper.getPitchAngle(params, params.pitch4Merge)
 
     local result = { cost = 0, skipCollision = true, }
 
@@ -2001,7 +2001,7 @@ local function updateFn_Motorway_4_1_lane_one_way_to_4_lane_large(params, bridge
             edges = _makeEdges(_pitchAngle, params, {-6, -6, 0}, {-2, -6, 0}, {4, 0, 0}, {4, 0, 0}),
             edgeType = _getEdgeType(params, bridgeData),
             edgeTypeName = _getEdgeTypeName(params, bridgeData),
-            freeNodes = params.direction == 0 and {0} or {1},
+            freeNodes = params.direction4Merge == 0 and {0} or {1},
             snapNodes = _getSnapNodes01(params, true)
         },
         {
@@ -2014,7 +2014,7 @@ local function updateFn_Motorway_4_1_lane_one_way_to_4_lane_large(params, bridge
             edges = _makeEdges(_pitchAngle, params, {-6, -2, 0}, {-2, -2, 0}, {4, 0, 0}, {4, 0, 0}),
             edgeType = _getEdgeType(params, bridgeData),
             edgeTypeName = _getEdgeTypeName(params, bridgeData),
-            freeNodes = params.direction == 0 and {0} or {1},
+            freeNodes = params.direction4Merge == 0 and {0} or {1},
             snapNodes = _getSnapNodes01(params, true)
         },
         {
@@ -2027,7 +2027,7 @@ local function updateFn_Motorway_4_1_lane_one_way_to_4_lane_large(params, bridge
             edges = _makeEdges(_pitchAngle, params, {-2, 2, 0}, {-6, 2, 0}, {-4, 0, 0}, {-4, 0, 0}),
             edgeType = _getEdgeType(params, bridgeData),
             edgeTypeName = _getEdgeTypeName(params, bridgeData),
-            freeNodes = params.direction == 0 and {1} or {0},
+            freeNodes = params.direction4Merge == 0 and {1} or {0},
             snapNodes = _getSnapNodes10(params, true)
         },
         {
@@ -2040,7 +2040,7 @@ local function updateFn_Motorway_4_1_lane_one_way_to_4_lane_large(params, bridge
             edges = _makeEdges(_pitchAngle, params, {-2, 6, 0}, {-6, 6, 0}, {-4, 0, 0}, {-4, 0, 0}),
             edgeType = _getEdgeType(params, bridgeData),
             edgeTypeName = _getEdgeTypeName(params, bridgeData),
-            freeNodes = params.direction == 0 and {1} or {0},
+            freeNodes = params.direction4Merge == 0 and {1} or {0},
             snapNodes = _getSnapNodes10(params, true)
         },
         {
@@ -2105,7 +2105,7 @@ local function updateFn_Motorway_4_1_lane_one_way_to_4_lane_large(params, bridge
             edges = _makeEdges(_pitchAngle, params, {2, 0, 0}, {10, 0, 0}),
             edgeType = _getEdgeType(params, bridgeData),
             edgeTypeName = _getEdgeTypeName(params, bridgeData),
-            freeNodes = params.direction == 0 and {1} or {0},
+            freeNodes = params.direction4Merge == 0 and {1} or {0},
             snapNodes = _getSnapNodes10(params, false)
         }
     }
@@ -2115,8 +2115,8 @@ local function updateFn_Motorway_4_1_lane_one_way_to_4_lane_large(params, bridge
 end
 
 local function updateFn_Motorway_2_1_lane_narrow_sidewalk_to_2_lane(params, bridgeData)
-    params.direction = 0 -- 2-way streets cannot be reversed, the game is like that
-    local _pitchAngle = pitchHelper.getPitchAngle(params)
+    params.direction4Merge = 0 -- 2-way streets cannot be reversed, the game is like that
+    local _pitchAngle = pitchHelper.getPitchAngle(params, params.pitch4Merge)
 
     local result = { cost = 0, skipCollision = true, }
 
@@ -2157,7 +2157,7 @@ local function updateFn_Motorway_2_1_lane_narrow_sidewalk_to_2_lane(params, brid
             edges = _makeEdges(_pitchAngle, params, {-4, -2, .0}, {-2, -2, .0}),
             edgeType = _getEdgeType(params, bridgeData),
             edgeTypeName = _getEdgeTypeName(params, bridgeData),
-            freeNodes = params.direction == 0 and {0} or {1},
+            freeNodes = params.direction4Merge == 0 and {0} or {1},
             snapNodes = _getSnapNodes01(params, true)
         },
         {
@@ -2170,7 +2170,7 @@ local function updateFn_Motorway_2_1_lane_narrow_sidewalk_to_2_lane(params, brid
             edges = _makeEdges(_pitchAngle, params, {-2, 2, 0}, {-4, 2, 0}, {-2, 0, 0}, {-2, 0, 0}),
             edgeType = _getEdgeType(params, bridgeData),
             edgeTypeName = _getEdgeTypeName(params, bridgeData),
-            freeNodes = params.direction == 0 and {1} or {0},
+            freeNodes = params.direction4Merge == 0 and {1} or {0},
             snapNodes = _getSnapNodes10(params, true)
         },
         {
@@ -2210,7 +2210,7 @@ local function updateFn_Motorway_2_1_lane_narrow_sidewalk_to_2_lane(params, brid
             edges = _makeEdges(_pitchAngle, params, {2, 0, 0}, {6, 0, 0}),
             edgeType = _getEdgeType(params, bridgeData),
             edgeTypeName = _getEdgeTypeName(params, bridgeData),
-            freeNodes = params.direction == 0 and {1} or {0},
+            freeNodes = params.direction4Merge == 0 and {1} or {0},
             snapNodes = _getSnapNodes10(params, false)
         }
     }
@@ -2221,7 +2221,7 @@ end
 
 local function updateFn_Motorway_3_1_lane_narrow_sidewalk_to_3_lane_one_way(params, bridgeData)
     local result = { cost = 0, skipCollision = true, }
-    local _pitchAngle = pitchHelper.getPitchAngle(params)
+    local _pitchAngle = pitchHelper.getPitchAngle(params, params.pitch4Merge)
 
     local connectorFace = {
         {2, -6.0, 0.0, 1.0},
@@ -2262,7 +2262,7 @@ local function updateFn_Motorway_3_1_lane_narrow_sidewalk_to_3_lane_one_way(para
             edges = _makeEdges(_pitchAngle, params, {-4, -4, .0}, {-2, -4, .0}, {2, 0, 0}, {2, 0, 0}),
             edgeType = _getEdgeType(params, bridgeData),
             edgeTypeName = _getEdgeTypeName(params, bridgeData),
-            freeNodes = params.direction == 0 and {0} or {1},
+            freeNodes = params.direction4Merge == 0 and {0} or {1},
             snapNodes = _getSnapNodes01(params, true)
         },
         {
@@ -2276,7 +2276,7 @@ local function updateFn_Motorway_3_1_lane_narrow_sidewalk_to_3_lane_one_way(para
             edges = _makeEdges(_pitchAngle, params, {-4, 0, .0}, {-2, 0, .0}, {2, 0, 0}, {2, 0, 0}),
             edgeType = _getEdgeType(params, bridgeData),
             edgeTypeName = _getEdgeTypeName(params, bridgeData),
-            freeNodes = params.direction == 0 and {0} or {1},
+            freeNodes = params.direction4Merge == 0 and {0} or {1},
             snapNodes = _getSnapNodes01(params, true)
         },
         {
@@ -2290,7 +2290,7 @@ local function updateFn_Motorway_3_1_lane_narrow_sidewalk_to_3_lane_one_way(para
             edges = _makeEdges(_pitchAngle, params, {-4, 4, 0}, {-2, 4, 0}, {2, 0, 0}, {2, 0, 0}),
             edgeType = _getEdgeType(params, bridgeData),
             edgeTypeName = _getEdgeTypeName(params, bridgeData),
-            freeNodes = params.direction == 0 and {0} or {1},
+            freeNodes = params.direction4Merge == 0 and {0} or {1},
             snapNodes = _getSnapNodes01(params, true)
         },
         {
@@ -2346,7 +2346,7 @@ local function updateFn_Motorway_3_1_lane_narrow_sidewalk_to_3_lane_one_way(para
             edges = _makeEdges(_pitchAngle, params, {2, 0, 0}, {6, 0, 0}),
             edgeType = _getEdgeType(params, bridgeData),
             edgeTypeName = _getEdgeTypeName(params, bridgeData),
-            freeNodes = params.direction == 0 and {1} or {0},
+            freeNodes = params.direction4Merge == 0 and {1} or {0},
             snapNodes = _getSnapNodes10(params, false)
         }
     }
@@ -2357,7 +2357,7 @@ end
 
 local function updateFn_Motorway_2_1_lane_narrow_sidewalk_to_2_lane_one_way(params, bridgeData)
     local result = { cost = 0, skipCollision = true, }
-    local _pitchAngle = pitchHelper.getPitchAngle(params)
+    local _pitchAngle = pitchHelper.getPitchAngle(params, params.pitch4Merge)
 
     local connectorFace = {
         {2, -4.0, 0.0, 1.0},
@@ -2398,7 +2398,7 @@ local function updateFn_Motorway_2_1_lane_narrow_sidewalk_to_2_lane_one_way(para
             edges = _makeEdges(_pitchAngle, params, {-4, -2, .0}, {-2, -2, .0}),
             edgeType = _getEdgeType(params, bridgeData),
             edgeTypeName = _getEdgeTypeName(params, bridgeData),
-            freeNodes = params.direction == 0 and {0} or {1},
+            freeNodes = params.direction4Merge == 0 and {0} or {1},
             snapNodes = _getSnapNodes01(params, true)
         },
         {
@@ -2412,7 +2412,7 @@ local function updateFn_Motorway_2_1_lane_narrow_sidewalk_to_2_lane_one_way(para
             edges = _makeEdges(_pitchAngle, params, {-4, 2, 0}, {-2, 2, 0}),
             edgeType = _getEdgeType(params, bridgeData),
             edgeTypeName = _getEdgeTypeName(params, bridgeData),
-            freeNodes = params.direction == 0 and {0} or {1},
+            freeNodes = params.direction4Merge == 0 and {0} or {1},
             snapNodes = _getSnapNodes01(params, true)
         },
         {
@@ -2454,7 +2454,7 @@ local function updateFn_Motorway_2_1_lane_narrow_sidewalk_to_2_lane_one_way(para
             edges = _makeEdges(_pitchAngle, params, {2, 0, 0}, {6, 0, 0}),
             edgeType = _getEdgeType(params, bridgeData),
             edgeTypeName = _getEdgeTypeName(params, bridgeData),
-            freeNodes = params.direction == 0 and {1} or {0},
+            freeNodes = params.direction4Merge == 0 and {1} or {0},
             snapNodes = _getSnapNodes10(params, false)
         }
     }
@@ -2471,13 +2471,13 @@ function data()
 				-- if not(params.streetType4Merge) or not(two.globalStreetData[params.streetType4Merge + 1]) then
 				-- 	params.streetType4Merge = 0
 				-- end
-                if not(params.bridgeType_) or not(two.globalBridgeData[params.bridgeType_ + 1]) then
-					params.bridgeType_ = 0
+                if not(params.bridgeType4Merge) or not(two.globalBridgeData[params.bridgeType4Merge + 1]) then
+					params.bridgeType4Merge = 0
 				end
 			end
 			_initParams()
 
-            local _bridgeData = two.globalBridgeData[params.bridgeType_ + 1]
+            local _bridgeData = two.globalBridgeData[params.bridgeType4Merge + 1]
 
             if params.mergingType == 0 then
                 return updateFn_2_1_lane_narrow_sidewalk_to_2_lane_one_way(params, _bridgeData)

@@ -1,5 +1,5 @@
 local pitchHelper = require('lollo_street_tuning/pitchHelper')
-local streetChunksHelper = require('lollo_street_tuning/lolloStreetChunksHelper')
+local streetHairpinHelper = require('lollo_street_tuning/lolloStreetHairpinHelper')
 
 function data()
     return {
@@ -8,8 +8,8 @@ function data()
 				if not(params.streetType4Hairpin) or not(two.globalStreetData[params.streetType4Hairpin + 1]) then
 					params.streetType4Hairpin = 0
 				end
-                if not(params.bridgeType_) or not(two.globalBridgeData[params.bridgeType_ + 1]) then
-					params.bridgeType_ = 0
+                if not(params.bridgeType4Hairpin) or not(two.globalBridgeData[params.bridgeType4Hairpin + 1]) then
+					params.bridgeType4Hairpin = 0
 				end
 			end
 			_initParams()
@@ -39,11 +39,11 @@ function data()
             -- clicking the bend won't bring up the construction menu (once plopped).
             -- Otherwise, the construction will stay isolated from the rest,
             -- and clicking it will bring up the params menu.
-            result.edgeLists = streetChunksHelper.getStreetHairpinSnapEdgeLists(
+            result.edgeLists = streetHairpinHelper.getStreetHairpinSnapEdgeLists(
                 params,
-                pitchHelper.getPitchAngle(params),
+                pitchHelper.getPitchAngle(params, params.pitch4Hairpin),
                 two.globalStreetData[params.streetType4Hairpin + 1],
-                two.globalBridgeData[params.bridgeType_ + 1],
+                two.globalBridgeData[params.bridgeType4Hairpin + 1],
                 tramTrackType
             )
             -- LOLLO NOTE this thing with the empty faces is required , otherwise the game will make its own alignments, with spikes and all on bridges or tunnels.

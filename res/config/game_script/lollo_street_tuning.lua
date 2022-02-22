@@ -703,14 +703,14 @@ function data()
         guiInit = function()
             -- make param window resizable coz our parameters are massive
 			for _, id in pairs({
-				-- "menu.construction.road.settingsWindow",
+				"menu.construction.road.settingsWindow",
 				-- "menu.construction.rail.settingsWindow",
 				-- "menu.construction.water.settingsWindow",
 				-- "menu.construction.air.settingsWindow",
 				-- "menu.construction.terrain.settingsWindow",
 				-- "menu.construction.town.settingsWindow",
 				-- "menu.construction.industry.settingsWindow",
-				"menu.modules.settingsWindow",
+				-- "menu.modules.settingsWindow",
 			}) do
 				local iLayoutItem = api.gui.util.getById(id)
 				if iLayoutItem then

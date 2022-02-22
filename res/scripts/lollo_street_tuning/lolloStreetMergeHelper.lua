@@ -15,7 +15,7 @@ local helper = {
         return {
             {
                 key = 'mergingType',
-                name = _('Street merging type'),
+                name = _('Street merge type'),
                 values = {
                     '↑  ↑   -   ↑↑', -- 0
                     '↑    ↑   -   ↑↑', -- 1
@@ -38,7 +38,7 @@ local helper = {
                 defaultIndex = 0
             },
             {
-                key = 'direction',
+                key = 'direction4Merge',
                 name = _('Direction (only one-way roads)'),
                 values = {
                     _('↑'),
@@ -47,7 +47,7 @@ local helper = {
                 defaultIndex = 0
             },
             {
-                key = 'bridgeType_',
+                key = 'bridgeType4Merge',
                 name = _('BridgeType'),
                 values = arrayUtils.map(
                     streetUtils.getGlobalBridgeDataPlusNoBridge(),
@@ -101,7 +101,7 @@ local helper = {
             --     defaultIndex = 0
             -- },
             {
-                key = 'pitch',
+                key = 'pitch4Merge',
                 name = _('Pitch (adjust it with O and P while building)'),
                 values = pitchHelper.getPitchParamValues(),
                 defaultIndex = pitchHelper.getDefaultPitchParamValue(),

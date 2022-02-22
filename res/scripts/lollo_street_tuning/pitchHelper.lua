@@ -22,10 +22,10 @@ helper.getDefaultPitchParamValue = function()
 end
 
 -------------------------- pitch calculations --------------------------
-helper.getPitchAngle = function(params)
+helper.getPitchAngle = function(params, paramsPitch)
     -- note that writing into params has no effect coz it is passed by value
     local paramsParamX = params.paramX or 0
-    local paramsPitch = params.pitch or _maxPitch4Slider
+    local paramsPitch = paramsPitch or _maxPitch4Slider
 
     -- params.upgrade = true tells me that I am upgrading an existing construction
     local paramsPitchIndexBase0 = paramsPitch + paramsParamX * _paramX2Pitch

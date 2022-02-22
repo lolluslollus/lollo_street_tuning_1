@@ -9,8 +9,8 @@ function data()
 				if not(params.streetType4Chunks) or not(two.globalStreetData[params.streetType4Chunks + 1]) then
 					params.streetType4Chunks = 0
 				end
-                if not(params.bridgeType_) or not(two.globalBridgeData[params.bridgeType_ + 1]) then
-					params.bridgeType_ = 0
+                if not(params.bridgeType4Chunks) or not(two.globalBridgeData[params.bridgeType4Chunks + 1]) then
+					params.bridgeType4Chunks = 0
 				end
 			end
 			_initParams()
@@ -22,7 +22,7 @@ function data()
             -- otherwise the game will say "hello there" or "easter egg" or other rubbish,
             -- then point away (to some animal) and do nothing,
             -- when the user clicks on a done construction to configure it.
-            local _pitchAngle = pitchHelper.getPitchAngle(params)
+            local _pitchAngle = pitchHelper.getPitchAngle(params, params.pitch4Chunks)
             result.models = {
                 {
                     id = 'lollo_assets/lollo_dummy.mdl',
@@ -45,7 +45,7 @@ function data()
                 params,
                 _pitchAngle,
                 two.globalStreetData[params.streetType4Chunks + 1],
-                two.globalBridgeData[params.bridgeType_ + 1],
+                two.globalBridgeData[params.bridgeType4Chunks + 1],
                 tramTrackType
             )
             -- LOLLO NOTE this thing with the empty faces is required , otherwise the game will make its own alignments, with spikes and all on bridges or tunnels.

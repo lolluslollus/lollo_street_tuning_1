@@ -1,6 +1,7 @@
 local arrayUtils = require('lollo_street_tuning.arrayUtils')
 local modSettings = require('lollo_street_tuning.settings')
 local streetChunksHelper = require('lollo_street_tuning/lolloStreetChunksHelper')
+local streetHairpinHelper = require('lollo_street_tuning/lolloStreetHairpinHelper')
 local streetMergeHelper = require('lollo_street_tuning/lolloStreetMergeHelper')
 local streetUtils = require('lollo_street_tuning/streetUtils')
 local stringUtils = require('lollo_street_tuning/stringUtils')
@@ -363,7 +364,7 @@ function data()
 
     return {
         info = {
-            minorVersion = 48,
+            minorVersion = 49,
             severityAdd = 'NONE',
             severityRemove = 'WARNING',
             name = _('_NAME'),
@@ -418,7 +419,7 @@ function data()
                 'lollo_street_hairpin_2.con',
                 'construction/lollo_street_hairpin',
                 {yearFrom = 1925, yearTo = 0},
-                streetChunksHelper.getStreetHairpinParams(),
+                streetHairpinHelper.getStreetHairpinParams(),
                 streetUtils.getGlobalBridgeDataPlusNoBridge(),
                 streetUtils.getGlobalStreetData({
                     streetUtils.getStreetDataFilters().PATHS,
