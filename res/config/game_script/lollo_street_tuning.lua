@@ -1,5 +1,6 @@
 local arrayUtils = require('lollo_street_tuning.arrayUtils')
 local edgeUtils = require('lollo_street_tuning.edgeUtils')
+local logger = require('lollo_street_tuning.logger')
 local streetUtils = require('lollo_street_tuning.streetUtils')
 local stringUtils = require('lollo_street_tuning/stringUtils')
 local transfUtils = require('lollo_street_tuning.transfUtils')
@@ -13,15 +14,14 @@ local transfUtilUG = require('transf')
 -- This seems to be a UG problem.
 -- To solve the issue, replace those stations with some others available in your game.
 
-local function _myErrorHandler(err)
-    print('lollo street tuning caught error: ', err)
-end
-
 local _eventId = '__lolloStreetTuningEvent__'
 local _eventProperties = {
     lollo_street_changer = { conName = 'lollo_street_changer.con', eventName = 'streetChangerBuilt' },
+    lollo_street_chunks = { conName = 'lollo_street_chunks_2.con', eventName = 'streetChunksBuilt' },
     lollo_street_cleaver = { conName = 'lollo_street_cleaver.con', eventName = 'streetCleaverBuilt' },
     lollo_street_get_info = { conName = 'lollo_street_get_info.con', eventName = 'streetGetInfoBuilt' },
+    lollo_street_hairpin = { conName = 'lollo_street_hairpin_2.con', eventName = 'streetHairpinBuilt' },
+    lollo_street_merge = { conName = 'lollo_street_merge_2.con', eventName = 'streetMergeBuilt' },
     lollo_street_splitter = { conName = 'lollo_street_splitter.con', eventName = 'streetSplitterBuilt' },
     lollo_street_splitter_w_api = { conName = 'lollo_street_splitter_w_api.con', eventName = 'streetSplitterWithApiBuilt' },
     lollo_toggle_all_tram_tracks = { conName = 'lollo_toggle_all_tram_tracks.con', eventName = 'toggleAllTracksBuilt' },
@@ -49,12 +49,24 @@ local function _isBuildingStreetChanger(args)
     return _isBuildingConstructionWithFileName(args, _eventProperties.lollo_street_changer.conName)
 end
 
+local function _isBuildingStreetChunks(args)
+    return _isBuildingConstructionWithFileName(args, _eventProperties.lollo_street_chunks.conName)
+end
+
 local function _isBuildingStreetCleaver(args)
     return _isBuildingConstructionWithFileName(args, _eventProperties.lollo_street_cleaver.conName)
 end
 
 local function _isBuildingStreetGetInfo(args)
     return _isBuildingConstructionWithFileName(args, _eventProperties.lollo_street_get_info.conName)
+end
+
+local function _isBuildingStreetHairpin(args)
+    return _isBuildingConstructionWithFileName(args, _eventProperties.lollo_street_hairpin.conName)
+end
+
+local function _isBuildingStreetMerge(args)
+    return _isBuildingConstructionWithFileName(args, _eventProperties.lollo_street_merge.conName)
 end
 
 local function _isBuildingStreetSplitter(args)
@@ -426,6 +438,69 @@ local _actions = {
         )
     end,
 
+    replaceConWithSnappyCopy = function(oldConstructionId)
+        -- rebuild the station with the same but snappy, to prevent pointless internal conflicts
+        -- that will prevent changing properties
+        logger.print('replaceConWithSnappyCopy starting, oldConstructionId =', oldConstructionId)
+        if not(edgeUtils.isValidAndExistingId(oldConstructionId)) then return end
+
+        local oldConstruction = api.engine.getComponent(oldConstructionId, api.type.ComponentType.CONSTRUCTION)
+        logger.print('oldConstruction =') logger.debugPrint(oldConstruction)
+        if not(oldConstruction)
+        or not(oldConstruction.params)
+        or oldConstruction.params.snapNodes_ == 3
+        then return end
+
+        local newConstruction = api.type.SimpleProposal.ConstructionEntity.new()
+        newConstruction.fileName = oldConstruction.fileName
+
+        local newParams = arrayUtils.cloneDeepOmittingFields(oldConstruction.params, nil, true)
+        newParams.seed = oldConstruction.params.seed + 1
+        newParams.snapNodes_ = 3 -- this is what this is all about
+        logger.print('newParams =') logger.debugPrint(newParams)
+        newConstruction.params = newParams
+
+        newConstruction.transf = oldConstruction.transf
+        -- some dummy name, it will be overwritten if I bulldoze before building anew
+        -- newConstruction.name = 'LOLLO snapping lorry bay'
+        newConstruction.playerEntity = api.engine.util.getPlayer()
+
+        local proposal = api.type.SimpleProposal.new()
+        proposal.constructionsToAdd[1] = newConstruction
+        -- LOLLO NOTE different tables are handled differently.
+        -- This one requires this system, UG says they will document it or amend it.
+        proposal.constructionsToRemove = { oldConstructionId }
+        -- proposal.constructionsToRemove[1] = oldConstructionId -- fails to add
+        -- proposal.constructionsToRemove:add(oldConstructionId) -- fails to add
+        -- proposal.old2new = { -- expected number, received table
+        --     { oldConstructionId, 1 }
+        -- }
+        -- proposal.old2new = {
+        --     oldConstructionId, 1
+        -- }
+        -- proposal.old2new = {
+        --     oldConstructionId,
+        -- }
+
+        -- local context = api.type.Context:new()
+        -- context.checkTerrainAlignment = false -- true gives smoother z, default is false
+        -- context.cleanupStreetGraph = false -- default is false
+        -- context.gatherBuildings = false -- default is false
+        -- context.gatherFields = true -- default is true
+        -- context.player = api.engine.util.getPlayer()
+
+        local cmd = api.cmd.make.buildProposal(proposal, nil, true) -- the 3rd param is "ignore errors"
+        api.cmd.sendCommand(cmd, function(res, success)
+            -- if I bulldoze here, the station will inherit the old name
+            -- logger.print('LOLLO _replaceConWithSnappyCopy res = ')
+            -- logger.debugPrint(res)
+            --for _, v in pairs(res.entities) do logger.print(v) end
+            logger.print('LOLLO _replaceConWithSnappyCopy success = ') logger.debugPrint(success)
+            -- if success then
+                -- if I bulldoze here, the station will get the new name
+            -- end
+        end)
+    end,
     replaceEdgeWithSame = function(oldEdgeId)
         -- only for testing
         -- replaces a street segment with an identical one, without destroying the buildings
@@ -723,7 +798,15 @@ function data()
             if (id ~= _eventId) then return end
             if type(args) ~= 'table' then return end
             if edgeUtils.isValidAndExistingId(args.constructionEntityId) then
-                -- print('args.constructionEntityId =', args.constructionEntityId or 'NIL')
+                logger.print('args.constructionEntityId =', args.constructionEntityId or 'NIL', 'event name =', name or 'NIL')
+                if name == _eventProperties.lollo_street_chunks.eventName
+                or name == _eventProperties.lollo_street_hairpin.eventName
+                or name == _eventProperties.lollo_street_merge.eventName
+                then
+                    _actions.replaceConWithSnappyCopy(args.constructionEntityId)
+                    return
+                end
+
                 local constructionTransf = api.engine.getComponent(args.constructionEntityId, api.type.ComponentType.CONSTRUCTION).transf
                 constructionTransf = transfUtilUG.new(constructionTransf:cols(0), constructionTransf:cols(1), constructionTransf:cols(2), constructionTransf:cols(3))
                 -- print('type(constructionTransf) =', type(constructionTransf))
@@ -808,7 +891,7 @@ function data()
                             -- end
                             -- print('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>')
                         end,
-                        _myErrorHandler
+                        logger.xpErrorHandler
                     )
                 end
 
@@ -835,68 +918,46 @@ function data()
             -- LOLLO NOTE args can have different types, even boolean, depending on the event id and name
             if id == 'constructionBuilder' and name == 'builder.apply' then
                 -- if name == "builder.proposalCreate" then return end
-                -- print('guiHandleEvent caught id = constructionBuilder and name = builder.apply')
+                logger.print('guiHandleEvent caught id = constructionBuilder and name = builder.apply')
                 xpcall(
                     function()
                         if not args.result or not args.result[1] then return end
 
-                        if _isBuildingStreetCleaver(args) then
+                        local _sendCommand = function(eventName)
                             api.cmd.sendCommand(api.cmd.make.sendScriptEvent(
                                 string.sub(debug.getinfo(1, 'S').source, 1),
                                 _eventId,
-                                _eventProperties.lollo_street_cleaver.eventName,
-                                {
-                                    constructionEntityId = args.result[1]
-                                }
-                            ))
-                        elseif _isBuildingStreetSplitter(args) then
-                            api.cmd.sendCommand(api.cmd.make.sendScriptEvent(
-                                string.sub(debug.getinfo(1, 'S').source, 1),
-                                _eventId,
-                                _eventProperties.lollo_street_splitter.eventName,
-                                {
-                                    constructionEntityId = args.result[1]
-                                }
-                            ))
-                        elseif _isBuildingStreetSplitterWithApi(args) then
-                            api.cmd.sendCommand(api.cmd.make.sendScriptEvent(
-                                string.sub(debug.getinfo(1, 'S').source, 1),
-                                _eventId,
-                                _eventProperties.lollo_street_splitter_w_api.eventName,
-                                {
-                                    constructionEntityId = args.result[1]
-                                }
-                            ))
-                        elseif _isBuildingStreetGetInfo(args) then
-                            api.cmd.sendCommand(api.cmd.make.sendScriptEvent(
-                                string.sub(debug.getinfo(1, 'S').source, 1),
-                                _eventId,
-                                _eventProperties.lollo_street_get_info.eventName,
-                                {
-                                    constructionEntityId = args.result[1]
-                                }
-                            ))
-                        elseif _isBuildingStreetChanger(args) then
-                            api.cmd.sendCommand(api.cmd.make.sendScriptEvent(
-                                string.sub(debug.getinfo(1, 'S').source, 1),
-                                _eventId,
-                                _eventProperties.lollo_street_changer.eventName,
-                                {
-                                    constructionEntityId = args.result[1]
-                                }
-                            ))
-                        elseif _isBuildingToggleAllTracks(args) then
-                            api.cmd.sendCommand(api.cmd.make.sendScriptEvent(
-                                string.sub(debug.getinfo(1, 'S').source, 1),
-                                _eventId,
-                                _eventProperties.lollo_toggle_all_tram_tracks.eventName,
+                                eventName,
                                 {
                                     constructionEntityId = args.result[1]
                                 }
                             ))
                         end
+
+                        if _isBuildingStreetCleaver(args) then
+                            _sendCommand(_eventProperties.lollo_street_cleaver.eventName)
+                        elseif _isBuildingStreetSplitter(args) then
+                            _sendCommand(_eventProperties.lollo_street_splitter.eventName)
+                        elseif _isBuildingStreetSplitterWithApi(args) then
+                            _sendCommand(_eventProperties.lollo_street_splitter_w_api.eventName)
+                        elseif _isBuildingStreetGetInfo(args) then
+                            _sendCommand(_eventProperties.lollo_street_get_info.eventName)
+                        elseif _isBuildingStreetChanger(args) then
+                            _sendCommand(_eventProperties.lollo_street_changer.eventName)
+                        elseif _isBuildingStreetChunks(args) then
+                            logger.print('chunks built')
+                            _sendCommand(_eventProperties.lollo_street_chunks.eventName)
+                        elseif _isBuildingStreetHairpin(args) then
+                            logger.print('hairpin built')
+                            _sendCommand(_eventProperties.lollo_street_hairpin.eventName)
+                        elseif _isBuildingStreetMerge(args) then
+                            logger.print('merge built')
+                            _sendCommand(_eventProperties.lollo_street_merge.eventName)
+                        elseif _isBuildingToggleAllTracks(args) then
+                            _sendCommand(_eventProperties.lollo_toggle_all_tram_tracks.eventName)
+                        end
                     end,
-                    _myErrorHandler
+                    logger.xpErrorHandler
                 )
             elseif (id == 'streetBuilder' or id == 'streetTrackModifier') and name == 'builder.apply' then
                 -- I get here in 3 cases:
@@ -996,7 +1057,7 @@ function data()
 
                         -- we don't change any more stuff, the rest is ok as it is
                     end,
-                    _myErrorHandler
+                    logger.xpErrorHandler
                 )
             end
         end,
