@@ -35,7 +35,7 @@ function data()
 				There is also a 1-metre footpath.
 				[h1]Problem I: vehicles make funny turns[/h1]
 				Sometimes, vehicles overshoot a crossing, then reverse, then turn where they are meant to.
-				Use the splitter to make them change lanes where you want.
+				Use the splitter to make them change lanes where you want - ie at the split.
 				[h1]Tips:[/h1]
 				- To better visualise the lanes, start the game in debug mode and press <AltGr> + <L>.
 				- Press and hold <shift> to replace a short road segment between two joints.
