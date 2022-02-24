@@ -1,0 +1,59 @@
+function data()
+    return {
+        type = 'STREET_CONSTRUCTION',
+        description = {
+            name = _('Street remover'),
+            description = _(
+                'Sometimes, a bit of street cannot be removed, because is comes from a mod that was updated or removed. Plop this on one of those streets and it will try to remove it. It will disappear automatically after the removal attempt.'
+            )
+        },
+        availability = {
+            yearFrom = 0,
+            yearTo = 0
+        },
+        order = 1102,
+        -- collider = {
+        --     type = 'NONE'
+        -- },
+        autoRemovable = true,
+        skipCollision = true,
+        skipCollisionCheck = true,
+        updateFn = function(params)
+            -- print('lollo street remover updateFn')
+            -- debugPrint(params)
+
+            local result = {
+            -- colliders = {},
+                cost = 0,
+                edgeLists = {},
+                models = {
+                    {
+                        id = 'lollo_assets/icon/pointer.mdl',
+                        collider = {
+                            type = 'NONE'
+                        },
+                        autoRemovable = true,
+                        skipCollision = true,
+                        skipCollisionCheck = true,
+                        transf = { 1, 0, 0, 0,  0, 1, 0, 0,  0, 0, 1, 0,  0, 0, 0, 1 }
+                    }
+                },
+                --		result.groundFaces = {}
+                --		result.h0 = {}
+                --		result.h1 = {}
+                -- collider = {
+                --     type = 'NONE'
+                -- },
+                -- autoRemovable = true
+                -- skipCollision = true
+                -- skipCollisionCheck = true
+                -- LOLLO NOTE this thing with the empty faces is required , otherwise the game will make its own alignments, with spikes and all on bridges or tunnels.
+                terrainAlignmentLists = { { type = "EQUAL", optional = true, faces =  { } } },
+            }
+
+            return result
+        end,
+        upgradeFn = function(_)
+        end
+    }
+end

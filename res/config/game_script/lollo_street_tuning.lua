@@ -22,6 +22,7 @@ local _eventProperties = {
     lollo_street_get_info = { conName = 'lollo_street_get_info.con', eventName = 'streetGetInfoBuilt' },
     lollo_street_hairpin = { conName = 'lollo_street_hairpin_2.con', eventName = 'streetHairpinBuilt' },
     lollo_street_merge = { conName = 'lollo_street_merge_2.con', eventName = 'streetMergeBuilt' },
+    lollo_street_remover = { conName = 'lollo_street_remover.con', eventName = 'streetRemoverBuilt' },
     lollo_street_splitter = { conName = 'lollo_street_splitter.con', eventName = 'streetSplitterBuilt' },
     lollo_street_splitter_w_api = { conName = 'lollo_street_splitter_w_api.con', eventName = 'streetSplitterWithApiBuilt' },
     lollo_toggle_all_tram_tracks = { conName = 'lollo_toggle_all_tram_tracks.con', eventName = 'toggleAllTracksBuilt' },
@@ -67,6 +68,10 @@ end
 
 local function _isBuildingStreetMerge(args)
     return _isBuildingConstructionWithFileName(args, _eventProperties.lollo_street_merge.conName)
+end
+
+local function _isBuildingStreetRemover(args)
+    return _isBuildingConstructionWithFileName(args, _eventProperties.lollo_street_remover.conName)
 end
 
 local function _isBuildingStreetSplitter(args)
@@ -437,6 +442,78 @@ local _actions = {
             end
         )
     end,
+    removeEdge = function(oldEdgeId)
+        logger.print('removeEdge starting')
+        -- removes an edge even if it has a street type, which has changed or disappeared
+        if not(edgeUtils.isValidAndExistingId(oldEdgeId))
+        then return end
+
+        local conIdToBeRemoved = nil
+        local conId = api.engine.system.streetConnectorSystem.getConstructionEntityForEdge(oldEdgeId)
+        if edgeUtils.isValidAndExistingId(conId) then
+            local conData = api.engine.getComponent(conId, api.type.ComponentType.CONSTRUCTION)
+            if conData and conData.frozenEdges then
+                -- if conData.fileName ~= 'lollo_street_chunks.con'
+                -- and conData.fileName ~= 'lollo_street_chunks_2.con' then
+                --     logger.warn('attempting to remove a frozen edge, remove its construction instead')
+                --     return
+                -- else
+                    conIdToBeRemoved = conId
+                    logger.print('conIdToBeRemoved =') logger.debugPrint(conIdToBeRemoved)
+                -- end
+            end
+        end
+
+        local proposal = api.type.SimpleProposal.new()
+        if conIdToBeRemoved then
+            proposal.constructionsToRemove = { conIdToBeRemoved }
+        else
+            local oldBaseEdge = api.engine.getComponent(oldEdgeId, api.type.ComponentType.BASE_EDGE)
+            logger.print('oldEdge =') logger.debugPrint(oldBaseEdge)
+            local oldEdgeStreet = api.engine.getComponent(oldEdgeId, api.type.ComponentType.BASE_EDGE_STREET)
+            logger.print('oldEdgeStreet =') logger.debugPrint(oldEdgeStreet)
+            -- save a crash when a modded road underwent a breaking change, so it has no oldEdgeStreet
+            if oldBaseEdge == nil or oldEdgeStreet == nil then return end
+
+            local orphanNodeIds = {}
+            local _map = api.engine.system.streetSystem.getNode2SegmentMap()
+            if #_map[oldBaseEdge.node0] == 1 then
+                orphanNodeIds[#orphanNodeIds+1] = oldBaseEdge.node0
+            end
+            if #_map[oldBaseEdge.node1] == 1 then
+                orphanNodeIds[#orphanNodeIds+1] = oldBaseEdge.node1
+            end
+
+            proposal.streetProposal.edgesToRemove[1] = oldEdgeId
+            for i = 1, #orphanNodeIds, 1 do
+                proposal.streetProposal.nodesToRemove[i] = orphanNodeIds[i]
+            end
+
+            if oldBaseEdge.objects then
+                for o = 1, #oldBaseEdge.objects do
+                    proposal.streetProposal.edgeObjectsToRemove[#proposal.streetProposal.edgeObjectsToRemove+1] = oldBaseEdge.objects[o][1]
+                end
+            end
+        end
+
+        api.cmd.sendCommand(
+            api.cmd.make.buildProposal(proposal, nil, true),
+            function(res, success)
+                -- print('LOLLO res = ') -- debugPrint(res)
+                -- print('LOLLO _replaceEdgeWithStreetType success = ') -- debugPrint(success)
+                if not(success) then
+                    -- this fails if there are more than one contiguous invalid segments.
+                    -- the message is
+                    -- can't connect edge at position (-2170.3 / -2674.84 / 35.4797)
+                    -- to get past this, we should navigate everywhere, checking for the street types
+                    -- that can be either gone missing, or have been changed.
+                    -- Then we should replace them with their own new version (streetTypeId = oldEdgeStreet.streetType),
+                    -- or remove them
+                    logger.warn('streetTuning.removeEdge failed, proposal = ') debugPrint(proposal)
+                end
+            end
+        )
+    end,
 
     replaceConWithSnappyCopy = function(oldConstructionId)
         -- rebuild the station with the same but snappy, to prevent pointless internal conflicts
@@ -802,7 +879,7 @@ function data()
                 or name == _eventProperties.lollo_street_merge.eventName
                 then
                     _actions.replaceConWithSnappyCopy(args.constructionEntityId)
-                    return
+                    return -- return here or it will be bulldozed, all following cons get bulldozed
                 end
 
                 local constructionTransf = api.engine.getComponent(args.constructionEntityId, api.type.ComponentType.CONSTRUCTION).transf
@@ -816,6 +893,13 @@ function data()
                     -- print('street cleaver got nearestEdge =', nearestEdgeId or 'NIL')
                     if edgeUtils.isValidAndExistingId(nearestEdgeId) and not(edgeUtils.isEdgeFrozen(nearestEdgeId)) then
                         _actions.cleaveEdge(nearestEdgeId)
+                    end
+                elseif name == _eventProperties.lollo_street_remover.eventName then
+                    local nearestEdgeId = edgeUtils.street.getNearestEdgeId(constructionTransf)
+                    if edgeUtils.isValidAndExistingId(nearestEdgeId) then
+                        _actions.removeEdge(
+                            nearestEdgeId
+                        )
                     end
                 elseif name == _eventProperties.lollo_street_splitter_w_api.eventName then
                     local nearestEdgeId = edgeUtils.street.getNearestEdgeId(constructionTransf)
@@ -951,6 +1035,8 @@ function data()
                         elseif _isBuildingStreetMerge(args) then
                             logger.print('merge built')
                             _sendCommand(_eventProperties.lollo_street_merge.eventName)
+                        elseif _isBuildingStreetRemover(args) then
+                            _sendCommand(_eventProperties.lollo_street_remover.eventName)
                         elseif _isBuildingToggleAllTracks(args) then
                             _sendCommand(_eventProperties.lollo_toggle_all_tram_tracks.eventName)
                         end
