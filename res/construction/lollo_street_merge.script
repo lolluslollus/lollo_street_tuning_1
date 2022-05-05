@@ -1,5 +1,6 @@
 -- local laneutil = require('laneutil')
 local edgeUtils = require('lollo_street_tuning.edgeUtils')
+local logger = require('lollo_street_tuning.logger')
 local pitchHelper = require('lollo_street_tuning/pitchHelper')
 -- local transf = require 'transf'
 -- LOLLO TODO see if you can ease the pain when reconfiguring an existing merger. maybe skip collisions? It is not enough.
@@ -211,6 +212,7 @@ local function updateFn_2_1_lane_narrow_sidewalk_to_2_lane_one_way(params, bridg
         }
     }
 
+    logger.print('result.edgeLists =') logger.debugPrint(result.edgeLists)
     _addDummyTerrainAlignmentLists(result)
     return result
 end

@@ -535,6 +535,7 @@ local _actions = {
         newParams.seed = oldConstruction.params.seed + 1
         newParams.snapNodes_ = 3 -- this is what this is all about
         logger.print('newParams =') logger.debugPrint(newParams)
+        local paramsBak = arrayUtils.cloneDeepOmittingFields(newParams, {'seed'})
         newConstruction.params = newParams
 
         newConstruction.transf = oldConstruction.transf
@@ -557,23 +558,41 @@ local _actions = {
         --     oldConstructionId,
         -- }
 
-        -- local context = api.type.Context:new()
-        -- context.checkTerrainAlignment = false -- true gives smoother z, default is false
+        local context = api.type.Context:new()
+        context.checkTerrainAlignment = true -- true gives smoother z, default is false
         -- context.cleanupStreetGraph = false -- default is false
-        -- context.gatherBuildings = false -- default is false
+        context.gatherBuildings = true -- default is false
         -- context.gatherFields = true -- default is true
         -- context.player = api.engine.util.getPlayer()
 
-        local cmd = api.cmd.make.buildProposal(proposal, nil, true) -- the 3rd param is "ignore errors"
-        api.cmd.sendCommand(cmd, function(res, success)
+        local cmd = api.cmd.make.buildProposal(proposal, context, true) -- the 3rd param is "ignore errors"
+        api.cmd.sendCommand(cmd, function(result, success)
             -- if I bulldoze here, the station will inherit the old name
-            -- logger.print('LOLLO _replaceConWithSnappyCopy res = ')
-            -- logger.debugPrint(res)
-            --for _, v in pairs(res.entities) do logger.print(v) end
+            -- logger.print('LOLLO _replaceConWithSnappyCopy result = ')
+            -- logger.debugPrint(result)
+            --for _, v in pairs(result.entities) do logger.print(v) end
             logger.print('LOLLO _replaceConWithSnappyCopy success = ') logger.debugPrint(success)
-            -- if success then
+            if success then
                 -- if I bulldoze here, the station will get the new name
-            -- end
+                xpcall(
+                    function()
+                        -- UG TODO there is no such thing in the new api,
+                        -- nor an upgrade event, which could be useful
+                        logger.print('oldConstructionId =') logger.debugPrint(oldConstructionId)
+                        logger.print('result.resultEntities[1] =') logger.debugPrint(result.resultEntities[1])
+                        logger.print('oldConstruction.fileName =') logger.debugPrint(oldConstruction.fileName)
+                        local upgradedConId = game.interface.upgradeConstruction(
+                            result.resultEntities[1],
+                            oldConstruction.fileName,
+                            paramsBak
+                        )
+                        logger.print('upgradeConstruction succeeded') logger.debugPrint(upgradedConId)
+                    end,
+                    function(error)
+                        logger.err(error)
+                    end
+                )
+            end
         end)
     end,
     replaceEdgeWithSame = function(oldEdgeId)
