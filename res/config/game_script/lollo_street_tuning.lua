@@ -561,9 +561,9 @@ local _actions = {
         local context = api.type.Context:new()
         context.checkTerrainAlignment = true -- true gives smoother z, default is false
         -- context.cleanupStreetGraph = false -- default is false
-        context.gatherBuildings = true -- default is false
+        -- context.gatherBuildings = true -- default is false
         -- context.gatherFields = true -- default is true
-        -- context.player = api.engine.util.getPlayer()
+        context.player = api.engine.util.getPlayer()
 
         local cmd = api.cmd.make.buildProposal(proposal, context, true) -- the 3rd param is "ignore errors"
         api.cmd.sendCommand(cmd, function(result, success)
@@ -574,24 +574,25 @@ local _actions = {
             logger.print('LOLLO _replaceConWithSnappyCopy success = ') logger.debugPrint(success)
             if success then
                 -- if I bulldoze here, the station will get the new name
-                xpcall(
-                    function()
-                        -- UG TODO there is no such thing in the new api,
-                        -- nor an upgrade event, which could be useful
-                        logger.print('oldConstructionId =') logger.debugPrint(oldConstructionId)
-                        logger.print('result.resultEntities[1] =') logger.debugPrint(result.resultEntities[1])
-                        logger.print('oldConstruction.fileName =') logger.debugPrint(oldConstruction.fileName)
-                        local upgradedConId = game.interface.upgradeConstruction(
-                            result.resultEntities[1],
-                            oldConstruction.fileName,
-                            paramsBak
-                        )
-                        logger.print('upgradeConstruction succeeded') logger.debugPrint(upgradedConId)
-                    end,
-                    function(error)
-                        logger.err(error)
-                    end
-                )
+                -- LOLLO TODO the following was not required before beta 350**, it is useless after 35041
+                -- xpcall(
+                --     function()
+                --         -- UG TODO there is no such thing in the new api,
+                --         -- nor an upgrade event, which could be useful
+                --         logger.print('oldConstructionId =') logger.debugPrint(oldConstructionId)
+                --         logger.print('result.resultEntities[1] =') logger.debugPrint(result.resultEntities[1])
+                --         logger.print('oldConstruction.fileName =') logger.debugPrint(oldConstruction.fileName)
+                --         local upgradedConId = game.interface.upgradeConstruction(
+                --             result.resultEntities[1],
+                --             oldConstruction.fileName,
+                --             paramsBak
+                --         )
+                --         logger.print('upgradeConstruction succeeded') logger.debugPrint(upgradedConId)
+                --     end,
+                --     function(error)
+                --         logger.err(error)
+                --     end
+                -- )
             end
         end)
     end,
@@ -897,7 +898,7 @@ function data()
                 or name == _eventProperties.lollo_street_hairpin.eventName
                 or name == _eventProperties.lollo_street_merge.eventName
                 then
-                    _actions.replaceConWithSnappyCopy(args.constructionEntityId)
+                    -- _actions.replaceConWithSnappyCopy(args.constructionEntityId)
                     return -- return here or it will be bulldozed, all following cons get bulldozed
                 end
 
@@ -998,7 +999,7 @@ function data()
 
                 _actions.bulldozeConstruction(args.constructionEntityId)
             elseif edgeUtils.isValidAndExistingId(args.edgeId) and edgeUtils.isValidId(args.streetTypeId) then
-                -- print('args.edgeId =', args.edgeId or 'NIL')
+                logger.print('args.edgeId =', args.edgeId or 'NIL')
                 if name == _eventProperties.noTramRightRoadBuilt.eventName then
                     _actions.replaceEdgeWithStreetType(
                         args.edgeId,
