@@ -573,8 +573,7 @@ local _actions = {
             --for _, v in pairs(result.entities) do logger.print(v) end
             logger.print('LOLLO _replaceConWithSnappyCopy success = ') logger.debugPrint(success)
             if success then
-                -- if I bulldoze here, the station will get the new name
-                -- LOLLO TODO the following was not required before beta 350**, it is useless after 35041
+                -- LOLLO NOTE the following was not required before beta 350**, it is useless after 35041
                 -- xpcall(
                 --     function()
                 --         -- UG TODO there is no such thing in the new api,
