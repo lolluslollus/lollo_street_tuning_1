@@ -862,7 +862,7 @@ local _actions = {
                     return -- change nothing and leave
                 end
             end
-            newEdge0.comp.objects = edge0Objects -- LOLLO NOTE cannot insert directly into edge0.comp.objects
+            newEdge0.comp.objects = edge0Objects -- LOLLO NOTE cannot insert directly into edge0.comp.objects. Different tables are handled differently...
             newEdge1.comp.objects = edge1Objects
         end
 
