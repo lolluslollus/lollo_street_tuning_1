@@ -576,17 +576,28 @@ local _actions = {
             if success then
                 xpcall(
                     function()
-                        -- UG TODO there is no such thing in the new api,
-                        -- nor an upgrade event, which could be useful
-                        logger.print('oldConId =') logger.debugPrint(oldConId)
-                        logger.print('result.resultEntities[1] =') logger.debugPrint(result.resultEntities[1])
-                        logger.print('oldConstruction.fileName =') logger.debugPrint(oldConstruction.fileName)
-                        local upgradedConId = game.interface.upgradeConstruction(
-                            result.resultEntities[1],
-                            oldConstruction.fileName,
-                            paramsBak
-                        )
-                        logger.print('upgradeConstruction succeeded') logger.debugPrint(upgradedConId)
+                        if result
+                        and result.resultProposalData
+                        and result.resultProposalData.errorState
+                        and not(result.resultProposalData.errorState.critical)
+                        and result.resultEntities
+                        and result.resultEntities[1] ~= nil
+                        and result.resultEntities[1] > 0
+                        then
+                            -- UG TODO there is no such thing in the new api,
+                            -- nor an upgrade event, both would be useful
+                            logger.print('oldConId =') logger.debugPrint(oldConId)
+                            logger.print('result.resultEntities[1] =') logger.debugPrint(result.resultEntities[1])
+                            logger.print('oldConstruction.fileName =') logger.debugPrint(oldConstruction.fileName)
+                            local upgradedConId = game.interface.upgradeConstruction(
+                                result.resultEntities[1],
+                                oldConstruction.fileName,
+                                paramsBak
+                            )
+                            logger.print('upgradeConstruction succeeded') logger.debugPrint(upgradedConId)
+                        else
+                            logger.warn('cannot upgrade construction')
+                        end
                     end,
                     function(error)
                         logger.err(error)
@@ -1036,6 +1047,7 @@ function data()
                 xpcall(
                     function()
                         if not args.result or not args.result[1] then return end
+                        if args.data.errorState and args.data.errorState.critical then logger.warn('cannot rebuild snappy copy') return end
 
                         local _sendCommand = function(eventName)
                             api.cmd.sendCommand(api.cmd.make.sendScriptEvent(
