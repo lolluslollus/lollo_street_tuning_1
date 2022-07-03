@@ -525,7 +525,7 @@ local _actions = {
         logger.print('oldConstruction =') logger.debugPrint(oldConstruction)
         if not(oldConstruction)
         or not(oldConstruction.params)
-        or oldConstruction.params.snapNodes_ == 3
+        or oldConstruction.params.snapNodes_ == 3 -- leave if nothing is going to change
         then return end
 
         local newConstruction = api.type.SimpleProposal.ConstructionEntity.new()
@@ -600,7 +600,7 @@ local _actions = {
                         end
                     end,
                     function(error)
-                        logger.err(error)
+                        logger.warn(error)
                     end
                 )
             end
