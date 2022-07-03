@@ -210,7 +210,7 @@ return {
             },
             {
                 key = 'extraRadius4Hairpin',
-                name = _('Extra radius (adjust it with Ü and + while building)'),
+                name = _('Extra radius (adjust it with Ü and + or [ and ] while building)'),
                 values = extraRadiusHelper.getParamValues(),
                 defaultIndex = extraRadiusHelper.getDefaultParamValue(),
                 uiType = 'SLIDER'
