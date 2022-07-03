@@ -1,7 +1,8 @@
-local arrayUtils = require('lollo_street_tuning/arrayUtils')
+local arrayUtils = require('lollo_street_tuning.arrayUtils')
 local edgeUtils = require('lollo_street_tuning.edgeUtils')
-local pitchHelper = require('lollo_street_tuning/pitchHelper')
-local streetUtils = require('lollo_street_tuning/streetUtils')
+local extraRadiusHelper = require('lollo_street_tuning.extraRadiusHelper')
+local pitchHelper = require('lollo_street_tuning.pitchHelper')
+local streetUtils = require('lollo_street_tuning.streetUtils')
 local streetUtilUG = require('streetutil')
 local vec3 = require('vec3')
 
@@ -208,6 +209,13 @@ return {
                 defaultIndex = 1
             },
             {
+                key = 'extraRadius4Hairpin',
+                name = _('Extra radius (adjust it with Ü and + while building)'),
+                values = extraRadiusHelper.getParamValues(),
+                defaultIndex = extraRadiusHelper.getDefaultParamValue(),
+                uiType = 'SLIDER'
+            },
+            {
                 key = 'pitch4Hairpin',
                 name = _('Pitch (adjust it with O and P while building)'),
                 values = pitchHelper.getPitchParamValues(),
@@ -216,7 +224,7 @@ return {
             }
         }
     end,
-    getStreetHairpinSnapEdgeLists = function(params, pitchAngle, streetData, bridgeData, tramTrackType)
+    getStreetHairpinSnapEdgeLists = function(params, extraRadius, pitchAngle, streetData, bridgeData, tramTrackType)
         local streetHalfWidth = _getStreetHalfWidth(streetData)
         local widthFactorBend = _getWidthFactor(streetHalfWidth)
         -- this is the fruit of trial and error, see the notes
@@ -235,8 +243,8 @@ return {
                     params.direction4Hairpin,
                     pitchAngle,
                     1,
-                    {-xMax, -widthFactorBend * streetHalfWidth, 0},
-                    {0, -widthFactorBend * streetHalfWidth, 0},
+                    {-xMax, -widthFactorBend * streetHalfWidth -extraRadius, 0},
+                    {0, -widthFactorBend * streetHalfWidth -extraRadius, 0},
                     {xMax, 0, 0},
                     {xMax, 0, 0}
                 ),
@@ -261,8 +269,8 @@ return {
                     params.direction4Hairpin,
                     -pitchAngle,
                     2,
-                    {0, widthFactorBend * streetHalfWidth, 0},
-                    {-xMax, widthFactorBend * streetHalfWidth, 0},
+                    {0, widthFactorBend * streetHalfWidth + extraRadius, 0},
+                    {-xMax, widthFactorBend * streetHalfWidth + extraRadius, 0},
                     {-xMax, 0, 0},
                     {-xMax, 0, 0}
                 ),
@@ -276,16 +284,16 @@ return {
         if params.direction4Hairpin == 0 then
             streetUtilUG.addEdgeAutoTangents(
                 edgeLists[2].edges,
-                vec3.new(0, -widthFactorBend * streetHalfWidth, 0),
-                vec3.new(0, widthFactorBend * streetHalfWidth, 0),
+                vec3.new(0, -widthFactorBend * streetHalfWidth -extraRadius, 0),
+                vec3.new(0, widthFactorBend * streetHalfWidth + extraRadius, 0),
                 vec3.new(1, 0, 0),
                 vec3.new(-1, 0, 0)
             )
         else
             streetUtilUG.addEdgeAutoTangents(
                 edgeLists[2].edges,
-                vec3.new(0, widthFactorBend * streetHalfWidth, 0),
-                vec3.new(0, -widthFactorBend * streetHalfWidth, 0),
+                vec3.new(0, widthFactorBend * streetHalfWidth + extraRadius, 0),
+                vec3.new(0, -widthFactorBend * streetHalfWidth -extraRadius, 0),
                 vec3.new(1, 0, 0),
                 vec3.new(-1, 0, 0)
             )

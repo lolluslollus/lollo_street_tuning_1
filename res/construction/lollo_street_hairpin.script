@@ -1,4 +1,5 @@
-local pitchHelper = require('lollo_street_tuning/pitchHelper')
+local extraRadiusHelper = require('lollo_street_tuning.extraRadiusHelper')
+local pitchHelper = require('lollo_street_tuning.pitchHelper')
 local streetHairpinHelper = require('lollo_street_tuning/lolloStreetHairpinHelper')
 
 function data()
@@ -41,6 +42,7 @@ function data()
             -- and clicking it will bring up the params menu.
             result.edgeLists = streetHairpinHelper.getStreetHairpinSnapEdgeLists(
                 params,
+                extraRadiusHelper.getExtraRadius(params, params.extraRadius4Hairpin),
                 pitchHelper.getPitchAngle(params, params.pitch4Hairpin),
                 two.globalStreetData[params.streetType4Hairpin + 1],
                 two.globalBridgeData[params.bridgeType4Hairpin + 1],

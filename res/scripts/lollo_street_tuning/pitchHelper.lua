@@ -24,11 +24,11 @@ end
 -------------------------- pitch calculations --------------------------
 helper.getPitchAngle = function(params, paramsPitch)
     -- note that writing into params has no effect coz it is passed by value
-    local paramsParamX = params.paramX or 0
-    local paramsPitch = paramsPitch or _maxPitch4Slider
+    local _paramsParamX = params.paramX or 0
+    local _paramsPitch = paramsPitch or _maxPitch4Slider
 
     -- params.upgrade = true tells me that I am upgrading an existing construction
-    local paramsPitchIndexBase0 = paramsPitch + paramsParamX * _paramX2Pitch
+    local paramsPitchIndexBase0 = _paramsPitch + _paramsParamX * _paramX2Pitch
 
     paramsPitchIndexBase0 = math.max(0, paramsPitchIndexBase0)
     paramsPitchIndexBase0 = math.min(_maxPitch4Slider + _maxPitch4Slider, paramsPitchIndexBase0)
