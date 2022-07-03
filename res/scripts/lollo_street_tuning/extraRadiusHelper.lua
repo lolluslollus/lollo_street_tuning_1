@@ -1,8 +1,8 @@
 local helper = {}
 
 local _maxExtraRadius4Slider = 100 -- I need a high value coz the arrow key bumps it by 10 at every click
-local _extraRadiusAdjustmentFactor = 0.25
-local _paramY2ExtraRadius = 16 / math.pi
+local _extraRadiusAdjustmentFactor = 0.1
+local _paramY2ExtraRadius = 16 / math.pi -- every keypress is 16 / PI
 
 ------------------------- construction parameters ----------------------
 helper.getParamValues = function()
