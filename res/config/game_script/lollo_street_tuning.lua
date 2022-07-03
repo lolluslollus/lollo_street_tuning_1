@@ -927,7 +927,11 @@ function data()
                         or name == _eventProperties.lollo_street_hairpin.eventName
                         or name == _eventProperties.lollo_street_merge.eventName
                         then
-                            _actions.replaceConWithSnappyCopy(args.constructionEntityId)
+                            -- LOLLO NOTE as of build 35050 (or the one before),
+                            -- transforming unsnapping edge nodes into snapping ones might break the connection
+                            -- and game.interface.upgradeConstruction often fails to restore it.
+                            -- This breaks wysiwyg, so we don't do it anymore.
+                            -- _actions.replaceConWithSnappyCopy(args.constructionEntityId)
                             -- return here or it will be bulldozed, all following cons get bulldozed
                         else
                             local constructionTransf = api.engine.getComponent(args.constructionEntityId, api.type.ComponentType.CONSTRUCTION).transf
@@ -1070,15 +1074,16 @@ function data()
                             _sendCommand(_eventProperties.lollo_street_get_info.eventName)
                         elseif _isBuildingStreetChanger(args) then
                             _sendCommand(_eventProperties.lollo_street_changer.eventName)
-                        elseif _isBuildingStreetChunks(args) then
-                            logger.print('chunks built')
-                            _sendCommand(_eventProperties.lollo_street_chunks.eventName)
-                        elseif _isBuildingStreetHairpin(args) then
-                            logger.print('hairpin built')
-                            _sendCommand(_eventProperties.lollo_street_hairpin.eventName)
-                        elseif _isBuildingStreetMerge(args) then
-                            logger.print('merge built')
-                            _sendCommand(_eventProperties.lollo_street_merge.eventName)
+                        -- we don't do this anymore, see the NOTE above
+                        -- elseif _isBuildingStreetChunks(args) then
+                        --     logger.print('chunks built')
+                        --     _sendCommand(_eventProperties.lollo_street_chunks.eventName)
+                        -- elseif _isBuildingStreetHairpin(args) then
+                        --     logger.print('hairpin built')
+                        --     _sendCommand(_eventProperties.lollo_street_hairpin.eventName)
+                        -- elseif _isBuildingStreetMerge(args) then
+                        --     logger.print('merge built')
+                        --     _sendCommand(_eventProperties.lollo_street_merge.eventName)
                         elseif _isBuildingStreetRemover(args) then
                             _sendCommand(_eventProperties.lollo_street_remover.eventName)
                         elseif _isBuildingToggleAllTracks(args) then
@@ -1156,7 +1161,8 @@ function data()
                         end
 
                         -- add bus lane right if required for current road
-                        --[[
+--[[
+                        LOLLO NOTE
                         this causes crashes with build 35050 and the paths that turn into bridges from the freestyle station.
                         local pathBuiltEventParams = {}
                         for _, addedSegment in pairs(addedSegments) do
@@ -1179,7 +1185,7 @@ function data()
                                 pathBuiltEventParams[i]
                             ))
                         end
-                        ]]
+]]
 
                         -- we don't change any more stuff, the rest is ok as it is
                     end,
