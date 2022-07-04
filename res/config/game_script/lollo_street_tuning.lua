@@ -2,7 +2,7 @@ local arrayUtils = require('lollo_street_tuning.arrayUtils')
 local edgeUtils = require('lollo_street_tuning.edgeUtils')
 local logger = require('lollo_street_tuning.logger')
 local streetUtils = require('lollo_street_tuning.streetUtils')
-local stringUtils = require('lollo_street_tuning/stringUtils')
+local stringUtils = require('lollo_street_tuning.stringUtils')
 local transfUtils = require('lollo_street_tuning.transfUtils')
 local transfUtilUG = require('transf')
 
@@ -442,6 +442,7 @@ local _actions = {
             end
         )
     end,
+
     removeEdge = function(oldEdgeId)
         logger.print('removeEdge starting')
         -- removes an edge even if it has a street type, which has changed or disappeared
@@ -571,7 +572,7 @@ local _actions = {
         -- local cmd = api.cmd.make.buildProposal(proposal, context, true) -- the 3rd param is "ignore errors"
 ]]
 
-        local cmd = api.cmd.make.buildProposal(proposal, nil, true) -- the 3rd param is "ignore errors"
+        local cmd = api.cmd.make.buildProposal(proposal, nil, false) -- the 3rd param is "ignore errors"
         api.cmd.sendCommand(cmd, function(result, success)
             -- logger.print('LOLLO replaceConWithSnappyCopy result = ') logger.debugPrint(result)
             logger.print('LOLLO replaceConWithSnappyCopy success = ') logger.debugPrint(success)
