@@ -1,6 +1,6 @@
 local logger = require('lollo_street_tuning.logger')
-local pitchHelper = require('lollo_street_tuning/pitchHelper')
-local streetChunksHelper = require('lollo_street_tuning/lolloStreetChunksHelper')
+local pitchHelper = require('lollo_street_tuning.pitchHelper')
+local streetChunksHelper = require('lollo_street_tuning.lolloStreetChunksHelper')
 -- local debugger = require('debugger')
 
 function data()

@@ -1,6 +1,6 @@
-local arrayUtils = require('lollo_street_tuning/arrayUtils')
-local pitchHelper = require('lollo_street_tuning/pitchHelper')
-local streetUtils = require('lollo_street_tuning/streetUtils')
+local arrayUtils = require('lollo_street_tuning.arrayUtils')
+local pitchHelper = require('lollo_street_tuning.pitchHelper')
+local streetUtils = require('lollo_street_tuning.streetUtils')
 
 local helper = {
     getParams = function()

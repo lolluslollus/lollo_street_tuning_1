@@ -1,5 +1,5 @@
 local idTransf = {1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1}
-local pitchUtil = require('lollo_street_tuning/lolloPitchHelper')
+local pitchUtil = require('lollo_street_tuning.lolloPitchHelper')
 local transf = require 'transf'
 local vec3 = require 'vec3'
 

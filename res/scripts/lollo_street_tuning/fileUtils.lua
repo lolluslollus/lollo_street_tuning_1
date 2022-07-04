@@ -1,4 +1,4 @@
-local stringUtils = require('lollo_street_tuning/stringUtils')
+local stringUtils = require('lollo_street_tuning.stringUtils')
 
 local function _getPackageCpaths()
     -- returns something like

@@ -1,7 +1,7 @@
 local extraRadiusHelper = require('lollo_street_tuning.extraRadiusHelper')
 local logger = require('lollo_street_tuning.logger')
 local pitchHelper = require('lollo_street_tuning.pitchHelper')
-local streetHairpinHelper = require('lollo_street_tuning/lolloStreetHairpinHelper')
+local streetHairpinHelper = require('lollo_street_tuning.lolloStreetHairpinHelper')
 
 function data()
     return {

@@ -1,7 +1,7 @@
-local arrayUtils = require('lollo_street_tuning/arrayUtils')
+local arrayUtils = require('lollo_street_tuning.arrayUtils')
 local edgeUtils = require('lollo_street_tuning.edgeUtils')
-local pitchHelper = require('lollo_street_tuning/pitchHelper')
-local streetUtils = require('lollo_street_tuning/streetUtils')
+local pitchHelper = require('lollo_street_tuning.pitchHelper')
+local streetUtils = require('lollo_street_tuning.streetUtils')
 
 -- --------------- parameters ------------------------
 local _distances = {}

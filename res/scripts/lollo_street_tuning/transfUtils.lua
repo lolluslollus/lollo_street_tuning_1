@@ -1,4 +1,4 @@
-local matrixUtils = require('lollo_street_tuning/matrix')
+local matrixUtils = require('lollo_street_tuning.matrix')
 
 local utils = {}
 

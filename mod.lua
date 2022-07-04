@@ -1,10 +1,10 @@
 local arrayUtils = require('lollo_street_tuning.arrayUtils')
 local modSettings = require('lollo_street_tuning.settings')
-local streetChunksHelper = require('lollo_street_tuning/lolloStreetChunksHelper')
-local streetHairpinHelper = require('lollo_street_tuning/lolloStreetHairpinHelper')
-local streetMergeHelper = require('lollo_street_tuning/lolloStreetMergeHelper')
-local streetUtils = require('lollo_street_tuning/streetUtils')
-local stringUtils = require('lollo_street_tuning/stringUtils')
+local streetChunksHelper = require('lollo_street_tuning.lolloStreetChunksHelper')
+local streetHairpinHelper = require('lollo_street_tuning.lolloStreetHairpinHelper')
+local streetMergeHelper = require('lollo_street_tuning.lolloStreetMergeHelper')
+local streetUtils = require('lollo_street_tuning.streetUtils')
+local stringUtils = require('lollo_street_tuning.stringUtils')
 -- local debugger = require('debugger')
 
 -- LOLLO TODO
