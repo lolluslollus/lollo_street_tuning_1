@@ -1,4 +1,5 @@
 local extraRadiusHelper = require('lollo_street_tuning.extraRadiusHelper')
+local logger = require('lollo_street_tuning.logger')
 local pitchHelper = require('lollo_street_tuning.pitchHelper')
 local streetHairpinHelper = require('lollo_street_tuning/lolloStreetHairpinHelper')
 
@@ -54,31 +55,31 @@ function data()
             return result
         end,
         getModelsFn = function(variant, closureParams)
-            print('LOLLO getModelsFn') -- never fires
-            debugPrint(variant)
-            debugPrint(closureParams)
+            logger.print('LOLLO getModelsFn') -- never fires
+            logger.debugPrint(variant)
+            logger.debugPrint(closureParams)
             return {}
         end,
         -- preProcessFn = function(one, two, three)
-        --     print('LOLLO preProcessFn') -- never fires coz construction is not modular
+        --     logger.print('LOLLO preProcessFn') -- never fires coz construction is not modular
         --     debugger()
-        --     debugPrint(one)
-        --     debugPrint(two)
-        --     debugPrint(three)
+        --     logger.debugPrint(one)
+        --     logger.debugPrint(two)
+        --     logger.debugPrint(three)
         -- end,
         upgradeFn = function(_)
-            print('LOLLO upgradeFn') -- never fires
+            logger.print('LOLLO upgradeFn') -- never fires
             -- LOLLO NOTE the game wants this function to be defined, even if it returns an empty table.
             -- If you leave it out, adding and removing tram tracks won't work.
             -- (Bus lanes don't work anyway.)
             return {}
         end,
         -- createTemplateFn = function(one, two, three)
-        --     print('LOLLO createTemplateFn') -- never fires
+        --     logger.print('LOLLO createTemplateFn') -- never fires
         --     debugger()
-        --     debugPrint(one)
-        --     debugPrint(two)
-        --     debugPrint(three)
+        --     logger.debugPrint(one)
+        --     logger.debugPrint(two)
+        --     logger.debugPrint(three)
         -- end,
     }
 end

@@ -1,7 +1,7 @@
 -- local laneutil = require('laneutil')
 local edgeUtils = require('lollo_street_tuning.edgeUtils')
 local logger = require('lollo_street_tuning.logger')
-local pitchHelper = require('lollo_street_tuning/pitchHelper')
+local pitchHelper = require('lollo_street_tuning.pitchHelper')
 -- local transf = require 'transf'
 -- LOLLO TODO see if you can ease the pain when reconfiguring an existing merger. maybe skip collisions? It is not enough.
 

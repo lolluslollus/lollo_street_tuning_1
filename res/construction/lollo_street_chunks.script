@@ -1,6 +1,7 @@
+local logger = require('lollo_street_tuning.logger')
 local pitchHelper = require('lollo_street_tuning/pitchHelper')
 local streetChunksHelper = require('lollo_street_tuning/lolloStreetChunksHelper')
-local debugger = require('debugger')
+-- local debugger = require('debugger')
 
 function data()
     return {
@@ -54,32 +55,32 @@ function data()
             return result
         end,
         getModelsFn = function(variant, closureParams)
-            print('LOLLO getModelsFn') -- never fires
-            debugPrint(variant)
-            debugPrint(closureParams)
+            logger.print('LOLLO getModelsFn') -- never fires
+            logger.debugPrint(variant)
+            logger.debugPrint(closureParams)
             return {}
         end,
         preProcessFn = function(one, two, three)
-            print('LOLLO preProcessFn') -- never fires
-            debugger()
-            debugPrint(one)
-            debugPrint(two)
-            debugPrint(three)
+            logger.print('LOLLO preProcessFn') -- never fires
+            -- debugger()
+            logger.debugPrint(one)
+            logger.debugPrint(two)
+            logger.debugPrint(three)
         end,
         upgradeFn = function(_)
-            print('LOLLO upgradeFn') -- never fires
-            debugger()
+            logger.print('LOLLO upgradeFn') -- never fires
+            -- debugger()
             -- LOLLO NOTE the game wants this function to be defined, even if it returns an empty table.
             -- If you leave it out, adding and removing tram tracks won't work.
             -- (Bus lanes don't work anyway.)
             return {}
         end,
         createTemplateFn = function(one, two, three)
-            print('LOLLO createTemplateFn') -- never fires
-            debugger()
-            debugPrint(one)
-            debugPrint(two)
-            debugPrint(three)
+            logger.print('LOLLO createTemplateFn') -- never fires
+            -- debugger()
+            logger.debugPrint(one)
+            logger.debugPrint(two)
+            logger.debugPrint(three)
         end,
     }
 end

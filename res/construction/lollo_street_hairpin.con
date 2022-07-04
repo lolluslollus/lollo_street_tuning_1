@@ -11,6 +11,7 @@ function data()
         },
         -- params = streetChunksHelper.getStreetHairpinParams(),
         order = 1242,
+        autoRemovable = false, -- Used to allow the construction to be removed, if it collides with something else.
         skipCollision = true,
     }
 end

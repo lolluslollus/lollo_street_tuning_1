@@ -1,4 +1,4 @@
-local pitchHelper = require('lollo_street_tuning/pitchHelper')
+local pitchHelper = require('lollo_street_tuning.pitchHelper')
 -- LOLLO TODO see if you can ease the pain when reconfiguring an existing merger. maybe skip collisions? It is not enough.
 
 function data()

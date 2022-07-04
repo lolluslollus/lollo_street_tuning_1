@@ -64,6 +64,7 @@ function data()
             return result
         end,
         upgradeFn = function(_)
+            return {}
         end
     }
 end

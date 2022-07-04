@@ -14,7 +14,7 @@ function data()
         -- collider = {
         --     type = 'NONE'
         -- },
-        -- autoRemovable = true,
+        autoRemovable = false, -- Used to allow the construction to be removed, if it collides with something else.
         skipCollision = true,
         --skipCollisionCheck = true,
     }
