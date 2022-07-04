@@ -1,4 +1,4 @@
-local myUtil = require('lollo_street_tuning.mdlHelpers/lollo_street_confluence_4_lanes_large_street_narrow_sidewalk')
+local myUtil = require('lollo_street_tuning.mdlHelpers.lollo_street_confluence_4_lanes_large_street_narrow_sidewalk')
 
 function data()
     return {
