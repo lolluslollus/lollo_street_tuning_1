@@ -17,9 +17,9 @@ function data()
 				This mod adds a street construction to toggle extra tram tracks. Plop it on a road and it will add or remove extra tram tracks, if there are enough lanes.
 				Previous iterations exposed roads with many tram tracks in the street menu, but that was ugly.
 				[h1]Problem D: vehicles queue up unnecessarily[/h1]
-				The game does not offer lane-bound waypoints, so routing the vehicles might involve some trial and error.
-				[h2]Solution: use dedicated roads[/h2]
-				Replace the offending road with one of the same width, that reserves the right lane for certain vehicles. Use the standard replace tool (the magic wand), helping yourself with <shift> to select a shorter segment of road. Use the slicer to cut your own segments if you must. Select the new road with the category icon to avoid confusion. Toggle bus lanes on or off as required, using the standard tool. Toggle tram tracks in the middle as required, using the dedicated street construction tool.
+				The game newly offers lane waypoints: use them.
+				[h2]Solution: use dedicated roads (now redundant, switch them off with the new mod setting)[/h2]
+				If lane waypoints are not enough, replace the offending road with one of the same width, that reserves the right lane for certain vehicles. Use the standard replace tool (the magic wand), helping yourself with <shift> to select a shorter segment of road. Use the slicer to cut your own segments if you must. Select the new road with the category icon to avoid confusion. Toggle bus lanes on or off as required, using the standard tool. Toggle tram tracks in the middle as required, using the dedicated street construction tool.
 				[h2]Fine-grained solution: split your road into segments[/h2]
 				When you build a long enough piece of road, the game splits it into seamless segments. The joints between them allow vehicles to change lanes. The trouble is, these segments are fairly long, and crossings do not allow switching lanes. If you have a shortish stretch of road, then a crossing, then another shortish stretch, then another crossing, chances are, vehicles cannot change lanes for a long while.
 				You can split a piece of road by adding an intersecting street and deleting it, but this often involves destroying several buildings. To keep the carnage down, use the slicer. Once you have multiple segments, you can change the road in some or all of them, selectively. Try adding an extra lane to the segment with the streetside stop only.
@@ -71,7 +71,6 @@ function data()
 				This is a UG problem. To solve it, replace those stations with some others available in your game.
 				B) The game always draws the tram track on the outer lane(s), even if trams are barred there. Take this as a graphical glitch.
 				C) The game always expects buses to be allowed in the outer lane(s).
-                D) Adding a bus lane to a road can break your multi-lane paths. Trial and error is the way out of this game limitation.
 			]],
 			["_NAME"] = "Street fine tuning",
 			["snapNodesName"] = "Snap to neighbours",
