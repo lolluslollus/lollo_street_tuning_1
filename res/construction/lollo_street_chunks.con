@@ -16,6 +16,28 @@ function data()
         -- },
         autoRemovable = false, -- Used to allow the construction to be removed, if it collides with something else.
         skipCollision = true,
-        --skipCollisionCheck = true,
+        updateFn = function(params)
+            local result = {
+                colliders = { },
+                cost = 0,
+                edgeLists = { },
+                groundFaces = { },
+                labelText = {
+                    [0] = { _('ReplaceWithNewer'), _('ReplaceWithNewer') }
+                },
+                models = {
+                    {
+                        id = 'lollo_assets/icon/red_w_message.mdl',
+                        transf = { 1, 0, 0, 0,  0, 1, 0, 0,  0, 0, 1, 0,  0, 0, 0, 1 }
+                    }
+                },
+                terrainAlignmentLists = { },
+            }
+
+            return result
+        end,
+        upgradeFn = function(_)
+            return {}
+        end
     }
 end
