@@ -382,7 +382,13 @@ function data()
             params = {
                 {
                     key = "lolloStreetTuning_YellowBusLaneStripes",
-                    name = _("Yellow bus lanes with stripes"),
+                    name = _("YellowBusLanes"),
+                    values = { _("No"), _("Yes"), },
+                    defaultIndex = 1,
+                },
+                {
+                    key = "lolloStreetTuning_IsMakeReservedLanes",
+                    name = _("MakeReservedLanes"),
                     values = { _("No"), _("Yes"), },
                     defaultIndex = 1,
                 },
@@ -435,7 +441,9 @@ function data()
                 streetUtils.getGlobalBridgeDataPlusNoBridge(),
                 streetUtils.getGlobalStreetData()
             )
-            _addStreetsWithReservedLanes()
+            if modSettings.get('lolloStreetTuning_IsMakeReservedLanes') == 1 then
+                _addStreetsWithReservedLanes()
+            end
             _hideAllTramTracksStreets()
         end
     }

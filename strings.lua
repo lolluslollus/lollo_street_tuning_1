@@ -83,7 +83,9 @@ function data()
 			["BridgeType"] = "Bridge Type",
 			["NoBridge"] = "No Bridge",
 			["StreetType"] = "Street Type",
-			["ReplaceWithNewer"] = "This construction is an old version: remove it and rebuild it to upgrade"
+			["ReplaceWithNewer"] = "This construction is an old version: remove it and rebuild it to upgrade",
+			["YellowBusLanes"] = "Yellow bus lanes with stripes",
+			["MakeReservedLanes"] = "Make reserved lanes",
 		},
 	}
 end

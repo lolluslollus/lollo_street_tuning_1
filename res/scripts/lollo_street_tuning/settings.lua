@@ -38,6 +38,12 @@ results.setModParamsFromRunFn = function(thisModParams)
     else
         game.config._lolloStreetTuning.lolloStreetTuning_YellowBusLaneStripes = 1
     end
+
+    if type(thisModParams) == 'table' and thisModParams.lolloStreetTuning_IsMakeReservedLanes == 0 then
+        game.config._lolloStreetTuning.lolloStreetTuning_IsMakeReservedLanes = 0
+    else
+        game.config._lolloStreetTuning.lolloStreetTuning_IsMakeReservedLanes = 1
+    end
 end
 
 return results
