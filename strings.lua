@@ -28,8 +28,8 @@ function data()
 				[h1]Problem F: ugly or impossible merges[/h1]
 				This mod adds a "street construction" to build merges. For example, you can merge up to four one-lane streets into a large one, perhaps for a fancy station square arrangement.
 				Merges can be reconfigured after being placed, if the street layout allows it. If a merge misbehaves after a mod update, change its direction twice (ie reverse and restore) to update it to the latest version.
-				[h1]Problem G: ugly tight curves[/h1]
-				This mod adds a "street construction" to build prettier tight curves. Lock a curve to keep its shape pretty and prevent other roads merging in. Unlock it to treat it like ordinary roads. You cannot relock an unlocked curve.
+				[h1]Problem G: ugly curves[/h1]
+				This mod adds a "street construction" to build prettier curves. Lock a curve to keep its shape pretty and prevent other roads merging in. Unlock it to treat it like ordinary roads. You cannot relock an unlocked curve. You can combine two of these to make custom roundabouts.
 				[h1]Problem H: no footpaths[/h1]
 				This mod adds some thin footpaths, nearly invisible. You can use them to perform various tricks, eg connecting stations to roads or having people walk across a park. Give them a bus lane to pedestrianise them.
 				There is also a 1-metre footpath.
