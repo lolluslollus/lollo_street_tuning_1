@@ -26,7 +26,6 @@ local _eventProperties = {
     lollo_street_splitter = { conName = 'lollo_street_splitter.con', eventName = 'streetSplitterBuilt' },
     lollo_street_splitter_w_api = { conName = 'lollo_street_splitter_w_api.con', eventName = 'streetSplitterWithApiBuilt' },
     lollo_toggle_all_tram_tracks = { conName = 'lollo_toggle_all_tram_tracks.con', eventName = 'toggleAllTracksBuilt' },
-    lollo_track_splitter_w_api = { conName = 'lollo_track_splitter_w_api.con', eventName = 'trackSplitterWithApiBuilt' },
     noTramRightRoadBuilt = { conName = '', eventName = 'noTramRightRoadBuilt' },
     pathBuilt = { conName = '', eventName = 'pathBuilt' },
 }
@@ -81,10 +80,6 @@ end
 
 local function _isBuildingStreetSplitterWithApi(args)
     return _isBuildingConstructionWithFileName(args, _eventProperties.lollo_street_splitter_w_api.conName)
-end
-
-local function _isBuildingTrackSplitterWithApi(args)
-    return _isBuildingConstructionWithFileName(args, _eventProperties.lollo_track_splitter_w_api.conName)
 end
 
 local function _isBuildingToggleAllTracks(args)
@@ -766,7 +761,7 @@ local _actions = {
         )
     end,
 
-    splitStreetEdge = function(wholeEdgeId, nodeBetween)
+    splitEdge = function(wholeEdgeId, nodeBetween)
         if not(edgeUtils.isValidAndExistingId(wholeEdgeId)) or type(nodeBetween) ~= 'table' then return end
 
         local oldBaseEdge = api.engine.getComponent(wholeEdgeId, api.type.ComponentType.BASE_EDGE)
@@ -779,7 +774,7 @@ local _actions = {
         if node0 == nil or node1 == nil then return end
 
         if not(edgeUtils.isXYZSame(nodeBetween.refPosition0, node0.position)) and not(edgeUtils.isXYZSame(nodeBetween.refPosition0, node1.position)) then
-            print('WARNING: splitStreetEdge cannot find the nodes')
+            print('WARNING: splitEdge cannot find the nodes')
         end
         local isNodeBetweenOrientatedLikeMyEdge = edgeUtils.isXYZSame(nodeBetween.refPosition0, node0.position)
         local distance0 = isNodeBetweenOrientatedLikeMyEdge and nodeBetween.refDistance0 or nodeBetween.refDistance1
@@ -894,141 +889,7 @@ local _actions = {
                 -- debugPrint(result)
                 -- print('LOLLO street splitter callback returned success = ', success)
                 if not(success) then
-                    print('Warning: streetTuning.splitStreetEdge failed, proposal = ') debugPrint(proposal)
-                end
-            end
-        )
-    end,
-
-    splitTrackEdge = function(wholeEdgeId, nodeBetween)
-        if not(edgeUtils.isValidAndExistingId(wholeEdgeId)) or type(nodeBetween) ~= 'table' then return end
-
-        local oldBaseEdge = api.engine.getComponent(wholeEdgeId, api.type.ComponentType.BASE_EDGE)
-        local oldBaseEdgeStreet = api.engine.getComponent(wholeEdgeId, api.type.ComponentType.BASE_EDGE_STREET)
-        -- save a crash when a modded road underwent a breaking change, so it has no oldEdgeStreet
-        if oldBaseEdge == nil or oldBaseEdgeStreet == nil then return end
-
-        local node0 = api.engine.getComponent(oldBaseEdge.node0, api.type.ComponentType.BASE_NODE)
-        local node1 = api.engine.getComponent(oldBaseEdge.node1, api.type.ComponentType.BASE_NODE)
-        if node0 == nil or node1 == nil then return end
-
-        if not(edgeUtils.isXYZSame(nodeBetween.refPosition0, node0.position)) and not(edgeUtils.isXYZSame(nodeBetween.refPosition0, node1.position)) then
-            print('WARNING: splitTrackEdge cannot find the nodes')
-        end
-        local isNodeBetweenOrientatedLikeMyEdge = edgeUtils.isXYZSame(nodeBetween.refPosition0, node0.position)
-        local distance0 = isNodeBetweenOrientatedLikeMyEdge and nodeBetween.refDistance0 or nodeBetween.refDistance1
-        local distance1 = isNodeBetweenOrientatedLikeMyEdge and nodeBetween.refDistance1 or nodeBetween.refDistance0
-        local tanSign = isNodeBetweenOrientatedLikeMyEdge and 1 or -1
-
-        local oldTan0Length = edgeUtils.getVectorLength(oldBaseEdge.tangent0)
-        local oldTan1Length = edgeUtils.getVectorLength(oldBaseEdge.tangent1)
-
-        local playerOwned = api.type.PlayerOwned.new()
-        playerOwned.player = api.engine.util.getPlayer()
-
-        local newNodeBetween = api.type.NodeAndEntity.new()
-        newNodeBetween.entity = -3
-        newNodeBetween.comp.position = api.type.Vec3f.new(nodeBetween.position.x, nodeBetween.position.y, nodeBetween.position.z)
-
-        local newEdge0 = api.type.SegmentAndEntity.new()
-        newEdge0.entity = -1
-        newEdge0.type = 0 -- 0 is api.type.enum.Carrier.ROAD, 1 is api.type.enum.Carrier.RAIL
-        newEdge0.comp.node0 = oldBaseEdge.node0
-        newEdge0.comp.node1 = -3
-        newEdge0.comp.tangent0 = api.type.Vec3f.new(
-            oldBaseEdge.tangent0.x * distance0 / oldTan0Length,
-            oldBaseEdge.tangent0.y * distance0 / oldTan0Length,
-            oldBaseEdge.tangent0.z * distance0 / oldTan0Length
-        )
-        newEdge0.comp.tangent1 = api.type.Vec3f.new(
-            nodeBetween.tangent.x * distance0 * tanSign,
-            nodeBetween.tangent.y * distance0 * tanSign,
-            nodeBetween.tangent.z * distance0 * tanSign
-        )
-        newEdge0.comp.type = oldBaseEdge.type -- respect bridge or tunnel
-        newEdge0.comp.typeIndex = oldBaseEdge.typeIndex -- respect bridge or tunnel type
-        newEdge0.playerOwned = playerOwned
-        newEdge0.streetEdge = oldBaseEdgeStreet
-
-        local newEdge1 = api.type.SegmentAndEntity.new()
-        newEdge1.entity = -2
-        newEdge1.type = 0 -- 0 is api.type.enum.Carrier.ROAD, 1 is api.type.enum.Carrier.RAIL
-        newEdge1.comp.node0 = -3
-        newEdge1.comp.node1 = oldBaseEdge.node1
-        newEdge1.comp.tangent0 = api.type.Vec3f.new(
-            nodeBetween.tangent.x * distance1 * tanSign,
-            nodeBetween.tangent.y * distance1 * tanSign,
-            nodeBetween.tangent.z * distance1 * tanSign
-        )
-        newEdge1.comp.tangent1 = api.type.Vec3f.new(
-            oldBaseEdge.tangent1.x * distance1 / oldTan1Length,
-            oldBaseEdge.tangent1.y * distance1 / oldTan1Length,
-            oldBaseEdge.tangent1.z * distance1 / oldTan1Length
-        )
-        newEdge1.comp.type = oldBaseEdge.type
-        newEdge1.comp.typeIndex = oldBaseEdge.typeIndex
-        newEdge1.playerOwned = playerOwned
-        newEdge1.streetEdge = oldBaseEdgeStreet
-
-        if type(oldBaseEdge.objects) == 'table' then
-            -- local edge0StationGroups = {}
-            -- local edge1StationGroups = {}
-            local edge0Objects = {}
-            local edge1Objects = {}
-            for _, edgeObj in pairs(oldBaseEdge.objects) do
-                local edgeObjPosition = edgeUtils.getObjectPosition(edgeObj[1])
-                -- print('edge object position =') debugPrint(edgeObjPosition)
-                if type(edgeObjPosition) ~= 'table' then return end -- change nothing and leave
-                local assignment = _utils.getWhichEdgeGetsEdgeObjectAfterSplit(
-                    edgeObjPosition,
-                    {node0.position.x, node0.position.y, node0.position.z},
-                    {node1.position.x, node1.position.y, node1.position.z},
-                    nodeBetween
-                )
-                if assignment.assignToSide == 0 then
-                    -- LOLLO NOTE if we skip this check,
-                    -- one can split a road between left and right terminals of a streetside staion
-                    -- and add more terminals on the new segments.
-                    -- local stationGroupId = api.engine.system.stationGroupSystem.getStationGroup(edgeObj[1])
-                    -- if arrayUtils.arrayHasValue(edge1StationGroups, stationGroupId) then return end -- don't split station groups
-                    -- if edgeUtils.isValidId(stationGroupId) then table.insert(edge0StationGroups, stationGroupId) end
-                    table.insert(edge0Objects, { edgeObj[1], edgeObj[2] })
-                elseif assignment.assignToSide == 1 then
-                    -- local stationGroupId = api.engine.system.stationGroupSystem.getStationGroup(edgeObj[1])
-                    -- if arrayUtils.arrayHasValue(edge0StationGroups, stationGroupId) then return end -- don't split station groups
-                    -- if edgeUtils.isValidId(stationGroupId) then table.insert(edge1StationGroups, stationGroupId) end
-                    table.insert(edge1Objects, { edgeObj[1], edgeObj[2] })
-                else
-                    -- print('don\'t change anything and leave')
-                    -- print('LOLLO error, assignment.assignToSide =', assignment.assignToSide)
-                    return -- change nothing and leave
-                end
-            end
-            newEdge0.comp.objects = edge0Objects -- LOLLO NOTE cannot insert directly into edge0.comp.objects. Different tables are handled differently...
-            newEdge1.comp.objects = edge1Objects
-        end
-
-        local proposal = api.type.SimpleProposal.new()
-        proposal.streetProposal.edgesToAdd[1] = newEdge0
-        proposal.streetProposal.edgesToAdd[2] = newEdge1
-        proposal.streetProposal.edgesToRemove[1] = wholeEdgeId
-        proposal.streetProposal.nodesToAdd[1] = newNodeBetween
-
-        local context = api.type.Context:new()
-        context.checkTerrainAlignment = true -- default is false, true gives smoother Z
-        -- context.cleanupStreetGraph = true -- default is false
-        -- context.gatherBuildings = true  -- default is false
-        -- context.gatherFields = true -- default is true
-        context.player = api.engine.util.getPlayer() -- default is -1
-
-        api.cmd.sendCommand(
-            api.cmd.make.buildProposal(proposal, context, true), -- the 3rd param is "ignore errors"; wrong proposals will be discarded anyway
-            function(result, success)
-                -- print('LOLLO street splitter callback returned result = ')
-                -- debugPrint(result)
-                -- print('LOLLO street splitter callback returned success = ', success)
-                if not(success) then
-                    print('Warning: streetTuning.splitTrackEdge failed, proposal = ') debugPrint(proposal)
+                    print('Warning: streetTuning.splitEdge failed, proposal = ') debugPrint(proposal)
                 end
             end
         )
@@ -1109,23 +970,7 @@ function data()
                                         }
                                     )
                                     -- print('nodeBetween =') debugPrint(nodeBetween)
-                                    _actions.splitStreetEdge(nearestEdgeId, nodeBetween)
-                                end
-                            elseif name == _eventProperties.lollo_track_splitter_w_api.eventName then
-                                local nearestEdgeId = edgeUtils.track.getNearestEdgeIdStrict(constructionTransf)
-                                -- print('track splitter got nearestEdge =', nearestEdgeId or 'NIL')
-                                if edgeUtils.isValidAndExistingId(nearestEdgeId) and not(edgeUtils.isEdgeFrozen(nearestEdgeId)) then
-                                    local nodeBetween = edgeUtils.getNodeBetweenByPosition(
-                                        nearestEdgeId,
-                                        -- LOLLO NOTE position and transf are always very similar
-                                        {
-                                            x = constructionTransf[13],
-                                            y = constructionTransf[14],
-                                            z = constructionTransf[15],
-                                        }
-                                    )
-                                    -- print('nodeBetween =') debugPrint(nodeBetween)
-                                    _actions.splitTrackEdge(nearestEdgeId, nodeBetween)
+                                    _actions.splitEdge(nearestEdgeId, nodeBetween)
                                 end
                             elseif name == _eventProperties.lollo_street_changer.eventName then
                                 local nearestEdgeId = edgeUtils.street.getNearestEdgeId(
@@ -1246,8 +1091,6 @@ function data()
                             _sendCommand(_eventProperties.lollo_street_remover.eventName)
                         elseif _isBuildingToggleAllTracks(args) then
                             _sendCommand(_eventProperties.lollo_toggle_all_tram_tracks.eventName)
-                        elseif _isBuildingTrackSplitterWithApi(args) then
-                            _sendCommand(_eventProperties.lollo_track_splitter_w_api.eventName)
                         end
                     end,
                     logger.xpErrorHandler
