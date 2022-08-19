@@ -3,11 +3,11 @@ local transf = require 'transf'
 
 function data()
     return {
-        type = 'STREET_CONSTRUCTION',
+        type = 'TRACK_CONSTRUCTION',
         description = {
-            name = _('Smart street splitter'),
+            name = _('Smart track splitter'),
             description = _(
-                'Automatically splits a street in two sections. Place different types of streets or roads between and outside splits, to route road vehicles on different lanes.'
+                'Automatically splits a track in two sections.'
             )
         },
         availability = {
