@@ -1,6 +1,6 @@
 function data()
     local modSettings = require('lollo_street_tuning.settings')
-    local _isUseBusLaneStripes = modSettings.get('lolloStreetTuning_YellowBusLaneStripes') == 1
+    local _isUseBusLaneStripes = modSettings.getModParams('lolloStreetTuning_YellowBusLaneStripes') == 1
 
     return {
         order = 3,

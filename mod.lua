@@ -441,7 +441,7 @@ function data()
                 streetUtils.getGlobalBridgeDataPlusNoBridge(),
                 streetUtils.getGlobalStreetData()
             )
-            if modSettings.get('lolloStreetTuning_IsMakeReservedLanes') == 1 then
+            if modSettings.getModParams('lolloStreetTuning_IsMakeReservedLanes') == 1 then
                 _addStreetsWithReservedLanes()
             end
             _hideAllTramTracksStreets()
