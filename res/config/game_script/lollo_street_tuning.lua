@@ -86,14 +86,29 @@ local function _isBuildingToggleAllTracks(args)
     return _isBuildingConstructionWithFileName(args, _eventProperties.lollo_toggle_all_tram_tracks.conName)
 end
 
+local _guiUtils = {
+    sendCommand = function(eventName, args)
+        api.cmd.sendCommand(api.cmd.make.sendScriptEvent(
+            string.sub(debug.getinfo(1, 'S').source, 1),
+            _eventId,
+            eventName,
+            {
+                constructionEntityId = args.result[1]
+            }
+        ))
+    end
+}
+
 local _utils = {
     getToggledAllTramTracksStreetTypeFileName = function(streetFileName)
+        logger.print('getToggledAllTramTracksStreetTypeFileName starting, streetFileName =') logger.debugPrint(streetFileName)
         if type(streetFileName) ~= 'string' or streetFileName == '' then return nil end
 
-        local allStreetsData = streetUtils.getGlobalStreetData(streetUtils.getStreetDataFilters().STOCK_AND_RESERVED_LANES)
-        -- print('allStreetsData has', #allStreetsData, 'records')
+        local allStreetsData = streetUtils.getGlobalStreetData({streetUtils.getStreetDataFilters().STOCK_AND_RESERVED_LANES})
+        logger.print('allStreetsData has', #allStreetsData, 'records')
         local oldStreetData = nil
         for _, value in pairs(allStreetsData) do
+            logger.print('checking', value.fileName or 'NIL')
             if stringUtils.stringEndsWith(streetFileName, value.fileName) then
                 oldStreetData = value
                 break
@@ -113,8 +128,7 @@ local _utils = {
         end
         if #sameSizeStreetsData == 0 then return nil end
 
-        -- print('sameSizeStreetsProperties =')
-        -- debugPrint(sameSizeStreetsProperties)
+        logger.print('sameSizeStreetsData =') logger.debugPrint(sameSizeStreetsData)
 
         local _getConcatCategories = function(arr)
             local result = ''
@@ -125,6 +139,7 @@ local _utils = {
         end
 
         local oldStreetCategoriesStr = _getConcatCategories(oldStreetData.categories)
+        logger.print('oldStreetCategoriesStr =') logger.debugPrint(oldStreetCategoriesStr)
         for i = 1, #sameSizeStreetsData do
             -- LOLLO TODO this estimator may be a little weak.
             -- we need a new property in streetUtils._getStreetTypesWithApi
@@ -693,6 +708,7 @@ local _actions = {
     end,
 
     replaceEdgeWithStreetType = function(oldEdgeId, newStreetTypeId)
+        logger.print('replaceEdgeWithStreetType starting')
         -- replaces the street without destroying the buildings
         if not(edgeUtils.isValidAndExistingId(oldEdgeId))
         or not(edgeUtils.isValidId(newStreetTypeId)) then return end
@@ -715,8 +731,10 @@ local _actions = {
 
         -- add / remove tram tracks upgrade if the new street type explicitly wants so
         if streetUtils.isTramRightBarred(newStreetTypeId) then
+            logger.print('tram barred in right lane')
             newEdge.streetEdge.tramTrackType = 0
         elseif streetUtils.isStreetAllTramTracks((api.res.streetTypeRep.get(newStreetTypeId) or {}).laneConfigs) then
+            logger.print('the new street type is for trams in all lanes')
             newEdge.streetEdge.tramTrackType = 2
         end
 
@@ -730,7 +748,10 @@ local _actions = {
         if newEdge.streetEdge.streetType == oldEdgeStreet.streetType
         and newEdge.streetEdge.tramTrackType == oldEdgeStreet.tramTrackType
         and newEdge.streetEdge.hasBus == oldEdgeStreet.hasBus
-        then return end
+        then
+            logger.print('nothing changed, leaving')
+            return
+        end
 
         local proposal = api.type.SimpleProposal.new()
         proposal.streetProposal.edgesToRemove[1] = oldEdgeId
@@ -755,7 +776,7 @@ local _actions = {
                 -- print('LOLLO res = ') -- debugPrint(res)
                 -- print('LOLLO _replaceEdgeWithStreetType success = ') -- debugPrint(success)
                 if not(success) then
-                    print('Warning: streetTuning.replaceEdgeWithStreetType failed, proposal = ') debugPrint(proposal)
+                    logger.warn('replaceEdgeWithStreetType failed, proposal = ') logger.warningDebugPrint(proposal)
                 end
             end
         )
@@ -911,7 +932,7 @@ function data()
 				-- "menu.modules.settingsWindow",
 			}) do
 				local iLayoutItem = api.gui.util.getById(id)
-				if iLayoutItem then
+				if iLayoutItem ~= nil then
 					iLayoutItem:setResizable(true)
 					iLayoutItem:setIcon("ui/hammer19.tga")
 				end
@@ -992,7 +1013,7 @@ function data()
                                         local newStreetTypeFileName = _utils.getToggledAllTramTracksStreetTypeFileName(
                                             api.res.streetTypeRep.getFileName(oldEdgeStreet.streetType)
                                         )
-                                        -- print('newStreetTypeFileName =', newStreetTypeFileName or 'NIL')
+                                        -- logger.print('newStreetTypeFileName =', newStreetTypeFileName or 'NIL')
                                         if type(newStreetTypeFileName) == 'string' then
                                             _actions.replaceEdgeWithStreetType(
                                                 nearestEdgeId,
@@ -1053,44 +1074,33 @@ function data()
                 logger.print('guiHandleEvent caught id = constructionBuilder and name = builder.apply')
                 xpcall(
                     function()
-                        if not args.result or not args.result[1] then return end
-                        if args.data.errorState and args.data.errorState.critical then logger.warn('cannot rebuild snappy copy') return end
-
-                        local _sendCommand = function(eventName)
-                            api.cmd.sendCommand(api.cmd.make.sendScriptEvent(
-                                string.sub(debug.getinfo(1, 'S').source, 1),
-                                _eventId,
-                                eventName,
-                                {
-                                    constructionEntityId = args.result[1]
-                                }
-                            ))
-                        end
+                        if not args or not args.result or not args.result[1] then return end
+                        if args.data.errorState and args.data.errorState.critical then logger.warn('cannot build or rebuild because of a critical error') return end
 
                         if _isBuildingStreetCleaver(args) then
-                            _sendCommand(_eventProperties.lollo_street_cleaver.eventName)
+                            _guiUtils.sendCommand(_eventProperties.lollo_street_cleaver.eventName, args)
                         elseif _isBuildingStreetSplitter(args) then
-                            _sendCommand(_eventProperties.lollo_street_splitter.eventName)
+                            _guiUtils.sendCommand(_eventProperties.lollo_street_splitter.eventName, args)
                         elseif _isBuildingStreetSplitterWithApi(args) then
-                            _sendCommand(_eventProperties.lollo_street_splitter_w_api.eventName)
+                            _guiUtils.sendCommand(_eventProperties.lollo_street_splitter_w_api.eventName, args)
                         elseif _isBuildingStreetGetInfo(args) then
-                            _sendCommand(_eventProperties.lollo_street_get_info.eventName)
+                            _guiUtils.sendCommand(_eventProperties.lollo_street_get_info.eventName, args)
                         elseif _isBuildingStreetChanger(args) then
-                            _sendCommand(_eventProperties.lollo_street_changer.eventName)
+                            _guiUtils.sendCommand(_eventProperties.lollo_street_changer.eventName, args)
                         -- we don't do this anymore, see the NOTE above
                         -- elseif _isBuildingStreetChunks(args) then
                         --     logger.print('chunks built')
-                        --     _sendCommand(_eventProperties.lollo_street_chunks.eventName)
+                        --     _guiUtils.sendCommand(_eventProperties.lollo_street_chunks.eventName, args)
                         -- elseif _isBuildingStreetHairpin(args) then
                         --     logger.print('hairpin built')
-                        --     _sendCommand(_eventProperties.lollo_street_hairpin.eventName)
+                        --     _guiUtils.sendCommand(_eventProperties.lollo_street_hairpin.eventName, args)
                         -- elseif _isBuildingStreetMerge(args) then
                         --     logger.print('merge built')
-                        --     _sendCommand(_eventProperties.lollo_street_merge.eventName)
+                        --     _guiUtils.sendCommand(_eventProperties.lollo_street_merge.eventName, args)
                         elseif _isBuildingStreetRemover(args) then
-                            _sendCommand(_eventProperties.lollo_street_remover.eventName)
+                            _guiUtils.sendCommand(_eventProperties.lollo_street_remover.eventName, args)
                         elseif _isBuildingToggleAllTracks(args) then
-                            _sendCommand(_eventProperties.lollo_toggle_all_tram_tracks.eventName)
+                            _guiUtils.sendCommand(_eventProperties.lollo_toggle_all_tram_tracks.eventName, args)
                         end
                     end,
                     logger.xpErrorHandler
@@ -1105,7 +1115,7 @@ function data()
                 -- I need to downgrade it to "no tram tracks",
                 -- otherwise trams will still try to ride in the rightmost lane.
                 -- It can be done by hand but this is handier.
-                -- print('guiHandleEvent caught id = streetBuilder and name = builder.apply')
+                -- logger.print('guiHandleEvent caught id =', id, 'and name = builder.apply')
                 -- local function _getRemovedSegment(removedSegments, addedSegment)
                 --     if not(removedSegments) or not(addedSegment) or not(addedSegment.comp) then return nil end
 

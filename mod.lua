@@ -1,4 +1,5 @@
 local arrayUtils = require('lollo_street_tuning.arrayUtils')
+local logger = require('lollo_street_tuning.logger')
 local modSettings = require('lollo_street_tuning.settings')
 local streetChunksHelper = require('lollo_street_tuning.lolloStreetChunksHelper')
 local streetHairpinHelper = require('lollo_street_tuning.lolloStreetHairpinHelper')
@@ -273,15 +274,17 @@ function data()
         -- print('LOLLO fileName=', fileName)
         if _tryReplaceOuterLanes(newStreet, targetTransportModes) == true then
             api.res.streetTypeRep.add(newStreet.type, newStreet, true)
-            -- print('LOLLO added', newStreet.type)
+            logger.print('LOLLO added', newStreet.type)
             -- debugPrint(newStreet)
         end
     end
 
     local function _addStreetsWithReservedLanes()
+        logger.print('_addStreetsWithReservedLanes starting')
         local streetDataTable = streetUtils.getGlobalStreetData()
+        logger.print('streetDataTable has', #streetDataTable, 'records')
         for _, streetDataRecordSmall in pairs(streetDataTable) do
-            -- print('LOLLO fileName =', streetDataRecordSmall.fileName or '')
+            logger.print('processing fileName =', streetDataRecordSmall.fileName or 'NIL')
             -- if stringUtils.stringContains(streetDataRecordSmall.fileName, 'town_medium_one_way_new') then
             --     print('about 1 to add variants to ', streetDataRecordSmall.fileName)
             -- end
@@ -343,6 +346,7 @@ function data()
                 end
             end
         end
+        logger.print('_addStreetsWithReservedLanes ending')
     end
 
     local function _hideAllTramTracksStreets()
