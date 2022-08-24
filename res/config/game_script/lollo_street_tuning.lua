@@ -1024,16 +1024,29 @@ function data()
                                 end
                             elseif name == _eventProperties.lollo_street_get_info.eventName then
                                 local nearbyEdges = edgeUtils.getNearbyObjects(constructionTransf, 0.5, api.type.ComponentType.BASE_EDGE)
-                                local nearbyConstructions = edgeUtils.getNearbyObjects(constructionTransf, 0.5, api.type.ComponentType.CONSTRUCTION)
+                                -- local nearbyConstructions = edgeUtils.getNearbyObjects(constructionTransf, 0.5, api.type.ComponentType.CONSTRUCTION)
                                 print('nearby edges = <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<')
                                 for edgeId, props in pairs(nearbyEdges) do
                                     if edgeUtils.isValidId(edgeId) then
                                         print('edge id =', edgeId)
                                         debugPrint(props)
                                         print('street edge props =')
-                                        debugPrint(api.engine.getComponent(edgeId, api.type.ComponentType.BASE_EDGE_STREET))
+                                        local streetEdgeProps = api.engine.getComponent(edgeId, api.type.ComponentType.BASE_EDGE_STREET)
+                                        debugPrint(streetEdgeProps)
+                                        if streetEdgeProps ~= nil and type(streetEdgeProps.streetType) == 'number' and streetEdgeProps.streetType > -1 then
+                                            print('streetTypeFileName =')
+                                            debugPrint(api.res.streetTypeRep.getFileName(streetEdgeProps.streetType))
+                                        end
                                         print('track edge props =')
-                                        debugPrint(api.engine.getComponent(edgeId, api.type.ComponentType.BASE_EDGE_TRACK))
+                                        local trackEdgeProps = api.engine.getComponent(edgeId, api.type.ComponentType.BASE_EDGE_TRACK)
+                                        debugPrint(trackEdgeProps)
+                                        if trackEdgeProps ~= nil and type(trackEdgeProps.trackType) == 'number' and trackEdgeProps.trackType > -1 then
+                                            print('trackTypeFileName =')
+                                            debugPrint(api.res.trackTypeRep.getFileName(trackEdgeProps.trackType))
+                                        end
+                                        -- LOLLO TOTO street type res/config/street/lollo_medium_4_lane_street-0001011000000000.lua
+                                        -- has transport modes = 00111... in the rightmost lanes.
+                                        -- expected is {0, 0, 0, 1,  0, 1, 1, 0,  0, 0, 0, 0,  0, 0, 0, 0}
                                     end
                                 end
                                 print('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>')
