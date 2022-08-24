@@ -137,11 +137,11 @@ function data()
             "SMALL_SHIP", 12
      ]]
 
-    local function _tryReplaceOuterLanes(oldStreetLaneConfigs, newStreet, targetTransportModes)
+    local function _getNewLaneConfigs(oldStreetLaneConfigs, targetTransportModes)
         local isSuccess = false
+        local results = {}
+
         local _isOneWay = streetUtils.isStreetOneWay(oldStreetLaneConfigs)
-        newStreet.laneConfigs = {}
-        -- print('LOLLO _isOneWay =', _isOneWay)
         for index, oldLaneConfig in pairs(oldStreetLaneConfigs) do
             local newLaneConfig = api.type.LaneConfig.new()
             newLaneConfig.speed = oldLaneConfig.speed
@@ -179,10 +179,10 @@ function data()
                 newLaneConfig.transportModes = oldLaneConfig.transportModes
             end
 
-            newStreet.laneConfigs[index] = newLaneConfig
+            results[index] = newLaneConfig
         end
 
-        return isSuccess
+        if isSuccess then return results else return false end
     end
 
     local function _addOneStreetWithOuterReservedLanes(oldStreet, fileName, targetTransportModes, descSuffix, categorySuffix, extraAssets)
@@ -195,7 +195,7 @@ function data()
         -- for key, value in pairs(streetData) do -- dumps
         newStreet.name = oldStreet.name .. ' - ' .. descSuffix
         newStreet.desc = oldStreet.desc .. ' - ' .. descSuffix
-        local isShowLog = newStreet.name == 'Medium street - 4 lanes - passengers right lane'
+        -- local isShowLog = newStreet.name == 'Medium street - 4 lanes - passengers right lane'
 
         -- newStreet.fileName = 'lollo_large_4_lane_4_tram_tracks_street_2.lua' -- dumps
         newStreet.categories = oldStreet.categories
@@ -272,21 +272,28 @@ function data()
         newStreet.embankmentSlopeLow = oldStreet.embankmentSlopeLow
         newStreet.embankmentSlopeHigh = oldStreet.embankmentSlopeHigh
         newStreet.maintenanceCost = oldStreet.maintenanceCost
+        newStreet.laneConfigs = oldStreet.laneConfigs
 
-        if _tryReplaceOuterLanes(oldStreet.laneConfigs, newStreet, targetTransportModes) == true then
-            -- UG TODO 35050 I insert a street type with my own laneConfigs,
-            -- but the api.get returns the old laneConfigs: why?
-            local streetTypeCountBefore = #api.res.streetTypeRep.getAll()
+        local newLaneConfigs = _getNewLaneConfigs(oldStreet.laneConfigs, targetTransportModes)
+        if newLaneConfigs then
+            -- LOLLO NOTE newly, you must add a streetType and then alter its laneConfig,
+            -- otherwise the new lane config is ignored.
             api.res.streetTypeRep.add(newStreet.type, newStreet, true)
-            local streetTypeCountAfter = #api.res.streetTypeRep.getAll()
-            if isShowLog then
-                print('new street "' .. newStreet.type .. '"added, it is') debugPrint(newStreet)
-                local streetTypeIndex_ = api.res.streetTypeRep.find(newStreet.type)
-                print('the api returns') debugPrint(api.res.streetTypeRep.get(streetTypeIndex_))
-                print('street type count before =', streetTypeCountBefore)
-                print('street type count streetTypeCountAfter =', streetTypeCountAfter)
+
+            local newStreetTypeIndex = api.res.streetTypeRep.find(newStreet.type)
+            if newStreetTypeIndex > -1 then
+                local newStreetTypeProps = api.res.streetTypeRep.get(newStreetTypeIndex)
+                -- newStreetTypeProps.laneConfigs = newLaneConfigs -- dumps, must do the lines one by one
+                for i = 1, #newStreetTypeProps.laneConfigs, 1 do
+                    newStreetTypeProps.laneConfigs[i] = newLaneConfigs[i]
+                end
+
+                logger.print('LOLLO added new street type', newStreet.type)
+            else
+                logger.print('LOLLO did not add the new street type', newStreet.type or 'NIL')
             end
-            logger.print('LOLLO added new street', newStreet.type)
+        else
+            logger.print('LOLLO got no new laneConfigs for new street type', newStreet.type)
         end
     end
 
@@ -379,7 +386,7 @@ function data()
 
     return {
         info = {
-            minorVersion = 55,
+            minorVersion = 56,
             severityAdd = 'NONE',
             severityRemove = 'WARNING',
             name = _('_NAME'),
