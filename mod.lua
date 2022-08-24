@@ -137,26 +137,24 @@ function data()
             "SMALL_SHIP", 12
      ]]
 
-    local function _tryReplaceOuterLanes(newStreet, targetTransportModes)
-        -- print('LOLLO newStreet before change =')
-        -- debugPrint(newStreet)
+    local function _tryReplaceOuterLanes(oldStreetLaneConfigs, newStreet, targetTransportModes)
         local isSuccess = false
-        local _isOneWay = streetUtils.isStreetOneWay(newStreet.laneConfigs)
+        local _isOneWay = streetUtils.isStreetOneWay(oldStreetLaneConfigs)
+        newStreet.laneConfigs = {}
         -- print('LOLLO _isOneWay =', _isOneWay)
-        for index, oldLaneConfig in pairs(newStreet.laneConfigs) do
+        for index, oldLaneConfig in pairs(oldStreetLaneConfigs) do
             local newLaneConfig = api.type.LaneConfig.new()
             newLaneConfig.speed = oldLaneConfig.speed
             newLaneConfig.width = oldLaneConfig.width
             newLaneConfig.height = oldLaneConfig.height
-            if _isOneWay and index > 1 and index < #newStreet.laneConfigs then
+            if _isOneWay and index > 1 and index < #oldStreetLaneConfigs then
                 -- invert one-way lanes so the bus lane and the tram track appear on the right
                 newLaneConfig.forward = true --false --not(oldLaneConfig.forward)
             else
                 newLaneConfig.forward = oldLaneConfig.forward
             end
-
             -- change the transport modes of the rightmost lane
-            if streetUtils.getIsOuterLane(newStreet.laneConfigs, index, _isOneWay) then
+            if streetUtils.getIsOuterLane(oldStreetLaneConfigs, index, _isOneWay) then
                 local newTransportModes = arrayUtils.cloneOmittingFields(targetTransportModes)
                 -- do not allow a transport mode that is disallowed in the original street type
                 -- if oldLaneConfig.transportModes[api.type.enum.TransportMode.BUS + 1] == 0 then
@@ -183,19 +181,23 @@ function data()
 
             newStreet.laneConfigs[index] = newLaneConfig
         end
-        -- print('LOLLO newStreet after change =')
-        -- debugPrint(newStreet)
+
         return isSuccess
     end
 
     local function _addOneStreetWithOuterReservedLanes(oldStreet, fileName, targetTransportModes, descSuffix, categorySuffix, extraAssets)
         local newStreet = api.type.StreetType.new()
 
+        newStreet.type = string.sub(fileName, 1, string.len(fileName) - string.len('.lua')) .. '-' .. streetUtils.transportModes.getLaneConfigToString(targetTransportModes) .. '.lua'
+        local streetTypeIndex = api.res.streetTypeRep.find(newStreet.type)
+        if streetTypeIndex > -1 then print('street type already present') end
+
         -- for key, value in pairs(streetData) do -- dumps
         newStreet.name = oldStreet.name .. ' - ' .. descSuffix
         newStreet.desc = oldStreet.desc .. ' - ' .. descSuffix
+        local isShowLog = newStreet.name == 'Medium street - 4 lanes - passengers right lane'
+
         -- newStreet.fileName = 'lollo_large_4_lane_4_tram_tracks_street_2.lua' -- dumps
-        newStreet.type = string.sub(fileName, 1, string.len(fileName) - string.len('.lua')) .. '-' .. streetUtils.transportModes.getLaneConfigToString(targetTransportModes) .. '.lua'
         newStreet.categories = oldStreet.categories
         local newCategories = {}
         for _, value in pairs(newStreet.categories) do
@@ -236,7 +238,7 @@ function data()
         newStreet.yearFrom = oldStreet.yearFrom or 0
         newStreet.yearTo = oldStreet.yearTo or 0
         newStreet.priority = oldStreet.priority
-        newStreet.aiLock = oldStreet.aiLock or false
+        newStreet.aiLock = oldStreet.aiLock or true
         -- LOLLO NOTE the api cannot read or write visibility, use the third parameter of the add function instead.
         newStreet.country = oldStreet.country or false
         -- LOLLO NOTE busAndTramRight has no effect if cars are not allowed
@@ -270,12 +272,21 @@ function data()
         newStreet.embankmentSlopeLow = oldStreet.embankmentSlopeLow
         newStreet.embankmentSlopeHigh = oldStreet.embankmentSlopeHigh
         newStreet.maintenanceCost = oldStreet.maintenanceCost
-        newStreet.laneConfigs = oldStreet.laneConfigs
-        -- print('LOLLO fileName=', fileName)
-        if _tryReplaceOuterLanes(newStreet, targetTransportModes) == true then
+
+        if _tryReplaceOuterLanes(oldStreet.laneConfigs, newStreet, targetTransportModes) == true then
+            -- UG TODO 35050 I insert a street type with my own laneConfigs,
+            -- but the api.get returns the old laneConfigs: why?
+            local streetTypeCountBefore = #api.res.streetTypeRep.getAll()
             api.res.streetTypeRep.add(newStreet.type, newStreet, true)
-            logger.print('LOLLO added', newStreet.type)
-            -- debugPrint(newStreet)
+            local streetTypeCountAfter = #api.res.streetTypeRep.getAll()
+            if isShowLog then
+                print('new street "' .. newStreet.type .. '"added, it is') debugPrint(newStreet)
+                local streetTypeIndex = api.res.streetTypeRep.find(newStreet.type)
+                print('the api returns') debugPrint(api.res.streetTypeRep.get(streetTypeIndex))
+                print('street type count before =', streetTypeCountBefore)
+                print('street type count streetTypeCountAfter =', streetTypeCountAfter)
+            end
+            logger.print('LOLLO added new street', newStreet.type)
         end
     end
 
@@ -368,7 +379,7 @@ function data()
 
     return {
         info = {
-            minorVersion = 54,
+            minorVersion = 55,
             severityAdd = 'NONE',
             severityRemove = 'WARNING',
             name = _('_NAME'),
