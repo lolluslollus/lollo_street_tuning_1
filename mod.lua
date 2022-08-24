@@ -281,8 +281,8 @@ function data()
             local streetTypeCountAfter = #api.res.streetTypeRep.getAll()
             if isShowLog then
                 print('new street "' .. newStreet.type .. '"added, it is') debugPrint(newStreet)
-                local streetTypeIndex = api.res.streetTypeRep.find(newStreet.type)
-                print('the api returns') debugPrint(api.res.streetTypeRep.get(streetTypeIndex))
+                local streetTypeIndex_ = api.res.streetTypeRep.find(newStreet.type)
+                print('the api returns') debugPrint(api.res.streetTypeRep.get(streetTypeIndex_))
                 print('street type count before =', streetTypeCountBefore)
                 print('street type count streetTypeCountAfter =', streetTypeCountAfter)
             end
