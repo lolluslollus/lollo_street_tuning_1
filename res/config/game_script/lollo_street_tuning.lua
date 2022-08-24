@@ -1049,6 +1049,13 @@ function data()
                                         -- expected is {0, 0, 0, 1,  0, 1, 1, 0,  0, 0, 0, 0,  0, 0, 0, 0}
                                     end
                                 end
+                                --[[
+                                    -- put the following in the console:
+                                    fileName = 'construction_name.con'
+                                    position = {0, 0, 0}
+                                    searchRadius = 99999
+                                    cons = game.interface.getEntities({pos = position, radius = searchRadius}, {type = "CONSTRUCTION", includeData = false, fileName = fileName})
+                                ]]
                                 print('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>')
                                 -- The following can freeze the game when pointed at a freestyle station
                                 -- print('nearby constructions = <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<')
