@@ -1,0 +1,41 @@
+local modelHelpers = require('lollo_street_tuning.mdlHelpers.allModels')
+
+function data()
+    return {
+        boundingInfo = modelHelpers.getVoidBoundingInfo(),
+        collider = modelHelpers.getVoidCollider(),
+        lods = {
+            {
+                node = {
+                    children = {
+                        {
+                            materials = {'asset/icon/asset_icon_mark.mtl'},
+                            -- mesh = 'asset/icon/lod_0_icon_exclamation_mark.msh',
+                            mesh = 'asset/icon/lod_0_icon_pointer_target.msh',
+                            transf = {1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1}
+                        },
+                    },
+                    transf = {1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 2, 0, 0, 0, 0, 1}
+                },
+                static = false,
+                visibleFrom = 0,
+                visibleTo = 1000
+            }
+        },
+        metadata = {
+            availability = {
+                yearFrom = 0,
+                yearTo = 0
+            },
+            cost = {
+                price = 0
+            },
+            autoRemovable = true,
+            skipCollision = true,
+            skipCollisionCheck = true
+        },
+        skipCollision = true,
+        skipCollisionCheck = true,
+        version = 1
+    }
+end

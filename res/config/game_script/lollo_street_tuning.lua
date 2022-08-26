@@ -979,27 +979,31 @@ function data()
                             -- _actions.replaceConWithSnappyCopy(args.constructionEntityId)
                             -- return here or it will be bulldozed, all following cons get bulldozed
                         else
-                            local constructionTransf = api.engine.getComponent(args.constructionEntityId, api.type.ComponentType.CONSTRUCTION).transf
-                            constructionTransf = transfUtilUG.new(constructionTransf:cols(0), constructionTransf:cols(1), constructionTransf:cols(2), constructionTransf:cols(3))
-                            -- print('type(constructionTransf) =', type(constructionTransf))
-                            -- debugPrint(constructionTransf)
+                            local conTransf = api.engine.getComponent(args.constructionEntityId, api.type.ComponentType.CONSTRUCTION).transf
+                            conTransf = transfUtilUG.new(conTransf:cols(0), conTransf:cols(1), conTransf:cols(2), conTransf:cols(3))
+                            -- print('type(conTransf) =', type(conTransf))
+                            -- debugPrint(conTransf)
                             if name == _eventProperties.lollo_street_splitter.eventName then
                             -- do nothing
                             elseif name == _eventProperties.lollo_street_cleaver.eventName then
-                                local nearestEdgeId = edgeUtils.street.getNearestEdgeId(constructionTransf, constructionTransf[15])
+                                local nearestEdgeId = edgeUtils.street.getNearestEdgeId(conTransf, conTransf[15])
                                 -- print('street cleaver got nearestEdge =', nearestEdgeId or 'NIL')
                                 if edgeUtils.isValidAndExistingId(nearestEdgeId) and not(edgeUtils.isEdgeFrozen(nearestEdgeId)) then
                                     _actions.cleaveEdge(nearestEdgeId)
                                 end
                             elseif name == _eventProperties.lollo_street_remover.eventName then
-                                local nearestEdgeId = edgeUtils.street.getNearestEdgeId(constructionTransf, constructionTransf[15])
+                                local nearestEdgeId = edgeUtils.street.getNearestEdgeId(conTransf, conTransf[15])
                                 if edgeUtils.isValidAndExistingId(nearestEdgeId) then
                                     _actions.removeEdge(
                                         nearestEdgeId
                                     )
                                 end
                             elseif name == _eventProperties.lollo_street_splitter_w_api.eventName then
-                                local nearestEdgeId = edgeUtils.street.getNearestEdgeId(constructionTransf, constructionTransf[15] + constants.splitterZShift)
+                                local nearestEdgeId = edgeUtils.street.getNearestEdgeId(
+                                    conTransf,
+                                    conTransf[15] + constants.splitterZShift - constants.splitterZToleranceM,
+                                    conTransf[15] + constants.splitterZShift + constants.splitterZToleranceM
+                                )
                                 logger.print('street splitter got nearestEdge =', nearestEdgeId or 'NIL')
                                 if edgeUtils.isValidAndExistingId(nearestEdgeId) and not(edgeUtils.isEdgeFrozen(nearestEdgeId)) then
                                     local averageZ = _utils.getAverageZ(nearestEdgeId)
@@ -1009,24 +1013,38 @@ function data()
                                             nearestEdgeId,
                                             -- LOLLO NOTE position and transf are always very similar
                                             {
-                                                x = constructionTransf[13],
-                                                y = constructionTransf[14],
+                                                x = conTransf[13],
+                                                y = conTransf[14],
                                                 z = averageZ,
                                             }
                                         )
                                         logger.print('nodeBetween =') logger.debugPrint(nodeBetween)
                                         _actions.splitEdge(nearestEdgeId, nodeBetween)
                                     end
+                                    -- this is a little more accurate, but it's also harder to use with tunnels and bridges.
+                                    -- a user error can throw it out of whack more than the averageZ does.
+                                    -- local nodeBetween = edgeUtils.getNodeBetweenByPosition(
+                                    --     nearestEdgeId,
+                                    --     -- LOLLO NOTE position and transf are always very similar
+                                    --     {
+                                    --         x = conTransf[13],
+                                    --         y = conTransf[14],
+                                    --         z = conTransf[15] + constants.splitterZShift,
+                                    --     },
+                                    --     logger.isExtendedLog()
+                                    -- )
+                                    -- logger.print('nodeBetween =') logger.debugPrint(nodeBetween)
+                                    -- _actions.splitEdge(nearestEdgeId, nodeBetween)
                                 end
                             elseif name == _eventProperties.lollo_street_changer.eventName then
-                                local nearestEdgeId = edgeUtils.street.getNearestEdgeId(constructionTransf, constructionTransf[15])
+                                local nearestEdgeId = edgeUtils.street.getNearestEdgeId(conTransf, conTransf[15])
                                 -- print('nearestEdge =', nearestEdgeId or 'NIL')
                                 if type(nearestEdgeId) == 'number' and nearestEdgeId >= 0 then
                                     -- print('LOLLO nearestEdgeId = ', nearestEdgeId or 'NIL')
                                     _actions.replaceEdgeWithSame(nearestEdgeId)
                                 end
                             elseif name == _eventProperties.lollo_toggle_all_tram_tracks.eventName then
-                                local nearestEdgeId = edgeUtils.street.getNearestEdgeId(constructionTransf, constructionTransf[15])
+                                local nearestEdgeId = edgeUtils.street.getNearestEdgeId(conTransf, conTransf[15])
                                 logger.print('toggle all tram tracks got nearestEdgeId =', nearestEdgeId or 'NIL')
                                 if edgeUtils.isValidAndExistingId(nearestEdgeId) and not(edgeUtils.isEdgeFrozen(nearestEdgeId)) then
                                     local oldEdgeStreet = api.engine.getComponent(nearestEdgeId, api.type.ComponentType.BASE_EDGE_STREET)
@@ -1044,8 +1062,8 @@ function data()
                                     end
                                 end
                             elseif name == _eventProperties.lollo_street_get_info.eventName then
-                                local nearbyEdges = edgeUtils.getNearbyObjects(constructionTransf, 0.5, api.type.ComponentType.BASE_EDGE)
-                                -- local nearbyConstructions = edgeUtils.getNearbyObjects(constructionTransf, 0.5, api.type.ComponentType.CONSTRUCTION)
+                                local nearbyEdges = edgeUtils.getNearbyObjects(conTransf, 0.5, api.type.ComponentType.BASE_EDGE)
+                                -- local nearbyConstructions = edgeUtils.getNearbyObjects(conTransf, 0.5, api.type.ComponentType.CONSTRUCTION)
                                 print('nearby edges = <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<')
                                 for edgeId, props in pairs(nearbyEdges) do
                                     if edgeUtils.isValidId(edgeId) then

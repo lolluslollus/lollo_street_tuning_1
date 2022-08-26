@@ -16,6 +16,12 @@ function data()
         order = 1102,
         autoRemovable = true,
         skipCollision = true,
+        -- useless
+        -- snapping = {
+        --     rail = false,
+        --     road = true,
+        --     water = false,
+        -- },
         updateFn = function(params)
             -- print('lollo street splitter updateFn') debugPrint(params)
             local result = {}
@@ -24,7 +30,7 @@ function data()
             result.edgeLists = {}
             result.models = {
                 {
-                    id = 'lollo_assets/icon/pointer.mdl',
+                    id = 'lollo_assets/icon/pointer_target.mdl',
                     autoRemovable = true,
                     skipCollision = true,
                     transf = {1, 0, 0, 0,  0, 1, 0, 0,  0, 0, 1, 0,  0, 0, constants.splitterZShift, 1}
