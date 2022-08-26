@@ -1,4 +1,5 @@
 local arrayUtils = require('lollo_street_tuning.arrayUtils')
+local constants = require('lollo_street_tuning.constants')
 local edgeUtils = require('lollo_street_tuning.edgeUtils')
 local logger = require('lollo_street_tuning.logger')
 local streetUtils = require('lollo_street_tuning.streetUtils')
@@ -100,6 +101,26 @@ local _guiUtils = {
 }
 
 local _utils = {
+    getAverageZ = function(edgeId)
+        if not(edgeUtils.isValidAndExistingId(edgeId)) then return nil end
+
+        local baseEdge = api.engine.getComponent(edgeId, api.type.ComponentType.BASE_EDGE)
+        if baseEdge == nil then return nil end
+
+        local baseNode0 = api.engine.getComponent(baseEdge.node0, api.type.ComponentType.BASE_NODE)
+        local baseNode1 = api.engine.getComponent(baseEdge.node1, api.type.ComponentType.BASE_NODE)
+        if baseNode0 == nil
+        or baseNode1 == nil
+        or baseNode0.position == nil
+        or baseNode1.position == nil
+        or type(baseNode0.position.z) ~= 'number'
+        or type(baseNode1.position.z) ~= 'number'
+        then
+            return nil
+        end
+
+        return (baseNode0.position.z + baseNode1.position.z) / 2
+    end,
     getToggledAllTramTracksStreetTypeFileName = function(streetFileName)
         logger.print('getToggledAllTramTracksStreetTypeFileName starting, streetFileName =') logger.debugPrint(streetFileName)
         if type(streetFileName) ~= 'string' or streetFileName == '' then return nil end
@@ -965,49 +986,49 @@ function data()
                             if name == _eventProperties.lollo_street_splitter.eventName then
                             -- do nothing
                             elseif name == _eventProperties.lollo_street_cleaver.eventName then
-                                local nearestEdgeId = edgeUtils.street.getNearestEdgeId(constructionTransf)
+                                local nearestEdgeId = edgeUtils.street.getNearestEdgeId(constructionTransf, constructionTransf[15])
                                 -- print('street cleaver got nearestEdge =', nearestEdgeId or 'NIL')
                                 if edgeUtils.isValidAndExistingId(nearestEdgeId) and not(edgeUtils.isEdgeFrozen(nearestEdgeId)) then
                                     _actions.cleaveEdge(nearestEdgeId)
                                 end
                             elseif name == _eventProperties.lollo_street_remover.eventName then
-                                local nearestEdgeId = edgeUtils.street.getNearestEdgeId(constructionTransf)
+                                local nearestEdgeId = edgeUtils.street.getNearestEdgeId(constructionTransf, constructionTransf[15])
                                 if edgeUtils.isValidAndExistingId(nearestEdgeId) then
                                     _actions.removeEdge(
                                         nearestEdgeId
                                     )
                                 end
                             elseif name == _eventProperties.lollo_street_splitter_w_api.eventName then
-                                local nearestEdgeId = edgeUtils.street.getNearestEdgeId(constructionTransf)
-                                -- print('street splitter got nearestEdge =', nearestEdgeId or 'NIL')
+                                local nearestEdgeId = edgeUtils.street.getNearestEdgeId(constructionTransf, constructionTransf[15] + constants.splitterZShift)
+                                logger.print('street splitter got nearestEdge =', nearestEdgeId or 'NIL')
                                 if edgeUtils.isValidAndExistingId(nearestEdgeId) and not(edgeUtils.isEdgeFrozen(nearestEdgeId)) then
-                                    local nodeBetween = edgeUtils.getNodeBetweenByPosition(
-                                        nearestEdgeId,
-                                        -- LOLLO NOTE position and transf are always very similar
-                                        {
-                                            x = constructionTransf[13],
-                                            y = constructionTransf[14],
-                                            z = constructionTransf[15],
-                                        }
-                                    )
-                                    -- print('nodeBetween =') debugPrint(nodeBetween)
-                                    _actions.splitEdge(nearestEdgeId, nodeBetween)
+                                    local averageZ = _utils.getAverageZ(nearestEdgeId)
+                                    logger.print('averageZ =', averageZ or 'NIL')
+                                    if type(averageZ) == 'number' then
+                                        local nodeBetween = edgeUtils.getNodeBetweenByPosition(
+                                            nearestEdgeId,
+                                            -- LOLLO NOTE position and transf are always very similar
+                                            {
+                                                x = constructionTransf[13],
+                                                y = constructionTransf[14],
+                                                z = averageZ,
+                                            }
+                                        )
+                                        logger.print('nodeBetween =') logger.debugPrint(nodeBetween)
+                                        _actions.splitEdge(nearestEdgeId, nodeBetween)
+                                    end
                                 end
                             elseif name == _eventProperties.lollo_street_changer.eventName then
-                                local nearestEdgeId = edgeUtils.street.getNearestEdgeId(
-                                    constructionTransf
-                                )
+                                local nearestEdgeId = edgeUtils.street.getNearestEdgeId(constructionTransf, constructionTransf[15])
                                 -- print('nearestEdge =', nearestEdgeId or 'NIL')
                                 if type(nearestEdgeId) == 'number' and nearestEdgeId >= 0 then
                                     -- print('LOLLO nearestEdgeId = ', nearestEdgeId or 'NIL')
                                     _actions.replaceEdgeWithSame(nearestEdgeId)
                                 end
                             elseif name == _eventProperties.lollo_toggle_all_tram_tracks.eventName then
-                                local nearestEdgeId = edgeUtils.street.getNearestEdgeId(
-                                    constructionTransf
-                                )
-                                -- print('nearestEdgeId =', nearestEdgeId or 'NIL')
-                                if edgeUtils.isValidAndExistingId(nearestEdgeId) then
+                                local nearestEdgeId = edgeUtils.street.getNearestEdgeId(constructionTransf, constructionTransf[15])
+                                logger.print('toggle all tram tracks got nearestEdgeId =', nearestEdgeId or 'NIL')
+                                if edgeUtils.isValidAndExistingId(nearestEdgeId) and not(edgeUtils.isEdgeFrozen(nearestEdgeId)) then
                                     local oldEdgeStreet = api.engine.getComponent(nearestEdgeId, api.type.ComponentType.BASE_EDGE_STREET)
                                     if oldEdgeStreet and oldEdgeStreet.streetType then
                                         local newStreetTypeFileName = _utils.getToggledAllTramTracksStreetTypeFileName(
@@ -1044,9 +1065,6 @@ function data()
                                             print('trackTypeFileName =')
                                             debugPrint(api.res.trackTypeRep.getFileName(trackEdgeProps.trackType))
                                         end
-                                        -- LOLLO TOTO street type res/config/street/lollo_medium_4_lane_street-0001011000000000.lua
-                                        -- has transport modes = 00111... in the rightmost lanes.
-                                        -- expected is {0, 0, 0, 1,  0, 1, 1, 0,  0, 0, 0, 0,  0, 0, 0, 0}
                                     end
                                 end
                                 --[[
