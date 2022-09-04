@@ -82,6 +82,15 @@ local helper = {
                 },
                 defaultIndex = 2
             },
+            {
+                key = 'tramTrackInEveryLane_',
+                name = _('Tram track in every lane (only applicable roads)'),
+                values = {
+                    _('No'),
+                    _('Yes'),
+                },
+                defaultIndex = 1
+            },
             -- {
             --     key = 'hasBus',
             --     name = _('Bus lane'),

@@ -76,6 +76,7 @@ function data()
 			["_NAME"] = "Street fine tuning",
 			["snapNodesName"] = "Snap to neighbours",
 			["snapNodesDesc"] = "Cycle through these values to help configure a station once it is built",
+			["Yes"] = "Yes",
 			["No"] = "No",
 			["Left"] = "End A",
 			["Right"] = "End B",
