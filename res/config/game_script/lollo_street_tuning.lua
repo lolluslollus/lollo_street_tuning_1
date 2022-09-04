@@ -943,19 +943,19 @@ function data()
         guiInit = function()
             -- make param window resizable coz our parameters are massive
 			for _, id in pairs({
-				"menu.construction.road.settingsWindow",
-				-- "menu.construction.rail.settingsWindow",
-				-- "menu.construction.water.settingsWindow",
-				-- "menu.construction.air.settingsWindow",
-				-- "menu.construction.terrain.settingsWindow",
-				-- "menu.construction.town.settingsWindow",
-				-- "menu.construction.industry.settingsWindow",
-				-- "menu.modules.settingsWindow",
+				'menu.construction.road.settingsWindow',
+				-- 'menu.construction.rail.settingsWindow',
+				-- 'menu.construction.water.settingsWindow',
+				-- 'menu.construction.air.settingsWindow',
+				-- 'menu.construction.terrain.settingsWindow',
+				-- 'menu.construction.town.settingsWindow',
+				-- 'menu.construction.industry.settingsWindow',
+				'menu.modules.settingsWindow',
 			}) do
 				local iLayoutItem = api.gui.util.getById(id)
 				if iLayoutItem ~= nil then
 					iLayoutItem:setResizable(true)
-					iLayoutItem:setIcon("ui/hammer19.tga")
+					iLayoutItem:setIcon('ui/hammer19.tga')
 				end
 			end
 		end,
@@ -1090,7 +1090,7 @@ function data()
                                     fileName = 'construction_name.con'
                                     position = {0, 0, 0}
                                     searchRadius = 99999
-                                    cons = game.interface.getEntities({pos = position, radius = searchRadius}, {type = "CONSTRUCTION", includeData = false, fileName = fileName})
+                                    cons = game.interface.getEntities({pos = position, radius = searchRadius}, {type = 'CONSTRUCTION', includeData = false, fileName = fileName})
                                 ]]
                                 print('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>')
                                 -- The following can freeze the game when pointed at a freestyle station
@@ -1126,7 +1126,7 @@ function data()
         guiHandleEvent = function(id, name, args)
             -- LOLLO NOTE args can have different types, even boolean, depending on the event id and name
             if id == 'constructionBuilder' and name == 'builder.apply' then
-                -- if name == "builder.proposalCreate" then return end
+                -- if name == 'builder.proposalCreate' then return end
                 logger.print('guiHandleEvent caught id = constructionBuilder and name = builder.apply')
                 xpcall(
                     function()
