@@ -2235,6 +2235,7 @@ local function updateFn_Motorway_2_1_lane_narrow_sidewalk_to_2_lane(params, brid
             freeNodes = params.direction4Merge == 0 and {1} or {0},
             snapNodes = _getSnapNodes10(params, true)
         },
+
         {
             type = 'STREET',
             params = {
