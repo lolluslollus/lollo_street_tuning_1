@@ -1,4 +1,6 @@
 package.path = package.path .. ';res/scripts/?.lua'
+package.path = package.path .. ';C:/Program Files (x86)/Steam/steamapps/common/Transport Fever 2/res/scripts/?.lua'
+
 local arrayUtils = require('lollo_street_tuning.arrayUtils')
 local matrixUtils = require('lollo_street_tuning.matrix')
 local streetUtils = require('lollo_street_tuning.streetUtils')
