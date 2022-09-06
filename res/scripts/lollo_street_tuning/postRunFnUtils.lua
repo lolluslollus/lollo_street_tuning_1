@@ -78,6 +78,7 @@ funcs.addAvailableConstruction = function(oldFileName, newFileName, scriptFileNa
     local newCon = api.type.ConstructionDesc.new()
     newCon.fileName = newFileName
     newCon.type = staticCon.type
+    newCon.snapping = staticCon.snapping
     newCon.description = staticCon.description
     -- newCon.availability = { yearFrom = 1925, yearTo = 0 } -- this dumps, the api wants it different
     newCon.availability.yearFrom = availability.yearFrom
