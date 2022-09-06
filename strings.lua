@@ -87,6 +87,17 @@ function data()
 			["ReplaceWithNewer"] = "This construction is an old version: remove it and rebuild it to upgrade",
 			["YellowBusLanes"] = "Yellow bus lanes with stripes",
 			["MakeReservedLanes"] = "Make reserved lanes",
+
+			-- flat foundation
+			["FlatFoundationName"] = "Flat Foundation",
+			["FlatFoundationDesc"] = "Plop this to flatten the terrain before building roads or tracks. Adjust it with the Construction Mover. Remove it when done.",
+			["FlatFoundationNotice"] = "Adjust me with the Construction Mover and remove me when done building on me.",
+			["X10m"] = "X size, coarse, m",
+			["X1m"] = "X size, medium, m",
+			["X0_1m"] = "X size, fine, m",
+			["Y10m"] = "Y size, coarse, m",
+			["Y1m"] = "Y size, medium, m",
+			["Y0_1m"] = "Y size, fine, m",
 		},
 	}
 end
