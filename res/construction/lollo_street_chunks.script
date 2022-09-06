@@ -7,10 +7,10 @@ function data()
     return {
         updateFn = function(params, two)
             local function _initParams()
-				if not(params.streetType4Chunks) or not(two.globalStreetData[params.streetType4Chunks + 1]) then
+				if not(params.streetType4Chunks) or not(two.globalStreetData) or not(two.globalStreetData[params.streetType4Chunks + 1]) then
 					params.streetType4Chunks = 0
 				end
-                if not(params.bridgeType4Chunks) or not(two.globalBridgeData[params.bridgeType4Chunks + 1]) then
+                if not(params.bridgeType4Chunks) or not(two.globalBridgeData) or not(two.globalBridgeData[params.bridgeType4Chunks + 1]) then
 					params.bridgeType4Chunks = 0
 				end
 			end

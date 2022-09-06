@@ -7,10 +7,10 @@ function data()
     return {
         updateFn = function(params, two)
             local function _initParams()
-				if not(params.streetType4Hairpin) or not(two.globalStreetData[params.streetType4Hairpin + 1]) then
+				if not(params.streetType4Hairpin) or not(two.globalStreetData) or not(two.globalStreetData[params.streetType4Hairpin + 1]) then
 					params.streetType4Hairpin = 0
 				end
-                if not(params.bridgeType4Hairpin) or not(two.globalBridgeData[params.bridgeType4Hairpin + 1]) then
+                if not(params.bridgeType4Hairpin) or not(two.globalBridgeData) or not(two.globalBridgeData[params.bridgeType4Hairpin + 1]) then
 					params.bridgeType4Hairpin = 0
 				end
 			end
