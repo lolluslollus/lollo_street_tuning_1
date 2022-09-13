@@ -27,6 +27,14 @@ function data()
                 size = {1.0, 1.0}
             },
         },
+        catenary = {
+            pole = { name = "lollo_assets/empty.mdl" },
+            poleCrossbar = { name = "lollo_assets/empty.mdl" },
+            poleDoubleCrossbar = { name = "lollo_assets/empty.mdl" },
+            isolatorStraight = "lollo_assets/empty.mdl";
+            isolatorCurve =  "lollo_assets/empty.mdl";
+            junction = "lollo_assets/empty.mdl";
+        },
         assets = {},
         cost = 1.0
     }
