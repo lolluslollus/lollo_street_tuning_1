@@ -495,14 +495,16 @@ helper.isStreetAllTramTracks = function(laneConfigs)
     return false
 end
 
-helper.isPath = function(streetTypeId)
+helper.hasCategory = function(streetTypeId, category)
     -- is it a path street type?
-    if type(streetTypeId) ~= 'number' or streetTypeId < 0 then return false end
+    if type(streetTypeId) ~= 'number' or streetTypeId < 0
+    or type(category) ~= 'string' or category == ''
+    then return false end
 
     local streetProperties = api.res.streetTypeRep.get(streetTypeId)
     if not(streetProperties) then return false end
 
-    return arrayUtils.arrayHasValue(streetProperties.categories, 'paths')
+    return arrayUtils.arrayHasValue(streetProperties.categories, category)
 end
 
 helper.isTramRightBarred = function(streetTypeId)

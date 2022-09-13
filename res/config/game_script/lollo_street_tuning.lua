@@ -760,7 +760,7 @@ local _actions = {
         end
 
         -- add bus lane and bar tram if the new street type wants so (paths)
-        if streetUtils.isPath(newStreetTypeId) then
+        if streetUtils.hasCategory(newStreetTypeId, 'paths') then
             newEdge.streetEdge.hasBus = true
             newEdge.streetEdge.tramTrackType = 0
         end
@@ -1200,61 +1200,76 @@ function data()
                 -- end
                 xpcall(
                     function()
+                        -- logger.print('guiHandleEvent caught id =', id, 'name =', name, 'args =') logger.debugPrint(args)
                         if not(args) or not(args.proposal) or not(args.proposal.proposal)
-                        or not(args.proposal.proposal.addedSegments) or not(args.proposal.proposal.addedSegments[1])
+                        or not(args.proposal.proposal.addedSegments)
                         or not(args.data) or not(args.data.entity2tn) then return end
 
-                        local addedSegments = args.proposal.proposal.addedSegments
+                        if (not(args.data.errorState) or not(args.data.errorState.critical))
+                        then
+                            local addedSegments = args.proposal.proposal.addedSegments
 
-                        -- remove right lane tram tracks if forbidden for current road
-                        local removeTramTrackEventParams = {}
-                        for _, addedSegment in pairs(addedSegments) do
-                            if addedSegment and addedSegment.streetEdge
-                            and addedSegment.streetEdge.tramTrackType ~= 0
-                            and addedSegment.streetEdge.streetType ~= nil then
-                                if streetUtils.isTramRightBarred(addedSegment.streetEdge.streetType) then
-                                    removeTramTrackEventParams[#removeTramTrackEventParams+1] = {
-                                        edgeId = addedSegment.entity,
-                                        streetTypeId = addedSegment.streetEdge.streetType
-                                    }
+                            -- remove right lane tram tracks if forbidden for current road
+                            local removeTramTrackEventParams = {}
+                            for _, addedSegment in pairs(addedSegments) do
+                                if addedSegment
+                                and addedSegment.streetEdge
+                                and addedSegment.streetEdge.streetType ~= nil
+                                and addedSegment.streetEdge.tramTrackType ~= 0
+                                and edgeUtils.isValidAndExistingId(addedSegment.entity)
+                                then
+                                    if streetUtils.isTramRightBarred(addedSegment.streetEdge.streetType) then
+                                        local conId = api.engine.system.streetConnectorSystem.getConstructionEntityForEdge(addedSegment.entity)
+                                        if not(edgeUtils.isValidId(conId)) then -- do not touch frozen segments
+                                            removeTramTrackEventParams[#removeTramTrackEventParams+1] = {
+                                                edgeId = addedSegment.entity,
+                                                streetTypeId = addedSegment.streetEdge.streetType
+                                            }
+                                        end
+                                    end
                                 end
                             end
-                        end
-                        for i = 1, #removeTramTrackEventParams do
-                            api.cmd.sendCommand(api.cmd.make.sendScriptEvent(
-                                string.sub(debug.getinfo(1, 'S').source, 1),
-                                _eventId,
-                                _eventProperties.noTramRightRoadBuilt.eventName,
-                                removeTramTrackEventParams[i]
-                            ))
-                        end
+                            for i = 1, #removeTramTrackEventParams do
+                                api.cmd.sendCommand(api.cmd.make.sendScriptEvent(
+                                    string.sub(debug.getinfo(1, 'S').source, 1),
+                                    _eventId,
+                                    _eventProperties.noTramRightRoadBuilt.eventName,
+                                    removeTramTrackEventParams[i]
+                                ))
+                            end
 
-                        -- add bus lane right if required for current road
---[[
-                        LOLLO NOTE
-                        this causes crashes with build 35050 and the paths that turn into bridges from the freestyle station.
-                        local pathBuiltEventParams = {}
-                        for _, addedSegment in pairs(addedSegments) do
-                            if addedSegment and addedSegment.streetEdge
-                            and not(addedSegment.streetEdge.hasBus)
-                            and addedSegment.streetEdge.streetType ~= nil then
-                                if streetUtils.isPath(addedSegment.streetEdge.streetType) then
-                                    pathBuiltEventParams[#pathBuiltEventParams+1] = {
-                                        edgeId = addedSegment.entity,
-                                        streetTypeId = addedSegment.streetEdge.streetType
-                                    }
+                            -- add bus lane right if required for current road
+                            -- LOLLO NOTE
+                            -- this used to cause crashes with build 35050 and the paths that turn into bridges from the freestyle station.
+                            local pathBuiltEventParams = {}
+                            for _, addedSegment in pairs(addedSegments) do
+                                if addedSegment
+                                and addedSegment.streetEdge
+                                and addedSegment.streetEdge.streetType ~= nil
+                                and (not(addedSegment.streetEdge.hasBus) or addedSegment.tramTrackType ~= 0)
+                                and edgeUtils.isValidAndExistingId(addedSegment.entity)
+                                then
+                                    if streetUtils.hasCategory(addedSegment.streetEdge.streetType, 'paths') then
+                                        -- print('addedSegment =') debugPrint(addedSegment)
+                                        local conId = api.engine.system.streetConnectorSystem.getConstructionEntityForEdge(addedSegment.entity)
+                                        if not(edgeUtils.isValidId(conId)) then -- do not touch frozen segments
+                                            pathBuiltEventParams[#pathBuiltEventParams+1] = {
+                                                edgeId = addedSegment.entity,
+                                                streetTypeId = addedSegment.streetEdge.streetType
+                                            }
+                                        end
+                                    end
                                 end
                             end
+                            for i = 1, #pathBuiltEventParams do
+                                api.cmd.sendCommand(api.cmd.make.sendScriptEvent(
+                                    string.sub(debug.getinfo(1, 'S').source, 1),
+                                    _eventId,
+                                    _eventProperties.pathBuilt.eventName,
+                                    pathBuiltEventParams[i]
+                                ))
+                            end
                         end
-                        for i = 1, #pathBuiltEventParams do
-                            api.cmd.sendCommand(api.cmd.make.sendScriptEvent(
-                                string.sub(debug.getinfo(1, 'S').source, 1),
-                                _eventId,
-                                _eventProperties.pathBuilt.eventName,
-                                pathBuiltEventParams[i]
-                            ))
-                        end
-]]
 
                         -- we don't change any more stuff, the rest is ok as it is
                     end,
