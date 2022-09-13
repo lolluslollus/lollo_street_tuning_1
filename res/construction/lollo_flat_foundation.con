@@ -181,7 +181,7 @@ function data()
             -- local _zMax = (2 * _xHalfSize) * math.sin(_yAngleRad)
             local _zMax = 0
 
-            print('x Size =', _xHalfSize * 2, 'y Size =', _yHalfSize * 2, '_zMax =', _zMax)
+            -- print('x Size =', _xHalfSize * 2, 'y Size =', _yHalfSize * 2, '_zMax =', _zMax)
             local _flatFaces = { {
                 {-_xHalfSize, -_yHalfSize, 0}, {-_xHalfSize, _yHalfSize, 0}, {_xHalfSize, _yHalfSize, _zMax}, {_xHalfSize, -_yHalfSize, _zMax}
             } }
