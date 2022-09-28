@@ -19,7 +19,6 @@ local helper = {
                 if str:len() == 1 then str = '0' .. str end
                 names[#names+1] = str
             end
-            print('names =') debugPrint(names)
             local icons = {}
             for _, name in ipairs(names) do
                 icons[#icons+1] = 'ui/parameters/lollo_street_tuning/merge' .. name .. '.tga'
