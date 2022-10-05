@@ -2,6 +2,7 @@ local arrayUtils = require('lollo_street_tuning.arrayUtils')
 local fileUtils = require('lollo_street_tuning.fileUtils')
 local stringUtils = require('lollo_street_tuning.stringUtils')
 
+
 local _streetDataBuffer = {
     -- table indexed by filterId
 }
@@ -372,6 +373,7 @@ local function _getStreetDataFiltered_StockAndReservedLanes(streetDataTable)
             end
         -- else
         --     print('_getStreetDataFiltered_StockAndReservedLanes leaving out', strDataRecord.fileName or 'NIL')
+
         end
     end
     -- print('_getStreetDataFiltered_StockAndReservedLanes is about to return', #results, 'records')
@@ -400,6 +402,7 @@ local function _getStreetTypesWithApi()
             fileName = fileName,
             icon = streetProperties.icon,
             isAllTramTracks = helper.isStreetAllTramTracks(streetProperties.laneConfigs),
+            isOneWay = helper.isStreetOneWay(streetProperties.laneConfigs),
             laneCount = #(streetProperties.laneConfigs),
             name = streetProperties.name,
             rightLaneWidth = (streetProperties.laneConfigs[2] or {}).width or 0,
