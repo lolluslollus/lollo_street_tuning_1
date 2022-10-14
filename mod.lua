@@ -53,38 +53,48 @@ function data()
         -- which is the only way we can define dynamic parameters.
         -- Here, the dynamic parameters are the street types.
         postRunFn = function(settings, params)
+            --[[
+                LOLLO NOTE UG TODO
+                In postRunFn, api.res.streetTypeRep.getAll() only returns street types,
+                which are available in the present game.
+                In other lua states, eg in game_script, it returns all street types, which have ever been present in the game,
+                including those from inactive mods.
+                This is inconsistent: the api should return the same in every state.
+                This happens with build 35050.
+            ]]
+            local globalBridgeData = streetUtils.getGlobalBridgeDataPlusNoBridge()
+            local globalStreetDataPathsAndStock = streetUtils.getGlobalStreetData({
+                streetUtils.getStreetDataFilters().PATHS,
+                streetUtils.getStreetDataFilters().STOCK,
+            })
+            local globalStreetDataStock = streetUtils.getGlobalStreetData()
+
             postRunFnUtils.addAvailableConstruction(
                 'lollo_street_chunks.con',
                 'lollo_street_chunks_2.con',
                 'construction/lollo_street_chunks',
                 {yearFrom = 1925, yearTo = 0},
-                streetChunksHelper.getStreetChunksParams(),
-                streetUtils.getGlobalBridgeDataPlusNoBridge(),
-                streetUtils.getGlobalStreetData({
-                    streetUtils.getStreetDataFilters().PATHS,
-                    streetUtils.getStreetDataFilters().STOCK,
-                })
+                streetChunksHelper.getStreetChunksParams(globalBridgeData, globalStreetDataPathsAndStock),
+                globalBridgeData,
+                globalStreetDataPathsAndStock
             )
             postRunFnUtils.addAvailableConstruction(
                 'lollo_street_hairpin.con',
                 'lollo_street_hairpin_2.con',
                 'construction/lollo_street_hairpin',
                 {yearFrom = 1925, yearTo = 0},
-                streetHairpinHelper.getStreetHairpinParams(),
-                streetUtils.getGlobalBridgeDataPlusNoBridge(),
-                streetUtils.getGlobalStreetData({
-                    streetUtils.getStreetDataFilters().PATHS,
-                    streetUtils.getStreetDataFilters().STOCK,
-                })
+                streetHairpinHelper.getStreetHairpinParams(globalBridgeData, globalStreetDataPathsAndStock),
+                globalBridgeData,
+                globalStreetDataPathsAndStock
             )
             postRunFnUtils.addAvailableConstruction(
                 'lollo_street_merge.con',
                 'lollo_street_merge_2.con',
                 'construction/lollo_street_merge',
                 {yearFrom = 1925, yearTo = 0},
-                streetMergeHelper.getParams(),
-                streetUtils.getGlobalBridgeDataPlusNoBridge(),
-                streetUtils.getGlobalStreetData()
+                streetMergeHelper.getParams(globalBridgeData, globalStreetDataStock),
+                globalBridgeData,
+                globalStreetDataStock
             )
             if modSettings.getModParams('lolloStreetTuning_IsMakeReservedLanes') == 1 then
                 postRunFnUtils.addStreetsWithReservedLanes()

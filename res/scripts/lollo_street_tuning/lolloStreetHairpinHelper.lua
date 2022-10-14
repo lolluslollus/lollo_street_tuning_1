@@ -2,7 +2,6 @@ local arrayUtils = require('lollo_street_tuning.arrayUtils')
 local edgeUtils = require('lollo_street_tuning.edgeUtils')
 local extraRadiusHelper = require('lollo_street_tuning.extraRadiusHelper')
 local pitchHelper = require('lollo_street_tuning.pitchHelper')
-local streetUtils = require('lollo_street_tuning.streetUtils')
 local streetUtilUG = require('streetutil')
 local vec3 = require('vec3')
 
@@ -124,12 +123,9 @@ local function _getEdgeTypeName(params, bridgeData)
 end
 
 return {
-    getStreetHairpinParams = function()
+    getStreetHairpinParams = function(globalBridgeData, globalStreetData)
         local defaultStreetTypeIndex = arrayUtils.findIndex(
-            streetUtils.getGlobalStreetData({
-                streetUtils.getStreetDataFilters().PATHS,
-                streetUtils.getStreetDataFilters().STOCK,
-            }),
+            globalStreetData,
             'fileName',
             'lollo_medium_1_way_1_lane_street_narrow_sidewalk.lua'
         ) - 1
@@ -140,10 +136,7 @@ return {
                 key = 'streetType4Hairpin',
                 name = _('StreetType'),
                 values = arrayUtils.map(
-                    streetUtils.getGlobalStreetData({
-                        streetUtils.getStreetDataFilters().PATHS,
-                        streetUtils.getStreetDataFilters().STOCK,
-                    }),
+                    globalStreetData,
                     function(str)
                         return str.name
                     end
@@ -157,7 +150,7 @@ return {
                 key = 'bridgeType4Hairpin',
                 name = _('BridgeType'),
                 values = arrayUtils.map(
-                    streetUtils.getGlobalBridgeDataPlusNoBridge(),
+                    globalBridgeData,
                     function(str)
                         return str.name
                         -- return str.icon

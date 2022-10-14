@@ -1,17 +1,8 @@
 local arrayUtils = require('lollo_street_tuning.arrayUtils')
 local pitchHelper = require('lollo_street_tuning.pitchHelper')
-local streetUtils = require('lollo_street_tuning.streetUtils')
 
 local helper = {
-    getParams = function()
-        -- print('globalBridgeData at getParams =') debugPrint(
-        --     arrayUtils.map(
-        --             streetUtils.getGlobalBridgeDataPlusNoBridge(),
-        --             function(str)
-        --                 return str
-        --             end
-        --     )
-        -- )
+    getParams = function(globalBridgeData, globalStreetData)
         local _getIcons = function()
             local names = {}
             for i = 0, 15, 1 do
@@ -65,7 +56,7 @@ local helper = {
                 key = 'bridgeType4Merge',
                 name = _('BridgeType'),
                 values = arrayUtils.map(
-                    streetUtils.getGlobalBridgeDataPlusNoBridge(),
+                    globalBridgeData,
                     function(str)
                         return str.name
                         -- return str.icon

@@ -37,11 +37,6 @@ function data()
             -- This is required if we want to make them snappable at all, to avoid crashes.
             -- We free all edges, so they can be freely converted to whatever one needs.
             -- We could make a lot of combinations and upgrade them with the construction params instead, but that would be a mess to use.
-            
-            -- local streetData = streetUtils.getGlobalStreetData({
-                --     streetUtils.getStreetDataFilters().PATHS,
-                --     streetUtils.getStreetDataFilters().STOCK,
-                -- })[params.streetType4Chunks + 1] -- this calls the api, which is not available here!
             result.edgeLists = streetChunksHelper.getStreetChunksSnapEdgeLists(
                 params,
                 _pitchAngle,
