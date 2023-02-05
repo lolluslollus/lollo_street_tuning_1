@@ -955,6 +955,7 @@ function data()
 				local iLayoutItem = api.gui.util.getById(id)
 				if iLayoutItem ~= nil then
 					iLayoutItem:setResizable(true)
+                    iLayoutItem:setMaximumSize(api.gui.util.Size.new(800,1200))
 					iLayoutItem:setIcon('ui/hammer19.tga')
 				end
 			end
