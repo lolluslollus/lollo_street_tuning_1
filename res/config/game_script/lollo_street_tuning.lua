@@ -1070,9 +1070,20 @@ function data()
                                     if edgeUtils.isValidId(edgeId) then
                                         print('edge id =', edgeId)
                                         debugPrint(props)
+
+                                        print('node0 props =')
+                                        if edgeUtils.isValidId(props.node0) then
+                                            debugPrint(api.engine.getComponent(props.node0, api.type.ComponentType.BASE_NODE))
+                                        end
+                                        print('node1 props =')
+                                        if edgeUtils.isValidId(props.node1) then
+                                            debugPrint(api.engine.getComponent(props.node1, api.type.ComponentType.BASE_NODE))
+                                        end
+
                                         print('street edge props =')
                                         local streetEdgeProps = api.engine.getComponent(edgeId, api.type.ComponentType.BASE_EDGE_STREET)
                                         debugPrint(streetEdgeProps)
+
                                         if streetEdgeProps ~= nil and type(streetEdgeProps.streetType) == 'number' and streetEdgeProps.streetType > -1 then
                                             print('streetTypeFileName =')
                                             debugPrint(api.res.streetTypeRep.getFileName(streetEdgeProps.streetType))
