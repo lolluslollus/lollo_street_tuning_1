@@ -931,7 +931,7 @@ local _actions = {
                 -- debugPrint(result)
                 -- print('LOLLO street splitter callback returned success = ', success)
                 if not(success) then
-                    print('Warning: streetTuning.splitEdge failed, proposal = ') debugPrint(proposal)
+                    print('Warning: streetTuning.splitEdge failed, result = ') debugPrint(result)
                 end
             end
         )
@@ -1079,6 +1079,9 @@ function data()
                                         if edgeUtils.isValidId(props.node1) then
                                             debugPrint(api.engine.getComponent(props.node1, api.type.ComponentType.BASE_NODE))
                                         end
+
+                                        print('lengths =')
+                                        edgeUtils.getEdgeLength(edgeId, true)
 
                                         print('street edge props =')
                                         local streetEdgeProps = api.engine.getComponent(edgeId, api.type.ComponentType.BASE_EDGE_STREET)
