@@ -1068,7 +1068,7 @@ function data()
                                 print('nearby edges = <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<')
                                 for edgeId, props in pairs(nearbyEdges) do
                                     if edgeUtils.isValidId(edgeId) then
-                                        print('edge id =', edgeId)
+                                        print('<<<<<<<< edge id =', edgeId)
                                         debugPrint(props)
 
                                         print('node0 props =')
@@ -1098,6 +1098,7 @@ function data()
                                             print('trackTypeFileName =')
                                             debugPrint(api.res.trackTypeRep.getFileName(trackEdgeProps.trackType))
                                         end
+                                        print('>>>>>>>>')
                                     end
                                 end
                                 --[[
