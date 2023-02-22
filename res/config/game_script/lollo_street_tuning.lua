@@ -1081,7 +1081,7 @@ function data()
                                         end
 
                                         print('lengths =')
-                                        edgeUtils.getEdgeLength(edgeId, true)
+                                        debugPrint(edgeUtils.getEdgeLength(edgeId, true))
 
                                         print('street edge props =')
                                         local streetEdgeProps = api.engine.getComponent(edgeId, api.type.ComponentType.BASE_EDGE_STREET)
