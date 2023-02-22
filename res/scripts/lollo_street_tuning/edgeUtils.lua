@@ -1,5 +1,4 @@
 local arrayUtils = require('lollo_street_tuning.arrayUtils')
-local matrixUtils = require('lollo_street_tuning.matrix')
 local quadrangleUtils = require('lollo_street_tuning.quadrangleUtils')
 local transfUtils = require('lollo_street_tuning.transfUtils')
 local transfUtilsUG = require('transf')
