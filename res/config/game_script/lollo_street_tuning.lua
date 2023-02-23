@@ -1017,7 +1017,8 @@ function data()
                                                 x = conTransf[13],
                                                 y = conTransf[14],
                                                 z = averageZ,
-                                            }
+                                            },
+                                            true
                                         )
                                         logger.print('nodeBetween =') logger.debugPrint(nodeBetween)
                                         _actions.splitEdge(nearestEdgeId, nodeBetween)
@@ -1032,6 +1033,7 @@ function data()
                                     --         y = conTransf[14],
                                     --         z = conTransf[15] + constants.splitterZShift,
                                     --     },
+                                    --     true,
                                     --     logger.isExtendedLog()
                                     -- )
                                     -- logger.print('nodeBetween =') logger.debugPrint(nodeBetween)
