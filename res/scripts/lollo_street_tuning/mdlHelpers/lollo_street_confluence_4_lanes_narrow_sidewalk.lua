@@ -76,7 +76,7 @@ results.getStreetLods = function()
                     -- ground
                     {
                         materials = { 'street/merge/country_new_medium_paving_low_prio.mtl'},
-                        mesh = 'merge/square_16x5.msh',
+                        mesh = 'lollo_street_tuning/merge/square_16x5.msh',
                         transf = {1, 0, 0, 0,  0, 1, 0, 0,  0, 0, 1, 0,  0, 0, 0, 1}
                     },
                 },

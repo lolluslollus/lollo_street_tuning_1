@@ -9,9 +9,8 @@ function data()
                 node = {
                     children = {
                         {
-                            materials = {'asset/icon/asset_icon_mark.mtl'},
-                            -- mesh = 'asset/icon/lod_0_icon_exclamation_mark.msh',
-                            mesh = 'asset/icon/lod_0_icon_pointer_target.msh',
+                            materials = {'lollo_street_tuning/icon/yellow.mtl'},
+                            mesh = 'lollo_street_tuning/icon/lod_0_icon_pointer_target.msh',
                             transf = {1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1}
                         },
                     },
