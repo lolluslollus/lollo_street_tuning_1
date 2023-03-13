@@ -353,9 +353,9 @@ local _actions = {
                     or transfUtils.getParallelSidewaysWithRotZ(posTanX2, offset)
                 print('newPosTanX2 =') debugPrint(newPosTanX2)
                 if isSwap then
-                    print('distance = ') debugPrint(edgeUtils.getPositionsDistance(newPosTanX2[1][1], posTanX2[2][1]))
+                    print('distance = ') debugPrint(transfUtils.getPositionsDistance(newPosTanX2[1][1], posTanX2[2][1]))
                 else
-                    print('distance = ') debugPrint(edgeUtils.getPositionsDistance(newPosTanX2[1][1], posTanX2[1][1]))
+                    print('distance = ') debugPrint(transfUtils.getPositionsDistance(newPosTanX2[1][1], posTanX2[1][1]))
                 end
 
                 local getNode0Entity = function()
@@ -832,8 +832,8 @@ local _actions = {
         local distance0 = nodeBetween.refDistance0
         local distance1 = nodeBetween.refDistance1
 
-        local oldTan0Length = edgeUtils.getVectorLength(oldBaseEdge.tangent0)
-        local oldTan1Length = edgeUtils.getVectorLength(oldBaseEdge.tangent1)
+        local oldTan0Length = transfUtils.getVectorLength(oldBaseEdge.tangent0)
+        local oldTan1Length = transfUtils.getVectorLength(oldBaseEdge.tangent1)
 
         local playerOwned = api.type.PlayerOwned.new()
         playerOwned.player = api.engine.util.getPlayer()

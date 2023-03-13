@@ -1,8 +1,8 @@
 local arrayUtils = require('lollo_street_tuning.arrayUtils')
-local edgeUtils = require('lollo_street_tuning.edgeUtils')
 local extraRadiusHelper = require('lollo_street_tuning.extraRadiusHelper')
 local pitchHelper = require('lollo_street_tuning.pitchHelper')
 local streetUtilUG = require('streetutil')
+local transfUtils = require('lollo_street_tuning.transfUtils')
 local vec3 = require('vec3')
 
 -- --------------- utils -----------------------------------
@@ -32,7 +32,7 @@ end
 
 local function _makeHairpinEdges(direction, pitchAngle, nodeIndexToBePitchedBase1, node0, node1, tan0, tan1)
     if tan0 == nil or tan1 == nil then
-        local edgeLength = edgeUtils.getVectorLength({node1[1] - node0[1], node1[2] - node0[2], node1[3] - node0[3]})
+        local edgeLength = transfUtils.getVectorLength({node1[1] - node0[1], node1[2] - node0[2], node1[3] - node0[3]})
         if tan0 == nil then tan0 = {edgeLength, 0, 0} end
         if tan1 == nil then tan1 = {edgeLength, 0, 0} end
     end

@@ -1,7 +1,7 @@
 -- local laneutil = require('laneutil')
-local edgeUtils = require('lollo_street_tuning.edgeUtils')
 local logger = require('lollo_street_tuning.logger')
 local pitchHelper = require('lollo_street_tuning.pitchHelper')
+local transfUtils = require('lollo_street_tuning.transfUtils')
 -- local transf = require 'transf'
 -- LOLLO TODO see if you can ease the pain when reconfiguring an existing merger. maybe skip collisions? It is not enough.
 
@@ -65,7 +65,7 @@ end
 
 local function _makeEdges(pitchAngle, params, node0, node1, tan0, tan1)
     if tan0 == nil or tan1 == nil then
-        local edgeLength = edgeUtils.getVectorLength({node1[1] - node0[1], node1[2] - node0[2], node1[3] - node0[3]})
+        local edgeLength = transfUtils.getVectorLength({node1[1] - node0[1], node1[2] - node0[2], node1[3] - node0[3]})
         if tan0 == nil then tan0 = {edgeLength, 0, 0} end
         if tan1 == nil then tan1 = {edgeLength, 0, 0} end
     end
