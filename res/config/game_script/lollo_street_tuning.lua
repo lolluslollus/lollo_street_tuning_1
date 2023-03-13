@@ -1,4 +1,5 @@
 local arrayUtils = require('lollo_street_tuning.arrayUtils')
+local comparisonUtils = require('lollo_street_tuning.comparisonUtils')
 local constants = require('lollo_street_tuning.constants')
 local edgeUtils = require('lollo_street_tuning.edgeUtils')
 local logger = require('lollo_street_tuning.logger')
@@ -815,12 +816,12 @@ local _actions = {
         local node1 = api.engine.getComponent(oldBaseEdge.node1, api.type.ComponentType.BASE_NODE)
         if node0 == nil or node1 == nil then return end
 
-        if not(edgeUtils.isXYZSame(nodeBetween.refPosition0, node0.position)) and not(edgeUtils.isXYZSame(nodeBetween.refPosition0, node1.position)) then
+        if not(comparisonUtils.isXYZsSame(nodeBetween.refPosition0, node0.position)) and not(comparisonUtils.isXYZsSame(nodeBetween.refPosition0, node1.position)) then
             logger.warn('splitEdge cannot find the nodes')
             return
         end
 
-        if edgeUtils.isXYZSame(nodeBetween.refPosition0, node0.position) then
+        if comparisonUtils.isXYZsSame(nodeBetween.refPosition0, node0.position) then
             logger.print('nodeBetween is orientated like my edge')
         else
             logger.print('nodeBetween is not orientated like my edge')
