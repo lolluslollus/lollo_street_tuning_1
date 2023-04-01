@@ -86,7 +86,9 @@ function data()
 			["StreetType"] = "Street Type",
 			["ReplaceWithNewer"] = "This construction is an old version: remove it and rebuild it to upgrade",
 			["YellowBusLanes"] = "Yellow bus lanes with stripes",
+			["YellowBusLanesTooltip"] = "Change the looks of bus lanes so they have yellow stripes",
 			["MakeReservedLanes"] = "Make reserved lanes",
+			["MakeReservedLanesTooltip"] = "Make additional street types with reserved lanes for buses and lorries, buses and trams, buses only.",
 
 			-- flat foundation
 			["FlatFoundationName"] = "Flat Foundation",

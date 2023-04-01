@@ -28,12 +28,14 @@ function data()
                 {
                     key = "lolloStreetTuning_YellowBusLaneStripes",
                     name = _("YellowBusLanes"),
+                    tooltip = _("YellowBusLanesTooltip"),
                     values = { _("No"), _("Yes"), },
                     defaultIndex = 1,
                 },
                 {
                     key = "lolloStreetTuning_IsMakeReservedLanes",
                     name = _("MakeReservedLanes"),
+                    tooltip = _("MakeReservedLanesTooltip"),
                     values = { _("No"), _("Yes"), },
                     defaultIndex = 1,
                 },
