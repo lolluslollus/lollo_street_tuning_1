@@ -684,53 +684,22 @@ local _actions = {
         newEdge.streetEdge = oldEdgeStreet
         -- eo.streetEdge.streetType = api.res.streetTypeRep.find(streetEdgeEntity.streetType)
 
-        local proposal = api.type.SimpleProposal.new()
-        proposal.streetProposal.edgesToRemove[1] = oldEdgeId
-        proposal.streetProposal.edgesToAdd[1] = newEdge
-        --[[ local sampleNewEdge =
-        {
-        entity = -1,
-        comp = {
-            node0 = 13010,
-            node1 = 18753,
-            tangent0 = {
-            x = -32.318000793457,
-            y = 81.757850646973,
-            z = 3.0953373908997,
-            },
-            tangent1 = {
-            x = -34.457527160645,
-            y = 80.931526184082,
-            z = -1.0708819627762,
-            },
-            type = 0,
-            typeIndex = -1,
-            objects = { },
-        },
-        type = 0,
-        params = {
-            streetType = 23,
-            hasBus = false,
-            tramTrackType = 0,
-            precedenceNode0 = 2,
-            precedenceNode1 = 2,
-        },
-        playerOwned = nil,
-        streetEdge = {
-            streetType = 23,
-            hasBus = false,
-            tramTrackType = 0,
-            precedenceNode0 = 2,
-            precedenceNode1 = 2,
-        },
-        trackEdge = {
-            trackType = -1,
-            catenary = false,
-        },
-        } ]]
+        local simpleProposal = api.type.SimpleProposal.new()
+        simpleProposal.streetProposal.edgesToRemove[1] = oldEdgeId
+        simpleProposal.streetProposal.edgesToAdd[1] = newEdge
+        logger.print('simple proposal =') logger.debugPrint(simpleProposal)
+
+        local context = api.type.Context:new()
+        -- context.checkTerrainAlignment = true -- default is false, true gives smoother Z
+        -- context.cleanupStreetGraph = true -- default is false
+        -- context.gatherBuildings = true  -- default is false
+        -- context.gatherFields = true -- default is true
+        -- context.player = api.engine.util.getPlayer() -- default is -1
+        local proposalData = api.engine.util.proposal.makeProposalData(simpleProposal, context)
+        logger.print('proposalData =') logger.debugPrint(proposalData)
 
         api.cmd.sendCommand(
-            api.cmd.make.buildProposal(proposal, nil, true),
+            api.cmd.make.buildProposal(simpleProposal, nil, true),
             function(result, success)
                 -- print('LOLLO res = ')
                 -- debugPrint(res)
@@ -738,9 +707,10 @@ local _actions = {
                 -- print('LOLLO success = ')
                 -- debugPrint(success)
                 if not(success) then
-                    print('Warning: streetTuning.replaceEdgeWithSame failed, proposal = ') debugPrint(proposal)
+                    logger.warn('Warning: streetTuning.replaceEdgeWithSame failed, proposal = ') logger.warningDebugPrint(simpleProposal)
                 else
-                    print('LOLLO street changer succeeded, result =') debugPrint(result)
+                    logger.print('LOLLO street changer succeeded, result =') logger.debugPrint(result)
+                    local proposal2 = result.proposal
                 end
             end
         )

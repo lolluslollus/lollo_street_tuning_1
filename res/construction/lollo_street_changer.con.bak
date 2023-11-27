@@ -10,17 +10,22 @@ function data()
                 'Changes a street.'
             )
         },
+        autoRemovable = true,
         availability = {
             yearFrom = 0,
             yearTo = 0
         },
-        order = 1,
         collider = {
             type = 'NONE'
         },
-        autoRemovable = true,
+        order = 1,
         skipCollision = true,
         skipCollisionCheck = true,
+        snapping = {
+			rail = true,
+			road = true,
+			water = false
+		},
         updateFn = function(params)
             -- print('lollo street changer updateFn')
             -- debugPrint(params)
