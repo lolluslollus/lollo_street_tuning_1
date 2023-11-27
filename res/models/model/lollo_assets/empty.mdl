@@ -1,14 +1,9 @@
 function data()
     return {
         boundingInfo = {
-            bbMax = {0, 0, 0},
-            bbMin = {0, 0, 0}
+            -- bbMax = {0, 0, 0},
+            -- bbMin = {0, 0, 0}
         },
-        --[[         collider = {
-            params = {},
-            transf = {1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1},
-            type = 'MESH'
-        }, ]]
         collider = {
             type = 'NONE'
         },
@@ -16,17 +11,13 @@ function data()
             {
                 node = {
                     children = {
-                        -- {
-                        --     materials = { 'asphalt_01.mtl' },
-                        --     mesh = 'lollo4x4.msh',
-                        --     transf = { 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, -2, -2, 0, 1, },
-                        -- },
+
                     },
                     transf = {1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1}
                 },
                 static = false,
                 visibleFrom = 0,
-                visibleTo = 1000
+                visibleTo = 100
             }
         },
         metadata = {

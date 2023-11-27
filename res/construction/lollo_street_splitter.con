@@ -7,7 +7,7 @@ function data()
         description = {
             name = _('Manual Street Splitter'),
             description = _(
-                'Splits a street in two sections. Place it carefully on the roadside to create a lane switching point. Help yourself with <m> and <n>. Place different types of streets or roads between and outside splits to route road vehicles on different lanes.'
+                'Splits a street in two sections. Place it carefully on the roadside to create a lane switching point. Help yourself with <m> and <n>. Splits allow vehicles to change lanes and many creative options when building.'
             )
         },
         availability = {

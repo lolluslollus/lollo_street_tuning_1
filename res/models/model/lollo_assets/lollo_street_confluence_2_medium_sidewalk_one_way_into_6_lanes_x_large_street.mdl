@@ -56,7 +56,7 @@ function data()
                         -- ground
                         {
                             materials = { 'street/merge/country_new_medium_paving_low_prio.mtl'},
-                            mesh = 'merge/square_40x10.msh',
+                            mesh = 'lollo_street_tuning/merge/square_40x10.msh',
                             transf = {1, 0, 0, 0,  0, 1, 0, 0,  0, 0, 1, 0,  -2.5, 0, 0, 1}
                         },
                     },

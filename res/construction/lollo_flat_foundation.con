@@ -1,0 +1,238 @@
+local _paramConstants = {
+    flat_foundation_ro = {
+        max = 30,
+        step = 1,
+    },
+    flat_foundation_x_10m = {
+        max = 100,
+        min = 0,
+        step = 10,
+    },
+    flat_foundation_y_10m = {
+        max = 100,
+        min = 0,
+        step = 10,
+    },
+    flat_foundation_x_1m = {
+        max = 9,
+        min = 0,
+        step = 1,
+    },
+    flat_foundation_y_1m = {
+        max = 9,
+        min = 0,
+        step = 1,
+    },
+    flat_foundation_x_0_1m = {
+        max = 0.9,
+        min = 0,
+        step = 0.1,
+    },
+    flat_foundation_y_0_1m = {
+        max = 0.9,
+        min = 0,
+        step = 0.1,
+    },
+}
+
+local _paramHelpers = {
+    MinusN2PlusN = {
+        getSliderValues = function(paramKey)
+            local max, step = _paramConstants[paramKey].max, _paramConstants[paramKey].step
+            local results = {}
+            for i = -max, max, step do
+                results[#results+1] = tostring(i)
+            end
+            return results
+        end,
+        getSliderMiddleValue = function(paramKey)
+            local max, step = _paramConstants[paramKey].max, _paramConstants[paramKey].step
+            return math.floor(max / step)
+        end,
+        getValueFromSliderParamValue = function(paramKey, paramValue)
+            local max, step = _paramConstants[paramKey].max, _paramConstants[paramKey].step
+            return -max + step * paramValue
+        end,
+    },
+    Nought2PlusN = {
+        getSliderValues = function(paramKey)
+            local max, min, step = _paramConstants[paramKey].max, _paramConstants[paramKey].min, _paramConstants[paramKey].step
+            local results = {}
+            for i = min, max, step do
+                results[#results+1] = tostring(i)
+            end
+            return results
+        end,
+        getSliderMiddleValue = function(paramKey)
+            local max, min, step = _paramConstants[paramKey].max, _paramConstants[paramKey].min, _paramConstants[paramKey].step
+            return math.floor((max - min) / step / 2)
+        end,
+        getValueFromSliderParamValue = function(paramKey, paramValue)
+            local min, step = _paramConstants[paramKey].min, _paramConstants[paramKey].step
+            return min + step * paramValue
+        end,
+    },
+
+}
+
+function data()
+    return {
+        type = 'STREET_CONSTRUCTION',
+        description = {
+            name = _('FlatFoundationName'),
+            description = _('FlatFoundationDesc')
+        },
+        availability = {
+            yearFrom = 0,
+            yearTo = 0
+        },
+        order = 1104,
+        collider = {
+            type = 'NONE'
+        },
+        autoRemovable = true,
+        params = {
+            {
+                key = 'flat_foundation_x_10m',
+                name = _('X10m'),
+                values = _paramHelpers.Nought2PlusN.getSliderValues('flat_foundation_x_10m'),
+                uiType = 'SLIDER',
+                defaultIndex = _paramHelpers.Nought2PlusN.getSliderMiddleValue('flat_foundation_x_10m'),
+            },
+            {
+                key = 'flat_foundation_x_1m',
+                name = _('X1m'),
+                values = _paramHelpers.Nought2PlusN.getSliderValues('flat_foundation_x_1m'),
+                uiType = 'SLIDER',
+                -- defaultIndex = 0,
+            },
+            {
+                key = 'flat_foundation_x_0_1m',
+                name = _('X0_1m'),
+                values = _paramHelpers.Nought2PlusN.getSliderValues('flat_foundation_x_0_1m'),
+                uiType = 'SLIDER',
+                -- defaultIndex = 0,
+            },
+            {
+                key = 'flat_foundation_y_10m',
+                name = _('Y10m'),
+                values = _paramHelpers.Nought2PlusN.getSliderValues('flat_foundation_y_10m'),
+                uiType = 'SLIDER',
+                defaultIndex = _paramHelpers.Nought2PlusN.getSliderMiddleValue('flat_foundation_y_10m'),
+            },
+            {
+                key = 'flat_foundation_y_1m',
+                name = _('Y1m'),
+                values = _paramHelpers.Nought2PlusN.getSliderValues('flat_foundation_y_1m'),
+                uiType = 'SLIDER',
+                -- defaultIndex = 0,
+            },
+            {
+                key = 'flat_foundation_y_0_1m',
+                name = _('Y0_1m'),
+                values = _paramHelpers.Nought2PlusN.getSliderValues('flat_foundation_y_0_1m'),
+                uiType = 'SLIDER',
+                -- defaultIndex = 0,
+            },
+            -- {
+            --     key = 'flat_foundation_ro',
+            --     name = _('Y angle'),
+            --     values = _paramHelpers.MinusN2PlusN.getSliderValues('flat_foundation_ro'),
+            --     uiType = 'SLIDER',
+            --     defaultIndex = _paramHelpers.MinusN2PlusN.getSliderMiddleValue('flat_foundation_ro'),
+            -- },
+            -- {
+            --     key = 'flat_foundation_allow_adjusting',
+            --     name = _('Allow adjusting'),
+            --     values = {_('No'), _('Yes')},
+            --     defaultIndex = 1,
+            -- }
+        },
+        skipCollision = true,
+        updateFn = function(params)
+            -- print('lollo street splitter updateFn')
+            -- debugPrint(params)
+
+            local result = {
+                colliders = {},
+                cost = 0,
+                labelText = {
+                    [0] = { _('FlatFoundationNotice'), _('FlatFoundationNotice') }
+                },
+                models = {
+                    {
+                        id = 'lollo_assets/icon/yellow_w_message.mdl',
+                        transf = {1, 0, 0, 0,  0, 1, 0, 0,  0, 0, 1, 0,  0, 0, 0, 1},
+                    },
+                }
+            }
+
+            local _xHalfSize = (
+                _paramHelpers.Nought2PlusN.getValueFromSliderParamValue('flat_foundation_x_10m', params.flat_foundation_x_10m) +
+                _paramHelpers.Nought2PlusN.getValueFromSliderParamValue('flat_foundation_x_1m', params.flat_foundation_x_1m) +
+                _paramHelpers.Nought2PlusN.getValueFromSliderParamValue('flat_foundation_x_0_1m', params.flat_foundation_x_0_1m)
+            ) / 2
+            local _yHalfSize = (
+                _paramHelpers.Nought2PlusN.getValueFromSliderParamValue('flat_foundation_y_10m', params.flat_foundation_y_10m) +
+                _paramHelpers.Nought2PlusN.getValueFromSliderParamValue('flat_foundation_y_1m', params.flat_foundation_y_1m) +
+                _paramHelpers.Nought2PlusN.getValueFromSliderParamValue('flat_foundation_y_0_1m', params.flat_foundation_y_0_1m)
+            ) / 2
+            -- local _yAngleRad = _paramHelpers.MinusN2PlusN.getValueFromSliderParamValue('flat_foundation_ro', params.flat_foundation_ro) * math.pi / 180
+            -- local _zMax = (2 * _xHalfSize) * math.sin(_yAngleRad)
+            local _zMax = 0
+
+            -- print('x Size =', _xHalfSize * 2, 'y Size =', _yHalfSize * 2, '_zMax =', _zMax)
+            local _flatFaces = { {
+                {-_xHalfSize, -_yHalfSize, 0}, {-_xHalfSize, _yHalfSize, 0}, {_xHalfSize, _yHalfSize, _zMax}, {_xHalfSize, -_yHalfSize, _zMax}
+            } }
+            result.terrainAlignmentLists = {
+                {
+                    type = 'EQUAL',
+                    optional = true, -- set this to true if the alignment must not throw collision errors when competing against other terrain alignments in the same construction
+                    slopeLow = 9.6,
+                    slopeHigh = 9.9,
+                    faces = _flatFaces,
+                },
+            }
+
+            -- result.models = params.flat_foundation_allow_adjusting == 0
+            --     and {
+            --         {
+            --             id = 'lollo_assets/empty.mdl',
+            --             transf = {1, 0, 0, 0,  0, 1, 0, 0,  0, 0, 1, 0,  0, 0, 0, 1},
+            --         }
+            --     }
+            --     or {
+            --         {
+            --             id = 'lollo_assets/icon/orange_w_message.mdl',
+            --             transf = {1, 0, 0, 0,  0, 1, 0, 0,  0, 0, 1, 0,  0, 0, 0, 1},
+            --         },
+            --     }
+
+            -- local faces, radius, wedgeCount = { }, 20, 10
+            -- for i = 1, wedgeCount do
+            --     local theta = 2 * math.pi / wedgeCount * i
+            --     faces[#faces+1] = { radius * math.cos(theta), radius * math.sin(theta), 0 }
+            -- end
+            -- faces = { faces }
+
+            -- result.groundFaces = { -- the ground faces ignore z, the alignment lists don't
+            --     {
+            --         face = faces[1],
+            --         loop = true,
+            --         modes = {
+            --             {
+            --                 key = 'none.lua',
+            --                 type = 'FILL',
+            --             },
+            --         }
+            --     }
+            -- }
+
+            return result
+        end,
+        upgradeFn = function(_)
+            return {}
+        end
+    }
+end

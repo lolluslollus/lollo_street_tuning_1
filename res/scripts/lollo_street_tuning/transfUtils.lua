@@ -1,6 +1,414 @@
+if math.atan2 == nil then
+    math.atan2 = function(dy, dx)
+        local result = 0
+        if dx == 0 then
+            result = math.pi * 0.5
+        else
+            result = math.atan(dy / dx)
+        end
+
+        if dx > 0 then
+            return result
+        elseif dx < 0 and dy >= 0 then
+            return result + math.pi
+        elseif dx < 0 and dy < 0 then
+            return result - math.pi
+        elseif dy > 0 then
+            return result
+        elseif dy < 0 then
+            return - result
+        else return false
+        end
+    end
+end
+
 local matrixUtils = require('lollo_street_tuning.matrix')
 
-local utils = {}
+local utils = {
+    -- copied from UG.transf.mul
+    get4x4MatrixesMultiplied = function(m1, m2)
+        return {
+            m1[1] * m2[1]  + m1[5] * m2[2]  + m1[9]  * m2[3]  + m1[13] * m2[4],
+            m1[2] * m2[1]  + m1[6] * m2[2]  + m1[10] * m2[3]  + m1[14] * m2[4],
+            m1[3] * m2[1]  + m1[7] * m2[2]  + m1[11] * m2[3]  + m1[15] * m2[4],
+            m1[4] * m2[1]  + m1[8] * m2[2]  + m1[12] * m2[3]  + m1[16] * m2[4],
+            m1[1] * m2[5]  + m1[5] * m2[6]  + m1[9]  * m2[7]  + m1[13] * m2[8],
+            m1[2] * m2[5]  + m1[6] * m2[6]  + m1[10] * m2[7]  + m1[14] * m2[8],
+            m1[3] * m2[5]  + m1[7] * m2[6]  + m1[11] * m2[7]  + m1[15] * m2[8],
+            m1[4] * m2[5]  + m1[8] * m2[6]  + m1[12] * m2[7]  + m1[16] * m2[8],
+            m1[1] * m2[9]  + m1[5] * m2[10] + m1[9]  * m2[11] + m1[13] * m2[12],
+            m1[2] * m2[9]  + m1[6] * m2[10] + m1[10] * m2[11] + m1[14] * m2[12],
+            m1[3] * m2[9]  + m1[7] * m2[10] + m1[11] * m2[11] + m1[15] * m2[12],
+            m1[4] * m2[9]  + m1[8] * m2[10] + m1[12] * m2[11] + m1[16] * m2[12],
+            m1[1] * m2[13] + m1[5] * m2[14] + m1[9]  * m2[15] + m1[13] * m2[16],
+            m1[2] * m2[13] + m1[6] * m2[14] + m1[10] * m2[15] + m1[14] * m2[16],
+            m1[3] * m2[13] + m1[7] * m2[14] + m1[11] * m2[15] + m1[15] * m2[16],
+            m1[4] * m2[13] + m1[8] * m2[14] + m1[12] * m2[15] + m1[16] * m2[16],
+        }
+    end,
+    --#region faster than mul()
+    getTransf_XShifted = function(transf, shift)
+        if transf == nil or type(shift) ~= 'number' then return transf end
+
+        return {
+            transf[1], transf[2], transf[3], transf[4],
+            transf[5], transf[6], transf[7], transf[8],
+            transf[9], transf[10], transf[11], transf[12],
+            transf[1] * shift + transf[13],
+            transf[2] * shift + transf[14],
+            transf[3] * shift + transf[15],
+            transf[4] * shift + transf[16],
+        }
+    end,
+
+    getTransf_YShifted = function(transf, shift)
+        if transf == nil or type(shift) ~= 'number' then return transf end
+
+        return {
+            transf[1], transf[2], transf[3], transf[4],
+            transf[5], transf[6], transf[7], transf[8],
+            transf[9], transf[10], transf[11], transf[12],
+            transf[5] * shift + transf[13],
+            transf[6] * shift + transf[14],
+            transf[7] * shift + transf[15],
+            transf[8] * shift + transf[16],
+        }
+    end,
+
+    getTransf_ZShifted = function(transf, shift)
+        if transf == nil or type(shift) ~= 'number' then return transf end
+
+        return {
+            transf[1], transf[2], transf[3], transf[4],
+            transf[5], transf[6], transf[7], transf[8],
+            transf[9], transf[10], transf[11], transf[12],
+            transf[9] * shift + transf[13],
+            transf[10] * shift + transf[14],
+            transf[11] * shift + transf[15],
+            transf[12] * shift + transf[16],
+        }
+    end,
+    ---@param transf table<number>
+    ---@param shifts123 table<number>
+    ---@return table<number>
+    getTransf_Shifted = function(transf, shifts123)
+        if type(transf) ~= 'table' or type(shifts123) ~= 'table' then return transf end
+        local x, y, z = table.unpack(shifts123)
+        -- if type(x) ~= 'number' or type[y] ~= 'number' or type(z) ~= 'number' then return transf end
+
+        return {
+            transf[1], transf[2], transf[3], transf[4],
+            transf[5], transf[6], transf[7], transf[8],
+            transf[9], transf[10], transf[11], transf[12],
+            transf[1] * x + transf[5] * y + transf[9]  * z + transf[13],
+            transf[2] * x + transf[6] * y + transf[10] * z + transf[14],
+            transf[3] * x + transf[7] * y + transf[11] * z + transf[15],
+            transf[4] * x + transf[8] * y + transf[12] * z + transf[16],
+        }
+    end,
+    ---@param transf table<number>
+    ---@param rotYRad number
+    ---@return table<number>
+    getTransf_YRotated = function(transf, rotYRad)
+        if type(transf) ~= 'table' or type(rotYRad) ~= 'number' then return transf end
+
+        local cosY, sinY = math.cos(rotYRad), math.sin(rotYRad)
+
+        return {
+            transf[1] * cosY - transf[9]  * sinY,
+            transf[2] * cosY - transf[10] * sinY,
+            transf[3] * cosY - transf[11] * sinY,
+            transf[4] * cosY - transf[12] * sinY,
+            transf[5],
+            transf[6],
+            transf[7],
+            transf[8],
+            transf[1] * sinY + transf[9]  * cosY,
+            transf[2] * sinY + transf[10] * cosY,
+            transf[3] * sinY + transf[11] * cosY,
+            transf[4] * sinY + transf[12] * cosY,
+            transf[13],
+            transf[14],
+            transf[15],
+            transf[16],
+        }
+    end,
+    ---@param transf table<number>
+    ---@param rotZRad number
+    ---@return table<number>
+    getTransf_ZRotated = function(transf, rotZRad)
+        if type(transf) ~= 'table' or type(rotZRad) ~= 'number' then return transf end
+
+        local cosZ, sinZ = math.cos(rotZRad), math.sin(rotZRad)
+
+        return {
+            transf[1] * cosZ  + transf[5] * sinZ,
+            transf[2] * cosZ  + transf[6] * sinZ,
+            transf[3] * cosZ  + transf[7] * sinZ,
+            transf[4] * cosZ  + transf[8] * sinZ,
+            -transf[1] * sinZ  + transf[5] * cosZ,
+            -transf[2] * sinZ  + transf[6] * cosZ,
+            -transf[3] * sinZ  + transf[7] * cosZ,
+            -transf[4] * sinZ  + transf[8] * cosZ,
+            transf[9],
+            transf[10],
+            transf[11],
+            transf[12],
+            transf[13],
+            transf[14],
+            transf[15],
+            transf[16],
+        }
+    end,
+    --- faster than calling mul(transf, {0, 1, 0, 0,  -1, 0, 0, 0...})
+    ---@param transf table<number>
+    ---@return table<number>
+    getTransf_ZRotatedP90 = function(transf)
+        if type(transf) ~= 'table' then return transf end
+
+        return {
+            transf[5], transf[6], transf[7], transf[8],
+            -transf[1], -transf[2], -transf[3], -transf[4],
+            transf[9], transf[10], transf[11], transf[12],
+            transf[13], transf[14], transf[15], transf[16],
+        }
+    end,
+    --- faster than calling mul(transf, {0, -1, 0, 0,  1, 0, 0, 0...})
+    ---@param transf table<number>
+    ---@return table<number>
+    getTransf_ZRotatedM90 = function(transf)
+        if type(transf) ~= 'table' then return transf end
+
+        local cosZ, sinZ = 0, -1
+
+        return {
+            -transf[5], -transf[6], -transf[7], -transf[8],
+            transf[1], transf[2], transf[3], transf[4],
+            transf[9], transf[10], transf[11], transf[12],
+            transf[13], transf[14], transf[15], transf[16],
+        }
+    end,
+    --- faster than calling mul(transf, {-1, 0, 0, 0,  0, -1, 0, 0...})
+    ---@param transf table<number>
+    ---@return table<number>
+    getTransf_ZRotated180 = function(transf)
+        if type(transf) ~= 'table' then return transf end
+
+        return {
+            -transf[1], -transf[2], -transf[3], -transf[4],
+            -transf[5], -transf[6], -transf[7], -transf[8],
+            transf[9], transf[10], transf[11], transf[12],
+            transf[13], transf[14], transf[15], transf[16],
+        }
+    end,
+    ---@param transf table<number>
+    ---@param rotZRad number
+    ---@param shifts123? table<number>
+    ---@return table<number>
+    getTransf_ZRotated_Shifted = function(transf, rotZRad, shifts123)
+        if type(transf) ~= 'table' or type(rotZRad) ~= 'number' then return transf end
+        local x, y, z = 0, 0, 0
+        if type(shifts123) == 'table' then x, y, z = table.unpack(shifts123) end
+        -- if type(x) ~= 'number' or type[y] ~= 'number' or type(z) ~= 'number' then return transf end
+
+        local cosZ, sinZ = math.cos(rotZRad), math.sin(rotZRad)
+
+        return {
+            transf[1] * cosZ  + transf[5] * sinZ,
+            transf[2] * cosZ  + transf[6] * sinZ,
+            transf[3] * cosZ  + transf[7] * sinZ,
+            transf[4] * cosZ  + transf[8] * sinZ,
+            -transf[1] * sinZ  + transf[5] * cosZ,
+            -transf[2] * sinZ  + transf[6] * cosZ,
+            -transf[3] * sinZ  + transf[7] * cosZ,
+            -transf[4] * sinZ  + transf[8] * cosZ,
+            transf[9],
+            transf[10],
+            transf[11],
+            transf[12],
+            transf[1] * x + transf[5] * y + transf[9]  * z + transf[13],
+            transf[2] * x + transf[6] * y + transf[10] * z + transf[14],
+            transf[3] * x + transf[7] * y + transf[11] * z + transf[15],
+            transf[4] * x + transf[8] * y + transf[12] * z + transf[16],
+        }
+    end,
+    --- faster than calling mul(transf, {0, 1, 0, 0,  -1, 0, 0, 0...})
+    ---@param transf table<number>
+    ---@param shifts123? table<number>
+    ---@return table<number>
+    getTransf_ZRotatedP90_Shifted = function(transf, shifts123)
+        if type(transf) ~= 'table' then return transf end
+        local x, y, z = 0, 0, 0
+        if type(shifts123) == 'table' then x, y, z = table.unpack(shifts123) end
+        -- if type(x) ~= 'number' or type[y] ~= 'number' or type(z) ~= 'number' then return transf end
+
+        return {
+            transf[5], transf[6], transf[7], transf[8],
+            -transf[1], -transf[2], -transf[3], -transf[4],
+            transf[9], transf[10], transf[11], transf[12],
+            transf[1] * x + transf[5] * y + transf[9]  * z + transf[13],
+            transf[2] * x + transf[6] * y + transf[10] * z + transf[14],
+            transf[3] * x + transf[7] * y + transf[11] * z + transf[15],
+            transf[4] * x + transf[8] * y + transf[12] * z + transf[16],
+        }
+    end,
+    --- faster than calling mul(transf, {0, -1, 0, 0,  1, 0, 0, 0...})
+    ---@param transf table<number>
+    ---@param shifts123? table<number>
+    ---@return table<number>
+    getTransf_ZRotatedM90_Shifted = function(transf, shifts123)
+        if type(transf) ~= 'table' then return transf end
+        local x, y, z = 0, 0, 0
+        if type(shifts123) == 'table' then x, y, z = table.unpack(shifts123) end
+        -- if type(x) ~= 'number' or type[y] ~= 'number' or type(z) ~= 'number' then return transf end
+
+        local cosZ, sinZ = 0, -1
+
+        return {
+            -transf[5], -transf[6], -transf[7], -transf[8],
+            transf[1], transf[2], transf[3], transf[4],
+            transf[9], transf[10], transf[11], transf[12],
+            transf[1] * x + transf[5] * y + transf[9]  * z + transf[13],
+            transf[2] * x + transf[6] * y + transf[10] * z + transf[14],
+            transf[3] * x + transf[7] * y + transf[11] * z + transf[15],
+            transf[4] * x + transf[8] * y + transf[12] * z + transf[16],
+        }
+    end,
+    --- faster than calling mul(transf, {-1, 0, 0, 0,  0, -1, 0, 0...})
+    ---@param transf table<number>
+    ---@param shifts123? table<number>
+    ---@return table<number>
+    getTransf_ZRotated180_Shifted = function(transf, shifts123)
+        if type(transf) ~= 'table' then return transf end
+        local x, y, z = 0, 0, 0
+        if type(shifts123) == 'table' then x, y, z = table.unpack(shifts123) end
+        -- if type(x) ~= 'number' or type[y] ~= 'number' or type(z) ~= 'number' then return transf end
+
+        return {
+            -transf[1], -transf[2], -transf[3], -transf[4],
+            -transf[5], -transf[6], -transf[7], -transf[8],
+            transf[9], transf[10], transf[11], transf[12],
+            transf[1] * x + transf[5] * y + transf[9]  * z + transf[13],
+            transf[2] * x + transf[6] * y + transf[10] * z + transf[14],
+            transf[3] * x + transf[7] * y + transf[11] * z + transf[15],
+            transf[4] * x + transf[8] * y + transf[12] * z + transf[16],
+        }
+    end,
+    getTransf_XScaled = function(transf, scale)
+        return {
+            transf[1] * scale, transf[2] * scale, transf[3] * scale, transf[4] * scale,
+            transf[5], transf[6], transf[7], transf[8],
+            transf[9], transf[10], transf[11], transf[12],
+            transf[13], transf[14], transf[15], transf[16]
+        }
+    end,
+    getTransf_YScaled = function(transf, scale)
+        return {
+            transf[1], transf[2], transf[3], transf[4],
+            transf[5] * scale, transf[6] * scale, transf[7] * scale, transf[8] * scale,
+            transf[9], transf[10], transf[11], transf[12],
+            transf[13], transf[14], transf[15], transf[16]
+        }
+    end,
+    getTransf_ZScaled = function(transf, scale)
+        return {
+            transf[1], transf[2], transf[3], transf[4],
+            transf[5], transf[6], transf[7], transf[8],
+            transf[9] * scale, transf[10] * scale, transf[11] * scale, transf[12] * scale,
+            transf[13], transf[14], transf[15], transf[16]
+        }
+    end,
+    getTransf_Scaled = function(transf, scales123)
+        if type(transf) ~= 'table' then return transf end
+        local x, y, z = 1, 1, 1
+        if type(scales123) == 'table' then x, y, z = table.unpack(scales123) end
+
+        return {
+            transf[1] * x, transf[2] * x, transf[3] * x, transf[4] * x,
+            transf[5] * y, transf[6] * y, transf[7] * y, transf[8] * y,
+            transf[9] * z, transf[10] * z, transf[11] * z, transf[12] * z,
+            transf[13], transf[14], transf[15], transf[16]
+        }
+    end,
+    getTransf_Scaled_Shifted = function(transf, scales123, shifts123)
+        if type(transf) ~= 'table' then return transf end
+        local x, y, z = 1, 1, 1
+        if type(scales123) == 'table' then x, y, z = table.unpack(scales123) end
+        local xx, yy, zz = 0, 0, 0
+        if type(shifts123) == 'table' then xx, yy, zz = table.unpack(shifts123) end
+
+        return {
+            transf[1] * x, transf[2] * x, transf[3] * x, transf[4] * x,
+            transf[5] * y, transf[6] * y, transf[7] * y, transf[8] * y,
+            transf[9] * z, transf[10] * z, transf[11] * z, transf[12] * z,
+            transf[1] * xx + transf[5] * yy + transf[9]  * zz + transf[13],
+            transf[2] * xx + transf[6] * yy + transf[10] * zz + transf[14],
+            transf[3] * xx + transf[7] * yy + transf[11] * zz + transf[15],
+            transf[4] * xx + transf[8] * yy + transf[12] * zz + transf[16],
+        }
+    end,
+    getTransf_XSkewedOnZ = function(transf, skew)
+        local m2 = {
+            1, 0, skew, 0,
+            0, 1, 0, 0,
+            0, 0, 1, 0,
+            0, 0, 0, 1,
+        }
+
+        return {
+            transf[1]  + transf[9]  * skew,
+            transf[2]  + transf[10] * skew,
+            transf[3]  + transf[11] * skew,
+            transf[4]  + transf[12] * skew,
+            transf[5],
+            transf[6],
+            transf[7],
+            transf[8],
+            transf[9],
+            transf[10],
+            transf[11],
+            transf[12],
+            transf[13],
+            transf[14],
+            transf[15],
+            transf[16],
+        }
+    end,
+--#endregion faster than mul()
+}
+
+--#region faces
+local _getFacePointTransformed = function(transf, faceXYZW)
+    return {
+        transf[1]*faceXYZW[1] + transf[5]*faceXYZW[2] + transf[ 9]*faceXYZW[3] + transf[13]*faceXYZW[4],
+        transf[2]*faceXYZW[1] + transf[6]*faceXYZW[2] + transf[10]*faceXYZW[3] + transf[14]*faceXYZW[4],
+        transf[3]*faceXYZW[1] + transf[7]*faceXYZW[2] + transf[11]*faceXYZW[3] + transf[15]*faceXYZW[4],
+        transf[4]*faceXYZW[1] + transf[8]*faceXYZW[2] + transf[12]*faceXYZW[3] + transf[16]*faceXYZW[4]
+    }
+end
+local _getFacePointTransformed_FAST = function(transf, faceXYZ1)
+    return {
+        transf[1]*faceXYZ1[1] + transf[5]*faceXYZ1[2] + transf[ 9]*faceXYZ1[3] + transf[13],
+        transf[2]*faceXYZ1[1] + transf[6]*faceXYZ1[2] + transf[10]*faceXYZ1[3] + transf[14],
+        transf[3]*faceXYZ1[1] + transf[7]*faceXYZ1[2] + transf[11]*faceXYZ1[3] + transf[15],
+        transf[4]*faceXYZ1[1] + transf[8]*faceXYZ1[2] + transf[12]*faceXYZ1[3] + transf[16]
+    }
+end
+utils.getFaceTransformed = function(transf, faceXYZW)
+    local results = {}
+    for i = 1, #faceXYZW do
+        results[i] = _getFacePointTransformed(transf, faceXYZW[i])
+    end
+    return results
+end
+utils.getFaceTransformed_FAST = function(transf, faceXYZ1)
+    local results = {}
+    for i = 1, #faceXYZ1 do
+        results[i] = _getFacePointTransformed_FAST(transf, faceXYZ1[i])
+    end
+    return results
+end
+--#endregion faces
 
 local _getMatrix = function(transf)
     return {
@@ -201,6 +609,30 @@ utils.getVec123Transformed = function(vec123, transf)
     }
 end
 
+utils.getVec123ZRotatedP90Deg = function(vec123)
+    return {
+        -vec123[2],
+        vec123[1],
+        vec123[3]
+    }
+end
+
+utils.getVec123ZRotatedM90Deg = function(vec123)
+    return {
+        vec123[2],
+        -vec123[1],
+        vec123[3]
+    }
+end
+
+utils.getVec123ZRotated180Deg = function(vec123)
+    return {
+        -vec123[1],
+        -vec123[2],
+        vec123[3]
+    }
+end
+
 utils.getPosTanX2Transformed = function(posTanX2, transf)
     local pos1 = {posTanX2[1][1][1], posTanX2[1][1][2], posTanX2[1][1][3]}
     local pos2 = {posTanX2[2][1][1], posTanX2[2][1][2], posTanX2[2][1][3]}
@@ -295,9 +727,27 @@ utils.getVectorLength = function(xyz)
     return math.sqrt(x * x + y * y + z * z)
 end
 
+---runs no checks, takes an xyz table
+---@param xyz table
+---@return number
+utils.getVectorLength_FAST = function(xyz)
+    -- if type(xyz) ~= 'table' and type(xyz) ~= 'userdata' then return nil end
+    local x = xyz.x
+    local y = xyz.y
+    local z = xyz.z
+    return math.sqrt(x * x + y * y + z * z)
+end
+
+utils.getVectorLength_onlyXY = function(xy)
+    if type(xy) ~= 'table' and type(xy) ~= 'userdata' then return nil end
+    local x = xy.x or xy[1] or 0.0
+    local y = xy.y or xy[2] or 0.0
+    return math.sqrt(x * x + y * y)
+end
+
 utils.getVectorNormalised = function(xyz, targetLength)
     if type(xyz) ~= 'table' and type(xyz) ~= 'userdata' then return nil end
-    if type(targetLength) == 'number' and targetLength == 0 then return { 0, 0, 0 } end
+    if targetLength == 0 then return { 0, 0, 0 } end
 
     local _oldLength = utils.getVectorLength(xyz)
     if _oldLength == 0 then return { 0, 0, 0 } end
@@ -318,11 +768,73 @@ utils.getVectorNormalised = function(xyz, targetLength)
     end
 end
 
+---runs no checks, takes and returns an xyz table
+---@param xyz table
+---@param targetLength? number
+---@return table
+utils.getVectorNormalised_FAST = function(xyz, targetLength)
+    -- if type(xyz) ~= 'table' and type(xyz) ~= 'userdata' then return nil end
+    if targetLength == 0 then return { 0, 0, 0 } end
+
+    local _oldLength = utils.getVectorLength_FAST(xyz)
+    if _oldLength == 0 then return { 0, 0, 0 } end
+
+    local _lengthFactor = (type(targetLength) == 'number' and targetLength or 1.0) / _oldLength
+    return {
+        x = xyz.x * _lengthFactor,
+        y = xyz.y * _lengthFactor,
+        z = xyz.z * _lengthFactor
+    }
+end
+
+utils.getVectorMultiplied = function(xyz, factor)
+    if type(xyz) ~= 'table' and type(xyz) ~= 'userdata' then return nil end
+    if type(factor) ~= 'number' then return nil end
+
+    if xyz.x ~= nil and xyz.y ~= nil and xyz.z ~= nil then
+        return {
+            x = xyz.x * factor,
+            y = xyz.y * factor,
+            z = xyz.z * factor
+        }
+    else
+        return {
+            xyz[1] * factor,
+            xyz[2] * factor,
+            xyz[3] * factor
+        }
+    end
+end
+
+utils.getVectorsDot = function(xyz1, xyz2)
+    -- returns |xyz1| * |xyz2| * cos(angle between xyz1 and xyz2)
+    if type(xyz1) ~= 'table' and type(xyz1) ~= 'userdata' then return nil end
+    if type(xyz2) ~= 'table' and type(xyz2) ~= 'userdata' then return nil end
+
+    local x1 = xyz1.x or xyz1[1] or 0.0
+    local y1 = xyz1.y or xyz1[2] or 0.0
+    local z1 = xyz1.z or xyz1[3] or 0.0
+
+    local x2 = xyz2.x or xyz2[1] or 0.0
+    local y2 = xyz2.y or xyz2[2] or 0.0
+    local z2 = xyz2.z or xyz2[3] or 0.0
+
+    return x1 * x2 + y1 * y2 + z1 * z2
+end
+
 utils.getPositionsDistance = function(pos0, pos1)
     local distance = utils.getVectorLength({
         (pos0.x or pos0[1]) - (pos1.x or pos1[1]),
         (pos0.y or pos0[2]) - (pos1.y or pos1[2]),
         (pos0.z or pos0[3]) - (pos1.z or pos1[3]),
+    })
+    return distance
+end
+
+utils.getPositionsDistance_onlyXY = function(pos0, pos1)
+    local distance = utils.getVectorLength_onlyXY({
+        (pos0.x or pos0[1]) - (pos1.x or pos1[1]),
+        (pos0.y or pos0[2]) - (pos1.y or pos1[2]),
     })
     return distance
 end
@@ -345,8 +857,8 @@ utils.getPositionsMiddle = function(pos0, pos1)
     end
 end
 
-utils.getParallelSideways = function(posTanX2, sideShift)
-    -- the result will be identical to the original but shifted sideways
+-- the result will be identical to the original but shifted sideways
+utils.getParallelSidewaysOLD = function(posTanX2, sideShift)
     local result = {
         {
             {},
@@ -369,31 +881,97 @@ utils.getParallelSideways = function(posTanX2, sideShift)
     return result
 end
 
-utils.getParallelSidewaysWithRotZ = function(posTanX2, sideShiftOnXYPlane)
-    -- the result will be parallel to the original at its ends but stretched or compressed due to the shift.
-    local _rot90Transf = { 0, 1, 0, 0, -1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, }
+---the result will be parallel to the original at its ends but stretched or compressed due to the shift; tan changes are ignored for speed.
+---do not use this for edges
+---@param posTanX2 table
+---@param sideShift number
+---@return table
+utils.getParallelSidewaysCoarse = function(posTanX2, sideShift)
+    local _oldPos1 = posTanX2[1][1]
+    local _oldPos2 = posTanX2[2][1]
+    if _oldPos1[1] == _oldPos2[1] and _oldPos1[2] == _oldPos2[2] then
+        return posTanX2
+    end
 
-    local oldPos1 = posTanX2[1][1]
-    local oldPos2 = posTanX2[2][1]
-    -- we reset Z coz we rotate around the Z axis and we want to obtain a distance on the XY plane
-    local oldTan1 = {posTanX2[1][2][1], posTanX2[1][2][2], 0}
-    local oldTan2 = {posTanX2[2][2][1], posTanX2[2][2][2], 0}
+    -- we ignore Z coz we rotate around the Z axis and we want to obtain a distance on the XY plane
+    -- here, we imagine segments perpendicular to the tangents
+    local sinZ1 = -posTanX2[1][2][2]
+    local cosZ1 = posTanX2[1][2][1]
+    local sinZ2 = -posTanX2[2][2][2]
+    local cosZ2 = posTanX2[2][2][1]
+    local _lengthZ1 = math.sqrt(sinZ1 * sinZ1 + cosZ1 * cosZ1)
+    sinZ1, cosZ1 = sinZ1 / _lengthZ1, cosZ1 / _lengthZ1
+    local _lengthZ2 = math.sqrt(sinZ2 * sinZ2 + cosZ2 * cosZ2)
+    sinZ2, cosZ2 = sinZ2 / _lengthZ2, cosZ2 / _lengthZ2
+    local _newPos1 = { _oldPos1[1] + sinZ1 * sideShift, _oldPos1[2] + cosZ1 * sideShift, _oldPos1[3] }
+    local _newPos2 = { _oldPos2[1] + sinZ2 * sideShift, _oldPos2[2] + cosZ2 * sideShift, _oldPos2[3] }
 
-    local tan1RotatedAndNormalised = utils.getVectorNormalised(utils.getVec123Transformed(oldTan1, _rot90Transf), sideShiftOnXYPlane)
-    local tan2RotatedAndNormalised = utils.getVectorNormalised(utils.getVec123Transformed(oldTan2, _rot90Transf), sideShiftOnXYPlane)
-
-    local result = {
+    return {
         {
-            { oldPos1[1] + tan1RotatedAndNormalised[1], oldPos1[2] + tan1RotatedAndNormalised[2], oldPos1[3] },
-            posTanX2[1][2]
+            _newPos1,
+            {
+                posTanX2[1][2][1],
+                posTanX2[1][2][2],
+                posTanX2[1][2][3],
+            }
         },
         {
-            { oldPos2[1] + tan2RotatedAndNormalised[1], oldPos2[2] + tan2RotatedAndNormalised[2], oldPos2[3] },
-            posTanX2[2][2]
+            _newPos2,
+            {
+                posTanX2[2][2][1],
+                posTanX2[2][2][2],
+                posTanX2[2][2][3],
+            }
         },
     }
+end
 
-    return result
+---the result will be parallel to the original at its ends but stretched or compressed due to the shift.
+---@param posTanX2 table
+---@param sideShift number
+---@return table
+---@return number
+---@return number
+utils.getParallelSideways = function(posTanX2, sideShift)
+    local _oldPos1 = posTanX2[1][1]
+    local _oldPos2 = posTanX2[2][1]
+    if _oldPos1[1] == _oldPos2[1] and _oldPos1[2] == _oldPos2[2] then
+        return posTanX2, 1, 1
+    end
+
+    -- we ignore Z coz we rotate around the Z axis and we want to obtain a distance on the XY plane
+    -- here, we imagine segments perpendicular to the tangents
+    local sinZ1 = -posTanX2[1][2][2]
+    local cosZ1 = posTanX2[1][2][1]
+    local sinZ2 = -posTanX2[2][2][2]
+    local cosZ2 = posTanX2[2][2][1]
+    local _lengthZ1 = math.sqrt(sinZ1 * sinZ1 + cosZ1 * cosZ1)
+    sinZ1, cosZ1 = sinZ1 / _lengthZ1, cosZ1 / _lengthZ1
+    local _lengthZ2 = math.sqrt(sinZ2 * sinZ2 + cosZ2 * cosZ2)
+    sinZ2, cosZ2 = sinZ2 / _lengthZ2, cosZ2 / _lengthZ2
+
+    local _newPos1 = { _oldPos1[1] + sinZ1 * sideShift, _oldPos1[2] + cosZ1 * sideShift, _oldPos1[3] }
+    local _newPos2 = { _oldPos2[1] + sinZ2 * sideShift, _oldPos2[2] + cosZ2 * sideShift, _oldPos2[3] }
+
+    local xRatio = (_oldPos2[1] ~= _oldPos1[1]) and math.abs((_newPos2[1] - _newPos1[1]) / (_oldPos2[1] - _oldPos1[1])) or nil
+    local yRatio = (_oldPos2[2] ~= _oldPos1[2]) and math.abs((_newPos2[2] - _newPos1[2]) / (_oldPos2[2] - _oldPos1[2])) or nil
+    if not(xRatio) or not(yRatio) then xRatio, yRatio = 1, 1 end -- vertical or horizontal posTanX2
+
+    local _newTan1 = { posTanX2[1][2][1] * xRatio, posTanX2[1][2][2] * yRatio, posTanX2[1][2][3] }
+    local _newTan2 = { posTanX2[2][2][1] * xRatio, posTanX2[2][2][2] * yRatio, posTanX2[2][2][3] }
+
+    return {
+        {
+            _newPos1,
+            _newTan1,
+        },
+        {
+            _newPos2,
+            _newTan2,
+        },
+    },
+    xRatio,
+    yRatio
 end
 
 utils.get1MLaneTransf = function(pos1, pos2)
@@ -484,6 +1062,105 @@ utils.get1MModelTransf = function(pos1, pos2)
     return result
 end
 
+-- gets a transf to fit something with length xObjectLength between two positions. x size is scaled, y and z sizes are preserved
+utils.getTransf2FitObjectBetweenPositions = function(pos0, pos1, xObjectLength, logger)
+    local _absX0I = xObjectLength / 2
+    local _logger = logger == nil and {print = function() end, debugPrint = function() end, getIsExtendedLog = function() return false end} or logger
+    local x0 = pos0.x or pos0[1]
+    local x1 = pos1.x or pos1[1]
+    local y0 = pos0.y or pos0[2]
+    local y1 = pos1.y or pos1[2]
+    local z0 = pos0.z or pos0[3]
+    local z1 = pos1.z or pos1[3]
+    local xMid = (x0 + x1) / 2
+    local yMid = (y0 + y1) / 2
+    local zMid = (z0 + z1) / 2
+    local vecX0 = {-_absX0I, 0, 0} -- transforms to {x0, y0, z0}
+    local vecX1 = {_absX0I, 0, 0} -- transforms to {x1, y1, z1}
+    local ipotenusaYX = math.sqrt((x1 - x0)^2 + (y1 - y0)^2)
+    local sinYX = (y1-y0) / ipotenusaYX
+    local cosYX = (x1-x0) / ipotenusaYX
+    _logger.print('ipotenusaYX =', ipotenusaYX, 'sinYX =', sinYX, 'cosYX =', cosYX)
+    local vecY0 = {0, 1, 0} -- transforms to {xMid - sinYX, yMid + cosYX, zMid}
+    local vecZ0 = {0, 0, 1} -- transforms to {xMid, yMid, zMid + 1}
+    local vecZTilted = {0, 0, 1} -- transforms to
+    -- {
+        -- xMid -math.sin(math.atan2((z1-z0), (ipotenusaYX))) * cosYX
+        -- yMid -math.sin(math.atan2((z1-z0), (ipotenusaYX))) * sinYX
+        -- zMid +math.cos(math.atan2((z1-z0), (ipotenusaYX)))
+    -- }
+    -- vecXYZ transformed with transf is:
+    --[[
+        x = vecXYZ.x * transf[1] + vecXYZ.y * transf[5] + vecXYZ.z * transf[9] + transf[13],
+        y = vecXYZ.x * transf[2] + vecXYZ.y * transf[6] + vecXYZ.z * transf[10] + transf[14],
+        z = vecXYZ.x * transf[3] + vecXYZ.y * transf[7] + vecXYZ.z * transf[11] + transf[15]
+    ]]
+    local unknownTransf = {}
+    unknownTransf[4] = 0
+    unknownTransf[8] = 0
+    unknownTransf[12] = 0
+    unknownTransf[16] = 1
+    unknownTransf[13] = xMid
+    unknownTransf[14] = yMid
+    unknownTransf[15] = zMid
+    -- solving for vecX0
+    -- local xyz = {x0, y0, z0}
+    unknownTransf[1] = (x0 - xMid) / (-_absX0I)
+    unknownTransf[2] = (y0 - yMid) / (-_absX0I)
+    unknownTransf[3] = (z0 - zMid) / (-_absX0I)
+    -- solving for vecX1 (same result)
+    -- unknownTransf[1] = (x1 - xMid) / absX0I
+    -- unknownTransf[2] = (y1 - yMid) / absX0I
+    -- unknownTransf[3] = (z1 - zMid) / absX0I
+    -- solving for vecY0
+    unknownTransf[5] = -sinYX
+    unknownTransf[6] = cosYX
+    unknownTransf[7] = 0
+    -- solving for vecZ0 vertical
+    -- this makes buildings vertical, the points match
+    unknownTransf[9] = 0
+    unknownTransf[10] = 0
+    unknownTransf[11] = 1
+    _logger.print('unknownTransf straight =') _logger.debugPrint(unknownTransf)
+    -- solving for vecZ0 tilted
+    -- this makes buildings perpendicular to the road, the points match. Curves seem to get less angry.
+    -- LOLLO TODO these three are fine for the edges but tilt the construction models, the con should compensate for it
+    -- xMid -math.sin(math.atan2((z1-z0), (ipotenusaYX))) * cosYX = unknownTransf[9] + xMid
+    unknownTransf[9] = -math.sin(math.atan2((z1-z0), (ipotenusaYX))) * cosYX
+    -- yMid -math.sin(math.atan2((z1-z0), (ipotenusaYX))) * sinYX = unknownTransf[10] + yMid
+    unknownTransf[10] = -math.sin(math.atan2((z1-z0), (ipotenusaYX))) * sinYX
+    -- zMid +math.cos(math.atan2((z1-z0), (ipotenusaYX))) = unknownTransf[11] + zMid
+    unknownTransf[11] = math.cos(math.atan2((z1-z0), (ipotenusaYX)))
+    _logger.print('unknownTransf tilted =') _logger.debugPrint(unknownTransf)
+
+    local result = unknownTransf
+    _logger.print('result =') _logger.debugPrint(result)
+    local vecX0Transformed = utils.getVecTransformed(utils.oneTwoThree2XYZ(vecX0), result)
+    local vecX1Transformed = utils.getVecTransformed(utils.oneTwoThree2XYZ(vecX1), result)
+    local vecYTransformed = utils.getVecTransformed(utils.oneTwoThree2XYZ(vecY0), result)
+    local vecZ0Transformed = utils.getVecTransformed(utils.oneTwoThree2XYZ(vecZ0), result)
+    if _logger.getIsExtendedLog() then
+        print('vecX0 straight and transformed =') debugPrint(vecX0) debugPrint(vecX0Transformed)
+        print('should be') debugPrint({x0, y0, z0})
+        print('vecX1 straight and transformed =') debugPrint(vecX1) debugPrint(vecX1Transformed)
+        print('should be') debugPrint({x1, y1, z1})
+        print('vecY0 straight and transformed =') debugPrint(vecY0) debugPrint(vecYTransformed)
+        print('should be') debugPrint({xMid - sinYX, yMid + cosYX, zMid})
+        print('vecZ0 straight and transformed =') debugPrint(vecZ0) debugPrint(vecZ0Transformed)
+        print('should be (vertical)') debugPrint({xMid, yMid, zMid + 1})
+        print('or, it should be (perpendicular fixed)') debugPrint({
+            xMid -math.sin(math.atan2((z1-z0), (ipotenusaYX))) * cosYX,
+            yMid -math.sin(math.atan2((z1-z0), (ipotenusaYX))) * sinYX,
+            zMid +math.cos(math.atan2((z1-z0), (ipotenusaYX)))
+        })
+        print('x0, x1 =', x0, x1)
+        print('y0, y1 =', y0, y1)
+        print('z0, z1 =', z0, z1)
+        print('xMid, yMid, zMid =', xMid, yMid, zMid)
+    end
+    return result
+end
+
 utils.getPosTanX2Normalised = function(posTanX2, targetLength)
     local pos1 = {posTanX2[1][1][1], posTanX2[1][1][2], posTanX2[1][1][3]}
     local tan1 = utils.getVectorNormalised(posTanX2[1][2], targetLength)
@@ -534,7 +1211,6 @@ utils.getExtrapolatedPosTanX2Continuation = function(posTanX2, length)
 end
 
 utils.getExtrapolatedPosX2Continuation = function(pos1, pos2, length)
-    -- the parallel will be exactly like the original, but that will entail some shifting
     if length == 0 then
         return pos2
     -- elseif length > 0 then
@@ -556,7 +1232,6 @@ utils.getExtrapolatedPosX2Continuation = function(pos1, pos2, length)
 end
 
 utils.getPosTanX2Reversed = function(posTanX2)
-    -- this will stretch or compress the parallel
     if type(posTanX2) ~= 'table' then return posTanX2 end
 
     return {
@@ -577,36 +1252,6 @@ utils.getPosTanX2Reversed = function(posTanX2)
             },
         },
     }
-end
-
-utils.isNumVeryClose = function(num1, num2, significantFigures)
-    if type(num1) ~= 'number' or type(num2) ~= 'number' then return false end
-
-    if not(significantFigures) then significantFigures = 5
-    elseif type(significantFigures) ~= 'number' then return false
-    elseif significantFigures < 1 or significantFigures > 10 then return false
-    end
-
-    local _formatString = "%." .. math.floor(significantFigures) .. "g"
-
-    -- wrong (less accurate):
-    -- local roundedNum1 = math.ceil(num1 * roundingFactor)
-    -- local roundedNum2 = math.ceil(num2 * roundingFactor)
-    -- better:
-    -- local roundedNum1 = math.floor(num1 * roundingFactor + 0.5)
-    -- local roundedNum2 = math.floor(num2 * roundingFactor + 0.5)
-    -- return roundedNum1 == roundedNum2
-    -- but what I really want are the first significant figures, never mind how big the number is
-    return (_formatString):format(num1) == (_formatString):format(num2)
-        or (_formatString):format(num1 * 1.1) == (_formatString):format(num2 * 1.1)
-end
-
-utils.sgn = function(num)
-    if tonumber(num) == nil then return nil end
-    if num > 0 then return 1
-    elseif num < 0 then return -1
-    else return 0
-    end
 end
 
 utils.getDistanceBetweenPointAndStraight = function(segmentPosition1, segmentPosition2, testPointPosition)

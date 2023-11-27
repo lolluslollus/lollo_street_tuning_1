@@ -62,7 +62,7 @@ results.getCountryRoadLods = function()
                     -- ground
                     {
                         materials = { 'street/merge/country_new_medium_paving_low_prio.mtl'},
-                        mesh = 'merge/square_16x5.msh',
+                        mesh = 'lollo_street_tuning/merge/square_16x5.msh',
                         transf = {0.8, 0, 0, 0,  0, 1.5, 0, 0,  0, 0, 1, 0,  0, 0, 0, 1}
                     },
                 },
@@ -107,18 +107,18 @@ results.getStreetLods = function()
                     -- straight bits
                     {
                         materials = {'street/new_medium_sidewalk_border_inner.mtl', 'street/new_medium_sidewalk.mtl'},
-                        mesh = 'merge/straight_4m_lod0.msh',
+                        mesh = 'lollo_street_tuning/merge/straight_4m_lod0.msh',
                         transf = {1, 0, 0, 0, 0, -1, 0, 0, 0, 0, 1, 0, -2, -16, 0, 1}
                     },
                     {
                         materials = {'street/new_medium_sidewalk_border_inner.mtl', 'street/new_medium_sidewalk.mtl'},
-                        mesh = 'merge/straight_4m_lod0.msh',
+                        mesh = 'lollo_street_tuning/merge/straight_4m_lod0.msh',
                         transf = {1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, -2, 16, 0, 1}
                     },
                     -- ground
                     {
                         materials = { 'street/merge/country_new_medium_paving_low_prio.mtl'},
-                        mesh = 'merge/square_16x5.msh',
+                        mesh = 'lollo_street_tuning/merge/square_16x5.msh',
                         transf = {0.8, 0, 0, 0,  0, 1.5, 0, 0,  0, 0, 1, 0,  0, 0, 0, 1}
                     },
                 },

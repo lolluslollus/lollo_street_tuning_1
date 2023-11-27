@@ -1,9 +1,8 @@
 local arrayUtils = require('lollo_street_tuning.arrayUtils')
-local edgeUtils = require('lollo_street_tuning.edgeUtils')
 local extraRadiusHelper = require('lollo_street_tuning.extraRadiusHelper')
 local pitchHelper = require('lollo_street_tuning.pitchHelper')
-local streetUtils = require('lollo_street_tuning.streetUtils')
 local streetUtilUG = require('streetutil')
+local transfUtils = require('lollo_street_tuning.transfUtils')
 local vec3 = require('vec3')
 
 -- --------------- utils -----------------------------------
@@ -33,7 +32,7 @@ end
 
 local function _makeHairpinEdges(direction, pitchAngle, nodeIndexToBePitchedBase1, node0, node1, tan0, tan1)
     if tan0 == nil or tan1 == nil then
-        local edgeLength = edgeUtils.getVectorLength({node1[1] - node0[1], node1[2] - node0[2], node1[3] - node0[3]})
+        local edgeLength = transfUtils.getVectorLength({node1[1] - node0[1], node1[2] - node0[2], node1[3] - node0[3]})
         if tan0 == nil then tan0 = {edgeLength, 0, 0} end
         if tan1 == nil then tan1 = {edgeLength, 0, 0} end
     end
@@ -124,12 +123,9 @@ local function _getEdgeTypeName(params, bridgeData)
 end
 
 return {
-    getStreetHairpinParams = function()
+    getStreetHairpinParams = function(globalBridgeData, globalStreetData)
         local defaultStreetTypeIndex = arrayUtils.findIndex(
-            streetUtils.getGlobalStreetData({
-                streetUtils.getStreetDataFilters().PATHS,
-                streetUtils.getStreetDataFilters().STOCK,
-            }),
+            globalStreetData,
             'fileName',
             'lollo_medium_1_way_1_lane_street_narrow_sidewalk.lua'
         ) - 1
@@ -140,10 +136,7 @@ return {
                 key = 'streetType4Hairpin',
                 name = _('StreetType'),
                 values = arrayUtils.map(
-                    streetUtils.getGlobalStreetData({
-                        streetUtils.getStreetDataFilters().PATHS,
-                        streetUtils.getStreetDataFilters().STOCK,
-                    }),
+                    globalStreetData,
                     function(str)
                         return str.name
                     end
@@ -157,7 +150,7 @@ return {
                 key = 'bridgeType4Hairpin',
                 name = _('BridgeType'),
                 values = arrayUtils.map(
-                    streetUtils.getGlobalBridgeDataPlusNoBridge(),
+                    globalBridgeData,
                     function(str)
                         return str.name
                         -- return str.icon

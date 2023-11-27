@@ -76,6 +76,32 @@ arrayUtils.concatKeysValues = function(table1, table2)
     end
 end
 
+arrayUtils.getConcatKeysValues = function(...)
+    -- local results <const> = {}
+    local results = {}
+    -- For each source table
+    for _, tab in pairs{...} do
+      -- For each pair in tab
+        for key, value in pairs(tab) do
+            results[key] = value
+        end
+    end
+    return results
+end
+
+arrayUtils.getConcatValues = function(...)
+    -- local results <const> = {}
+    local results = {}
+    -- For each source table
+    for _, tab in pairs{...} do
+      -- For each value in tab
+        for _, value in pairs(tab) do
+            results[#results+1] = value
+        end
+    end
+    return results
+end
+
 arrayUtils.getFirst = function(tab)
     if tab == nil or #tab == nil then return nil end
 
@@ -128,23 +154,38 @@ arrayUtils.sort = function(table0, elementName, asc)
     return table0
 end
 
+arrayUtils.getCount = function(tab, isDiscardNil)
+    if type(tab) ~= 'table' and type(tab) ~= 'userdata' then
+        return -1
+    end
+
+    local result = 0
+    for _, value in pairs(tab) do
+        if not(isDiscardNil) or value ~= nil then
+            result = result + 1
+        end
+    end
+
+    return result
+end
+
 arrayUtils.findIndex = function(tab, fieldName, fieldValueNonNil)
     if type(tab) ~= 'table' or fieldValueNonNil == nil then return -1 end
 
     if type(fieldName) == 'string' then
         if string.len(fieldName) > 0 then
-            for i = 1, #tab do
-                if type(tab[i]) == 'table' and tab[i][fieldName] == fieldValueNonNil then
+            for key, value in pairs(tab) do
+                if type(value) == 'table' and value[fieldName] == fieldValueNonNil then
                     -- print('LOLLO findIndex found index =', i, 'tab[i][fieldName] =', tab[i][fieldName], 'fieldValueNonNil =', fieldValueNonNil, 'content =')
                     -- debugPrint(tab[i])
-                    return i
+                    return key
                 end
             end
         end
     else
-        for i = 1, #tab do
-            if tab[i] == fieldValueNonNil then
-                return i
+        for key, value in pairs(tab) do
+            if value == fieldValueNonNil then
+                return key
             end
         end
     end

@@ -3,7 +3,7 @@ function data()
         type = 'STREET_CONSTRUCTION',
         description = {
             name = _('Street chunks'),
-            description = _('Lays chunks of street, single or multiple in parallel. Use O and P to adjust the pitch while building and the slider when upgrading.')
+            description = _('Lays chunks of street, single or multiple in parallel. Use O and P to adjust the pitch while building.')
         },
         availability = {
             yearFrom = -1, --1925,

@@ -1,40 +1,46 @@
 local arrayUtils = require('lollo_street_tuning.arrayUtils')
 local pitchHelper = require('lollo_street_tuning.pitchHelper')
-local streetUtils = require('lollo_street_tuning.streetUtils')
 
 local helper = {
-    getParams = function()
-        -- print('globalBridgeData at getParams =') debugPrint(
-        --     arrayUtils.map(
-        --             streetUtils.getGlobalBridgeDataPlusNoBridge(),
-        --             function(str)
-        --                 return str
-        --             end
-        --     )
-        -- )
+    getParams = function(globalBridgeData, globalStreetData)
+        local _getIcons = function()
+            local names = {}
+            for i = 0, 15, 1 do
+                local str = tostring(i)
+                if str:len() == 1 then str = '0' .. str end
+                names[#names+1] = str
+            end
+            local icons = {}
+            for _, name in ipairs(names) do
+                icons[#icons+1] = 'ui/parameters/lollo_street_tuning/merge' .. name .. '.tga'
+            end
+            return icons
+        end
         return {
             {
                 key = 'mergingType',
                 name = _('Street merge type'),
-                values = {
+                uiType = 'ICON_BUTTON',
+                --[[ values = {
                     '↑  ↑   -   ↑↑', -- 0
-                    '↑    ↑   -   ↑↑', -- 1
+                    '~ ↑    ↑   -   ↑↑', -- 1
                     '↓  ↑   -   ↓↑', -- 2
-                    '↓    ↑   -   ↓↑', -- 3
+                    '~ ↓    ↑   -   ↓↑', -- 3
                     '↑  ↑  ↑   -   ↑↑↑', -- 4
                     -- '↑    ↑    ↑   -   ↑↑↑', -- 5
-                    '↑  ↑  ↑  ↑   -   ↑↑↑↑', -- 5
-                    '↓  ↓  ↑  ↑   -   ↓↓↑↑', -- 6
+                    '~ ↑  ↑  ↑  ↑   -   ↑↑↑↑', -- 5
+                    '~ ↓  ↓  ↑  ↑   -   ↓↓↑↑', -- 6
                     '↓  ↓  ↑  ↑   -   ↓ ↓ ↑ ↑', -- 7
                     '↓↓   ↑↑   -   ↓ ↓ ↓ ↑ ↑ ↑', -- 8
                     '↓↓↓   ↑↑↑   -   ↓ ↓ ↓ ↑ ↑ ↑', -- 9
                     'M ↓↓↓   ↑↑↑   -   ↓ ↓ ↓ ↑ ↑ ↑', -- 10
                     'M ↓↓   ↑↑   -   ↓ ↓ ↓ ↑ ↑ ↑', -- 11
-                    'M ↓↓   ↑↑   -   ↓ ↓ ↑ ↑', -- 12
+                    'M ↓  ↓  ↑  ↑   -   ↓ ↓ ↑ ↑', -- 12
                     'M ↑  ↑  ↑   -   ↑↑↑', -- 13
                     'M ↑  ↑   -   ↑↑', -- 14
                     'M ↓  ↑   -   ↓↑', -- 15
-                },
+                }, ]]
+                values = _getIcons(),
                 defaultIndex = 0
             },
             {
@@ -50,7 +56,7 @@ local helper = {
                 key = 'bridgeType4Merge',
                 name = _('BridgeType'),
                 values = arrayUtils.map(
-                    streetUtils.getGlobalBridgeDataPlusNoBridge(),
+                    globalBridgeData,
                     function(str)
                         return str.name
                         -- return str.icon
@@ -81,6 +87,15 @@ local helper = {
                     _('ELECTRIC')
                 },
                 defaultIndex = 2
+            },
+            {
+                key = 'tramTrackInEveryLane_',
+                name = _('Tram track in every lane (only applicable roads)'),
+                values = {
+                    _('No'),
+                    _('Yes'),
+                },
+                defaultIndex = 1
             },
             -- {
             --     key = 'hasBus',

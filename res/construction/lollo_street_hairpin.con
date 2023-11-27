@@ -3,13 +3,12 @@ function data()
         type = 'STREET_CONSTRUCTION',
         description = {
             name = _('Street hairpin curves'),
-            description = _('Lays streets as tightly bent as the game allows. Use O and P to adjust the pitch.')
+            description = _('Lays streets as tightly bent as the game allows. When building, use O and P to adjust the pitch and Ü and + to adjust the radius.')
         },
         availability = {
             yearFrom = -1, --1925,
             yearTo = -1 --0
         },
-        -- params = streetChunksHelper.getStreetHairpinParams(),
         order = 1242,
         autoRemovable = false, -- Used to allow the construction to be removed, if it collides with something else.
         skipCollision = true,

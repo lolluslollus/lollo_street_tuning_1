@@ -19,7 +19,7 @@ function data()
                 node = {
                     children = {
                         {
-                            materials = {'asset/icon/asset_icon_mark.mtl'},
+                            materials = {'lollo_street_tuning/icon/yellow.mtl'},
                             mesh = 'asset/icon/lod_0_icon_question_mark.msh',
                             transf = {1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1}
                         }

@@ -1,7 +1,7 @@
 -- local laneutil = require('laneutil')
-local edgeUtils = require('lollo_street_tuning.edgeUtils')
 local logger = require('lollo_street_tuning.logger')
 local pitchHelper = require('lollo_street_tuning.pitchHelper')
+local transfUtils = require('lollo_street_tuning.transfUtils')
 -- local transf = require 'transf'
 -- LOLLO TODO see if you can ease the pain when reconfiguring an existing merger. maybe skip collisions? It is not enough.
 
@@ -54,6 +54,10 @@ local function _getHasBus(params)
     return params.hasBus == 1
 end
 
+local function _getTramTrackInEveryLane(params)
+    return params.tramTrackInEveryLane_ == 1
+end
+
 local function _getTramTrackType(params)
     return params.tramTrack_ == 0 and "NO" or params.tramTrack_ == 1 and "YES" or "ELECTRIC"
     -- return params.tramTrack_ and (({'NO', 'YES', 'ELECTRIC'})[params.tramTrack_ + 1]) or 'NO'
@@ -61,7 +65,7 @@ end
 
 local function _makeEdges(pitchAngle, params, node0, node1, tan0, tan1)
     if tan0 == nil or tan1 == nil then
-        local edgeLength = edgeUtils.getVectorLength({node1[1] - node0[1], node1[2] - node0[2], node1[3] - node0[3]})
+        local edgeLength = transfUtils.getVectorLength({node1[1] - node0[1], node1[2] - node0[2], node1[3] - node0[3]})
         if tan0 == nil then tan0 = {edgeLength, 0, 0} end
         if tan1 == nil then tan1 = {edgeLength, 0, 0} end
     end
@@ -135,18 +139,17 @@ local function updateFn_2_1_lane_narrow_sidewalk_to_2_lane_one_way(params, bridg
 
     -- LOLLO NOTE hasBus has no effect, neither do hasBusLane, busLane or hasBus, with true or false
     -- local busLaneType = params.busLane and (({'NO', 'YES'})[params.busLane + 1]) or 'NO'
+    local isTramTrackInEveryLane = _getTramTrackInEveryLane(params)
     local tramTrackType = _getTramTrackType(params)
     local hasBus = _getHasBus(params)
     result.edgeLists = {
         {
             type = 'STREET',
             params = {
-                -- busLaneType = busLaneType, -- does not pull, neither do hasBusLane and busLane, with true or false
                 hasBus = hasBus,
                 skipCollision = true,
-                --skipCollisionCheck = true,
                 type = 'lollo_medium_1_way_1_lane_street_narrow_sidewalk.lua',
-                tramTrackType = tramTrackType
+                tramTrackType = params.direction4Merge == 0 and tramTrackType or (isTramTrackInEveryLane and tramTrackType or 'NO')
             },
             edges = _makeEdges(_pitchAngle, params, {-4, -2, .0}, {-2, -2, .0}),
             edgeType = _getEdgeType(params, bridgeData),
@@ -160,7 +163,7 @@ local function updateFn_2_1_lane_narrow_sidewalk_to_2_lane_one_way(params, bridg
                 hasBus = hasBus,
                 skipCollision = true,
                 type = 'lollo_medium_1_way_1_lane_street_narrow_sidewalk.lua',
-                tramTrackType = tramTrackType
+                tramTrackType = params.direction4Merge == 1 and tramTrackType or (isTramTrackInEveryLane and tramTrackType or 'NO')
             },
             edges = _makeEdges(_pitchAngle, params, {-4, 2, 0}, {-2, 2, 0}),
             edgeType = _getEdgeType(params, bridgeData),
@@ -174,21 +177,7 @@ local function updateFn_2_1_lane_narrow_sidewalk_to_2_lane_one_way(params, bridg
                 hasBus = hasBus,
                 skipCollision = true,
                 type = 'lollo_internal_1_way_1_lane_street_no_sidewalk.lua',
-                tramTrackType = tramTrackType
-            },
-            edges = _makeEdges(_pitchAngle, params, {-1.8, 2, 0}, {1.8, 2, 0}),
-            edgeType = _getEdgeType(params, bridgeData),
-            edgeTypeName = _getInternalEdgeTypeName(),
-            freeNodes = {},
-            snapNodes = {}
-        },
-        {
-            type = 'STREET',
-            params = {
-                hasBus = hasBus,
-                skipCollision = true,
-                type = 'lollo_internal_1_way_1_lane_street_no_sidewalk.lua',
-                tramTrackType = tramTrackType
+                tramTrackType = params.direction4Merge == 0 and tramTrackType or (isTramTrackInEveryLane and tramTrackType or 'NO')
             },
             edges = _makeEdges(_pitchAngle, params, {-1.8, -2, 0}, {1.8, -2, 0}),
             edgeType = _getEdgeType(params, bridgeData),
@@ -201,7 +190,23 @@ local function updateFn_2_1_lane_narrow_sidewalk_to_2_lane_one_way(params, bridg
             params = {
                 hasBus = hasBus,
                 skipCollision = true,
-                type = tramTrackType == 'NO' and 'standard/town_medium_one_way_new.lua' or 'lollo_medium_1_way_2_lane_2_tram_tracks_street.lua',
+                type = 'lollo_internal_1_way_1_lane_street_no_sidewalk.lua',
+                tramTrackType = params.direction4Merge == 1 and tramTrackType or (isTramTrackInEveryLane and tramTrackType or 'NO')
+            },
+            edges = _makeEdges(_pitchAngle, params, {-1.8, 2, 0}, {1.8, 2, 0}),
+            edgeType = _getEdgeType(params, bridgeData),
+            edgeTypeName = _getInternalEdgeTypeName(),
+            freeNodes = {},
+            snapNodes = {}
+        },
+        {
+            type = 'STREET',
+            params = {
+                hasBus = hasBus,
+                skipCollision = true,
+                type = tramTrackType == 'NO'
+                    and 'standard/town_medium_one_way_new.lua'
+                    or (isTramTrackInEveryLane and 'lollo_medium_1_way_2_lane_2_tram_tracks_street.lua' or 'standard/town_medium_one_way_new.lua'),
                 tramTrackType = tramTrackType
             },
             edges = _makeEdges(_pitchAngle, params, {2, 0, 0}, {6, 0, 0}),
@@ -248,6 +253,7 @@ local function updateFn_2_1_lane_narrow_sidewalk_to_2_lane(params, bridgeData)
         }
     }
 
+    local isTramTrackInEveryLane = _getTramTrackInEveryLane(params)
     local tramTrackType = _getTramTrackType(params)
     result.edgeLists = {
         {
@@ -351,6 +357,7 @@ local function updateFn_2_1_lane_medium_sidewalk_to_2_lane_one_way(params, bridg
         }
     }
 
+    local isTramTrackInEveryLane = _getTramTrackInEveryLane(params)
     local tramTrackType = _getTramTrackType(params)
     result.edgeLists = {
         {
@@ -358,7 +365,7 @@ local function updateFn_2_1_lane_medium_sidewalk_to_2_lane_one_way(params, bridg
             params = {
                 skipCollision = true,
                 type = 'lollo_medium_1_way_1_lane_street.lua',
-                tramTrackType = tramTrackType
+                tramTrackType = params.direction4Merge == 0 and tramTrackType or (isTramTrackInEveryLane and tramTrackType or 'NO')
             },
             edges = _makeEdges(_pitchAngle, params, {-4, -4, 0}, {-2, -4, 0}),
             edgeType = _getEdgeType(params, bridgeData),
@@ -371,7 +378,7 @@ local function updateFn_2_1_lane_medium_sidewalk_to_2_lane_one_way(params, bridg
             params = {
                 skipCollision = true,
                 type = 'lollo_medium_1_way_1_lane_street.lua',
-                tramTrackType = tramTrackType
+                tramTrackType = params.direction4Merge == 1 and tramTrackType or (isTramTrackInEveryLane and tramTrackType or 'NO')
             },
             edges = _makeEdges(_pitchAngle, params, {-4, 4, 0}, {-2, 4, 0}),
             edgeType = _getEdgeType(params, bridgeData),
@@ -384,20 +391,7 @@ local function updateFn_2_1_lane_medium_sidewalk_to_2_lane_one_way(params, bridg
             params = {
                 skipCollision = true,
                 type = 'lollo_internal_1_way_1_lane_street_no_sidewalk.lua',
-                tramTrackType = tramTrackType
-            },
-            edges = _makeEdges(_pitchAngle, params, {-1.8, 4, 0}, {1.8, 3, 0}, {4, -0.1, 0}, {4, -0.1, 0}),
-            edgeType = _getEdgeType(params, bridgeData),
-            edgeTypeName = _getInternalEdgeTypeName(),
-            freeNodes = {},
-            snapNodes = {}
-        },
-        {
-            type = 'STREET',
-            params = {
-                skipCollision = true,
-                type = 'lollo_internal_1_way_1_lane_street_no_sidewalk.lua',
-                tramTrackType = tramTrackType
+                tramTrackType = params.direction4Merge == 0 and tramTrackType or (isTramTrackInEveryLane and tramTrackType or 'NO')
             },
             edges = _makeEdges(_pitchAngle, params, {-1.8, -4, 0}, {1.8, -3, 0}, {4, 0.1, 0}, {4, 0.1, 0}),
             edgeType = _getEdgeType(params, bridgeData),
@@ -409,7 +403,22 @@ local function updateFn_2_1_lane_medium_sidewalk_to_2_lane_one_way(params, bridg
             type = 'STREET',
             params = {
                 skipCollision = true,
-                type = tramTrackType == 'NO' and 'lollo_medium_1_way_2_lane_medium_sidewalk_street.lua' or 'lollo_medium_1_way_2_lane_2_tram_tracks_medium_sidewalk_street.lua',
+                type = 'lollo_internal_1_way_1_lane_street_no_sidewalk.lua',
+                tramTrackType = params.direction4Merge == 1 and tramTrackType or (isTramTrackInEveryLane and tramTrackType or 'NO')
+            },
+            edges = _makeEdges(_pitchAngle, params, {-1.8, 4, 0}, {1.8, 3, 0}, {4, -0.1, 0}, {4, -0.1, 0}),
+            edgeType = _getEdgeType(params, bridgeData),
+            edgeTypeName = _getInternalEdgeTypeName(),
+            freeNodes = {},
+            snapNodes = {}
+        },
+        {
+            type = 'STREET',
+            params = {
+                skipCollision = true,
+                type = tramTrackType == 'NO'
+                    and 'lollo_medium_1_way_2_lane_medium_sidewalk_street.lua'
+                    or (isTramTrackInEveryLane and 'lollo_medium_1_way_2_lane_2_tram_tracks_medium_sidewalk_street.lua' or 'lollo_medium_1_way_2_lane_medium_sidewalk_street.lua'),
                 tramTrackType = tramTrackType
             },
             -- this could be shortened to x = 2 to x = 6, but it dumps with no messages
@@ -456,6 +465,7 @@ local function updateFn_2_1_lane_medium_sidewalk_to_2_lane(params, bridgeData)
         }
     }
 
+    local isTramTrackInEveryLane = _getTramTrackInEveryLane(params)
     local tramTrackType = _getTramTrackType(params)
     result.edgeLists = {
         {
@@ -560,6 +570,7 @@ local function updateFn_3_1_lane_narrow_sidewalk_to_3_lane_one_way(params, bridg
         }
     }
 
+    local isTramTrackInEveryLane = _getTramTrackInEveryLane(params)
     local tramTrackType = _getTramTrackType(params)
     result.edgeLists = {
         {
@@ -567,7 +578,7 @@ local function updateFn_3_1_lane_narrow_sidewalk_to_3_lane_one_way(params, bridg
             params = {
                 skipCollision = true,
                 type = 'lollo_medium_1_way_1_lane_street_narrow_sidewalk.lua',
-                tramTrackType = tramTrackType
+                tramTrackType = params.direction4Merge == 0 and tramTrackType or (isTramTrackInEveryLane and tramTrackType or 'NO')
             },
             edges = _makeEdges(_pitchAngle, params, {-4, -4, 0}, {-2, -4, 0}),
             edgeType = _getEdgeType(params, bridgeData),
@@ -580,7 +591,7 @@ local function updateFn_3_1_lane_narrow_sidewalk_to_3_lane_one_way(params, bridg
             params = {
                 skipCollision = true,
                 type = 'lollo_medium_1_way_1_lane_street_narrow_sidewalk.lua',
-                tramTrackType = tramTrackType
+                tramTrackType = isTramTrackInEveryLane and tramTrackType or 'NO',
             },
             edges = _makeEdges(_pitchAngle, params, {-4, 0, 0}, {-2, 0, 0}),
             edgeType = _getEdgeType(params, bridgeData),
@@ -593,7 +604,7 @@ local function updateFn_3_1_lane_narrow_sidewalk_to_3_lane_one_way(params, bridg
             params = {
                 skipCollision = true,
                 type = 'lollo_medium_1_way_1_lane_street_narrow_sidewalk.lua',
-                tramTrackType = tramTrackType
+                tramTrackType = params.direction4Merge == 1 and tramTrackType or (isTramTrackInEveryLane and tramTrackType or 'NO')
             },
             edges = _makeEdges(_pitchAngle, params, {-4, 4, 0}, {-2, 4, 0}),
             edgeType = _getEdgeType(params, bridgeData),
@@ -606,9 +617,9 @@ local function updateFn_3_1_lane_narrow_sidewalk_to_3_lane_one_way(params, bridg
             params = {
                 skipCollision = true,
                 type = 'lollo_internal_1_way_1_lane_street_no_sidewalk.lua',
-                tramTrackType = tramTrackType
+                tramTrackType = params.direction4Merge == 0 and tramTrackType or (isTramTrackInEveryLane and tramTrackType or 'NO')
             },
-            edges = _makeEdges(_pitchAngle, params, {-1.8, 4, 0}, {1.8, 4, 0}),
+            edges = _makeEdges(_pitchAngle, params, {-1.8, -4, 0}, {1.8, -4, 0}),
             edgeType = _getEdgeType(params, bridgeData),
             edgeTypeName = _getInternalEdgeTypeName(),
             freeNodes = {},
@@ -619,7 +630,7 @@ local function updateFn_3_1_lane_narrow_sidewalk_to_3_lane_one_way(params, bridg
             params = {
                 skipCollision = true,
                 type = 'lollo_internal_1_way_1_lane_street_no_sidewalk.lua',
-                tramTrackType = tramTrackType
+                tramTrackType = isTramTrackInEveryLane and tramTrackType or 'NO',
             },
             edges = _makeEdges(_pitchAngle, params, {-1.8, 0, 0}, {1.8, 0, 0}),
             edgeType = _getEdgeType(params, bridgeData),
@@ -632,9 +643,9 @@ local function updateFn_3_1_lane_narrow_sidewalk_to_3_lane_one_way(params, bridg
             params = {
                 skipCollision = true,
                 type = 'lollo_internal_1_way_1_lane_street_no_sidewalk.lua',
-                tramTrackType = tramTrackType
+                tramTrackType = params.direction4Merge == 1 and tramTrackType or (isTramTrackInEveryLane and tramTrackType or 'NO')
             },
-            edges = _makeEdges(_pitchAngle, params, {-1.8, -4, 0}, {1.8, -4, 0}),
+            edges = _makeEdges(_pitchAngle, params, {-1.8, 4, 0}, {1.8, 4, 0}),
             edgeType = _getEdgeType(params, bridgeData),
             edgeTypeName = _getInternalEdgeTypeName(),
             freeNodes = {},
@@ -644,7 +655,9 @@ local function updateFn_3_1_lane_narrow_sidewalk_to_3_lane_one_way(params, bridg
             type = 'STREET',
             params = {
                 skipCollision = true,
-                type = tramTrackType == 'NO' and 'lollo_medium_1_way_3_lane_street.lua' or 'lollo_medium_1_way_3_lane_3_tram_tracks_street.lua',
+                type = tramTrackType == 'NO'
+                    and 'lollo_medium_1_way_3_lane_street.lua'
+                    or (isTramTrackInEveryLane and 'lollo_medium_1_way_3_lane_3_tram_tracks_street.lua' or 'lollo_medium_1_way_3_lane_street.lua'),
                 tramTrackType = tramTrackType
             },
             edges = _makeEdges(_pitchAngle, params, {2, 0, 0}, {6, 0, 0}),
@@ -688,6 +701,7 @@ end
 --         }
 --     }
 
+--     local isTramTrackInEveryLane = _getTramTrackInEveryLane(params)
 --     local tramTrackType = _getTramTrackType(params)
 --     result.edgeLists = {
 --         {
@@ -772,7 +786,9 @@ end
 --             type = 'STREET',
 --             params = {
 --                 skipCollision = true,
---                 type = tramTrackType == 'NO' and 'lollo_medium_1_way_3_lane_street.lua' or 'lollo_medium_1_way_3_lane_3_tram_tracks_street.lua',
+--                 type = tramTrackType == 'NO'
+--                     and 'lollo_medium_1_way_3_lane_street.lua'
+--                     or (isTramTrackInEveryLane and 'lollo_medium_1_way_3_lane_3_tram_tracks_street.lua' or 'lollo_medium_1_way_3_lane_street.lua'),
 --                 tramTrackType = tramTrackType
 --             },
 --             -- this could be shortened to x = 2 to x = 6, but it dumps with no messages
@@ -816,6 +832,7 @@ local function updateFn_4_1_lane_narrow_sidewalk_to_4_lane_one_way(params, bridg
         }
     }
 
+    local isTramTrackInEveryLane = _getTramTrackInEveryLane(params)
     local tramTrackType = _getTramTrackType(params)
     result.edgeLists = {
         {
@@ -823,7 +840,7 @@ local function updateFn_4_1_lane_narrow_sidewalk_to_4_lane_one_way(params, bridg
             params = {
                 skipCollision = true,
                 type = 'lollo_medium_1_way_1_lane_street_narrow_sidewalk.lua',
-                tramTrackType = tramTrackType
+                tramTrackType = params.direction4Merge == 0 and tramTrackType or (isTramTrackInEveryLane and tramTrackType or 'NO')
             },
             edges = _makeEdges(_pitchAngle, params, {-8, -6, 0}, {-6, -6, 0}),
             edgeType = _getEdgeType(params, bridgeData),
@@ -836,7 +853,7 @@ local function updateFn_4_1_lane_narrow_sidewalk_to_4_lane_one_way(params, bridg
             params = {
                 skipCollision = true,
                 type = 'lollo_medium_1_way_1_lane_street_narrow_sidewalk.lua',
-                tramTrackType = tramTrackType
+                tramTrackType = isTramTrackInEveryLane and tramTrackType or 'NO',
             },
             edges = _makeEdges(_pitchAngle, params, {-8, -2, 0}, {-6, -2, 0}),
             edgeType = _getEdgeType(params, bridgeData),
@@ -849,7 +866,7 @@ local function updateFn_4_1_lane_narrow_sidewalk_to_4_lane_one_way(params, bridg
             params = {
                 skipCollision = true,
                 type = 'lollo_medium_1_way_1_lane_street_narrow_sidewalk.lua',
-                tramTrackType = tramTrackType
+                tramTrackType = isTramTrackInEveryLane and tramTrackType or 'NO',
             },
             edges = _makeEdges(_pitchAngle, params, {-8, 2, 0}, {-6, 2, 0}),
             edgeType = _getEdgeType(params, bridgeData),
@@ -862,7 +879,7 @@ local function updateFn_4_1_lane_narrow_sidewalk_to_4_lane_one_way(params, bridg
             params = {
                 skipCollision = true,
                 type = 'lollo_medium_1_way_1_lane_street_narrow_sidewalk.lua',
-                tramTrackType = tramTrackType
+                tramTrackType = params.direction4Merge == 1 and tramTrackType or (isTramTrackInEveryLane and tramTrackType or 'NO')
             },
             edges = _makeEdges(_pitchAngle, params, {-8, 6, 0}, {-6, 6, 0}),
             edgeType = _getEdgeType(params, bridgeData),
@@ -875,9 +892,9 @@ local function updateFn_4_1_lane_narrow_sidewalk_to_4_lane_one_way(params, bridg
             params = {
                 skipCollision = true,
                 type = 'lollo_internal_1_way_1_lane_street_no_sidewalk.lua',
-                tramTrackType = tramTrackType
+                tramTrackType = params.direction4Merge == 0 and tramTrackType or (isTramTrackInEveryLane and tramTrackType or 'NO')
             },
-            edges = _makeEdges(_pitchAngle, params, {-5.8, 6, 0}, {1.8, 4.5, 0}, {8, -0.1, 0}, {8, -0.1, 0}),
+            edges = _makeEdges(_pitchAngle, params, {-5.8, -6, 0}, {1.8, -4.5, 0}, {8, 0.1, 0}, {8, 0.1, 0}),
             edgeType = _getEdgeType(params, bridgeData),
             edgeTypeName = _getInternalEdgeTypeName(),
             freeNodes = {},
@@ -888,20 +905,7 @@ local function updateFn_4_1_lane_narrow_sidewalk_to_4_lane_one_way(params, bridg
             params = {
                 skipCollision = true,
                 type = 'lollo_internal_1_way_1_lane_street_no_sidewalk.lua',
-                tramTrackType = tramTrackType
-            },
-            edges = _makeEdges(_pitchAngle, params, {-5.8, 2, 0}, {1.8, 1.5, 0}, {8, -0.1, 0}, {8, -0.1, 0}),
-            edgeType = _getEdgeType(params, bridgeData),
-            edgeTypeName = _getInternalEdgeTypeName(),
-            freeNodes = {},
-            snapNodes = {}
-        },
-        {
-            type = 'STREET',
-            params = {
-                skipCollision = true,
-                type = 'lollo_internal_1_way_1_lane_street_no_sidewalk.lua',
-                tramTrackType = tramTrackType
+                tramTrackType = isTramTrackInEveryLane and tramTrackType or 'NO',
             },
             edges = _makeEdges(_pitchAngle, params, {-5.8, -2, 0}, {1.8, -1.5, 0}, {8, 0.1, 0}, {8, 0.1, 0}),
             edgeType = _getEdgeType(params, bridgeData),
@@ -914,9 +918,9 @@ local function updateFn_4_1_lane_narrow_sidewalk_to_4_lane_one_way(params, bridg
             params = {
                 skipCollision = true,
                 type = 'lollo_internal_1_way_1_lane_street_no_sidewalk.lua',
-                tramTrackType = tramTrackType
+                tramTrackType = isTramTrackInEveryLane and tramTrackType or 'NO',
             },
-            edges = _makeEdges(_pitchAngle, params, {-5.8, -6, 0}, {1.8, -4.5, 0}, {8, 0.1, 0}, {8, 0.1, 0}),
+            edges = _makeEdges(_pitchAngle, params, {-5.8, 2, 0}, {1.8, 1.5, 0}, {8, -0.1, 0}, {8, -0.1, 0}),
             edgeType = _getEdgeType(params, bridgeData),
             edgeTypeName = _getInternalEdgeTypeName(),
             freeNodes = {},
@@ -926,7 +930,22 @@ local function updateFn_4_1_lane_narrow_sidewalk_to_4_lane_one_way(params, bridg
             type = 'STREET',
             params = {
                 skipCollision = true,
-                type = tramTrackType == 'NO' and 'lollo_medium_1_way_4_lane_street.lua' or 'lollo_medium_1_way_4_lane_4_tram_tracks_street.lua',
+                type = 'lollo_internal_1_way_1_lane_street_no_sidewalk.lua',
+                tramTrackType = params.direction4Merge == 1 and tramTrackType or (isTramTrackInEveryLane and tramTrackType or 'NO')
+            },
+            edges = _makeEdges(_pitchAngle, params, {-5.8, 6, 0}, {1.8, 4.5, 0}, {8, -0.1, 0}, {8, -0.1, 0}),
+            edgeType = _getEdgeType(params, bridgeData),
+            edgeTypeName = _getInternalEdgeTypeName(),
+            freeNodes = {},
+            snapNodes = {}
+        },
+        {
+            type = 'STREET',
+            params = {
+                skipCollision = true,
+                type = tramTrackType == 'NO'
+                    and 'lollo_medium_1_way_4_lane_street.lua'
+                    or (isTramTrackInEveryLane and 'lollo_medium_1_way_4_lane_4_tram_tracks_street.lua' or 'lollo_medium_1_way_4_lane_street.lua'),
                 tramTrackType = tramTrackType
             },
             -- this could be shortened to x = 2 to x = 6, but it dumps with no messages
@@ -973,6 +992,7 @@ local function updateFn_4_1_lane_narrow_sidewalk_to_4_lane(params, bridgeData)
         }
     }
 
+    local isTramTrackInEveryLane = _getTramTrackInEveryLane(params)
     local tramTrackType = _getTramTrackType(params)
     result.edgeLists = {
         {
@@ -993,7 +1013,7 @@ local function updateFn_4_1_lane_narrow_sidewalk_to_4_lane(params, bridgeData)
             params = {
                 skipCollision = true,
                 type = 'lollo_medium_1_way_1_lane_street_narrow_sidewalk.lua',
-                tramTrackType = tramTrackType
+                tramTrackType = isTramTrackInEveryLane and tramTrackType or 'NO',
             },
             edges = _makeEdges(_pitchAngle, params, {-8, -2, 0}, {-6, -2, 0}),
             edgeType = _getEdgeType(params, bridgeData),
@@ -1006,7 +1026,7 @@ local function updateFn_4_1_lane_narrow_sidewalk_to_4_lane(params, bridgeData)
             params = {
                 skipCollision = true,
                 type = 'lollo_medium_1_way_1_lane_street_narrow_sidewalk.lua',
-                tramTrackType = tramTrackType
+                tramTrackType = isTramTrackInEveryLane and tramTrackType or 'NO',
             },
             edges = _makeEdges(_pitchAngle, params, {-6, 2, 0}, {-8, 2, 0}, {-2, 0, 0}, {-2, 0, 0}),
             edgeType = _getEdgeType(params, bridgeData),
@@ -1046,7 +1066,7 @@ local function updateFn_4_1_lane_narrow_sidewalk_to_4_lane(params, bridgeData)
             params = {
                 skipCollision = true,
                 type = 'lollo_internal_1_way_1_lane_street_no_sidewalk.lua',
-                tramTrackType = tramTrackType
+                tramTrackType = isTramTrackInEveryLane and tramTrackType or 'NO',
             },
             edges = _makeEdges(_pitchAngle, params, {-5.8, -2, 0}, {1.8, -1.5, 0}, {8, 0.1, 0}, {8, 0.1, 0}),
             edgeType = _getEdgeType(params, bridgeData),
@@ -1059,7 +1079,7 @@ local function updateFn_4_1_lane_narrow_sidewalk_to_4_lane(params, bridgeData)
             params = {
                 skipCollision = true,
                 type = 'lollo_internal_1_way_1_lane_street_no_sidewalk.lua',
-                tramTrackType = tramTrackType
+                tramTrackType = isTramTrackInEveryLane and tramTrackType or 'NO',
             },
             edges = _makeEdges(_pitchAngle, params, {1.8, 1.5, 0}, {-5.8, 2, 0}, {-8, 0.1, 0}, {-8, 0.1, 0}),
             edgeType = _getEdgeType(params, bridgeData),
@@ -1085,7 +1105,9 @@ local function updateFn_4_1_lane_narrow_sidewalk_to_4_lane(params, bridgeData)
             type = 'STREET',
             params = {
                 skipCollision = true,
-                type = tramTrackType == 'NO' and 'lollo_medium_4_lane_street.lua' or 'lollo_medium_4_lane_4_tram_tracks_street.lua',
+                type = tramTrackType == 'NO'
+                    and 'lollo_medium_4_lane_street.lua'
+                    or (isTramTrackInEveryLane and 'lollo_medium_4_lane_4_tram_tracks_street.lua' or 'lollo_medium_4_lane_street.lua'),
                 tramTrackType = tramTrackType
             },
             -- this could be shortened to x = 2 to x = 6, but it dumps with no messages
@@ -1132,6 +1154,7 @@ local function updateFn_4_1_lane_narrow_sidewalk_to_4_lane_large(params, bridgeD
         }
     }
 
+    local isTramTrackInEveryLane = _getTramTrackInEveryLane(params)
     local tramTrackType = _getTramTrackType(params)
     result.edgeLists = {
         {
@@ -1152,7 +1175,7 @@ local function updateFn_4_1_lane_narrow_sidewalk_to_4_lane_large(params, bridgeD
             params = {
                 skipCollision = true,
                 type = 'lollo_medium_1_way_1_lane_street_narrow_sidewalk.lua',
-                tramTrackType = tramTrackType
+                tramTrackType = isTramTrackInEveryLane and tramTrackType or 'NO',
             },
             edges = _makeEdges(_pitchAngle, params, {-4, -2, 0}, {-2, -2, 0}),
             edgeType = _getEdgeType(params, bridgeData),
@@ -1165,7 +1188,7 @@ local function updateFn_4_1_lane_narrow_sidewalk_to_4_lane_large(params, bridgeD
             params = {
                 skipCollision = true,
                 type = 'lollo_medium_1_way_1_lane_street_narrow_sidewalk.lua',
-                tramTrackType = tramTrackType
+                tramTrackType = isTramTrackInEveryLane and tramTrackType or 'NO',
             },
             edges = _makeEdges(_pitchAngle, params, {-2, 2, 0}, {-4, 2, 0}, {-2, 0, 0}, {-2, 0, 0}),
             edgeType = _getEdgeType(params, bridgeData),
@@ -1186,6 +1209,7 @@ local function updateFn_4_1_lane_narrow_sidewalk_to_4_lane_large(params, bridgeD
             freeNodes = params.direction4Merge == 0 and {1} or {0},
             snapNodes = _getSnapNodes10(params, true)
         },
+
         {
             type = 'STREET',
             params = {
@@ -1204,7 +1228,7 @@ local function updateFn_4_1_lane_narrow_sidewalk_to_4_lane_large(params, bridgeD
             params = {
                 skipCollision = true,
                 type = 'lollo_internal_1_way_1_lane_street_no_sidewalk.lua',
-                tramTrackType = tramTrackType
+                tramTrackType = isTramTrackInEveryLane and tramTrackType or 'NO',
             },
             edges = _makeEdges(_pitchAngle, params, {-1.8, -2, 0}, {1.8, -2, 0}),
             edgeType = _getEdgeType(params, bridgeData),
@@ -1217,7 +1241,7 @@ local function updateFn_4_1_lane_narrow_sidewalk_to_4_lane_large(params, bridgeD
             params = {
                 skipCollision = true,
                 type = 'lollo_internal_1_way_1_lane_street_no_sidewalk.lua',
-                tramTrackType = tramTrackType
+                tramTrackType = isTramTrackInEveryLane and tramTrackType or 'NO',
             },
             edges = _makeEdges(_pitchAngle, params, {1.8, 2, 0}, {-1.8, 2, 0}, {-3.6, 0, 0}, {-3.6, 0, 0}),
             edgeType = _getEdgeType(params, bridgeData),
@@ -1238,11 +1262,14 @@ local function updateFn_4_1_lane_narrow_sidewalk_to_4_lane_large(params, bridgeD
             freeNodes = {},
             snapNodes = {}
         },
+
         {
             type = 'STREET',
             params = {
                 skipCollision = true,
-                type = tramTrackType == 'NO' and 'standard/town_large_new.lua' or 'lollo_large_4_lane_4_tram_tracks_street.lua',
+                type = tramTrackType == 'NO'
+                    and 'standard/town_large_new.lua'
+                    or (isTramTrackInEveryLane and 'lollo_large_4_lane_4_tram_tracks_street.lua' or 'standard/town_large_new.lua'),
                 tramTrackType = tramTrackType
             },
             edges = _makeEdges(_pitchAngle, params, {2, 0, 0}, {8, 0, 0}),
@@ -1288,13 +1315,16 @@ local function updateFn_2_2_lane_one_way_to_6_lane_x_large(params, bridgeData)
         }
     }
 
+    local isTramTrackInEveryLane = _getTramTrackInEveryLane(params)
     local tramTrackType = _getTramTrackType(params)
     result.edgeLists = {
         {
             type = 'STREET',
             params = {
                 skipCollision = true,
-                type = tramTrackType == 'NO' and 'standard/town_medium_one_way_new.lua' or 'lollo_medium_1_way_2_lane_2_tram_tracks_street.lua',
+                type = tramTrackType == 'NO'
+                    and 'standard/town_medium_one_way_new.lua'
+                    or (isTramTrackInEveryLane and 'lollo_medium_1_way_2_lane_2_tram_tracks_street.lua' or 'standard/town_medium_one_way_new.lua'),
                 tramTrackType = tramTrackType
             },
             edges = _makeEdges(_pitchAngle, params, {-6, -8, 0}, {-2, -8, 0}),
@@ -1307,7 +1337,9 @@ local function updateFn_2_2_lane_one_way_to_6_lane_x_large(params, bridgeData)
             type = 'STREET',
             params = {
                 skipCollision = true,
-                type = tramTrackType == 'NO' and 'standard/town_medium_one_way_new.lua' or 'lollo_medium_1_way_2_lane_2_tram_tracks_street.lua',
+                type = tramTrackType == 'NO'
+                    and 'standard/town_medium_one_way_new.lua'
+                    or (isTramTrackInEveryLane and 'lollo_medium_1_way_2_lane_2_tram_tracks_street.lua' or 'standard/town_medium_one_way_new.lua'),
                 tramTrackType = tramTrackType
             },
             edges = _makeEdges(_pitchAngle, params, {-2, 8, 0}, {-6, 8, 0}, {-4, 0, 0}, {-4, 0, 0}),
@@ -1316,6 +1348,7 @@ local function updateFn_2_2_lane_one_way_to_6_lane_x_large(params, bridgeData)
             freeNodes = params.direction4Merge == 0 and {1} or {0},
             snapNodes = _getSnapNodes10(params, true)
         },
+
         {
             type = 'STREET',
             params = {
@@ -1334,7 +1367,7 @@ local function updateFn_2_2_lane_one_way_to_6_lane_x_large(params, bridgeData)
             params = {
                 skipCollision = true,
                 type = 'lollo_internal_1_way_1_lane_street_no_sidewalk.lua',
-                tramTrackType = tramTrackType
+                tramTrackType = isTramTrackInEveryLane and tramTrackType or 'NO',
             },
             edges = _makeEdges(_pitchAngle, params, {-1.8, -6, 0}, {1.8, -6, 0}),
             edgeType = _getEdgeType(params, bridgeData),
@@ -1342,13 +1375,13 @@ local function updateFn_2_2_lane_one_way_to_6_lane_x_large(params, bridgeData)
             freeNodes = {},
             snapNodes = {}
         },
-        -- cannot connect the inner lanes
+        -- cannot connect the inner lanes, so we do that in the model
         -- {
         --     type = 'STREET',
         --     params = {
         --         skipCollision = true,
         --         type = 'lollo_internal_1_way_1_lane_street_no_sidewalk.lua',
-        --         tramTrackType = tramTrackType
+        --         tramTrackType = isTramTrackInEveryLane and tramTrackType or 'NO',
         --     },
         --     edges = _makeEdges(_pitchAngle, params, {-1.8, -6, 0}, {1.8, -2, 0}, {4, 0.1, 0}, {4, 0.1, 0}),
         --     edgeType = _getEdgeType(params, bridgeData),
@@ -1361,7 +1394,7 @@ local function updateFn_2_2_lane_one_way_to_6_lane_x_large(params, bridgeData)
         --     params = {
         --         skipCollision = true,
         --         type = 'lollo_internal_1_way_1_lane_street_no_sidewalk.lua',
-        --         tramTrackType = tramTrackType
+        --         tramTrackType = isTramTrackInEveryLane and tramTrackType or 'NO',
         --     },
         --     edges = _makeEdges(_pitchAngle, params, {1.8, 2, 0}, {-1.8, 6, 0}, {-4, 0.1, 0}, {-4, 0.1, 0}),
         --     edgeType = _getEdgeType(params, bridgeData),
@@ -1374,7 +1407,7 @@ local function updateFn_2_2_lane_one_way_to_6_lane_x_large(params, bridgeData)
             params = {
                 skipCollision = true,
                 type = 'lollo_internal_1_way_1_lane_street_no_sidewalk.lua',
-                tramTrackType = tramTrackType
+                tramTrackType = isTramTrackInEveryLane and tramTrackType or 'NO',
             },
             edges = _makeEdges(_pitchAngle, params, {1.8, 6, 0}, {-1.8, 6, 0}, {-3.6, 0, 0}, {-3.6, 0, 0}),
             edgeType = _getEdgeType(params, bridgeData),
@@ -1399,7 +1432,9 @@ local function updateFn_2_2_lane_one_way_to_6_lane_x_large(params, bridgeData)
             type = 'STREET',
             params = {
                 skipCollision = true,
-                type = tramTrackType == 'NO' and 'standard/town_x_large_new.lua' or 'lollo_x_large_6_tram_tracks_street.lua',
+                type = tramTrackType == 'NO'
+                    and 'standard/town_x_large_new.lua'
+                    or (isTramTrackInEveryLane and 'lollo_x_large_6_tram_tracks_street.lua' or 'standard/town_x_large_new.lua'),
                 tramTrackType = tramTrackType
             },
             edges = _makeEdges(_pitchAngle, params, {2, 0, 0}, {10, 0, 0}),
@@ -1445,6 +1480,7 @@ local function updateFn_6_1_lane_one_way_to_6_lane_x_large(params, bridgeData)
         }
     }
 
+    local isTramTrackInEveryLane = _getTramTrackInEveryLane(params)
     local tramTrackType = _getTramTrackType(params)
     result.edgeLists = {
         {
@@ -1465,7 +1501,7 @@ local function updateFn_6_1_lane_one_way_to_6_lane_x_large(params, bridgeData)
             params = {
                 skipCollision = true,
                 type = 'lollo_medium_1_way_1_lane_street_narrow_sidewalk.lua',
-                tramTrackType = tramTrackType
+                tramTrackType = isTramTrackInEveryLane and tramTrackType or 'NO'
             },
             edges = _makeEdges(_pitchAngle, params, {-4, -6, 0}, {-2, -6, 0}, {2, 0, 0}, {2, 0, 0}),
             edgeType = _getEdgeType(params, bridgeData),
@@ -1478,7 +1514,7 @@ local function updateFn_6_1_lane_one_way_to_6_lane_x_large(params, bridgeData)
             params = {
                 skipCollision = true,
                 type = 'lollo_medium_1_way_1_lane_street_narrow_sidewalk.lua',
-                tramTrackType = tramTrackType
+                tramTrackType = isTramTrackInEveryLane and tramTrackType or 'NO'
             },
             edges = _makeEdges(_pitchAngle, params, {-4, -2, 0}, {-2, -2, 0}, {2, 0, 0}, {2, 0, 0}),
             edgeType = _getEdgeType(params, bridgeData),
@@ -1491,7 +1527,7 @@ local function updateFn_6_1_lane_one_way_to_6_lane_x_large(params, bridgeData)
             params = {
                 skipCollision = true,
                 type = 'lollo_medium_1_way_1_lane_street_narrow_sidewalk.lua',
-                tramTrackType = tramTrackType
+                tramTrackType = isTramTrackInEveryLane and tramTrackType or 'NO'
             },
             edges = _makeEdges(_pitchAngle, params, {-2, 2, 0}, {-4, 2, 0}, {-2, 0, 0}, {-2, 0, 0}),
             edgeType = _getEdgeType(params, bridgeData),
@@ -1504,7 +1540,7 @@ local function updateFn_6_1_lane_one_way_to_6_lane_x_large(params, bridgeData)
             params = {
                 skipCollision = true,
                 type = 'lollo_medium_1_way_1_lane_street_narrow_sidewalk.lua',
-                tramTrackType = tramTrackType
+                tramTrackType = isTramTrackInEveryLane and tramTrackType or 'NO'
             },
             edges = _makeEdges(_pitchAngle, params, {-2, 6, 0}, {-4, 6, 0}, {-2, 0, 0}, {-2, 0, 0}),
             edgeType = _getEdgeType(params, bridgeData),
@@ -1525,6 +1561,7 @@ local function updateFn_6_1_lane_one_way_to_6_lane_x_large(params, bridgeData)
             freeNodes = params.direction4Merge == 0 and {1} or {0},
             snapNodes = _getSnapNodes10(params, true)
         },
+
         {
             type = 'STREET',
             params = {
@@ -1543,7 +1580,7 @@ local function updateFn_6_1_lane_one_way_to_6_lane_x_large(params, bridgeData)
             params = {
                 skipCollision = true,
                 type = 'lollo_internal_1_way_1_lane_street_no_sidewalk.lua',
-                tramTrackType = tramTrackType
+                tramTrackType = isTramTrackInEveryLane and tramTrackType or 'NO'
             },
             edges = _makeEdges(_pitchAngle, params, {-1.8, -6, 0}, {1.8, -6, 0}, {3.6, 0, 0}, {3.6, 0, 0}),
             edgeType = _getEdgeType(params, bridgeData),
@@ -1556,7 +1593,7 @@ local function updateFn_6_1_lane_one_way_to_6_lane_x_large(params, bridgeData)
             params = {
                 skipCollision = true,
                 type = 'lollo_internal_1_way_1_lane_street_no_sidewalk.lua',
-                tramTrackType = tramTrackType
+                tramTrackType = isTramTrackInEveryLane and tramTrackType or 'NO'
             },
             edges = _makeEdges(_pitchAngle, params, {-1.8, -2, 0}, {1.8, -2, 0}, {3.6, 0, 0}, {3.6, 0, 0}),
             edgeType = _getEdgeType(params, bridgeData),
@@ -1569,7 +1606,7 @@ local function updateFn_6_1_lane_one_way_to_6_lane_x_large(params, bridgeData)
             params = {
                 skipCollision = true,
                 type = 'lollo_internal_1_way_1_lane_street_no_sidewalk.lua',
-                tramTrackType = tramTrackType
+                tramTrackType = isTramTrackInEveryLane and tramTrackType or 'NO'
             },
             edges = _makeEdges(_pitchAngle, params, {1.8, 2, 0}, {-1.8, 2, 0}, {-3.6, 0, 0}, {-3.6, 0, 0}),
             edgeType = _getEdgeType(params, bridgeData),
@@ -1582,7 +1619,7 @@ local function updateFn_6_1_lane_one_way_to_6_lane_x_large(params, bridgeData)
             params = {
                 skipCollision = true,
                 type = 'lollo_internal_1_way_1_lane_street_no_sidewalk.lua',
-                tramTrackType = tramTrackType
+                tramTrackType = isTramTrackInEveryLane and tramTrackType or 'NO'
             },
             edges = _makeEdges(_pitchAngle, params, {1.8, 6, 0}, {-1.8, 6, 0}, {-3.6, 0, 0}, {-3.6, 0, 0}),
             edgeType = _getEdgeType(params, bridgeData),
@@ -1603,11 +1640,14 @@ local function updateFn_6_1_lane_one_way_to_6_lane_x_large(params, bridgeData)
             freeNodes = {},
             snapNodes = {}
         },
+
         {
             type = 'STREET',
             params = {
                 skipCollision = true,
-                type = tramTrackType == 'NO' and 'standard/town_x_large_new.lua' or 'lollo_x_large_6_tram_tracks_street.lua',
+                type = tramTrackType == 'NO'
+                    and 'standard/town_x_large_new.lua'
+                    or (isTramTrackInEveryLane and 'lollo_x_large_6_tram_tracks_street.lua' or 'standard/town_x_large_new.lua'),
                 tramTrackType = tramTrackType
             },
             edges = _makeEdges(_pitchAngle, params, {2, 0, 0}, {10, 0, 0}),
@@ -1653,6 +1693,7 @@ local function updateFn_Motorway_6_1_lane_one_way_to_6_lane_x_large(params, brid
         }
     }
 
+    local isTramTrackInEveryLane = _getTramTrackInEveryLane(params)
     local tramTrackType = _getTramTrackType(params)
     result.edgeLists = {
         {
@@ -1673,7 +1714,7 @@ local function updateFn_Motorway_6_1_lane_one_way_to_6_lane_x_large(params, brid
             params = {
                 skipCollision = true,
                 type = 'lollo_medium_1_way_1_lane_country_road_narrow_sidewalk.lua',
-                tramTrackType = tramTrackType
+                tramTrackType = isTramTrackInEveryLane and tramTrackType or 'NO'
             },
             edges = _makeEdges(_pitchAngle, params, {-4, -6, 0}, {-2, -6, 0}, {2, 0, 0}, {2, 0, 0}),
             edgeType = _getEdgeType(params, bridgeData),
@@ -1686,7 +1727,7 @@ local function updateFn_Motorway_6_1_lane_one_way_to_6_lane_x_large(params, brid
             params = {
                 skipCollision = true,
                 type = 'lollo_medium_1_way_1_lane_country_road_narrow_sidewalk.lua',
-                tramTrackType = tramTrackType
+                tramTrackType = isTramTrackInEveryLane and tramTrackType or 'NO'
             },
             edges = _makeEdges(_pitchAngle, params, {-4, -2, 0}, {-2, -2, 0}, {2, 0, 0}, {2, 0, 0}),
             edgeType = _getEdgeType(params, bridgeData),
@@ -1699,7 +1740,7 @@ local function updateFn_Motorway_6_1_lane_one_way_to_6_lane_x_large(params, brid
             params = {
                 skipCollision = true,
                 type = 'lollo_medium_1_way_1_lane_country_road_narrow_sidewalk.lua',
-                tramTrackType = tramTrackType
+                tramTrackType = isTramTrackInEveryLane and tramTrackType or 'NO'
             },
             edges = _makeEdges(_pitchAngle, params, {-2, 2, 0}, {-4, 2, 0}, {-2, 0, 0}, {-2, 0, 0}),
             edgeType = _getEdgeType(params, bridgeData),
@@ -1712,7 +1753,7 @@ local function updateFn_Motorway_6_1_lane_one_way_to_6_lane_x_large(params, brid
             params = {
                 skipCollision = true,
                 type = 'lollo_medium_1_way_1_lane_country_road_narrow_sidewalk.lua',
-                tramTrackType = tramTrackType
+                tramTrackType = isTramTrackInEveryLane and tramTrackType or 'NO'
             },
             edges = _makeEdges(_pitchAngle, params, {-2, 6, 0}, {-4, 6, 0}, {-2, 0, 0}, {-2, 0, 0}),
             edgeType = _getEdgeType(params, bridgeData),
@@ -1733,6 +1774,7 @@ local function updateFn_Motorway_6_1_lane_one_way_to_6_lane_x_large(params, brid
             freeNodes = params.direction4Merge == 0 and {1} or {0},
             snapNodes = _getSnapNodes10(params, true)
         },
+
         {
             type = 'STREET',
             params = {
@@ -1751,7 +1793,7 @@ local function updateFn_Motorway_6_1_lane_one_way_to_6_lane_x_large(params, brid
             params = {
                 skipCollision = true,
                 type = 'lollo_internal_1_way_1_lane_street_no_sidewalk.lua',
-                tramTrackType = tramTrackType
+                tramTrackType = isTramTrackInEveryLane and tramTrackType or 'NO'
             },
             edges = _makeEdges(_pitchAngle, params, {-1.8, -6, 0}, {1.8, -6, 0}, {3.6, 0, 0}, {3.6, 0, 0}),
             edgeType = _getEdgeType(params, bridgeData),
@@ -1764,7 +1806,7 @@ local function updateFn_Motorway_6_1_lane_one_way_to_6_lane_x_large(params, brid
             params = {
                 skipCollision = true,
                 type = 'lollo_internal_1_way_1_lane_street_no_sidewalk.lua',
-                tramTrackType = tramTrackType
+                tramTrackType = isTramTrackInEveryLane and tramTrackType or 'NO'
             },
             edges = _makeEdges(_pitchAngle, params, {-1.8, -2, 0}, {1.8, -2, 0}, {3.6, 0, 0}, {3.6, 0, 0}),
             edgeType = _getEdgeType(params, bridgeData),
@@ -1777,7 +1819,7 @@ local function updateFn_Motorway_6_1_lane_one_way_to_6_lane_x_large(params, brid
             params = {
                 skipCollision = true,
                 type = 'lollo_internal_1_way_1_lane_street_no_sidewalk.lua',
-                tramTrackType = tramTrackType
+                tramTrackType = isTramTrackInEveryLane and tramTrackType or 'NO'
             },
             edges = _makeEdges(_pitchAngle, params, {1.8, 2, 0}, {-1.8, 2, 0}, {-3.6, 0, 0}, {-3.6, 0, 0}),
             edgeType = _getEdgeType(params, bridgeData),
@@ -1790,7 +1832,7 @@ local function updateFn_Motorway_6_1_lane_one_way_to_6_lane_x_large(params, brid
             params = {
                 skipCollision = true,
                 type = 'lollo_internal_1_way_1_lane_street_no_sidewalk.lua',
-                tramTrackType = tramTrackType
+                tramTrackType = isTramTrackInEveryLane and tramTrackType or 'NO'
             },
             edges = _makeEdges(_pitchAngle, params, {1.8, 6, 0}, {-1.8, 6, 0}, {-3.6, 0, 0}, {-3.6, 0, 0}),
             edgeType = _getEdgeType(params, bridgeData),
@@ -1811,11 +1853,14 @@ local function updateFn_Motorway_6_1_lane_one_way_to_6_lane_x_large(params, brid
             freeNodes = {},
             snapNodes = {}
         },
+
         {
             type = 'STREET',
             params = {
                 skipCollision = true,
-                type = tramTrackType == 'NO' and 'standard/country_x_large_new.lua' or 'lollo_x_large_6_tram_tracks_country_road.lua',
+                type = tramTrackType == 'NO'
+                    and 'standard/country_x_large_new.lua'
+                    or (isTramTrackInEveryLane and 'lollo_x_large_6_tram_tracks_country_road.lua' or 'standard/country_x_large_new.lua'),
                 tramTrackType = tramTrackType
             },
             edges = _makeEdges(_pitchAngle, params, {2, 0, 0}, {10, 0, 0}),
@@ -1861,13 +1906,16 @@ local function updateFn_Motorway_2_2_lane_one_way_to_6_lane_x_large(params, brid
         }
     }
 
+    local isTramTrackInEveryLane = _getTramTrackInEveryLane(params)
     local tramTrackType = _getTramTrackType(params)
     result.edgeLists = {
         {
             type = 'STREET',
             params = {
                 skipCollision = true,
-                type = tramTrackType == 'NO' and 'standard/country_medium_one_way_new.lua' or 'lollo_medium_1_way_2_lane_2_tram_tracks_country_road.lua',
+                type = tramTrackType == 'NO'
+                    and 'standard/country_medium_one_way_new.lua'
+                    or (isTramTrackInEveryLane and 'lollo_medium_1_way_2_lane_2_tram_tracks_country_road.lua' or 'standard/country_medium_one_way_new.lua'),
                 tramTrackType = tramTrackType
             },
             edges = _makeEdges(_pitchAngle, params, {-6, -8, 0}, {-2, -8, 0}),
@@ -1880,7 +1928,9 @@ local function updateFn_Motorway_2_2_lane_one_way_to_6_lane_x_large(params, brid
             type = 'STREET',
             params = {
                 skipCollision = true,
-                type = tramTrackType == 'NO' and 'standard/country_medium_one_way_new.lua' or 'lollo_medium_1_way_2_lane_2_tram_tracks_country_road.lua',
+                type = tramTrackType == 'NO'
+                    and 'standard/country_medium_one_way_new.lua'
+                    or (isTramTrackInEveryLane and 'lollo_medium_1_way_2_lane_2_tram_tracks_country_road.lua' or 'standard/country_medium_one_way_new.lua'),
                 tramTrackType = tramTrackType
             },
             edges = _makeEdges(_pitchAngle, params, {-2, 8, 0}, {-6, 8, 0}, {-4, 0, 0}, {-4, 0, 0}),
@@ -1889,6 +1939,7 @@ local function updateFn_Motorway_2_2_lane_one_way_to_6_lane_x_large(params, brid
             freeNodes = params.direction4Merge == 0 and {1} or {0},
             snapNodes = _getSnapNodes10(params, true)
         },
+
         {
             type = 'STREET',
             params = {
@@ -1907,7 +1958,7 @@ local function updateFn_Motorway_2_2_lane_one_way_to_6_lane_x_large(params, brid
             params = {
                 skipCollision = true,
                 type = 'lollo_internal_1_way_1_lane_street_no_sidewalk.lua',
-                tramTrackType = tramTrackType
+                tramTrackType = isTramTrackInEveryLane and tramTrackType or 'NO'
             },
             edges = _makeEdges(_pitchAngle, params, {-1.8, -6, 0}, {1.8, -6, 0}),
             edgeType = _getEdgeType(params, bridgeData),
@@ -1920,7 +1971,7 @@ local function updateFn_Motorway_2_2_lane_one_way_to_6_lane_x_large(params, brid
             params = {
                 skipCollision = true,
                 type = 'lollo_internal_1_way_1_lane_street_no_sidewalk.lua',
-                tramTrackType = tramTrackType
+                tramTrackType = isTramTrackInEveryLane and tramTrackType or 'NO'
             },
             edges = _makeEdges(_pitchAngle, params, {1.8, 6, 0}, {-1.8, 6, 0}, {-3.6, 0, 0}, {-3.6, 0, 0}),
             edgeType = _getEdgeType(params, bridgeData),
@@ -1941,11 +1992,14 @@ local function updateFn_Motorway_2_2_lane_one_way_to_6_lane_x_large(params, brid
             freeNodes = {},
             snapNodes = {}
         },
+
         {
             type = 'STREET',
             params = {
                 skipCollision = true,
-                type = tramTrackType == 'NO' and 'standard/country_x_large_new.lua' or 'lollo_x_large_6_tram_tracks_country_road.lua',
+                type = tramTrackType == 'NO'
+                    and 'standard/country_x_large_new.lua'
+                    or (isTramTrackInEveryLane and 'lollo_x_large_6_tram_tracks_country_road.lua' or 'standard/country_x_large_new.lua'),
                 tramTrackType = tramTrackType
             },
             edges = _makeEdges(_pitchAngle, params, {2, 0, 0}, {10, 0, 0}),
@@ -1991,6 +2045,7 @@ local function updateFn_Motorway_4_1_lane_one_way_to_4_lane_large(params, bridge
         }
     }
 
+    local isTramTrackInEveryLane = _getTramTrackInEveryLane(params)
     local tramTrackType = _getTramTrackType(params)
     result.edgeLists = {
         {
@@ -2000,7 +2055,7 @@ local function updateFn_Motorway_4_1_lane_one_way_to_4_lane_large(params, bridge
                 type = 'lollo_medium_1_way_1_lane_country_road_narrow_sidewalk.lua',
                 tramTrackType = tramTrackType
             },
-            edges = _makeEdges(_pitchAngle, params, {-6, -6, 0}, {-2, -6, 0}, {4, 0, 0}, {4, 0, 0}),
+            edges = _makeEdges(_pitchAngle, params, {-4, -6, 0}, {-2, -6, 0}),
             edgeType = _getEdgeType(params, bridgeData),
             edgeTypeName = _getEdgeTypeName(params, bridgeData),
             freeNodes = params.direction4Merge == 0 and {0} or {1},
@@ -2011,9 +2066,9 @@ local function updateFn_Motorway_4_1_lane_one_way_to_4_lane_large(params, bridge
             params = {
                 skipCollision = true,
                 type = 'lollo_medium_1_way_1_lane_country_road_narrow_sidewalk.lua',
-                tramTrackType = tramTrackType
+                tramTrackType = isTramTrackInEveryLane and tramTrackType or 'NO',
             },
-            edges = _makeEdges(_pitchAngle, params, {-6, -2, 0}, {-2, -2, 0}, {4, 0, 0}, {4, 0, 0}),
+            edges = _makeEdges(_pitchAngle, params, {-4, -2, 0}, {-2, -2, 0}),
             edgeType = _getEdgeType(params, bridgeData),
             edgeTypeName = _getEdgeTypeName(params, bridgeData),
             freeNodes = params.direction4Merge == 0 and {0} or {1},
@@ -2024,9 +2079,9 @@ local function updateFn_Motorway_4_1_lane_one_way_to_4_lane_large(params, bridge
             params = {
                 skipCollision = true,
                 type = 'lollo_medium_1_way_1_lane_country_road_narrow_sidewalk.lua',
-                tramTrackType = tramTrackType
+                tramTrackType = isTramTrackInEveryLane and tramTrackType or 'NO',
             },
-            edges = _makeEdges(_pitchAngle, params, {-2, 2, 0}, {-6, 2, 0}, {-4, 0, 0}, {-4, 0, 0}),
+            edges = _makeEdges(_pitchAngle, params, {-2, 2, 0}, {-4, 2, 0}, {-2, 0, 0}, {-2, 0, 0}),
             edgeType = _getEdgeType(params, bridgeData),
             edgeTypeName = _getEdgeTypeName(params, bridgeData),
             freeNodes = params.direction4Merge == 0 and {1} or {0},
@@ -2039,12 +2094,13 @@ local function updateFn_Motorway_4_1_lane_one_way_to_4_lane_large(params, bridge
                 type = 'lollo_medium_1_way_1_lane_country_road_narrow_sidewalk.lua',
                 tramTrackType = tramTrackType
             },
-            edges = _makeEdges(_pitchAngle, params, {-2, 6, 0}, {-6, 6, 0}, {-4, 0, 0}, {-4, 0, 0}),
+            edges = _makeEdges(_pitchAngle, params, {-2, 6, 0}, {-4, 6, 0}, {-2, 0, 0}, {-2, 0, 0}),
             edgeType = _getEdgeType(params, bridgeData),
             edgeTypeName = _getEdgeTypeName(params, bridgeData),
             freeNodes = params.direction4Merge == 0 and {1} or {0},
             snapNodes = _getSnapNodes10(params, true)
         },
+
         {
             type = 'STREET',
             params = {
@@ -2052,7 +2108,7 @@ local function updateFn_Motorway_4_1_lane_one_way_to_4_lane_large(params, bridge
                 type = 'lollo_internal_1_way_1_lane_street_no_sidewalk.lua',
                 tramTrackType = tramTrackType
             },
-            edges = _makeEdges(_pitchAngle, params, {-1.8, -6, 0}, {1.8, -6, 0}, {3.6, 0, 0}, {3.6, 0, 0}),
+            edges = _makeEdges(_pitchAngle, params, {-1.8, -6, 0}, {1.8, -6, 0}),
             edgeType = _getEdgeType(params, bridgeData),
             edgeTypeName = _getInternalEdgeTypeName(),
             freeNodes = {},
@@ -2063,9 +2119,9 @@ local function updateFn_Motorway_4_1_lane_one_way_to_4_lane_large(params, bridge
             params = {
                 skipCollision = true,
                 type = 'lollo_internal_1_way_1_lane_street_no_sidewalk.lua',
-                tramTrackType = tramTrackType
+                tramTrackType = isTramTrackInEveryLane and tramTrackType or 'NO',
             },
-            edges = _makeEdges(_pitchAngle, params, {-1.8, -2, 0}, {1.8, -2, 0}, {3.6, 0, 0}, {3.6, 0, 0}),
+            edges = _makeEdges(_pitchAngle, params, {-1.8, -2, 0}, {1.8, -2, 0}),
             edgeType = _getEdgeType(params, bridgeData),
             edgeTypeName = _getInternalEdgeTypeName(),
             freeNodes = {},
@@ -2076,7 +2132,7 @@ local function updateFn_Motorway_4_1_lane_one_way_to_4_lane_large(params, bridge
             params = {
                 skipCollision = true,
                 type = 'lollo_internal_1_way_1_lane_street_no_sidewalk.lua',
-                tramTrackType = tramTrackType
+                tramTrackType = isTramTrackInEveryLane and tramTrackType or 'NO',
             },
             edges = _makeEdges(_pitchAngle, params, {1.8, 2, 0}, {-1.8, 2, 0}, {-3.6, 0, 0}, {-3.6, 0, 0}),
             edgeType = _getEdgeType(params, bridgeData),
@@ -2097,14 +2153,17 @@ local function updateFn_Motorway_4_1_lane_one_way_to_4_lane_large(params, bridge
             freeNodes = {},
             snapNodes = {}
         },
+
         {
             type = 'STREET',
             params = {
                 skipCollision = true,
-                type = tramTrackType == 'NO' and 'standard/country_large_new.lua' or 'lollo_large_4_lane_4_tram_tracks_country_road.lua',
+                type = tramTrackType == 'NO'
+                    and 'standard/country_large_new.lua'
+                    or (isTramTrackInEveryLane and 'lollo_large_4_lane_4_tram_tracks_country_road.lua' or 'standard/country_large_new.lua'),
                 tramTrackType = tramTrackType
             },
-            edges = _makeEdges(_pitchAngle, params, {2, 0, 0}, {10, 0, 0}),
+            edges = _makeEdges(_pitchAngle, params, {2, 0, 0}, {8, 0, 0}),
             edgeType = _getEdgeType(params, bridgeData),
             edgeTypeName = _getEdgeTypeName(params, bridgeData),
             freeNodes = params.direction4Merge == 0 and {1} or {0},
@@ -2147,6 +2206,7 @@ local function updateFn_Motorway_2_1_lane_narrow_sidewalk_to_2_lane(params, brid
         }
     }
 
+    local isTramTrackInEveryLane = _getTramTrackInEveryLane(params)
     local tramTrackType = _getTramTrackType(params)
     result.edgeLists = {
         {
@@ -2175,6 +2235,7 @@ local function updateFn_Motorway_2_1_lane_narrow_sidewalk_to_2_lane(params, brid
             freeNodes = params.direction4Merge == 0 and {1} or {0},
             snapNodes = _getSnapNodes10(params, true)
         },
+
         {
             type = 'STREET',
             params = {
@@ -2250,6 +2311,7 @@ local function updateFn_Motorway_3_1_lane_narrow_sidewalk_to_3_lane_one_way(para
         }
     }
 
+    local isTramTrackInEveryLane = _getTramTrackInEveryLane(params)
     local tramTrackType = _getTramTrackType(params)
     local hasBus = _getHasBus(params)
     result.edgeLists = {
@@ -2259,7 +2321,7 @@ local function updateFn_Motorway_3_1_lane_narrow_sidewalk_to_3_lane_one_way(para
                 hasBus = hasBus,
                 skipCollision = true,
                 type = 'lollo_medium_1_way_1_lane_country_road_narrow_sidewalk.lua',
-                tramTrackType = tramTrackType
+                tramTrackType = params.direction4Merge == 0 and tramTrackType or (isTramTrackInEveryLane and tramTrackType or 'NO')
             },
             edges = _makeEdges(_pitchAngle, params, {-4, -4, .0}, {-2, -4, .0}, {2, 0, 0}, {2, 0, 0}),
             edgeType = _getEdgeType(params, bridgeData),
@@ -2273,7 +2335,7 @@ local function updateFn_Motorway_3_1_lane_narrow_sidewalk_to_3_lane_one_way(para
                 hasBus = hasBus,
                 skipCollision = true,
                 type = 'lollo_medium_1_way_1_lane_country_road_narrow_sidewalk.lua',
-                tramTrackType = tramTrackType
+                tramTrackType = isTramTrackInEveryLane and tramTrackType or 'NO'
             },
             edges = _makeEdges(_pitchAngle, params, {-4, 0, .0}, {-2, 0, .0}, {2, 0, 0}, {2, 0, 0}),
             edgeType = _getEdgeType(params, bridgeData),
@@ -2287,7 +2349,7 @@ local function updateFn_Motorway_3_1_lane_narrow_sidewalk_to_3_lane_one_way(para
                 hasBus = hasBus,
                 skipCollision = true,
                 type = 'lollo_medium_1_way_1_lane_country_road_narrow_sidewalk.lua',
-                tramTrackType = tramTrackType
+                tramTrackType = params.direction4Merge == 1 and tramTrackType or (isTramTrackInEveryLane and tramTrackType or 'NO')
             },
             edges = _makeEdges(_pitchAngle, params, {-4, 4, 0}, {-2, 4, 0}, {2, 0, 0}, {2, 0, 0}),
             edgeType = _getEdgeType(params, bridgeData),
@@ -2295,15 +2357,16 @@ local function updateFn_Motorway_3_1_lane_narrow_sidewalk_to_3_lane_one_way(para
             freeNodes = params.direction4Merge == 0 and {0} or {1},
             snapNodes = _getSnapNodes01(params, true)
         },
+
         {
             type = 'STREET',
             params = {
                 hasBus = hasBus,
                 skipCollision = true,
                 type = 'lollo_internal_1_way_1_lane_street_no_sidewalk.lua',
-                tramTrackType = tramTrackType
+                tramTrackType = params.direction4Merge == 0 and tramTrackType or (isTramTrackInEveryLane and tramTrackType or 'NO')
             },
-            edges = _makeEdges(_pitchAngle, params, {-1.8, 4, 0}, {1.8, 4, 0}),
+            edges = _makeEdges(_pitchAngle, params, {-1.8, -4, 0}, {1.8, -4, 0}),
             edgeType = _getEdgeType(params, bridgeData),
             edgeTypeName = _getInternalEdgeTypeName(),
             freeNodes = {},
@@ -2315,7 +2378,7 @@ local function updateFn_Motorway_3_1_lane_narrow_sidewalk_to_3_lane_one_way(para
                 hasBus = hasBus,
                 skipCollision = true,
                 type = 'lollo_internal_1_way_1_lane_street_no_sidewalk.lua',
-                tramTrackType = tramTrackType
+                tramTrackType = isTramTrackInEveryLane and tramTrackType or 'NO'
             },
             edges = _makeEdges(_pitchAngle, params, {-1.8, 0, 0}, {1.8, 0, 0}),
             edgeType = _getEdgeType(params, bridgeData),
@@ -2329,20 +2392,23 @@ local function updateFn_Motorway_3_1_lane_narrow_sidewalk_to_3_lane_one_way(para
                 hasBus = hasBus,
                 skipCollision = true,
                 type = 'lollo_internal_1_way_1_lane_street_no_sidewalk.lua',
-                tramTrackType = tramTrackType
+                tramTrackType = params.direction4Merge == 1 and tramTrackType or (isTramTrackInEveryLane and tramTrackType or 'NO')
             },
-            edges = _makeEdges(_pitchAngle, params, {-1.8, -4, 0}, {1.8, -4, 0}),
+            edges = _makeEdges(_pitchAngle, params, {-1.8, 4, 0}, {1.8, 4, 0}),
             edgeType = _getEdgeType(params, bridgeData),
             edgeTypeName = _getInternalEdgeTypeName(),
             freeNodes = {},
             snapNodes = {}
         },
+
         {
             type = 'STREET',
             params = {
                 hasBus = hasBus,
                 skipCollision = true,
-                type = tramTrackType == 'NO' and 'lollo_medium_1_way_3_lane_country_road.lua' or 'lollo_medium_1_way_3_lane_3_tram_tracks_country_road.lua',
+                type = tramTrackType == 'NO'
+                    and 'lollo_medium_1_way_3_lane_country_road.lua'
+                    or (isTramTrackInEveryLane and 'lollo_medium_1_way_3_lane_3_tram_tracks_country_road.lua' or 'lollo_medium_1_way_3_lane_country_road.lua'),
                 tramTrackType = tramTrackType
             },
             edges = _makeEdges(_pitchAngle, params, {2, 0, 0}, {6, 0, 0}),
@@ -2386,6 +2452,7 @@ local function updateFn_Motorway_2_1_lane_narrow_sidewalk_to_2_lane_one_way(para
         }
     }
 
+    local isTramTrackInEveryLane = _getTramTrackInEveryLane(params)
     local tramTrackType = _getTramTrackType(params)
     local hasBus = _getHasBus(params)
     result.edgeLists = {
@@ -2395,7 +2462,7 @@ local function updateFn_Motorway_2_1_lane_narrow_sidewalk_to_2_lane_one_way(para
                 hasBus = hasBus,
                 skipCollision = true,
                 type = 'lollo_medium_1_way_1_lane_country_road_narrow_sidewalk.lua',
-                tramTrackType = tramTrackType
+                tramTrackType = params.direction4Merge == 0 and tramTrackType or (isTramTrackInEveryLane and tramTrackType or 'NO')
             },
             edges = _makeEdges(_pitchAngle, params, {-4, -2, .0}, {-2, -2, .0}),
             edgeType = _getEdgeType(params, bridgeData),
@@ -2409,7 +2476,7 @@ local function updateFn_Motorway_2_1_lane_narrow_sidewalk_to_2_lane_one_way(para
                 hasBus = hasBus,
                 skipCollision = true,
                 type = 'lollo_medium_1_way_1_lane_country_road_narrow_sidewalk.lua',
-                tramTrackType = tramTrackType
+                tramTrackType = params.direction4Merge == 1 and tramTrackType or (isTramTrackInEveryLane and tramTrackType or 'NO')
             },
             edges = _makeEdges(_pitchAngle, params, {-4, 2, 0}, {-2, 2, 0}),
             edgeType = _getEdgeType(params, bridgeData),
@@ -2417,27 +2484,14 @@ local function updateFn_Motorway_2_1_lane_narrow_sidewalk_to_2_lane_one_way(para
             freeNodes = params.direction4Merge == 0 and {0} or {1},
             snapNodes = _getSnapNodes01(params, true)
         },
+
         {
             type = 'STREET',
             params = {
                 hasBus = hasBus,
                 skipCollision = true,
                 type = 'lollo_internal_1_way_1_lane_street_no_sidewalk.lua',
-                tramTrackType = tramTrackType
-            },
-            edges = _makeEdges(_pitchAngle, params, {-1.8, 2, 0}, {1.8, 2, 0}),
-            edgeType = _getEdgeType(params, bridgeData),
-            edgeTypeName = _getInternalEdgeTypeName(),
-            freeNodes = {},
-            snapNodes = {}
-        },
-        {
-            type = 'STREET',
-            params = {
-                hasBus = hasBus,
-                skipCollision = true,
-                type = 'lollo_internal_1_way_1_lane_street_no_sidewalk.lua',
-                tramTrackType = tramTrackType
+                tramTrackType = params.direction4Merge == 0 and tramTrackType or (isTramTrackInEveryLane and tramTrackType or 'NO')
             },
             edges = _makeEdges(_pitchAngle, params, {-1.8, -2, 0}, {1.8, -2, 0}),
             edgeType = _getEdgeType(params, bridgeData),
@@ -2450,7 +2504,24 @@ local function updateFn_Motorway_2_1_lane_narrow_sidewalk_to_2_lane_one_way(para
             params = {
                 hasBus = hasBus,
                 skipCollision = true,
-                type = tramTrackType == 'NO' and 'standard/country_medium_one_way_new.lua' or 'lollo_medium_1_way_2_lane_2_tram_tracks_country_road.lua',
+                type = 'lollo_internal_1_way_1_lane_street_no_sidewalk.lua',
+                tramTrackType = params.direction4Merge == 1 and tramTrackType or (isTramTrackInEveryLane and tramTrackType or 'NO')
+            },
+            edges = _makeEdges(_pitchAngle, params, {-1.8, 2, 0}, {1.8, 2, 0}),
+            edgeType = _getEdgeType(params, bridgeData),
+            edgeTypeName = _getInternalEdgeTypeName(),
+            freeNodes = {},
+            snapNodes = {}
+        },
+
+        {
+            type = 'STREET',
+            params = {
+                hasBus = hasBus,
+                skipCollision = true,
+                type = tramTrackType == 'NO'
+                    and 'standard/country_medium_one_way_new.lua'
+                    or (isTramTrackInEveryLane and 'lollo_medium_1_way_2_lane_2_tram_tracks_country_road.lua' or 'standard/country_medium_one_way_new.lua'),
                 tramTrackType = tramTrackType
             },
             edges = _makeEdges(_pitchAngle, params, {2, 0, 0}, {6, 0, 0}),
@@ -2470,10 +2541,10 @@ function data()
     return {
         updateFn = function(params, two)
             local function _initParams()
-				-- if not(params.streetType4Merge) or not(two.globalStreetData[params.streetType4Merge + 1]) then
+				-- if not(params.streetType4Merge) or not(two.globalStreetData) or not(two.globalStreetData[params.streetType4Merge + 1]) then
 				-- 	params.streetType4Merge = 0
 				-- end
-                if not(params.bridgeType4Merge) or not(two.globalBridgeData[params.bridgeType4Merge + 1]) then
+                if not(params.bridgeType4Merge) or not(two.globalBridgeData) or not(two.globalBridgeData[params.bridgeType4Merge + 1]) then
 					params.bridgeType4Merge = 0
 				end
 			end

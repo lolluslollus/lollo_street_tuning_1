@@ -5,8 +5,8 @@ function data()
     return {
         type = 'STREET_CONSTRUCTION',
         description = {
-            name = _('Street merging'),
-            description = _('Merges multiple streets and a single broader street. Use O and P to adjust the pitch while building and the slider when upgrading.')
+            name = _('Street merges'),
+            description = _('Merges multiple streets and a single broader street. Use O and P to adjust the pitch while building.')
         },
         availability = {
             yearFrom = -1, --1925,

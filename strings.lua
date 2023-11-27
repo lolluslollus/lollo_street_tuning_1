@@ -18,7 +18,7 @@ function data()
 				Previous iterations exposed roads with many tram tracks in the street menu, but that was ugly.
 				[h1]Problem D: vehicles queue up unnecessarily[/h1]
 				The game newly offers lane waypoints: use them.
-				[h2]Solution: use dedicated roads (redundant as of lane waypoints, switch them off with the new mod setting)[/h2]
+				[h2]Solution: use dedicated roads (or switch them off with the new mod setting if you are in a new game and don't want them)[/h2]
 				If lane waypoints are not enough, replace the offending road with one of the same width, that reserves the right lane for certain vehicles. Use the standard replace tool (the magic wand), helping yourself with <shift> to select a shorter segment of road. Use the slicer to cut your own segments if you must. Select the new road with the category icon to avoid confusion. Toggle bus lanes on or off as required, using the standard tool. Toggle tram tracks in the middle as required, using the dedicated street construction tool.
 				[h2]Fine-grained solution: split your road into segments[/h2]
 				When you build a long enough piece of road, the game splits it into seamless segments. The joints between them allow vehicles to change lanes. The trouble is, these segments are fairly long, and crossings do not allow switching lanes. If you have a shortish stretch of road, then a crossing, then another shortish stretch, then another crossing, chances are, vehicles cannot change lanes for a long while.
@@ -71,20 +71,39 @@ function data()
 				This is a UG problem. To solve it, replace those stations with some others available in your game.
 				B) The game always draws the tram track on the outer lane(s), even if trams are barred there. Take this as a graphical glitch.
 				C) The game always expects buses to be allowed in the outer lane(s).
+				D) Do not use any mods that alter the game default roads.
 			]],
 			["_NAME"] = "Street fine tuning",
 			["snapNodesName"] = "Snap to neighbours",
 			["snapNodesDesc"] = "Cycle through these values to help configure a station once it is built",
+			["Yes"] = "Yes",
 			["No"] = "No",
 			["Left"] = "End A",
 			["Right"] = "End B",
 			["Both"] = "Both Ends",
 			["BridgeType"] = "Bridge Type",
 			["NoBridge"] = "No Bridge",
+			["RemoveStreetEdgeWaypointDesc"] = "Place this on a street segment to get it removed, for precision work.",
+			["RemoveStreetEdgeWaypointName"] = "Street segment remover.",
+			["RemoveTrackEdgeWaypointDesc"] = "Place this on a track segment to get it removed, for precision work.",
+			["RemoveTrackEdgeWaypointName"] = "Track segment remover.",
 			["StreetType"] = "Street Type",
 			["ReplaceWithNewer"] = "This construction is an old version: remove it and rebuild it to upgrade",
 			["YellowBusLanes"] = "Yellow bus lanes with stripes",
+			["YellowBusLanesTooltip"] = "Change the looks of bus lanes so they have yellow stripes",
 			["MakeReservedLanes"] = "Make reserved lanes",
+			["MakeReservedLanesTooltip"] = "Make additional street types with reserved lanes for buses and lorries, buses and trams, buses only.",
+
+			-- flat foundation
+			["FlatFoundationName"] = "Flat Foundation",
+			["FlatFoundationDesc"] = "Plop this to flatten the terrain before building roads or tracks. Adjust it with the Construction Mover. Remove it when done.",
+			["FlatFoundationNotice"] = "Adjust me with the Construction Mover and remove me when done building on me.",
+			["X10m"] = "X size, coarse, m",
+			["X1m"] = "X size, medium, m",
+			["X0_1m"] = "X size, fine, m",
+			["Y10m"] = "Y size, coarse, m",
+			["Y1m"] = "Y size, medium, m",
+			["Y0_1m"] = "Y size, fine, m",
 		},
 	}
 end

@@ -2,6 +2,7 @@ local arrayUtils = require('lollo_street_tuning.arrayUtils')
 local fileUtils = require('lollo_street_tuning.fileUtils')
 local stringUtils = require('lollo_street_tuning.stringUtils')
 
+
 local _streetDataBuffer = {
     -- table indexed by filterId
 }
@@ -335,7 +336,9 @@ local function _getStreetDataFiltered_Stock(streetDataTable)
 end
 
 local function _getStreetDataFiltered_StockAndReservedLanes(streetDataTable)
+    -- print('_getStreetDataFiltered_StockAndReservedLanes starting')
     if type(streetDataTable) ~= 'table' then return {} end
+    -- print('_getStreetDataFiltered_StockAndReservedLanes ONE')
 
     local results = {}
     for _, strDataRecord in pairs(streetDataTable) do
@@ -368,8 +371,12 @@ local function _getStreetDataFiltered_StockAndReservedLanes(streetDataTable)
             then
                 table.insert(results, #results + 1, strDataRecord)
             end
+        -- else
+        --     print('_getStreetDataFiltered_StockAndReservedLanes leaving out', strDataRecord.fileName or 'NIL')
+
         end
     end
+    -- print('_getStreetDataFiltered_StockAndReservedLanes is about to return', #results, 'records')
     return results
 end
 
@@ -395,9 +402,11 @@ local function _getStreetTypesWithApi()
             fileName = fileName,
             icon = streetProperties.icon,
             isAllTramTracks = helper.isStreetAllTramTracks(streetProperties.laneConfigs),
+            isOneWay = helper.isStreetOneWay(streetProperties.laneConfigs),
             laneCount = #(streetProperties.laneConfigs),
             name = streetProperties.name,
             rightLaneWidth = (streetProperties.laneConfigs[2] or {}).width or 0,
+            sidewalkHeight = streetProperties.sidewalkHeight or 0,
             sidewalkWidth = streetProperties.sidewalkWidth,
             streetWidth = streetProperties.streetWidth,
             -- LOLLO NOTE isVisible may return true even if street.visibility = false.
@@ -407,12 +416,13 @@ local function _getStreetTypesWithApi()
             yearTo = streetProperties.yearTo
         }
     end
-    -- print('_getStreetTypesWithApi is about to return ') debugPrint(results)
+    -- print('_getStreetTypesWithApi is about to return', #results, 'records')
+    -- debugPrint(arrayUtils.cloneOmittingFields(results, {'aiLock', 'categories', 'icon', 'rightLaneWidth', 'sidewalkWidth', 'streetWidth'}))
     return results
 end
 
 local function _initLolloStreetDataWithApi(filter)
-    -- print('_initLolloStreetDataWithApi starting with filter =') debugPrint(filter)
+    -- print('_initLolloStreetDataWithApi starting with filter id =', filter.id)
     -- print('_streetDataBuffer[filter.id] =', _streetDataBuffer[filter.id])
     -- print('type(_streetDataBuffer[filter.id]) =', type(_streetDataBuffer[filter.id]))
 
@@ -489,14 +499,16 @@ helper.isStreetAllTramTracks = function(laneConfigs)
     return false
 end
 
-helper.isPath = function(streetTypeId)
+helper.hasCategory = function(streetTypeId, category)
     -- is it a path street type?
-    if type(streetTypeId) ~= 'number' or streetTypeId < 0 then return false end
+    if type(streetTypeId) ~= 'number' or streetTypeId < 0
+    or type(category) ~= 'string' or category == ''
+    then return false end
 
     local streetProperties = api.res.streetTypeRep.get(streetTypeId)
     if not(streetProperties) then return false end
 
-    return arrayUtils.arrayHasValue(streetProperties.categories, 'paths')
+    return arrayUtils.arrayHasValue(streetProperties.categories, category)
 end
 
 helper.isTramRightBarred = function(streetTypeId)

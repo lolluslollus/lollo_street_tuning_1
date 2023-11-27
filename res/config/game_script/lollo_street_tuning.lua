@@ -1,4 +1,6 @@
 local arrayUtils = require('lollo_street_tuning.arrayUtils')
+local comparisonUtils = require('lollo_street_tuning.comparisonUtils')
+local constants = require('lollo_street_tuning.constants')
 local edgeUtils = require('lollo_street_tuning.edgeUtils')
 local logger = require('lollo_street_tuning.logger')
 local streetUtils = require('lollo_street_tuning.streetUtils')
@@ -23,11 +25,22 @@ local _eventProperties = {
     lollo_street_hairpin = { conName = 'lollo_street_hairpin_2.con', eventName = 'streetHairpinBuilt' },
     lollo_street_merge = { conName = 'lollo_street_merge_2.con', eventName = 'streetMergeBuilt' },
     lollo_street_remover = { conName = 'lollo_street_remover.con', eventName = 'streetRemoverBuilt' },
+    lollo_street_remover_waypoint = { conName = '', eventName = 'streetRemoverWaypointBuilt' },
     lollo_street_splitter = { conName = 'lollo_street_splitter.con', eventName = 'streetSplitterBuilt' },
     lollo_street_splitter_w_api = { conName = 'lollo_street_splitter_w_api.con', eventName = 'streetSplitterWithApiBuilt' },
     lollo_toggle_all_tram_tracks = { conName = 'lollo_toggle_all_tram_tracks.con', eventName = 'toggleAllTracksBuilt' },
     noTramRightRoadBuilt = { conName = '', eventName = 'noTramRightRoadBuilt' },
     pathBuilt = { conName = '', eventName = 'pathBuilt' },
+}
+local _guiWaypoints = {
+    streetEdgeRemover = {
+        modelId = nil,
+        fileName = 'lollo_street_tuning/street/remove_street_edge_waypoint.mdl',
+    },
+    trackEdgeRemover = {
+        modelId = nil,
+        fileName = 'lollo_street_tuning/railroad/remove_track_edge_waypoint.mdl',
+    }
 }
 
 local function _isBuildingConstructionWithFileName(args, fileName)
@@ -86,14 +99,63 @@ local function _isBuildingToggleAllTracks(args)
     return _isBuildingConstructionWithFileName(args, _eventProperties.lollo_toggle_all_tram_tracks.conName)
 end
 
+local _guiUtils = {
+    sendCommandWithArgs = function(eventName, args)
+        api.cmd.sendCommand(api.cmd.make.sendScriptEvent(
+            string.sub(debug.getinfo(1, 'S').source, 1),
+            _eventId,
+            eventName,
+            args
+        ))
+    end,
+    sendCommandWithConId = function(eventName, args)
+        api.cmd.sendCommand(api.cmd.make.sendScriptEvent(
+            string.sub(debug.getinfo(1, 'S').source, 1),
+            _eventId,
+            eventName,
+            {
+                conId = args.result[1]
+            }
+        ))
+    end,
+}
+
 local _utils = {
+    getAverageZ = function(edgeId)
+        if not(edgeUtils.isValidAndExistingId(edgeId)) then return nil end
+
+        local baseEdge = api.engine.getComponent(edgeId, api.type.ComponentType.BASE_EDGE)
+        if baseEdge == nil then return nil end
+
+        local baseNode0 = api.engine.getComponent(baseEdge.node0, api.type.ComponentType.BASE_NODE)
+        local baseNode1 = api.engine.getComponent(baseEdge.node1, api.type.ComponentType.BASE_NODE)
+        if baseNode0 == nil
+        or baseNode1 == nil
+        or baseNode0.position == nil
+        or baseNode1.position == nil
+        or type(baseNode0.position.z) ~= 'number'
+        or type(baseNode1.position.z) ~= 'number'
+        then
+            return nil
+        end
+
+        return (baseNode0.position.z + baseNode1.position.z) / 2
+    end,
+    getConTransf = function(conId)
+        if not(edgeUtils.isValidAndExistingId(conId)) then return nil end
+
+        local conTransf = api.engine.getComponent(conId, api.type.ComponentType.CONSTRUCTION).transf
+        return transfUtilUG.new(conTransf:cols(0), conTransf:cols(1), conTransf:cols(2), conTransf:cols(3))
+    end,
     getToggledAllTramTracksStreetTypeFileName = function(streetFileName)
+        logger.print('getToggledAllTramTracksStreetTypeFileName starting, streetFileName =') logger.debugPrint(streetFileName)
         if type(streetFileName) ~= 'string' or streetFileName == '' then return nil end
 
-        local allStreetsData = streetUtils.getGlobalStreetData(streetUtils.getStreetDataFilters().STOCK_AND_RESERVED_LANES)
-        -- print('allStreetsData has', #allStreetsData, 'records')
+        local allStreetsData = streetUtils.getGlobalStreetData({streetUtils.getStreetDataFilters().STOCK_AND_RESERVED_LANES})
+        logger.print('allStreetsData has', #allStreetsData, 'records')
         local oldStreetData = nil
         for _, value in pairs(allStreetsData) do
+            logger.print('checking', value.fileName or 'NIL')
             if stringUtils.stringEndsWith(streetFileName, value.fileName) then
                 oldStreetData = value
                 break
@@ -113,8 +175,7 @@ local _utils = {
         end
         if #sameSizeStreetsData == 0 then return nil end
 
-        -- print('sameSizeStreetsProperties =')
-        -- debugPrint(sameSizeStreetsProperties)
+        logger.print('sameSizeStreetsData =') logger.debugPrint(sameSizeStreetsData)
 
         local _getConcatCategories = function(arr)
             local result = ''
@@ -125,6 +186,7 @@ local _utils = {
         end
 
         local oldStreetCategoriesStr = _getConcatCategories(oldStreetData.categories)
+        logger.print('oldStreetCategoriesStr =') logger.debugPrint(oldStreetCategoriesStr)
         for i = 1, #sameSizeStreetsData do
             -- LOLLO TODO this estimator may be a little weak.
             -- we need a new property in streetUtils._getStreetTypesWithApi
@@ -215,11 +277,11 @@ local _utils = {
 }
 
 local _actions = {
-    bulldozeConstruction = function(constructionId)
-        -- print('constructionId =', constructionId)
-        if type(constructionId) ~= 'number' or constructionId < 0 then return end
+    bulldozeConstruction = function(conId)
+        -- print('conId =', conId)
+        if not(edgeUtils.isValidAndExistingId(conId)) then return end
 
-        local oldConstruction = api.engine.getComponent(constructionId, api.type.ComponentType.CONSTRUCTION)
+        local oldConstruction = api.engine.getComponent(conId, api.type.ComponentType.CONSTRUCTION)
         -- print('oldConstruction =')
         -- debugPrint(oldConstruction)
         if not(oldConstruction) or not(oldConstruction.params) then return end
@@ -227,9 +289,9 @@ local _actions = {
         local proposal = api.type.SimpleProposal.new()
         -- LOLLO NOTE there are asymmetries how different tables are handled.
         -- This one requires this system, UG says they will document it or amend it.
-        proposal.constructionsToRemove = { constructionId }
-        -- proposal.constructionsToRemove[1] = constructionId -- fails to add
-        -- proposal.constructionsToRemove:add(constructionId) -- fails to add
+        proposal.constructionsToRemove = { conId }
+        -- proposal.constructionsToRemove[1] = conId -- fails to add
+        -- proposal.constructionsToRemove:add(conId) -- fails to add
 
         api.cmd.sendCommand(
             api.cmd.make.buildProposal(proposal, nil, true), -- the 3rd param is "ignore errors"; wrong proposals will be discarded anyway
@@ -245,8 +307,7 @@ local _actions = {
 
     cleaveEdge = function(oldEdgeId)
         -- replaces an edge with many edges, one each lane
-        if not(edgeUtils.isValidAndExistingId(oldEdgeId))
-        or not(edgeUtils.isValidId(oldEdgeId)) then return end
+        if not(edgeUtils.isValidAndExistingId(oldEdgeId)) or edgeUtils.isEdgeFrozen(oldEdgeId) then return end
 
         local oldBaseEdge = api.engine.getComponent(oldEdgeId, api.type.ComponentType.BASE_EDGE)
         local oldBaseEdgeStreet = api.engine.getComponent(oldEdgeId, api.type.ComponentType.BASE_EDGE_STREET)
@@ -317,9 +378,9 @@ local _actions = {
                     or transfUtils.getParallelSidewaysWithRotZ(posTanX2, offset)
                 print('newPosTanX2 =') debugPrint(newPosTanX2)
                 if isSwap then
-                    print('distance = ') debugPrint(edgeUtils.getPositionsDistance(newPosTanX2[1][1], posTanX2[2][1]))
+                    print('distance = ') debugPrint(transfUtils.getPositionsDistance(newPosTanX2[1][1], posTanX2[2][1]))
                 else
-                    print('distance = ') debugPrint(edgeUtils.getPositionsDistance(newPosTanX2[1][1], posTanX2[1][1]))
+                    print('distance = ') debugPrint(transfUtils.getPositionsDistance(newPosTanX2[1][1], posTanX2[1][1]))
                 end
 
                 local getNode0Entity = function()
@@ -446,35 +507,28 @@ local _actions = {
     removeEdge = function(oldEdgeId)
         logger.print('removeEdge starting')
         -- removes an edge even if it has a street type, which has changed or disappeared
-        if not(edgeUtils.isValidAndExistingId(oldEdgeId))
-        then return end
+        if not(edgeUtils.isValidAndExistingId(oldEdgeId)) then return end
 
-        local conIdToBeRemoved = nil
+        local proposal = api.type.SimpleProposal.new()
+
         local conId = api.engine.system.streetConnectorSystem.getConstructionEntityForEdge(oldEdgeId)
         if edgeUtils.isValidAndExistingId(conId) then
             local conData = api.engine.getComponent(conId, api.type.ComponentType.CONSTRUCTION)
-            if conData and conData.frozenEdges then
-                -- if conData.fileName ~= 'lollo_street_chunks.con'
-                -- and conData.fileName ~= 'lollo_street_chunks_2.con' then
-                --     logger.warn('attempting to remove a frozen edge, remove its construction instead')
-                --     return
-                -- else
-                    conIdToBeRemoved = conId
-                    logger.print('conIdToBeRemoved =') logger.debugPrint(conIdToBeRemoved)
-                -- end
+            if conData ~= nil
+            -- and conData.frozenEdges ~= nil
+            then
+                proposal.constructionsToRemove = { conId }
+                logger.print('conIdToBeRemoved =') logger.debugPrint(conId)
             end
-        end
-
-        local proposal = api.type.SimpleProposal.new()
-        if conIdToBeRemoved then
-            proposal.constructionsToRemove = { conIdToBeRemoved }
-        else
+        elseif not(edgeUtils.isEdgeFrozen(oldEdgeId)) then
             local oldBaseEdge = api.engine.getComponent(oldEdgeId, api.type.ComponentType.BASE_EDGE)
             logger.print('oldEdge =') logger.debugPrint(oldBaseEdge)
             local oldEdgeStreet = api.engine.getComponent(oldEdgeId, api.type.ComponentType.BASE_EDGE_STREET)
             logger.print('oldEdgeStreet =') logger.debugPrint(oldEdgeStreet)
+            local oldEdgeTrack = api.engine.getComponent(oldEdgeId, api.type.ComponentType.BASE_EDGE_TRACK)
+            logger.print('oldEdgeTrack =') logger.debugPrint(oldEdgeTrack)
             -- save a crash when a modded road underwent a breaking change, so it has no oldEdgeStreet
-            if oldBaseEdge == nil or oldEdgeStreet == nil then return end
+            if oldBaseEdge == nil or (oldEdgeStreet == nil and oldEdgeTrack == nil) then return end
 
             local orphanNodeIds = {}
             local _map = api.engine.system.streetSystem.getNode2SegmentMap()
@@ -501,7 +555,7 @@ local _actions = {
             api.cmd.make.buildProposal(proposal, nil, true),
             function(res, success)
                 -- print('LOLLO res = ') -- debugPrint(res)
-                -- print('LOLLO _replaceEdgeWithStreetType success = ') -- debugPrint(success)
+                -- print('LOLLO removeEdge success = ') -- debugPrint(success)
                 if not(success) then
                     -- this fails if there are more than one contiguous invalid segments.
                     -- the message is
@@ -510,7 +564,7 @@ local _actions = {
                     -- that can be either gone missing, or have been changed.
                     -- Then we should replace them with their own new version (streetTypeId = oldEdgeStreet.streetType),
                     -- or remove them
-                    logger.warn('streetTuning.removeEdge failed, proposal = ') debugPrint(proposal)
+                    logger.warn('streetTuning.removeEdge failed, proposal = ') logger.warningDebugPrint(proposal)
                 end
             end
         )
@@ -612,7 +666,7 @@ local _actions = {
     replaceEdgeWithSame = function(oldEdgeId)
         -- only for testing
         -- replaces a street segment with an identical one, without destroying the buildings
-        if type(oldEdgeId) ~= 'number' or oldEdgeId < 0 then return end
+        if not(edgeUtils.isValidAndExistingId(oldEdgeId)) then return end
 
         local oldEdge = api.engine.getComponent(oldEdgeId, api.type.ComponentType.BASE_EDGE)
         local oldEdgeStreet = api.engine.getComponent(oldEdgeId, api.type.ComponentType.BASE_EDGE_STREET)
@@ -693,9 +747,9 @@ local _actions = {
     end,
 
     replaceEdgeWithStreetType = function(oldEdgeId, newStreetTypeId)
+        logger.print('replaceEdgeWithStreetType starting')
         -- replaces the street without destroying the buildings
-        if not(edgeUtils.isValidAndExistingId(oldEdgeId))
-        or not(edgeUtils.isValidId(newStreetTypeId)) then return end
+        if not(edgeUtils.isValidAndExistingId(oldEdgeId)) or edgeUtils.isEdgeFrozen(oldEdgeId) or not(edgeUtils.isValidId(newStreetTypeId)) then return end
 
         local oldEdge = api.engine.getComponent(oldEdgeId, api.type.ComponentType.BASE_EDGE)
         if oldEdge == nil then return end
@@ -715,13 +769,15 @@ local _actions = {
 
         -- add / remove tram tracks upgrade if the new street type explicitly wants so
         if streetUtils.isTramRightBarred(newStreetTypeId) then
+            logger.print('tram barred in right lane')
             newEdge.streetEdge.tramTrackType = 0
         elseif streetUtils.isStreetAllTramTracks((api.res.streetTypeRep.get(newStreetTypeId) or {}).laneConfigs) then
+            logger.print('the new street type is for trams in all lanes')
             newEdge.streetEdge.tramTrackType = 2
         end
 
         -- add bus lane and bar tram if the new street type wants so (paths)
-        if streetUtils.isPath(newStreetTypeId) then
+        if streetUtils.hasCategory(newStreetTypeId, 'paths') then
             newEdge.streetEdge.hasBus = true
             newEdge.streetEdge.tramTrackType = 0
         end
@@ -730,7 +786,10 @@ local _actions = {
         if newEdge.streetEdge.streetType == oldEdgeStreet.streetType
         and newEdge.streetEdge.tramTrackType == oldEdgeStreet.tramTrackType
         and newEdge.streetEdge.hasBus == oldEdgeStreet.hasBus
-        then return end
+        then
+            logger.print('nothing changed, leaving')
+            return
+        end
 
         local proposal = api.type.SimpleProposal.new()
         proposal.streetProposal.edgesToRemove[1] = oldEdgeId
@@ -755,14 +814,14 @@ local _actions = {
                 -- print('LOLLO res = ') -- debugPrint(res)
                 -- print('LOLLO _replaceEdgeWithStreetType success = ') -- debugPrint(success)
                 if not(success) then
-                    print('Warning: streetTuning.replaceEdgeWithStreetType failed, proposal = ') debugPrint(proposal)
+                    logger.warn('replaceEdgeWithStreetType failed, proposal = ') logger.warningDebugPrint(proposal)
                 end
             end
         )
     end,
 
     splitEdge = function(wholeEdgeId, nodeBetween)
-        if not(edgeUtils.isValidAndExistingId(wholeEdgeId)) or type(nodeBetween) ~= 'table' then return end
+        if not(edgeUtils.isValidAndExistingId(wholeEdgeId)) or edgeUtils.isEdgeFrozen(wholeEdgeId) or type(nodeBetween) ~= 'table' then return end
 
         local oldBaseEdge = api.engine.getComponent(wholeEdgeId, api.type.ComponentType.BASE_EDGE)
         local oldBaseEdgeStreet = api.engine.getComponent(wholeEdgeId, api.type.ComponentType.BASE_EDGE_STREET)
@@ -773,16 +832,25 @@ local _actions = {
         local node1 = api.engine.getComponent(oldBaseEdge.node1, api.type.ComponentType.BASE_NODE)
         if node0 == nil or node1 == nil then return end
 
-        if not(edgeUtils.isXYZSame(nodeBetween.refPosition0, node0.position)) and not(edgeUtils.isXYZSame(nodeBetween.refPosition0, node1.position)) then
-            print('WARNING: splitEdge cannot find the nodes')
+        if not(comparisonUtils.isXYZsSame(nodeBetween.refPosition0, node0.position)) and not(comparisonUtils.isXYZsSame(nodeBetween.refPosition0, node1.position)) then
+            logger.warn('splitEdge cannot find the nodes')
+            return
         end
-        local isNodeBetweenOrientatedLikeMyEdge = edgeUtils.isXYZSame(nodeBetween.refPosition0, node0.position)
-        local distance0 = isNodeBetweenOrientatedLikeMyEdge and nodeBetween.refDistance0 or nodeBetween.refDistance1
-        local distance1 = isNodeBetweenOrientatedLikeMyEdge and nodeBetween.refDistance1 or nodeBetween.refDistance0
-        local tanSign = isNodeBetweenOrientatedLikeMyEdge and 1 or -1
 
-        local oldTan0Length = edgeUtils.getVectorLength(oldBaseEdge.tangent0)
-        local oldTan1Length = edgeUtils.getVectorLength(oldBaseEdge.tangent1)
+        if comparisonUtils.isXYZsSame(nodeBetween.refPosition0, node0.position) then
+            logger.print('nodeBetween is orientated like my edge')
+        else
+            logger.print('nodeBetween is not orientated like my edge')
+            nodeBetween.refDistance0, nodeBetween.refDistance1 = nodeBetween.refDistance1, nodeBetween.refDistance0
+            nodeBetween.refPosition0, nodeBetween.refPosition1 = nodeBetween.refPosition1, nodeBetween.refPosition0
+            nodeBetween.refTangent0, nodeBetween.refTangent1 = nodeBetween.refTangent1, nodeBetween.refTangent0
+            nodeBetween.tangent = transfUtils.getVectorMultiplied(nodeBetween.tangent, -1)
+        end
+        local distance0 = nodeBetween.refDistance0
+        local distance1 = nodeBetween.refDistance1
+
+        local oldTan0Length = transfUtils.getVectorLength(oldBaseEdge.tangent0)
+        local oldTan1Length = transfUtils.getVectorLength(oldBaseEdge.tangent1)
 
         local playerOwned = api.type.PlayerOwned.new()
         playerOwned.player = api.engine.util.getPlayer()
@@ -802,9 +870,9 @@ local _actions = {
             oldBaseEdge.tangent0.z * distance0 / oldTan0Length
         )
         newEdge0.comp.tangent1 = api.type.Vec3f.new(
-            nodeBetween.tangent.x * distance0 * tanSign,
-            nodeBetween.tangent.y * distance0 * tanSign,
-            nodeBetween.tangent.z * distance0 * tanSign
+            nodeBetween.tangent.x * distance0,
+            nodeBetween.tangent.y * distance0,
+            nodeBetween.tangent.z * distance0
         )
         newEdge0.comp.type = oldBaseEdge.type -- respect bridge or tunnel
         newEdge0.comp.typeIndex = oldBaseEdge.typeIndex -- respect bridge or tunnel type
@@ -817,9 +885,9 @@ local _actions = {
         newEdge1.comp.node0 = -3
         newEdge1.comp.node1 = oldBaseEdge.node1
         newEdge1.comp.tangent0 = api.type.Vec3f.new(
-            nodeBetween.tangent.x * distance1 * tanSign,
-            nodeBetween.tangent.y * distance1 * tanSign,
-            nodeBetween.tangent.z * distance1 * tanSign
+            nodeBetween.tangent.x * distance1,
+            nodeBetween.tangent.y * distance1,
+            nodeBetween.tangent.z * distance1
         )
         newEdge1.comp.tangent1 = api.type.Vec3f.new(
             oldBaseEdge.tangent1.x * distance1 / oldTan1Length,
@@ -889,7 +957,7 @@ local _actions = {
                 -- debugPrint(result)
                 -- print('LOLLO street splitter callback returned success = ', success)
                 if not(success) then
-                    print('Warning: streetTuning.splitEdge failed, proposal = ') debugPrint(proposal)
+                    print('Warning: streetTuning.splitEdge failed, result = ') debugPrint(result)
                 end
             end
         )
@@ -901,21 +969,25 @@ function data()
         guiInit = function()
             -- make param window resizable coz our parameters are massive
 			for _, id in pairs({
-				"menu.construction.road.settingsWindow",
-				-- "menu.construction.rail.settingsWindow",
-				-- "menu.construction.water.settingsWindow",
-				-- "menu.construction.air.settingsWindow",
-				-- "menu.construction.terrain.settingsWindow",
-				-- "menu.construction.town.settingsWindow",
-				-- "menu.construction.industry.settingsWindow",
-				-- "menu.modules.settingsWindow",
+				'menu.construction.road.settingsWindow',
+				-- 'menu.construction.rail.settingsWindow',
+				-- 'menu.construction.water.settingsWindow',
+				-- 'menu.construction.air.settingsWindow',
+				-- 'menu.construction.terrain.settingsWindow',
+				-- 'menu.construction.town.settingsWindow',
+				-- 'menu.construction.industry.settingsWindow',
+				'menu.modules.settingsWindow',
 			}) do
 				local iLayoutItem = api.gui.util.getById(id)
-				if iLayoutItem then
+				if iLayoutItem ~= nil then
 					iLayoutItem:setResizable(true)
-					iLayoutItem:setIcon("ui/hammer19.tga")
+                    iLayoutItem:setMaximumSize(api.gui.util.Size.new(800,1200))
+					iLayoutItem:setIcon('ui/hammer19.tga')
 				end
 			end
+            -- read variables
+            _guiWaypoints.streetEdgeRemover.modelId = api.res.modelRep.find(_guiWaypoints.streetEdgeRemover.fileName)
+            _guiWaypoints.trackEdgeRemover.modelId = api.res.modelRep.find(_guiWaypoints.trackEdgeRemover.fileName)
 		end,
         handleEvent = function(src, id, name, args)
             if (id ~= _eventId) then return end
@@ -924,123 +996,177 @@ function data()
             xpcall(
                 function()
                     logger.print('handleEvent firing, src =', src, 'id =', id, 'name =', name, 'args =') logger.debugPrint(args)
-
-                    if edgeUtils.isValidAndExistingId(args.constructionEntityId) then
-                        if name == _eventProperties.lollo_street_chunks.eventName
-                        or name == _eventProperties.lollo_street_hairpin.eventName
-                        or name == _eventProperties.lollo_street_merge.eventName
-                        then
-                            -- LOLLO NOTE as of build 35050 (or the one before),
-                            -- transforming unsnapping edge nodes into snapping ones might break the connection
-                            -- and game.interface.upgradeConstruction often fails to restore it.
-                            -- This breaks wysiwyg, so we don't do it anymore.
-                            -- _actions.replaceConWithSnappyCopy(args.constructionEntityId)
-                            -- return here or it will be bulldozed, all following cons get bulldozed
-                        else
-                            local constructionTransf = api.engine.getComponent(args.constructionEntityId, api.type.ComponentType.CONSTRUCTION).transf
-                            constructionTransf = transfUtilUG.new(constructionTransf:cols(0), constructionTransf:cols(1), constructionTransf:cols(2), constructionTransf:cols(3))
-                            -- print('type(constructionTransf) =', type(constructionTransf))
-                            -- debugPrint(constructionTransf)
-                            if name == _eventProperties.lollo_street_splitter.eventName then
-                            -- do nothing
-                            elseif name == _eventProperties.lollo_street_cleaver.eventName then
-                                local nearestEdgeId = edgeUtils.street.getNearestEdgeId(constructionTransf)
-                                -- print('street cleaver got nearestEdge =', nearestEdgeId or 'NIL')
-                                if edgeUtils.isValidAndExistingId(nearestEdgeId) and not(edgeUtils.isEdgeFrozen(nearestEdgeId)) then
-                                    _actions.cleaveEdge(nearestEdgeId)
-                                end
-                            elseif name == _eventProperties.lollo_street_remover.eventName then
-                                local nearestEdgeId = edgeUtils.street.getNearestEdgeId(constructionTransf)
-                                if edgeUtils.isValidAndExistingId(nearestEdgeId) then
-                                    _actions.removeEdge(
-                                        nearestEdgeId
-                                    )
-                                end
-                            elseif name == _eventProperties.lollo_street_splitter_w_api.eventName then
-                                local nearestEdgeId = edgeUtils.street.getNearestEdgeId(constructionTransf)
-                                -- print('street splitter got nearestEdge =', nearestEdgeId or 'NIL')
-                                if edgeUtils.isValidAndExistingId(nearestEdgeId) and not(edgeUtils.isEdgeFrozen(nearestEdgeId)) then
+--[[
+                    if name == _eventProperties.lollo_street_chunks.eventName
+                    or name == _eventProperties.lollo_street_hairpin.eventName
+                    or name == _eventProperties.lollo_street_merge.eventName
+                    then
+                        -- if edgeUtils.isValidAndExistingId(args.conId) then
+                        -- LOLLO NOTE as of build 35050 (or the one before),
+                        -- transforming unsnapping edge nodes into snapping ones might break the connection
+                        -- and game.interface.upgradeConstruction often fails to restore it.
+                        -- This breaks wysiwyg, so we don't do it anymore.
+                        -- _actions.replaceConWithSnappyCopy(args.conId)
+                        -- return here or it will be bulldozed, all following cons get bulldozed
+                        -- end
+                    elseif name == _eventProperties.lollo_street_splitter.eventName then
+]]
+                    if name == _eventProperties.lollo_street_splitter.eventName then
+                        -- do nothing
+                        _actions.bulldozeConstruction(args.conId)
+                    elseif name == _eventProperties.lollo_street_cleaver.eventName then
+                        local conTransf = _utils.getConTransf(args.conId)
+                        if conTransf ~= nil then
+                            local nearestEdgeId = edgeUtils.street.getNearestEdgeId(conTransf, conTransf[15])
+                            _actions.cleaveEdge(nearestEdgeId)
+                        end
+                        _actions.bulldozeConstruction(args.conId)
+                    elseif name == _eventProperties.lollo_street_remover.eventName then
+                        local conTransf = _utils.getConTransf(args.conId)
+                        if conTransf ~= nil then
+                            local nearestEdgeId = edgeUtils.street.getNearestEdgeId(conTransf, conTransf[15])
+                            _actions.removeEdge(nearestEdgeId)
+                        end
+                        _actions.bulldozeConstruction(args.conId)
+                    elseif name == _eventProperties.lollo_street_remover_waypoint.eventName then
+                        _actions.removeEdge(args.edgeId)
+                    elseif name == _eventProperties.lollo_street_splitter_w_api.eventName then
+                        local conTransf = _utils.getConTransf(args.conId)
+                        if conTransf ~= nil then
+                            local nearestEdgeId = edgeUtils.street.getNearestEdgeId(
+                                conTransf,
+                                conTransf[15] + constants.splitterZShift - constants.splitterZToleranceM,
+                                conTransf[15] + constants.splitterZShift + constants.splitterZToleranceM
+                            )
+                            logger.print('street splitter got nearestEdge =', nearestEdgeId or 'NIL')
+                            if edgeUtils.isValidAndExistingId(nearestEdgeId) and not(edgeUtils.isEdgeFrozen(nearestEdgeId)) then
+                                local averageZ = _utils.getAverageZ(nearestEdgeId)
+                                logger.print('averageZ =', averageZ or 'NIL')
+                                if type(averageZ) == 'number' then
                                     local nodeBetween = edgeUtils.getNodeBetweenByPosition(
                                         nearestEdgeId,
                                         -- LOLLO NOTE position and transf are always very similar
                                         {
-                                            x = constructionTransf[13],
-                                            y = constructionTransf[14],
-                                            z = constructionTransf[15],
-                                        }
+                                            x = conTransf[13],
+                                            y = conTransf[14],
+                                            z = averageZ,
+                                        },
+                                        true
                                     )
-                                    -- print('nodeBetween =') debugPrint(nodeBetween)
+                                    logger.print('nodeBetween =') logger.debugPrint(nodeBetween)
                                     _actions.splitEdge(nearestEdgeId, nodeBetween)
                                 end
-                            elseif name == _eventProperties.lollo_street_changer.eventName then
-                                local nearestEdgeId = edgeUtils.street.getNearestEdgeId(
-                                    constructionTransf
-                                )
-                                -- print('nearestEdge =', nearestEdgeId or 'NIL')
-                                if type(nearestEdgeId) == 'number' and nearestEdgeId >= 0 then
-                                    -- print('LOLLO nearestEdgeId = ', nearestEdgeId or 'NIL')
-                                    _actions.replaceEdgeWithSame(nearestEdgeId)
-                                end
-                            elseif name == _eventProperties.lollo_toggle_all_tram_tracks.eventName then
-                                local nearestEdgeId = edgeUtils.street.getNearestEdgeId(
-                                    constructionTransf
-                                )
-                                -- print('nearestEdgeId =', nearestEdgeId or 'NIL')
-                                if edgeUtils.isValidAndExistingId(nearestEdgeId) then
-                                    local oldEdgeStreet = api.engine.getComponent(nearestEdgeId, api.type.ComponentType.BASE_EDGE_STREET)
-                                    if oldEdgeStreet and oldEdgeStreet.streetType then
-                                        local newStreetTypeFileName = _utils.getToggledAllTramTracksStreetTypeFileName(
-                                            api.res.streetTypeRep.getFileName(oldEdgeStreet.streetType)
-                                        )
-                                        -- print('newStreetTypeFileName =', newStreetTypeFileName or 'NIL')
-                                        if type(newStreetTypeFileName) == 'string' then
-                                            _actions.replaceEdgeWithStreetType(
-                                                nearestEdgeId,
-                                                api.res.streetTypeRep.find(newStreetTypeFileName)
-                                            )
-                                        end
-                                    end
-                                end
-                            elseif name == _eventProperties.lollo_street_get_info.eventName then
-                                local nearbyEdges = edgeUtils.getNearbyObjects(constructionTransf, 0.5, api.type.ComponentType.BASE_EDGE)
-                                local nearbyConstructions = edgeUtils.getNearbyObjects(constructionTransf, 0.5, api.type.ComponentType.CONSTRUCTION)
-                                print('nearby edges = <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<')
-                                for edgeId, props in pairs(nearbyEdges) do
-                                    if edgeUtils.isValidId(edgeId) then
-                                        print('edge id =', edgeId)
-                                        debugPrint(props)
-                                        print('street edge props =')
-                                        debugPrint(api.engine.getComponent(edgeId, api.type.ComponentType.BASE_EDGE_STREET))
-                                        print('track edge props =')
-                                        debugPrint(api.engine.getComponent(edgeId, api.type.ComponentType.BASE_EDGE_TRACK))
-                                    end
-                                end
-                                print('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>')
-                                -- The following can freeze the game when pointed at a freestyle station
-                                -- print('nearby constructions = <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<')
-                                -- for conId, props in pairs(nearbyConstructions) do
-                                --     if edgeUtils.isValidId(conId) then
-                                --         print('construction id =', conId)
-                                --         debugPrint(props)
-                                --     end
-                                -- end
-                                -- print('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>')
+                                -- this is a little more accurate, but it's also harder to use with tunnels and bridges.
+                                -- a user error can throw it out of whack more than the averageZ does.
+                                -- local nodeBetween = edgeUtils.getNodeBetweenByPosition(
+                                --     nearestEdgeId,
+                                --     -- LOLLO NOTE position and transf are always very similar
+                                --     {
+                                --         x = conTransf[13],
+                                --         y = conTransf[14],
+                                --         z = conTransf[15] + constants.splitterZShift,
+                                --     },
+                                --     true,
+                                --     logger.isExtendedLog()
+                                -- )
+                                -- logger.print('nodeBetween =') logger.debugPrint(nodeBetween)
+                                -- _actions.splitEdge(nearestEdgeId, nodeBetween)
                             end
+                        end
+                        _actions.bulldozeConstruction(args.conId)
+                    elseif name == _eventProperties.lollo_street_changer.eventName then
+                        local conTransf = _utils.getConTransf(args.conId)
+                        if conTransf ~= nil then
+                            local nearestEdgeId = edgeUtils.street.getNearestEdgeId(conTransf, conTransf[15])
+                            _actions.replaceEdgeWithSame(nearestEdgeId)
+                        end
+                        _actions.bulldozeConstruction(args.conId)
+                    elseif name == _eventProperties.lollo_toggle_all_tram_tracks.eventName then
+                        local conTransf = _utils.getConTransf(args.conId)
+                        if conTransf ~= nil then
+                            local nearestEdgeId = edgeUtils.street.getNearestEdgeId(conTransf, conTransf[15])
+                            logger.print('toggle all tram tracks got nearestEdgeId =', nearestEdgeId or 'NIL')
+                            if edgeUtils.isValidAndExistingId(nearestEdgeId) and not(edgeUtils.isEdgeFrozen(nearestEdgeId)) then
+                                local oldEdgeStreet = api.engine.getComponent(nearestEdgeId, api.type.ComponentType.BASE_EDGE_STREET)
+                                if oldEdgeStreet ~= nil and oldEdgeStreet.streetType ~= nil then
+                                    local newStreetTypeFileName = _utils.getToggledAllTramTracksStreetTypeFileName(
+                                        api.res.streetTypeRep.getFileName(oldEdgeStreet.streetType)
+                                    )
+                                    -- logger.print('newStreetTypeFileName =', newStreetTypeFileName or 'NIL')
+                                    if type(newStreetTypeFileName) == 'string' then
+                                        _actions.replaceEdgeWithStreetType(
+                                            nearestEdgeId,
+                                            api.res.streetTypeRep.find(newStreetTypeFileName)
+                                        )
+                                    end
+                                end
+                            end
+                        end
+                        _actions.bulldozeConstruction(args.conId)
+                    elseif name == _eventProperties.lollo_street_get_info.eventName then
+                        local conTransf = _utils.getConTransf(args.conId)
+                        if conTransf ~= nil then
+                            local nearbyEdges = edgeUtils.getNearbyObjects(conTransf, 0.5, api.type.ComponentType.BASE_EDGE)
+                            -- local nearbyConstructions = edgeUtils.getNearbyObjects(conTransf, 0.5, api.type.ComponentType.CONSTRUCTION)
+                            print('nearby edges = <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<')
+                            for edgeId, props in pairs(nearbyEdges) do
+                                if edgeUtils.isValidId(edgeId) then
+                                    print('<<<<<<<< edge id =', edgeId)
+                                    debugPrint(props)
 
-                            _actions.bulldozeConstruction(args.constructionEntityId)
+                                    print('node0 props =')
+                                    if edgeUtils.isValidId(props.node0) then
+                                        debugPrint(api.engine.getComponent(props.node0, api.type.ComponentType.BASE_NODE))
+                                    end
+                                    print('node1 props =')
+                                    if edgeUtils.isValidId(props.node1) then
+                                        debugPrint(api.engine.getComponent(props.node1, api.type.ComponentType.BASE_NODE))
+                                    end
+
+                                    print('lengths =')
+                                    debugPrint(edgeUtils.getEdgeLength(edgeId, true))
+
+                                    print('street edge props =')
+                                    local streetEdgeProps = api.engine.getComponent(edgeId, api.type.ComponentType.BASE_EDGE_STREET)
+                                    debugPrint(streetEdgeProps)
+
+                                    if streetEdgeProps ~= nil and type(streetEdgeProps.streetType) == 'number' and streetEdgeProps.streetType > -1 then
+                                        print('streetTypeFileName =')
+                                        debugPrint(api.res.streetTypeRep.getFileName(streetEdgeProps.streetType))
+                                    end
+                                    print('track edge props =')
+                                    local trackEdgeProps = api.engine.getComponent(edgeId, api.type.ComponentType.BASE_EDGE_TRACK)
+                                    debugPrint(trackEdgeProps)
+                                    if trackEdgeProps ~= nil and type(trackEdgeProps.trackType) == 'number' and trackEdgeProps.trackType > -1 then
+                                        print('trackTypeFileName =')
+                                        debugPrint(api.res.trackTypeRep.getFileName(trackEdgeProps.trackType))
+                                    end
+                                    print('>>>>>>>>')
+                                end
+                            end
+                            --[[
+                                -- put the following in the console:
+                                fileName = 'construction_name.con'
+                                position = {0, 0, 0}
+                                searchRadius = 99999
+                                cons = game.interface.getEntities({pos = position, radius = searchRadius}, {type = 'CONSTRUCTION', includeData = false, fileName = fileName})
+                            ]]
+                            print('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>')
+                            -- The following can freeze the game when pointed at a freestyle station
+                            -- print('nearby constructions = <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<')
+                            -- for conId, props in pairs(nearbyConstructions) do
+                            --     if edgeUtils.isValidId(conId) then
+                            --         print('construction id =', conId)
+                            --         debugPrint(props)
+                            --     end
+                            -- end
+                            -- print('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>')
                         end
-                    elseif edgeUtils.isValidAndExistingId(args.edgeId) and edgeUtils.isValidId(args.streetTypeId) then
-                        if name == _eventProperties.noTramRightRoadBuilt.eventName then
-                            _actions.replaceEdgeWithStreetType(
-                                args.edgeId,
-                                args.streetTypeId
-                            )
-                        elseif name == _eventProperties.pathBuilt.eventName then
-                            _actions.replaceEdgeWithStreetType(
-                                args.edgeId,
-                                args.streetTypeId
-                            )
-                        end
+                        _actions.bulldozeConstruction(args.conId)
+                    elseif name == _eventProperties.noTramRightRoadBuilt.eventName then
+                        _actions.replaceEdgeWithStreetType(args.edgeId, args.streetTypeId)
+                    elseif name == _eventProperties.pathBuilt.eventName then
+                        _actions.replaceEdgeWithStreetType(args.edgeId, args.streetTypeId)
                     end
                 end,
                 logger.xpErrorHandler
@@ -1049,48 +1175,37 @@ function data()
         guiHandleEvent = function(id, name, args)
             -- LOLLO NOTE args can have different types, even boolean, depending on the event id and name
             if id == 'constructionBuilder' and name == 'builder.apply' then
-                -- if name == "builder.proposalCreate" then return end
+                -- if name == 'builder.proposalCreate' then return end
                 logger.print('guiHandleEvent caught id = constructionBuilder and name = builder.apply')
                 xpcall(
                     function()
-                        if not args.result or not args.result[1] then return end
-                        if args.data.errorState and args.data.errorState.critical then logger.warn('cannot rebuild snappy copy') return end
-
-                        local _sendCommand = function(eventName)
-                            api.cmd.sendCommand(api.cmd.make.sendScriptEvent(
-                                string.sub(debug.getinfo(1, 'S').source, 1),
-                                _eventId,
-                                eventName,
-                                {
-                                    constructionEntityId = args.result[1]
-                                }
-                            ))
-                        end
+                        if not args or not args.result or not args.result[1] then return end
+                        if args.data.errorState and args.data.errorState.critical then logger.warn('cannot build or rebuild because of a critical error') return end
 
                         if _isBuildingStreetCleaver(args) then
-                            _sendCommand(_eventProperties.lollo_street_cleaver.eventName)
+                            _guiUtils.sendCommandWithConId(_eventProperties.lollo_street_cleaver.eventName, args)
                         elseif _isBuildingStreetSplitter(args) then
-                            _sendCommand(_eventProperties.lollo_street_splitter.eventName)
+                            _guiUtils.sendCommandWithConId(_eventProperties.lollo_street_splitter.eventName, args)
                         elseif _isBuildingStreetSplitterWithApi(args) then
-                            _sendCommand(_eventProperties.lollo_street_splitter_w_api.eventName)
+                            _guiUtils.sendCommandWithConId(_eventProperties.lollo_street_splitter_w_api.eventName, args)
                         elseif _isBuildingStreetGetInfo(args) then
-                            _sendCommand(_eventProperties.lollo_street_get_info.eventName)
+                            _guiUtils.sendCommandWithConId(_eventProperties.lollo_street_get_info.eventName, args)
                         elseif _isBuildingStreetChanger(args) then
-                            _sendCommand(_eventProperties.lollo_street_changer.eventName)
+                            _guiUtils.sendCommandWithConId(_eventProperties.lollo_street_changer.eventName, args)
                         -- we don't do this anymore, see the NOTE above
                         -- elseif _isBuildingStreetChunks(args) then
                         --     logger.print('chunks built')
-                        --     _sendCommand(_eventProperties.lollo_street_chunks.eventName)
+                        --     _guiUtils.sendCommand(_eventProperties.lollo_street_chunks.eventName, args)
                         -- elseif _isBuildingStreetHairpin(args) then
                         --     logger.print('hairpin built')
-                        --     _sendCommand(_eventProperties.lollo_street_hairpin.eventName)
+                        --     _guiUtils.sendCommand(_eventProperties.lollo_street_hairpin.eventName, args)
                         -- elseif _isBuildingStreetMerge(args) then
                         --     logger.print('merge built')
-                        --     _sendCommand(_eventProperties.lollo_street_merge.eventName)
+                        --     _guiUtils.sendCommand(_eventProperties.lollo_street_merge.eventName, args)
                         elseif _isBuildingStreetRemover(args) then
-                            _sendCommand(_eventProperties.lollo_street_remover.eventName)
+                            _guiUtils.sendCommandWithConId(_eventProperties.lollo_street_remover.eventName, args)
                         elseif _isBuildingToggleAllTracks(args) then
-                            _sendCommand(_eventProperties.lollo_toggle_all_tram_tracks.eventName)
+                            _guiUtils.sendCommandWithConId(_eventProperties.lollo_toggle_all_tram_tracks.eventName, args)
                         end
                     end,
                     logger.xpErrorHandler
@@ -1105,7 +1220,7 @@ function data()
                 -- I need to downgrade it to "no tram tracks",
                 -- otherwise trams will still try to ride in the rightmost lane.
                 -- It can be done by hand but this is handier.
-                -- print('guiHandleEvent caught id = streetBuilder and name = builder.apply')
+                -- logger.print('guiHandleEvent caught id =', id, 'and name = builder.apply')
                 -- local function _getRemovedSegment(removedSegments, addedSegment)
                 --     if not(removedSegments) or not(addedSegment) or not(addedSegment.comp) then return nil end
 
@@ -1134,63 +1249,103 @@ function data()
                 -- end
                 xpcall(
                     function()
+                        -- logger.print('guiHandleEvent caught id =', id, 'name =', name, 'args =') logger.debugPrint(args)
                         if not(args) or not(args.proposal) or not(args.proposal.proposal)
-                        or not(args.proposal.proposal.addedSegments) or not(args.proposal.proposal.addedSegments[1])
+                        or not(args.proposal.proposal.addedSegments)
                         or not(args.data) or not(args.data.entity2tn) then return end
 
-                        local addedSegments = args.proposal.proposal.addedSegments
+                        if (not(args.data.errorState) or not(args.data.errorState.critical))
+                        then
+                            local addedSegments = args.proposal.proposal.addedSegments
 
-                        -- remove right lane tram tracks if forbidden for current road
-                        local removeTramTrackEventParams = {}
-                        for _, addedSegment in pairs(addedSegments) do
-                            if addedSegment and addedSegment.streetEdge
-                            and addedSegment.streetEdge.tramTrackType ~= 0
-                            and addedSegment.streetEdge.streetType ~= nil then
-                                if streetUtils.isTramRightBarred(addedSegment.streetEdge.streetType) then
-                                    removeTramTrackEventParams[#removeTramTrackEventParams+1] = {
-                                        edgeId = addedSegment.entity,
-                                        streetTypeId = addedSegment.streetEdge.streetType
-                                    }
+                            -- remove right lane tram tracks if forbidden for current road
+                            local removeTramTrackEventParams = {}
+                            for _, addedSegment in pairs(addedSegments) do
+                                if addedSegment
+                                and addedSegment.streetEdge
+                                and addedSegment.streetEdge.streetType ~= nil
+                                and addedSegment.streetEdge.tramTrackType ~= 0
+                                and edgeUtils.isValidAndExistingId(addedSegment.entity)
+                                then
+                                    if streetUtils.isTramRightBarred(addedSegment.streetEdge.streetType) then
+                                        local conId = api.engine.system.streetConnectorSystem.getConstructionEntityForEdge(addedSegment.entity)
+                                        if not(edgeUtils.isValidId(conId)) then -- do not touch frozen segments
+                                            removeTramTrackEventParams[#removeTramTrackEventParams+1] = {
+                                                edgeId = addedSegment.entity,
+                                                streetTypeId = addedSegment.streetEdge.streetType
+                                            }
+                                        end
+                                    end
                                 end
                             end
-                        end
-                        for i = 1, #removeTramTrackEventParams do
-                            api.cmd.sendCommand(api.cmd.make.sendScriptEvent(
-                                string.sub(debug.getinfo(1, 'S').source, 1),
-                                _eventId,
-                                _eventProperties.noTramRightRoadBuilt.eventName,
-                                removeTramTrackEventParams[i]
-                            ))
-                        end
+                            for i = 1, #removeTramTrackEventParams do
+                                api.cmd.sendCommand(api.cmd.make.sendScriptEvent(
+                                    string.sub(debug.getinfo(1, 'S').source, 1),
+                                    _eventId,
+                                    _eventProperties.noTramRightRoadBuilt.eventName,
+                                    removeTramTrackEventParams[i]
+                                ))
+                            end
 
-                        -- add bus lane right if required for current road
---[[
-                        LOLLO NOTE
-                        this causes crashes with build 35050 and the paths that turn into bridges from the freestyle station.
-                        local pathBuiltEventParams = {}
-                        for _, addedSegment in pairs(addedSegments) do
-                            if addedSegment and addedSegment.streetEdge
-                            and not(addedSegment.streetEdge.hasBus)
-                            and addedSegment.streetEdge.streetType ~= nil then
-                                if streetUtils.isPath(addedSegment.streetEdge.streetType) then
-                                    pathBuiltEventParams[#pathBuiltEventParams+1] = {
-                                        edgeId = addedSegment.entity,
-                                        streetTypeId = addedSegment.streetEdge.streetType
-                                    }
+                            -- add bus lane right if required for current road
+                            -- LOLLO NOTE
+                            -- this used to cause crashes with build 35050 and the paths that turn into bridges from the freestyle station.
+                            local pathBuiltEventParams = {}
+                            for _, addedSegment in pairs(addedSegments) do
+                                if addedSegment
+                                and addedSegment.streetEdge
+                                and addedSegment.streetEdge.streetType ~= nil
+                                and (not(addedSegment.streetEdge.hasBus) or addedSegment.tramTrackType ~= 0)
+                                and edgeUtils.isValidAndExistingId(addedSegment.entity)
+                                then
+                                    if streetUtils.hasCategory(addedSegment.streetEdge.streetType, 'paths') then
+                                        -- print('addedSegment =') debugPrint(addedSegment)
+                                        local conId = api.engine.system.streetConnectorSystem.getConstructionEntityForEdge(addedSegment.entity)
+                                        if not(edgeUtils.isValidId(conId)) then -- do not touch frozen segments
+                                            pathBuiltEventParams[#pathBuiltEventParams+1] = {
+                                                edgeId = addedSegment.entity,
+                                                streetTypeId = addedSegment.streetEdge.streetType
+                                            }
+                                        end
+                                    end
                                 end
                             end
+                            for i = 1, #pathBuiltEventParams do
+                                api.cmd.sendCommand(api.cmd.make.sendScriptEvent(
+                                    string.sub(debug.getinfo(1, 'S').source, 1),
+                                    _eventId,
+                                    _eventProperties.pathBuilt.eventName,
+                                    pathBuiltEventParams[i]
+                                ))
+                            end
                         end
-                        for i = 1, #pathBuiltEventParams do
-                            api.cmd.sendCommand(api.cmd.make.sendScriptEvent(
-                                string.sub(debug.getinfo(1, 'S').source, 1),
-                                _eventId,
-                                _eventProperties.pathBuilt.eventName,
-                                pathBuiltEventParams[i]
-                            ))
-                        end
-]]
 
                         -- we don't change any more stuff, the rest is ok as it is
+                    end,
+                    logger.xpErrorHandler
+                )
+            elseif (name == 'builder.apply' and id == 'streetTerminalBuilder') then
+                xpcall(
+                    function()
+                        -- logger.print('guiHandleEvent caught id =', id, 'name =', name, 'args =')
+                        -- waypoint, traffic light, my own waypoints built
+                        if args and args.proposal and args.proposal.proposal
+                        and args.proposal.proposal.edgeObjectsToAdd
+                        and args.proposal.proposal.edgeObjectsToAdd[1]
+                        and args.proposal.proposal.edgeObjectsToAdd[1].modelInstance
+                        then
+                            -- LOLLO NOTE as I added an edge object, I have NOT split the edge
+                            local modelId = args.proposal.proposal.edgeObjectsToAdd[1].modelInstance.modelId
+                            if modelId == _guiWaypoints.streetEdgeRemover.modelId or modelId == _guiWaypoints.trackEdgeRemover.modelId then
+                                logger.print('args.proposal.proposal.edgeObjectsToAdd[1] =') logger.debugPrint(args.proposal.proposal.edgeObjectsToAdd[1])
+                                _guiUtils.sendCommandWithArgs(
+                                    _eventProperties.lollo_street_remover_waypoint.eventName,
+                                    {
+                                        edgeId = args.proposal.proposal.edgeObjectsToAdd[1].segmentEntity,
+                                    }
+                                )
+                            end
+                        end
                     end,
                     logger.xpErrorHandler
                 )

@@ -115,6 +115,14 @@
             --     size = {8.0, 0.41602}
             -- }
         },
+        catenary = {
+            pole = { name = "lollo_assets/empty.mdl" },
+            poleCrossbar = { name = "lollo_assets/empty.mdl" },
+            poleDoubleCrossbar = { name = "lollo_assets/empty.mdl" },
+            isolatorStraight = "lollo_assets/empty.mdl";
+            isolatorCurve =  "lollo_assets/empty.mdl";
+            junction = "asset/cable_junction.mdl";
+        },
         assets = {
             -- {
             --     name = 'street/street_light_eu_c.mdl',
