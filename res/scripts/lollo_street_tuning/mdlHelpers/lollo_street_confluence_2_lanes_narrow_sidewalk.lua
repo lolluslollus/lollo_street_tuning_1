@@ -110,69 +110,144 @@ end
 
 results.getTransportNetworkProvider = function(isOneWay, isSidewalkRaised)
     local sidewalkHeight = isSidewalkRaised and 0.3 or 0.0
+    local pedestrianLanes = laneutil.createLanes(
+        {
+            curves = {
+                ['shorter_right_lane'] = {
+                    {{2.00000, -6.00000, sidewalkHeight}, {-2.00000, -3.60000, sidewalkHeight}}
+                },
+                ['shorter_left_lane'] = {
+                    {{2.00000, 6.00000, sidewalkHeight}, {-2.00000, 3.60000, sidewalkHeight}}
+                }
+            }
+        },
+        {'PERSON'},
+        20,
+        3,
+        true --linkable
+    )
     return {
-        laneLists = {
+        -- laneLists = {
             -- vehicles
-            isOneWay and laneutil.createLanes(
-                {
-                    curves = {
-                        ['right_lane_one'] = {
-                            {{-2, -2, 0}, {-1.8, -2, 0}}
-                        },
-                        ['right_lane_two'] = {
-                            {{1.8, -2, 0}, {2, -2, 0}}
-                        },
-                        ['left_lane_one'] = {
-                            {{-2, 2, 0}, {-1.8, 2, 0}}
-                        },
-                        ['left_lane_two'] = {
-                            {{1.8, 2, 0}, {2, 2, 0}}
-                        }
-                    }
+            -- isOneWay and laneutil.createLanes(
+            --     {
+            --         curves = {
+            --             ['right_lane_one'] = {
+            --                 {{-2, -2, 0}, {-1.8, -2, 0}}
+            --             },
+            --             ['right_lane_two'] = {
+            --                 {{1.8, -2, 0}, {2, -2, 0}}
+            --             },
+            --             ['left_lane_one'] = {
+            --                 {{-2, 2, 0}, {-1.8, 2, 0}}
+            --             },
+            --             ['left_lane_two'] = {
+            --                 {{1.8, 2, 0}, {2, 2, 0}}
+            --             }
+            --         }
+            --     },
+            --     {'BUS', 'CAR', 'ELECTRIC_TRAM', 'TRAM', 'TRUCK'},
+            --     constants.veryHighSpeed,
+            --     3,
+            --     false --linkable
+            -- ) or laneutil.createLanes(
+            --     {
+            --         curves = {
+            --             ['right_lane_one'] = {
+            --                 {{-2, -2, 0}, {-1.8, -2, 0}}
+            --             },
+            --             ['right_lane_two'] = {
+            --                 {{1.8, -2, 0}, {2, -2, 0}}
+            --             },
+            --             ['left_lane_one'] = {
+            --                 {{-1.8, 2, 0}, {-2, 2, 0}}
+            --             },
+            --             ['left_lane_two'] = {
+            --                 {{2, 2, 0}, {1.8, 2, 0}}
+            --             }
+            --         }
+            --     },
+            --     {'BUS', 'CAR', 'ELECTRIC_TRAM', 'TRAM', 'TRUCK'},
+            --     constants.veryHighSpeed,
+            --     3,
+            --     false --linkable
+            -- ),
+        laneLists = isOneWay and {
+            {
+                linkable = false,
+                nodes = {
+                    {{ -2, -2, 0 }, { constants.tanFast, 0, 0 }, 3},
+                    {{ -1.8, -2, 0 }, { constants.tanFast, 0, 0 }, 3},
                 },
-                {'BUS', 'CAR', 'ELECTRIC_TRAM', 'TRAM', 'TRUCK'},
-                constants.veryHighSpeed,
-                3,
-                false --linkable
-            ) or laneutil.createLanes(
-                {
-                    curves = {
-                        ['right_lane_one'] = {
-                            {{-2, -2, 0}, {-1.8, -2, 0}}
-                        },
-                        ['right_lane_two'] = {
-                            {{1.8, -2, 0}, {2, -2, 0}}
-                        },
-                        ['left_lane_one'] = {
-                            {{-1.8, 2, 0}, {-2, 2, 0}}
-                        },
-                        ['left_lane_two'] = {
-                            {{2, 2, 0}, {1.8, 2, 0}}
-                        }
-                    }
+                transportModes = {'BUS', 'CAR', 'ELECTRIC_TRAM', 'TRAM', 'TRUCK'},
+                speedLimit = constants.veryHighSpeed,
+            },
+            {
+                linkable = false,
+                nodes = {
+                    {{ 1.8, -2, 0 }, { constants.tanFast, 0, 0 }, 3},
+                    {{ 2.0, -2, 0 }, { constants.tanFast, 0, 0 }, 3},
                 },
-                {'BUS', 'CAR', 'ELECTRIC_TRAM', 'TRAM', 'TRUCK'},
-                constants.veryHighSpeed,
-                3,
-                false --linkable
-            ),
-            -- pedestrians
-            laneutil.createLanes(
-                {
-                    curves = {
-                        ['shorter_right_lane'] = {
-                            {{2.00000, -6.00000, sidewalkHeight}, {-2.00000, -3.60000, sidewalkHeight}}
-                        },
-                        ['shorter_left_lane'] = {
-                            {{2.00000, 6.00000, sidewalkHeight}, {-2.00000, 3.60000, sidewalkHeight}}
-                        }
-                    }
+                transportModes = {'BUS', 'CAR', 'ELECTRIC_TRAM', 'TRAM', 'TRUCK'},
+                speedLimit = constants.veryHighSpeed,
+            },
+            {
+                linkable = false,
+                nodes = {
+                    {{ -2, 2, 0 }, { constants.tanFast, 0, 0 }, 3},
+                    {{ -1.8, 2, 0 }, { constants.tanFast, 0, 0 }, 3},
                 },
-                {'PERSON'},
-                20,
-                3,
-                true --linkable
-            )
+                transportModes = {'BUS', 'CAR', 'ELECTRIC_TRAM', 'TRAM', 'TRUCK'},
+                speedLimit = constants.veryHighSpeed,
+            },
+            {
+                linkable = false,
+                nodes = {
+                    {{ 1.8, 2, 0 }, { constants.tanFast, 0, 0 }, 3},
+                    {{ 2.0, 2, 0 }, { constants.tanFast, 0, 0 }, 3},
+                },
+                transportModes = {'BUS', 'CAR', 'ELECTRIC_TRAM', 'TRAM', 'TRUCK'},
+                speedLimit = constants.veryHighSpeed,
+            },
+            pedestrianLanes
+        } or {
+            {
+                linkable = false,
+                nodes = {
+                    {{ -2, -2, 0 }, { constants.tanFast, 0, 0 }, 3},
+                    {{ -1.8, -2, 0 }, { constants.tanFast, 0, 0 }, 3},
+                },
+                transportModes = {'BUS', 'CAR', 'ELECTRIC_TRAM', 'TRAM', 'TRUCK'},
+                speedLimit = constants.veryHighSpeed,
+            },
+            {
+                linkable = false,
+                nodes = {
+                    {{ 1.8, -2, 0 }, { constants.tanFast, 0, 0 }, 3},
+                    {{ 2.0, -2, 0 }, { constants.tanFast, 0, 0 }, 3},
+                },
+                transportModes = {'BUS', 'CAR', 'ELECTRIC_TRAM', 'TRAM', 'TRUCK'},
+                speedLimit = constants.veryHighSpeed,
+            },
+            {
+                linkable = false,
+                nodes = {
+                    {{ -1.8, 2, 0 }, { -constants.tanFast, 0, 0 }, 3},
+                    {{ -2, 2, 0 }, { -constants.tanFast, 0, 0 }, 3},
+                },
+                transportModes = {'BUS', 'CAR', 'ELECTRIC_TRAM', 'TRAM', 'TRUCK'},
+                speedLimit = constants.veryHighSpeed,
+            },
+            {
+                linkable = false,
+                nodes = {
+                    {{ 2.0, 2, 0 }, { -constants.tanFast, 0, 0 }, 3},
+                    {{ 1.8, 2, 0 }, { -constants.tanFast, 0, 0 }, 3},
+                },
+                transportModes = {'BUS', 'CAR', 'ELECTRIC_TRAM', 'TRAM', 'TRUCK'},
+                speedLimit = constants.veryHighSpeed,
+            },
+            pedestrianLanes
         },
         runways = {},
         terminals = {}
