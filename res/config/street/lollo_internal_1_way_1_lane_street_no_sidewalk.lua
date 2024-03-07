@@ -1,4 +1,5 @@
 ﻿function data()
+    local constants = require('lollo_street_tuning.constants')
     return {
         --numLanes = 4,
         laneConfig = {
@@ -17,7 +18,7 @@
         aiLock = true,
         visibility = false, -- do not display this street in the menu, unreliable
         country = false,
-        speed = 100.0, -- was 50.0,
+        speed = constants.veryHighSpeed, -- was 50.0,
         -- priority = this crashes 4, -- LOLLO NOTE this is copied from airports, it should give priority to this street
         type = 'lollo_internal_1_way_1_lane_street_no_sidewalk.lua',
         name = _('Medium one-way street with 1 lane'),

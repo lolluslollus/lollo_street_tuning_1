@@ -1,4 +1,4 @@
-local idTransf = {1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1}
+local constants = require('lollo_street_tuning.constants')
 local laneutil = require('laneutil')
 local results = {}
 
@@ -14,7 +14,7 @@ results.getCollider = function()
         params = {
             halfExtents = {4, 8.0, 0.15}
         },
-        transf = idTransf,
+        transf = constants.idTransf,
         type = 'BOX'
     }
 end
@@ -81,7 +81,7 @@ results.getStreetLods = function()
                     },
                 },
                 transf = {.8, 0, 0, 0, 0, .8, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1},
-                -- transf = idTransf
+                -- transf = constants.idTransf
             },
             static = false,
             visibleFrom = 0,
@@ -126,7 +126,7 @@ results.getTransportNetworkProvider = function(isOneWay, isSidewalkRaised)
                     }
                 },
                 {'BUS', 'CAR', 'ELECTRIC_TRAM', 'TRAM', 'TRUCK'},
-                100,
+                constants.veryHighSpeed,
                 3.0,
                 false --linkable
             ) or laneutil.createLanes(
@@ -166,7 +166,7 @@ results.getTransportNetworkProvider = function(isOneWay, isSidewalkRaised)
                     }
                 },
                 {'BUS', 'CAR', 'ELECTRIC_TRAM', 'TRAM', 'TRUCK'},
-                100,
+                constants.veryHighSpeed,
                 3.0,
                 false --linkable
             ),

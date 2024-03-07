@@ -1,4 +1,4 @@
-local idTransf = {1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1}
+local constants = require('lollo_street_tuning.constants')
 local laneutil = require('laneutil')
 local results = {}
 
@@ -14,7 +14,7 @@ results.getCollider = function()
         params = {
             halfExtents = {2, 16.0, 0.15}
         },
-        transf = idTransf,
+        transf = constants.idTransf,
         type = 'BOX'
     }
 end
@@ -24,7 +24,7 @@ results.getCountryRoadLods = function()
         {
             node = {
                 children = {},
-                transf = idTransf
+                transf = constants.idTransf
             },
             static = false,
             visibleFrom = 0,
@@ -116,7 +116,7 @@ results.getStreetLods = function()
                     --     transf = {-0.32, 0, 0, 0, 0, -0.32, 0, 0, 0, 0, 1, 0, -1.2, 11.2, 0, 1}
                     -- },
                 },
-                transf = idTransf
+                -- transf = constants.idTransf
             },
             static = false,
             visibleFrom = 0,
@@ -172,7 +172,7 @@ results.getTransportNetworkProvider = function(isSidewalkRaised)
                     }
                 },
                 {'BUS', 'CAR', 'ELECTRIC_TRAM', 'TRAM', 'TRUCK'},
-                100,
+                constants.veryHighSpeed,
                 3.0,
                 false --linkable
             ),

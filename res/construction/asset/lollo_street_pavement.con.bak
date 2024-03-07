@@ -1,4 +1,4 @@
-local idTransf = {1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1}
+local constants = require('lollo_street_tuning.constants')
 local pitchUtil = require('lollo_street_tuning.lolloPitchHelper')
 local transf = require 'transf'
 local vec3 = require 'vec3'
@@ -12,7 +12,7 @@ function data()
                 id = 'lollo_assets/lollo_pavement_square.mdl',
                 skipCollision = true,
                 -- transf = idTransfPitched,
-                transf = idTransf,
+                transf = constants.idTransf,
             }
         elseif params.size == 1 then
             result[1] = {
@@ -134,7 +134,7 @@ function data()
                             0.15
                         }
                     },
-                    transf = idTransf,
+                    transf = constants.idTransf,
                     type = 'BOX'
                 }
             }

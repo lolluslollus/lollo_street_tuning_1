@@ -1,6 +1,6 @@
 -- LOLLO NOTE this is obsolete, we keep the model so it won't break old games
 
-local idTransf = {1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1}
+local constants = require('lollo_street_tuning.constants')
 local laneutil = require('laneutil')
 
 function data()
@@ -15,7 +15,7 @@ function data()
             params = {
                 halfExtents = {4.0, 12.0, 0.15}
             },
-            transf = idTransf,
+            transf = constants.idTransf,
             type = 'BOX'
         },
         lods = {
@@ -148,7 +148,7 @@ function data()
                             }
                         },
                         {'BUS', 'CAR', 'ELECTRIC_TRAM', 'TRAM', 'TRUCK'},
-                        100,
+                        constants.veryHighSpeed,
                         3,
                         false --linkable
                     ),
