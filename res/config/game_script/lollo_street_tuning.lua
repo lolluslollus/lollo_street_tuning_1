@@ -699,7 +699,7 @@ local _actions = {
         logger.print('proposalData =') logger.debugPrint(proposalData)
 
         api.cmd.sendCommand(
-            api.cmd.make.buildProposal(simpleProposal, nil, true),
+            api.cmd.make.buildProposal(simpleProposal, context, true),
             function(result, success)
                 -- print('LOLLO res = ')
                 -- debugPrint(res)
@@ -710,7 +710,7 @@ local _actions = {
                     logger.warn('Warning: streetTuning.replaceEdgeWithSame failed, proposal = ') logger.warningDebugPrint(simpleProposal)
                 else
                     logger.print('LOLLO street changer succeeded, result =') logger.debugPrint(result)
-                    local proposal2 = result.proposal
+                    -- local proposal2 = result.proposal
                 end
             end
         )
