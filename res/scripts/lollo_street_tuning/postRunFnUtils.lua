@@ -259,8 +259,8 @@ local function _addOneStreetWithOuterReservedLanes(oldStreet, fileName, targetTr
     newStreet.signalAssetName = oldStreet.signalAssetName
     newStreet.cost = oldStreet.cost or 0
     newStreet.catenary = oldStreet.catenary
-    newStreet.lodDistFrom = oldStreet.lodDistFrom
-    newStreet.lodDistTo = oldStreet.lodDistTo
+    -- newStreet.lodDistFrom = oldStreet.lodDistFrom -- no more supported as of sep 2024
+    -- newStreet.lodDistTo = oldStreet.lodDistTo -- no more supported as of sep 2024
     newStreet.sidewalkFillGroundTex = oldStreet.sidewalkFillGroundTex
     newStreet.streetFillGroundTex = oldStreet.streetFillGroundTex
     newStreet.borderGroundTex = oldStreet.borderGroundTex

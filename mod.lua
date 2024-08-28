@@ -9,7 +9,7 @@ local streetUtils = require('lollo_street_tuning.streetUtils')
 function data()
     return {
         info = {
-            minorVersion = 64,
+            minorVersion = 65,
             severityAdd = 'NONE',
             severityRemove = 'WARNING',
             name = _('_NAME'),
@@ -37,7 +37,7 @@ function data()
                     name = _("MakeReservedLanes"),
                     tooltip = _("MakeReservedLanesTooltip"),
                     values = { _("No"), _("Yes"), },
-                    defaultIndex = 1,
+                    defaultIndex = 0,
                 },
             },
         },
