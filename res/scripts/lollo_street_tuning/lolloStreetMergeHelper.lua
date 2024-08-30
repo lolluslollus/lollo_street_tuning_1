@@ -97,15 +97,36 @@ local helper = {
                 },
                 defaultIndex = 1
             },
-            -- {
-            --     key = 'hasBus',
-            --     name = _('Bus lane'),
-            --     values = {
-            --         _('No'),
-            --         _('Yes')
-            --     },
-            --     defaultIndex = 0
-            -- },
+            {
+                key = 'hasBusLeft_',
+                name = _('HasBusLeft'),
+                values = {
+                    -- must be in this sequence
+                    _('NO'),
+                    _('YES'),
+                },
+                defaultIndex = 0
+            },
+            {
+                key = 'hasBusRight_',
+                name = _('HasBusRight'),
+                values = {
+                    -- must be in this sequence
+                    _('NO'),
+                    _('YES'),
+                },
+                defaultIndex = 0
+            },
+            {
+                key = 'hasBusInEveryLane_',
+                name = _('HasBusInEveryLane'),
+                values = {
+                    -- must be in this sequence
+                    _('NO'),
+                    _('YES'),
+                },
+                defaultIndex = 0
+            },
             {
                 key = 'pitch4Merge',
                 name = _('Pitch (adjust it with O and P while building)'),

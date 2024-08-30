@@ -50,8 +50,16 @@ local function _getGroundFaces(face, params)
     }
 end
 
-local function _getHasBus(params)
-    return params.hasBus == 1
+local function _getHasBusLeft(params)
+    return params.hasBusLeft_ == 1
+end
+
+local function _getHasBusRight(params)
+    return params.hasBusRight_ == 1
+end
+
+local function _getHasBusInEveryLane(params)
+    return params.hasBusInEveryLane_ == 1
 end
 
 local function _getTramTrackInEveryLane(params)
@@ -137,16 +145,16 @@ local function updateFn_2_1_lane_narrow_sidewalk_to_2_lane_one_way(params, bridg
         }
     }
 
-    -- LOLLO NOTE hasBus has no effect, neither do hasBusLane, busLane or hasBus, with true or false
-    -- local busLaneType = params.busLane and (({'NO', 'YES'})[params.busLane + 1]) or 'NO'
     local isTramTrackInEveryLane = _getTramTrackInEveryLane(params)
     local tramTrackType = _getTramTrackType(params)
-    local hasBus = _getHasBus(params)
+    local hasBusLeft = _getHasBusLeft(params)
+    local hasBusRight = _getHasBusRight(params)
+    local hasBusInEveryLane = _getHasBusInEveryLane(params)
     result.edgeLists = {
         {
             type = 'STREET',
             params = {
-                hasBus = hasBus,
+                hasBus = hasBusLeft,
                 skipCollision = true,
                 type = 'lollo_medium_1_way_1_lane_street_narrow_sidewalk.lua',
                 tramTrackType = params.direction4Merge == 0 and tramTrackType or (isTramTrackInEveryLane and tramTrackType or 'NO')
@@ -160,7 +168,7 @@ local function updateFn_2_1_lane_narrow_sidewalk_to_2_lane_one_way(params, bridg
         {
             type = 'STREET',
             params = {
-                hasBus = hasBus,
+                hasBus = hasBusLeft and hasBusInEveryLane,
                 skipCollision = true,
                 type = 'lollo_medium_1_way_1_lane_street_narrow_sidewalk.lua',
                 tramTrackType = params.direction4Merge == 1 and tramTrackType or (isTramTrackInEveryLane and tramTrackType or 'NO')
@@ -174,7 +182,7 @@ local function updateFn_2_1_lane_narrow_sidewalk_to_2_lane_one_way(params, bridg
         {
             type = 'STREET',
             params = {
-                hasBus = hasBus,
+                hasBus = hasBusLeft,
                 skipCollision = true,
                 type = 'lollo_internal_1_way_1_lane_street_no_sidewalk.lua',
                 tramTrackType = params.direction4Merge == 0 and tramTrackType or (isTramTrackInEveryLane and tramTrackType or 'NO')
@@ -188,7 +196,7 @@ local function updateFn_2_1_lane_narrow_sidewalk_to_2_lane_one_way(params, bridg
         {
             type = 'STREET',
             params = {
-                hasBus = hasBus,
+                hasBus = false,
                 skipCollision = true,
                 type = 'lollo_internal_1_way_1_lane_street_no_sidewalk.lua',
                 tramTrackType = params.direction4Merge == 1 and tramTrackType or (isTramTrackInEveryLane and tramTrackType or 'NO')
@@ -202,7 +210,7 @@ local function updateFn_2_1_lane_narrow_sidewalk_to_2_lane_one_way(params, bridg
         {
             type = 'STREET',
             params = {
-                hasBus = hasBus,
+                hasBus = hasBusRight,
                 skipCollision = true,
                 type = tramTrackType == 'NO'
                     and 'standard/town_medium_one_way_new.lua'
@@ -255,10 +263,13 @@ local function updateFn_2_1_lane_narrow_sidewalk_to_2_lane(params, bridgeData)
 
     local isTramTrackInEveryLane = _getTramTrackInEveryLane(params)
     local tramTrackType = _getTramTrackType(params)
+    local hasBusLeft = _getHasBusLeft(params)
+    local hasBusRight = _getHasBusRight(params)
     result.edgeLists = {
         {
             type = 'STREET',
             params = {
+                hasBus = hasBusLeft,
                 skipCollision = true,
                 type = 'lollo_medium_1_way_1_lane_street_narrow_sidewalk.lua',
                 tramTrackType = tramTrackType
@@ -272,6 +283,7 @@ local function updateFn_2_1_lane_narrow_sidewalk_to_2_lane(params, bridgeData)
         {
             type = 'STREET',
             params = {
+                hasBus = hasBusLeft,
                 skipCollision = true,
                 type = 'lollo_medium_1_way_1_lane_street_narrow_sidewalk.lua',
                 tramTrackType = tramTrackType
@@ -285,6 +297,7 @@ local function updateFn_2_1_lane_narrow_sidewalk_to_2_lane(params, bridgeData)
         {
             type = 'STREET',
             params = {
+                hasBus = hasBusLeft,
                 skipCollision = true,
                 type = 'lollo_internal_1_way_1_lane_street_no_sidewalk.lua',
                 tramTrackType = tramTrackType
@@ -298,6 +311,7 @@ local function updateFn_2_1_lane_narrow_sidewalk_to_2_lane(params, bridgeData)
         {
             type = 'STREET',
             params = {
+                hasBus = hasBusLeft,
                 skipCollision = true,
                 type = 'lollo_internal_1_way_1_lane_street_no_sidewalk.lua',
                 tramTrackType = tramTrackType
@@ -312,6 +326,7 @@ local function updateFn_2_1_lane_narrow_sidewalk_to_2_lane(params, bridgeData)
         {
             type = 'STREET',
             params = {
+                hasBus = hasBusRight,
                 skipCollision = true,
                 type = 'standard/town_medium_new.lua',
                 tramTrackType = tramTrackType
@@ -359,10 +374,14 @@ local function updateFn_2_1_lane_medium_sidewalk_to_2_lane_one_way(params, bridg
 
     local isTramTrackInEveryLane = _getTramTrackInEveryLane(params)
     local tramTrackType = _getTramTrackType(params)
+    local hasBusLeft = _getHasBusLeft(params)
+    local hasBusRight = _getHasBusRight(params)
+    local hasBusInEveryLane = _getHasBusInEveryLane(params)
     result.edgeLists = {
         {
             type = 'STREET',
             params = {
+                hasBus = hasBusLeft,
                 skipCollision = true,
                 type = 'lollo_medium_1_way_1_lane_street.lua',
                 tramTrackType = params.direction4Merge == 0 and tramTrackType or (isTramTrackInEveryLane and tramTrackType or 'NO')
@@ -376,6 +395,7 @@ local function updateFn_2_1_lane_medium_sidewalk_to_2_lane_one_way(params, bridg
         {
             type = 'STREET',
             params = {
+                hasBus = hasBusLeft and hasBusInEveryLane,
                 skipCollision = true,
                 type = 'lollo_medium_1_way_1_lane_street.lua',
                 tramTrackType = params.direction4Merge == 1 and tramTrackType or (isTramTrackInEveryLane and tramTrackType or 'NO')
@@ -389,6 +409,7 @@ local function updateFn_2_1_lane_medium_sidewalk_to_2_lane_one_way(params, bridg
         {
             type = 'STREET',
             params = {
+                hasBus = false,
                 skipCollision = true,
                 type = 'lollo_internal_1_way_1_lane_street_no_sidewalk.lua',
                 tramTrackType = params.direction4Merge == 0 and tramTrackType or (isTramTrackInEveryLane and tramTrackType or 'NO')
@@ -402,6 +423,7 @@ local function updateFn_2_1_lane_medium_sidewalk_to_2_lane_one_way(params, bridg
         {
             type = 'STREET',
             params = {
+                hasBus = false,
                 skipCollision = true,
                 type = 'lollo_internal_1_way_1_lane_street_no_sidewalk.lua',
                 tramTrackType = params.direction4Merge == 1 and tramTrackType or (isTramTrackInEveryLane and tramTrackType or 'NO')
@@ -415,6 +437,7 @@ local function updateFn_2_1_lane_medium_sidewalk_to_2_lane_one_way(params, bridg
         {
             type = 'STREET',
             params = {
+                hasBus = hasBusRight,
                 skipCollision = true,
                 type = tramTrackType == 'NO'
                     and 'lollo_medium_1_way_2_lane_medium_sidewalk_street.lua'
@@ -467,10 +490,13 @@ local function updateFn_2_1_lane_medium_sidewalk_to_2_lane(params, bridgeData)
 
     local isTramTrackInEveryLane = _getTramTrackInEveryLane(params)
     local tramTrackType = _getTramTrackType(params)
+    local hasBusLeft = _getHasBusLeft(params)
+    local hasBusRight = _getHasBusRight(params)
     result.edgeLists = {
         {
             type = 'STREET',
             params = {
+                hasBus = hasBusLeft,
                 skipCollision = true,
                 type = 'lollo_medium_1_way_1_lane_street.lua',
                 tramTrackType = tramTrackType
@@ -484,6 +510,7 @@ local function updateFn_2_1_lane_medium_sidewalk_to_2_lane(params, bridgeData)
         {
             type = 'STREET',
             params = {
+                hasBus = hasBusLeft,
                 skipCollision = true,
                 type = 'lollo_medium_1_way_1_lane_street.lua',
                 tramTrackType = tramTrackType
@@ -497,6 +524,7 @@ local function updateFn_2_1_lane_medium_sidewalk_to_2_lane(params, bridgeData)
         {
             type = 'STREET',
             params = {
+                hasBus = false,
                 skipCollision = true,
                 type = 'lollo_internal_1_way_1_lane_street_no_sidewalk.lua',
                 tramTrackType = tramTrackType
@@ -510,6 +538,7 @@ local function updateFn_2_1_lane_medium_sidewalk_to_2_lane(params, bridgeData)
         {
             type = 'STREET',
             params = {
+                hasBus = false,
                 skipCollision = true,
                 type = 'lollo_internal_1_way_1_lane_street_no_sidewalk.lua',
                 tramTrackType = tramTrackType
@@ -524,6 +553,7 @@ local function updateFn_2_1_lane_medium_sidewalk_to_2_lane(params, bridgeData)
         {
             type = 'STREET',
             params = {
+                hasBus = hasBusRight,
                 skipCollision = true,
                 type = 'lollo_medium_2_lane_medium_sidewalk_street.lua',
                 tramTrackType = tramTrackType
@@ -572,10 +602,14 @@ local function updateFn_3_1_lane_narrow_sidewalk_to_3_lane_one_way(params, bridg
 
     local isTramTrackInEveryLane = _getTramTrackInEveryLane(params)
     local tramTrackType = _getTramTrackType(params)
+    local hasBusLeft = _getHasBusLeft(params)
+    local hasBusRight = _getHasBusRight(params)
+    local hasBusInEveryLane = _getHasBusInEveryLane(params)
     result.edgeLists = {
         {
             type = 'STREET',
             params = {
+                hasBus = hasBusLeft,
                 skipCollision = true,
                 type = 'lollo_medium_1_way_1_lane_street_narrow_sidewalk.lua',
                 tramTrackType = params.direction4Merge == 0 and tramTrackType or (isTramTrackInEveryLane and tramTrackType or 'NO')
@@ -589,6 +623,7 @@ local function updateFn_3_1_lane_narrow_sidewalk_to_3_lane_one_way(params, bridg
         {
             type = 'STREET',
             params = {
+                hasBus = hasBusLeft and hasBusInEveryLane,
                 skipCollision = true,
                 type = 'lollo_medium_1_way_1_lane_street_narrow_sidewalk.lua',
                 tramTrackType = isTramTrackInEveryLane and tramTrackType or 'NO',
@@ -602,6 +637,7 @@ local function updateFn_3_1_lane_narrow_sidewalk_to_3_lane_one_way(params, bridg
         {
             type = 'STREET',
             params = {
+                hasBus = hasBusLeft and hasBusInEveryLane,
                 skipCollision = true,
                 type = 'lollo_medium_1_way_1_lane_street_narrow_sidewalk.lua',
                 tramTrackType = params.direction4Merge == 1 and tramTrackType or (isTramTrackInEveryLane and tramTrackType or 'NO')
@@ -615,6 +651,7 @@ local function updateFn_3_1_lane_narrow_sidewalk_to_3_lane_one_way(params, bridg
         {
             type = 'STREET',
             params = {
+                hasBus = hasBusLeft,
                 skipCollision = true,
                 type = 'lollo_internal_1_way_1_lane_street_no_sidewalk.lua',
                 tramTrackType = params.direction4Merge == 0 and tramTrackType or (isTramTrackInEveryLane and tramTrackType or 'NO')
@@ -628,6 +665,7 @@ local function updateFn_3_1_lane_narrow_sidewalk_to_3_lane_one_way(params, bridg
         {
             type = 'STREET',
             params = {
+                hasBus = false,
                 skipCollision = true,
                 type = 'lollo_internal_1_way_1_lane_street_no_sidewalk.lua',
                 tramTrackType = isTramTrackInEveryLane and tramTrackType or 'NO',
@@ -641,6 +679,7 @@ local function updateFn_3_1_lane_narrow_sidewalk_to_3_lane_one_way(params, bridg
         {
             type = 'STREET',
             params = {
+                hasBus = false,
                 skipCollision = true,
                 type = 'lollo_internal_1_way_1_lane_street_no_sidewalk.lua',
                 tramTrackType = params.direction4Merge == 1 and tramTrackType or (isTramTrackInEveryLane and tramTrackType or 'NO')
@@ -654,6 +693,7 @@ local function updateFn_3_1_lane_narrow_sidewalk_to_3_lane_one_way(params, bridg
         {
             type = 'STREET',
             params = {
+                hasBus = hasBusRight,
                 skipCollision = true,
                 type = tramTrackType == 'NO'
                     and 'lollo_medium_1_way_3_lane_street.lua'
@@ -834,10 +874,14 @@ local function updateFn_4_1_lane_narrow_sidewalk_to_4_lane_one_way(params, bridg
 
     local isTramTrackInEveryLane = _getTramTrackInEveryLane(params)
     local tramTrackType = _getTramTrackType(params)
+    local hasBusLeft = _getHasBusLeft(params)
+    local hasBusRight = _getHasBusRight(params)
+    local hasBusInEveryLane = _getHasBusInEveryLane(params)
     result.edgeLists = {
         {
             type = 'STREET',
             params = {
+                hasBus = hasBusLeft,
                 skipCollision = true,
                 type = 'lollo_medium_1_way_1_lane_street_narrow_sidewalk.lua',
                 tramTrackType = params.direction4Merge == 0 and tramTrackType or (isTramTrackInEveryLane and tramTrackType or 'NO')
@@ -851,6 +895,7 @@ local function updateFn_4_1_lane_narrow_sidewalk_to_4_lane_one_way(params, bridg
         {
             type = 'STREET',
             params = {
+                hasBus = hasBusLeft and hasBusInEveryLane,
                 skipCollision = true,
                 type = 'lollo_medium_1_way_1_lane_street_narrow_sidewalk.lua',
                 tramTrackType = isTramTrackInEveryLane and tramTrackType or 'NO',
@@ -864,6 +909,7 @@ local function updateFn_4_1_lane_narrow_sidewalk_to_4_lane_one_way(params, bridg
         {
             type = 'STREET',
             params = {
+                hasBus = hasBusLeft and hasBusInEveryLane,
                 skipCollision = true,
                 type = 'lollo_medium_1_way_1_lane_street_narrow_sidewalk.lua',
                 tramTrackType = isTramTrackInEveryLane and tramTrackType or 'NO',
@@ -877,6 +923,7 @@ local function updateFn_4_1_lane_narrow_sidewalk_to_4_lane_one_way(params, bridg
         {
             type = 'STREET',
             params = {
+                hasBus = hasBusLeft and hasBusInEveryLane,
                 skipCollision = true,
                 type = 'lollo_medium_1_way_1_lane_street_narrow_sidewalk.lua',
                 tramTrackType = params.direction4Merge == 1 and tramTrackType or (isTramTrackInEveryLane and tramTrackType or 'NO')
@@ -890,6 +937,7 @@ local function updateFn_4_1_lane_narrow_sidewalk_to_4_lane_one_way(params, bridg
         {
             type = 'STREET',
             params = {
+                hasBus = hasBusLeft,
                 skipCollision = true,
                 type = 'lollo_internal_1_way_1_lane_street_no_sidewalk.lua',
                 tramTrackType = params.direction4Merge == 0 and tramTrackType or (isTramTrackInEveryLane and tramTrackType or 'NO')
@@ -903,6 +951,7 @@ local function updateFn_4_1_lane_narrow_sidewalk_to_4_lane_one_way(params, bridg
         {
             type = 'STREET',
             params = {
+                hasBus = false,
                 skipCollision = true,
                 type = 'lollo_internal_1_way_1_lane_street_no_sidewalk.lua',
                 tramTrackType = isTramTrackInEveryLane and tramTrackType or 'NO',
@@ -916,6 +965,7 @@ local function updateFn_4_1_lane_narrow_sidewalk_to_4_lane_one_way(params, bridg
         {
             type = 'STREET',
             params = {
+                hasBus = false,
                 skipCollision = true,
                 type = 'lollo_internal_1_way_1_lane_street_no_sidewalk.lua',
                 tramTrackType = isTramTrackInEveryLane and tramTrackType or 'NO',
@@ -929,6 +979,7 @@ local function updateFn_4_1_lane_narrow_sidewalk_to_4_lane_one_way(params, bridg
         {
             type = 'STREET',
             params = {
+                hasBus = false,
                 skipCollision = true,
                 type = 'lollo_internal_1_way_1_lane_street_no_sidewalk.lua',
                 tramTrackType = params.direction4Merge == 1 and tramTrackType or (isTramTrackInEveryLane and tramTrackType or 'NO')
@@ -942,6 +993,7 @@ local function updateFn_4_1_lane_narrow_sidewalk_to_4_lane_one_way(params, bridg
         {
             type = 'STREET',
             params = {
+                hasBus = hasBusRight,
                 skipCollision = true,
                 type = tramTrackType == 'NO'
                     and 'lollo_medium_1_way_4_lane_street.lua'
@@ -994,10 +1046,14 @@ local function updateFn_4_1_lane_narrow_sidewalk_to_4_lane(params, bridgeData)
 
     local isTramTrackInEveryLane = _getTramTrackInEveryLane(params)
     local tramTrackType = _getTramTrackType(params)
+    local hasBusLeft = _getHasBusLeft(params)
+    local hasBusRight = _getHasBusRight(params)
+    local hasBusInEveryLane = _getHasBusInEveryLane(params)
     result.edgeLists = {
         {
             type = 'STREET',
             params = {
+                hasBus = hasBusLeft,
                 skipCollision = true,
                 type = 'lollo_medium_1_way_1_lane_street_narrow_sidewalk.lua',
                 tramTrackType = tramTrackType
@@ -1011,6 +1067,7 @@ local function updateFn_4_1_lane_narrow_sidewalk_to_4_lane(params, bridgeData)
         {
             type = 'STREET',
             params = {
+                hasBus = hasBusLeft and hasBusInEveryLane,
                 skipCollision = true,
                 type = 'lollo_medium_1_way_1_lane_street_narrow_sidewalk.lua',
                 tramTrackType = isTramTrackInEveryLane and tramTrackType or 'NO',
@@ -1024,6 +1081,7 @@ local function updateFn_4_1_lane_narrow_sidewalk_to_4_lane(params, bridgeData)
         {
             type = 'STREET',
             params = {
+                hasBus = hasBusLeft and hasBusInEveryLane,
                 skipCollision = true,
                 type = 'lollo_medium_1_way_1_lane_street_narrow_sidewalk.lua',
                 tramTrackType = isTramTrackInEveryLane and tramTrackType or 'NO',
@@ -1037,6 +1095,7 @@ local function updateFn_4_1_lane_narrow_sidewalk_to_4_lane(params, bridgeData)
         {
             type = 'STREET',
             params = {
+                hasBus = hasBusLeft,
                 skipCollision = true,
                 type = 'lollo_medium_1_way_1_lane_street_narrow_sidewalk.lua',
                 tramTrackType = tramTrackType
@@ -1051,6 +1110,7 @@ local function updateFn_4_1_lane_narrow_sidewalk_to_4_lane(params, bridgeData)
         {
             type = 'STREET',
             params = {
+                hasBus = hasBusLeft,
                 skipCollision = true,
                 type = 'lollo_internal_1_way_1_lane_street_no_sidewalk.lua',
                 tramTrackType = tramTrackType
@@ -1064,6 +1124,7 @@ local function updateFn_4_1_lane_narrow_sidewalk_to_4_lane(params, bridgeData)
         {
             type = 'STREET',
             params = {
+                hasBus = false,
                 skipCollision = true,
                 type = 'lollo_internal_1_way_1_lane_street_no_sidewalk.lua',
                 tramTrackType = isTramTrackInEveryLane and tramTrackType or 'NO',
@@ -1077,6 +1138,7 @@ local function updateFn_4_1_lane_narrow_sidewalk_to_4_lane(params, bridgeData)
         {
             type = 'STREET',
             params = {
+                hasBus = false,
                 skipCollision = true,
                 type = 'lollo_internal_1_way_1_lane_street_no_sidewalk.lua',
                 tramTrackType = isTramTrackInEveryLane and tramTrackType or 'NO',
@@ -1090,6 +1152,7 @@ local function updateFn_4_1_lane_narrow_sidewalk_to_4_lane(params, bridgeData)
         {
             type = 'STREET',
             params = {
+                hasBus = hasBusLeft,
                 skipCollision = true,
                 type = 'lollo_internal_1_way_1_lane_street_no_sidewalk.lua',
                 tramTrackType = tramTrackType
@@ -1104,6 +1167,7 @@ local function updateFn_4_1_lane_narrow_sidewalk_to_4_lane(params, bridgeData)
         {
             type = 'STREET',
             params = {
+                hasBus = hasBusRight,
                 skipCollision = true,
                 type = tramTrackType == 'NO'
                     and 'lollo_medium_4_lane_street.lua'
@@ -1156,10 +1220,14 @@ local function updateFn_4_1_lane_narrow_sidewalk_to_4_lane_large(params, bridgeD
 
     local isTramTrackInEveryLane = _getTramTrackInEveryLane(params)
     local tramTrackType = _getTramTrackType(params)
+    local hasBusLeft = _getHasBusLeft(params)
+    local hasBusRight = _getHasBusRight(params)
+    local hasBusInEveryLane = _getHasBusInEveryLane(params)
     result.edgeLists = {
         {
             type = 'STREET',
             params = {
+                hasBus = hasBusLeft,
                 skipCollision = true,
                 type = 'lollo_medium_1_way_1_lane_street_narrow_sidewalk.lua',
                 tramTrackType = tramTrackType
@@ -1173,6 +1241,7 @@ local function updateFn_4_1_lane_narrow_sidewalk_to_4_lane_large(params, bridgeD
         {
             type = 'STREET',
             params = {
+                hasBus = hasBusLeft and hasBusInEveryLane,
                 skipCollision = true,
                 type = 'lollo_medium_1_way_1_lane_street_narrow_sidewalk.lua',
                 tramTrackType = isTramTrackInEveryLane and tramTrackType or 'NO',
@@ -1186,6 +1255,7 @@ local function updateFn_4_1_lane_narrow_sidewalk_to_4_lane_large(params, bridgeD
         {
             type = 'STREET',
             params = {
+                hasBus = hasBusLeft and hasBusInEveryLane,
                 skipCollision = true,
                 type = 'lollo_medium_1_way_1_lane_street_narrow_sidewalk.lua',
                 tramTrackType = isTramTrackInEveryLane and tramTrackType or 'NO',
@@ -1199,6 +1269,7 @@ local function updateFn_4_1_lane_narrow_sidewalk_to_4_lane_large(params, bridgeD
         {
             type = 'STREET',
             params = {
+                hasBus = hasBusLeft,
                 skipCollision = true,
                 type = 'lollo_medium_1_way_1_lane_street_narrow_sidewalk.lua',
                 tramTrackType = tramTrackType
@@ -1213,6 +1284,7 @@ local function updateFn_4_1_lane_narrow_sidewalk_to_4_lane_large(params, bridgeD
         {
             type = 'STREET',
             params = {
+                hasBus = hasBusLeft,
                 skipCollision = true,
                 type = 'lollo_internal_1_way_1_lane_street_no_sidewalk.lua',
                 tramTrackType = tramTrackType
@@ -1226,6 +1298,7 @@ local function updateFn_4_1_lane_narrow_sidewalk_to_4_lane_large(params, bridgeD
         {
             type = 'STREET',
             params = {
+                hasBus = false,
                 skipCollision = true,
                 type = 'lollo_internal_1_way_1_lane_street_no_sidewalk.lua',
                 tramTrackType = isTramTrackInEveryLane and tramTrackType or 'NO',
@@ -1239,6 +1312,7 @@ local function updateFn_4_1_lane_narrow_sidewalk_to_4_lane_large(params, bridgeD
         {
             type = 'STREET',
             params = {
+                hasBus = false,
                 skipCollision = true,
                 type = 'lollo_internal_1_way_1_lane_street_no_sidewalk.lua',
                 tramTrackType = isTramTrackInEveryLane and tramTrackType or 'NO',
@@ -1252,6 +1326,7 @@ local function updateFn_4_1_lane_narrow_sidewalk_to_4_lane_large(params, bridgeD
         {
             type = 'STREET',
             params = {
+                hasBus = hasBusLeft,
                 skipCollision = true,
                 type = 'lollo_internal_1_way_1_lane_street_no_sidewalk.lua',
                 tramTrackType = tramTrackType
@@ -1266,6 +1341,7 @@ local function updateFn_4_1_lane_narrow_sidewalk_to_4_lane_large(params, bridgeD
         {
             type = 'STREET',
             params = {
+                hasBus = hasBusRight,
                 skipCollision = true,
                 type = tramTrackType == 'NO'
                     and 'standard/town_large_new.lua'
@@ -1317,10 +1393,14 @@ local function updateFn_2_2_lane_one_way_to_6_lane_x_large(params, bridgeData)
 
     local isTramTrackInEveryLane = _getTramTrackInEveryLane(params)
     local tramTrackType = _getTramTrackType(params)
+    local hasBusLeft = _getHasBusLeft(params)
+    local hasBusRight = _getHasBusRight(params)
+    local hasBusInEveryLane = _getHasBusInEveryLane(params)
     result.edgeLists = {
         {
             type = 'STREET',
             params = {
+                hasBus = hasBusLeft,
                 skipCollision = true,
                 type = tramTrackType == 'NO'
                     and 'standard/town_medium_one_way_new.lua'
@@ -1336,6 +1416,7 @@ local function updateFn_2_2_lane_one_way_to_6_lane_x_large(params, bridgeData)
         {
             type = 'STREET',
             params = {
+                hasBus = hasBusLeft,
                 skipCollision = true,
                 type = tramTrackType == 'NO'
                     and 'standard/town_medium_one_way_new.lua'
@@ -1352,6 +1433,7 @@ local function updateFn_2_2_lane_one_way_to_6_lane_x_large(params, bridgeData)
         {
             type = 'STREET',
             params = {
+                hasBus = hasBusLeft,
                 skipCollision = true,
                 type = 'lollo_internal_1_way_1_lane_street_no_sidewalk.lua',
                 tramTrackType = tramTrackType
@@ -1365,6 +1447,7 @@ local function updateFn_2_2_lane_one_way_to_6_lane_x_large(params, bridgeData)
         {
             type = 'STREET',
             params = {
+                hasBus = false,
                 skipCollision = true,
                 type = 'lollo_internal_1_way_1_lane_street_no_sidewalk.lua',
                 tramTrackType = isTramTrackInEveryLane and tramTrackType or 'NO',
@@ -1405,6 +1488,7 @@ local function updateFn_2_2_lane_one_way_to_6_lane_x_large(params, bridgeData)
         {
             type = 'STREET',
             params = {
+                hasBus = false,
                 skipCollision = true,
                 type = 'lollo_internal_1_way_1_lane_street_no_sidewalk.lua',
                 tramTrackType = isTramTrackInEveryLane and tramTrackType or 'NO',
@@ -1418,6 +1502,7 @@ local function updateFn_2_2_lane_one_way_to_6_lane_x_large(params, bridgeData)
         {
             type = 'STREET',
             params = {
+                hasBus = hasBusLeft,
                 skipCollision = true,
                 type = 'lollo_internal_1_way_1_lane_street_no_sidewalk.lua',
                 tramTrackType = tramTrackType
@@ -1431,6 +1516,7 @@ local function updateFn_2_2_lane_one_way_to_6_lane_x_large(params, bridgeData)
         {
             type = 'STREET',
             params = {
+                hasBus = hasBusRight,
                 skipCollision = true,
                 type = tramTrackType == 'NO'
                     and 'standard/town_x_large_new.lua'
@@ -1482,10 +1568,14 @@ local function updateFn_6_1_lane_one_way_to_6_lane_x_large(params, bridgeData)
 
     local isTramTrackInEveryLane = _getTramTrackInEveryLane(params)
     local tramTrackType = _getTramTrackType(params)
+    local hasBusLeft = _getHasBusLeft(params)
+    local hasBusRight = _getHasBusRight(params)
+    local hasBusInEveryLane = _getHasBusInEveryLane(params)
     result.edgeLists = {
         {
             type = 'STREET',
             params = {
+                hasBus = hasBusLeft,
                 skipCollision = true,
                 type = 'lollo_medium_1_way_1_lane_street_narrow_sidewalk.lua',
                 tramTrackType = tramTrackType
@@ -1499,6 +1589,7 @@ local function updateFn_6_1_lane_one_way_to_6_lane_x_large(params, bridgeData)
         {
             type = 'STREET',
             params = {
+                hasBus = hasBusLeft and hasBusInEveryLane,
                 skipCollision = true,
                 type = 'lollo_medium_1_way_1_lane_street_narrow_sidewalk.lua',
                 tramTrackType = isTramTrackInEveryLane and tramTrackType or 'NO'
@@ -1512,6 +1603,7 @@ local function updateFn_6_1_lane_one_way_to_6_lane_x_large(params, bridgeData)
         {
             type = 'STREET',
             params = {
+                hasBus = hasBusLeft and hasBusInEveryLane,
                 skipCollision = true,
                 type = 'lollo_medium_1_way_1_lane_street_narrow_sidewalk.lua',
                 tramTrackType = isTramTrackInEveryLane and tramTrackType or 'NO'
@@ -1525,6 +1617,7 @@ local function updateFn_6_1_lane_one_way_to_6_lane_x_large(params, bridgeData)
         {
             type = 'STREET',
             params = {
+                hasBus = hasBusLeft and hasBusInEveryLane,
                 skipCollision = true,
                 type = 'lollo_medium_1_way_1_lane_street_narrow_sidewalk.lua',
                 tramTrackType = isTramTrackInEveryLane and tramTrackType or 'NO'
@@ -1538,6 +1631,7 @@ local function updateFn_6_1_lane_one_way_to_6_lane_x_large(params, bridgeData)
         {
             type = 'STREET',
             params = {
+                hasBus = hasBusLeft and hasBusInEveryLane,
                 skipCollision = true,
                 type = 'lollo_medium_1_way_1_lane_street_narrow_sidewalk.lua',
                 tramTrackType = isTramTrackInEveryLane and tramTrackType or 'NO'
@@ -1551,6 +1645,7 @@ local function updateFn_6_1_lane_one_way_to_6_lane_x_large(params, bridgeData)
         {
             type = 'STREET',
             params = {
+                hasBus = hasBusLeft,
                 skipCollision = true,
                 type = 'lollo_medium_1_way_1_lane_street_narrow_sidewalk.lua',
                 tramTrackType = tramTrackType
@@ -1565,6 +1660,7 @@ local function updateFn_6_1_lane_one_way_to_6_lane_x_large(params, bridgeData)
         {
             type = 'STREET',
             params = {
+                hasBus = hasBusLeft,
                 skipCollision = true,
                 type = 'lollo_internal_1_way_1_lane_street_no_sidewalk.lua',
                 tramTrackType = tramTrackType
@@ -1578,6 +1674,7 @@ local function updateFn_6_1_lane_one_way_to_6_lane_x_large(params, bridgeData)
         {
             type = 'STREET',
             params = {
+                hasBus = false,
                 skipCollision = true,
                 type = 'lollo_internal_1_way_1_lane_street_no_sidewalk.lua',
                 tramTrackType = isTramTrackInEveryLane and tramTrackType or 'NO'
@@ -1591,6 +1688,7 @@ local function updateFn_6_1_lane_one_way_to_6_lane_x_large(params, bridgeData)
         {
             type = 'STREET',
             params = {
+                hasBus = false,
                 skipCollision = true,
                 type = 'lollo_internal_1_way_1_lane_street_no_sidewalk.lua',
                 tramTrackType = isTramTrackInEveryLane and tramTrackType or 'NO'
@@ -1604,6 +1702,7 @@ local function updateFn_6_1_lane_one_way_to_6_lane_x_large(params, bridgeData)
         {
             type = 'STREET',
             params = {
+                hasBus = false,
                 skipCollision = true,
                 type = 'lollo_internal_1_way_1_lane_street_no_sidewalk.lua',
                 tramTrackType = isTramTrackInEveryLane and tramTrackType or 'NO'
@@ -1617,6 +1716,7 @@ local function updateFn_6_1_lane_one_way_to_6_lane_x_large(params, bridgeData)
         {
             type = 'STREET',
             params = {
+                hasBus = false,
                 skipCollision = true,
                 type = 'lollo_internal_1_way_1_lane_street_no_sidewalk.lua',
                 tramTrackType = isTramTrackInEveryLane and tramTrackType or 'NO'
@@ -1630,6 +1730,7 @@ local function updateFn_6_1_lane_one_way_to_6_lane_x_large(params, bridgeData)
         {
             type = 'STREET',
             params = {
+                hasBus = hasBusLeft,
                 skipCollision = true,
                 type = 'lollo_internal_1_way_1_lane_street_no_sidewalk.lua',
                 tramTrackType = tramTrackType
@@ -1644,6 +1745,7 @@ local function updateFn_6_1_lane_one_way_to_6_lane_x_large(params, bridgeData)
         {
             type = 'STREET',
             params = {
+                hasBus = hasBusRight,
                 skipCollision = true,
                 type = tramTrackType == 'NO'
                     and 'standard/town_x_large_new.lua'
@@ -1695,10 +1797,14 @@ local function updateFn_Motorway_6_1_lane_one_way_to_6_lane_x_large(params, brid
 
     local isTramTrackInEveryLane = _getTramTrackInEveryLane(params)
     local tramTrackType = _getTramTrackType(params)
+    local hasBusLeft = _getHasBusLeft(params)
+    local hasBusRight = _getHasBusRight(params)
+    local hasBusInEveryLane = _getHasBusInEveryLane(params)
     result.edgeLists = {
         {
             type = 'STREET',
             params = {
+                hasBus = hasBusLeft,
                 skipCollision = true,
                 type = 'lollo_medium_1_way_1_lane_country_road_narrow_sidewalk.lua',
                 tramTrackType = tramTrackType
@@ -1712,6 +1818,7 @@ local function updateFn_Motorway_6_1_lane_one_way_to_6_lane_x_large(params, brid
         {
             type = 'STREET',
             params = {
+                hasBus = hasBusLeft and hasBusInEveryLane,
                 skipCollision = true,
                 type = 'lollo_medium_1_way_1_lane_country_road_narrow_sidewalk.lua',
                 tramTrackType = isTramTrackInEveryLane and tramTrackType or 'NO'
@@ -1725,6 +1832,7 @@ local function updateFn_Motorway_6_1_lane_one_way_to_6_lane_x_large(params, brid
         {
             type = 'STREET',
             params = {
+                hasBus = hasBusLeft and hasBusInEveryLane,
                 skipCollision = true,
                 type = 'lollo_medium_1_way_1_lane_country_road_narrow_sidewalk.lua',
                 tramTrackType = isTramTrackInEveryLane and tramTrackType or 'NO'
@@ -1738,6 +1846,7 @@ local function updateFn_Motorway_6_1_lane_one_way_to_6_lane_x_large(params, brid
         {
             type = 'STREET',
             params = {
+                hasBus = hasBusLeft and hasBusInEveryLane,
                 skipCollision = true,
                 type = 'lollo_medium_1_way_1_lane_country_road_narrow_sidewalk.lua',
                 tramTrackType = isTramTrackInEveryLane and tramTrackType or 'NO'
@@ -1751,6 +1860,7 @@ local function updateFn_Motorway_6_1_lane_one_way_to_6_lane_x_large(params, brid
         {
             type = 'STREET',
             params = {
+                hasBus = hasBusLeft and hasBusInEveryLane,
                 skipCollision = true,
                 type = 'lollo_medium_1_way_1_lane_country_road_narrow_sidewalk.lua',
                 tramTrackType = isTramTrackInEveryLane and tramTrackType or 'NO'
@@ -1764,6 +1874,7 @@ local function updateFn_Motorway_6_1_lane_one_way_to_6_lane_x_large(params, brid
         {
             type = 'STREET',
             params = {
+                hasBus = hasBusLeft,
                 skipCollision = true,
                 type = 'lollo_medium_1_way_1_lane_country_road_narrow_sidewalk.lua',
                 tramTrackType = tramTrackType
@@ -1778,6 +1889,7 @@ local function updateFn_Motorway_6_1_lane_one_way_to_6_lane_x_large(params, brid
         {
             type = 'STREET',
             params = {
+                hasBus = hasBusLeft,
                 skipCollision = true,
                 type = 'lollo_internal_1_way_1_lane_street_no_sidewalk.lua',
                 tramTrackType = tramTrackType
@@ -1791,6 +1903,7 @@ local function updateFn_Motorway_6_1_lane_one_way_to_6_lane_x_large(params, brid
         {
             type = 'STREET',
             params = {
+                hasBus = false,
                 skipCollision = true,
                 type = 'lollo_internal_1_way_1_lane_street_no_sidewalk.lua',
                 tramTrackType = isTramTrackInEveryLane and tramTrackType or 'NO'
@@ -1804,6 +1917,7 @@ local function updateFn_Motorway_6_1_lane_one_way_to_6_lane_x_large(params, brid
         {
             type = 'STREET',
             params = {
+                hasBus = false,
                 skipCollision = true,
                 type = 'lollo_internal_1_way_1_lane_street_no_sidewalk.lua',
                 tramTrackType = isTramTrackInEveryLane and tramTrackType or 'NO'
@@ -1817,6 +1931,7 @@ local function updateFn_Motorway_6_1_lane_one_way_to_6_lane_x_large(params, brid
         {
             type = 'STREET',
             params = {
+                hasBus = false,
                 skipCollision = true,
                 type = 'lollo_internal_1_way_1_lane_street_no_sidewalk.lua',
                 tramTrackType = isTramTrackInEveryLane and tramTrackType or 'NO'
@@ -1830,6 +1945,7 @@ local function updateFn_Motorway_6_1_lane_one_way_to_6_lane_x_large(params, brid
         {
             type = 'STREET',
             params = {
+                hasBus = false,
                 skipCollision = true,
                 type = 'lollo_internal_1_way_1_lane_street_no_sidewalk.lua',
                 tramTrackType = isTramTrackInEveryLane and tramTrackType or 'NO'
@@ -1843,6 +1959,7 @@ local function updateFn_Motorway_6_1_lane_one_way_to_6_lane_x_large(params, brid
         {
             type = 'STREET',
             params = {
+                hasBus = hasBusLeft,
                 skipCollision = true,
                 type = 'lollo_internal_1_way_1_lane_street_no_sidewalk.lua',
                 tramTrackType = tramTrackType
@@ -1857,6 +1974,7 @@ local function updateFn_Motorway_6_1_lane_one_way_to_6_lane_x_large(params, brid
         {
             type = 'STREET',
             params = {
+                hasBus = hasBusRight,
                 skipCollision = true,
                 type = tramTrackType == 'NO'
                     and 'standard/country_x_large_new.lua'
@@ -1908,10 +2026,14 @@ local function updateFn_Motorway_2_2_lane_one_way_to_6_lane_x_large(params, brid
 
     local isTramTrackInEveryLane = _getTramTrackInEveryLane(params)
     local tramTrackType = _getTramTrackType(params)
+    local hasBusLeft = _getHasBusLeft(params)
+    local hasBusRight = _getHasBusRight(params)
+    local hasBusInEveryLane = _getHasBusInEveryLane(params)
     result.edgeLists = {
         {
             type = 'STREET',
             params = {
+                hasBus = hasBusLeft,
                 skipCollision = true,
                 type = tramTrackType == 'NO'
                     and 'standard/country_medium_one_way_new.lua'
@@ -1927,6 +2049,7 @@ local function updateFn_Motorway_2_2_lane_one_way_to_6_lane_x_large(params, brid
         {
             type = 'STREET',
             params = {
+                hasBus = hasBusLeft,
                 skipCollision = true,
                 type = tramTrackType == 'NO'
                     and 'standard/country_medium_one_way_new.lua'
@@ -1943,6 +2066,7 @@ local function updateFn_Motorway_2_2_lane_one_way_to_6_lane_x_large(params, brid
         {
             type = 'STREET',
             params = {
+                hasBus = hasBusLeft,
                 skipCollision = true,
                 type = 'lollo_internal_1_way_1_lane_street_no_sidewalk.lua',
                 tramTrackType = tramTrackType
@@ -1956,6 +2080,7 @@ local function updateFn_Motorway_2_2_lane_one_way_to_6_lane_x_large(params, brid
         {
             type = 'STREET',
             params = {
+                hasBus = false,
                 skipCollision = true,
                 type = 'lollo_internal_1_way_1_lane_street_no_sidewalk.lua',
                 tramTrackType = isTramTrackInEveryLane and tramTrackType or 'NO'
@@ -1969,6 +2094,7 @@ local function updateFn_Motorway_2_2_lane_one_way_to_6_lane_x_large(params, brid
         {
             type = 'STREET',
             params = {
+                hasBus = false,
                 skipCollision = true,
                 type = 'lollo_internal_1_way_1_lane_street_no_sidewalk.lua',
                 tramTrackType = isTramTrackInEveryLane and tramTrackType or 'NO'
@@ -1982,6 +2108,7 @@ local function updateFn_Motorway_2_2_lane_one_way_to_6_lane_x_large(params, brid
         {
             type = 'STREET',
             params = {
+                hasBus = hasBusLeft,
                 skipCollision = true,
                 type = 'lollo_internal_1_way_1_lane_street_no_sidewalk.lua',
                 tramTrackType = tramTrackType
@@ -1996,6 +2123,7 @@ local function updateFn_Motorway_2_2_lane_one_way_to_6_lane_x_large(params, brid
         {
             type = 'STREET',
             params = {
+                hasBus = hasBusRight,
                 skipCollision = true,
                 type = tramTrackType == 'NO'
                     and 'standard/country_x_large_new.lua'
@@ -2047,10 +2175,14 @@ local function updateFn_Motorway_4_1_lane_one_way_to_4_lane_large(params, bridge
 
     local isTramTrackInEveryLane = _getTramTrackInEveryLane(params)
     local tramTrackType = _getTramTrackType(params)
+    local hasBusLeft = _getHasBusLeft(params)
+    local hasBusRight = _getHasBusRight(params)
+    local hasBusInEveryLane = _getHasBusInEveryLane(params)
     result.edgeLists = {
         {
             type = 'STREET',
             params = {
+                hasBus = hasBusLeft,
                 skipCollision = true,
                 type = 'lollo_medium_1_way_1_lane_country_road_narrow_sidewalk.lua',
                 tramTrackType = tramTrackType
@@ -2064,6 +2196,7 @@ local function updateFn_Motorway_4_1_lane_one_way_to_4_lane_large(params, bridge
         {
             type = 'STREET',
             params = {
+                hasBus = hasBusLeft and hasBusInEveryLane,
                 skipCollision = true,
                 type = 'lollo_medium_1_way_1_lane_country_road_narrow_sidewalk.lua',
                 tramTrackType = isTramTrackInEveryLane and tramTrackType or 'NO',
@@ -2077,6 +2210,7 @@ local function updateFn_Motorway_4_1_lane_one_way_to_4_lane_large(params, bridge
         {
             type = 'STREET',
             params = {
+                hasBus = hasBusLeft and hasBusInEveryLane,
                 skipCollision = true,
                 type = 'lollo_medium_1_way_1_lane_country_road_narrow_sidewalk.lua',
                 tramTrackType = isTramTrackInEveryLane and tramTrackType or 'NO',
@@ -2090,6 +2224,7 @@ local function updateFn_Motorway_4_1_lane_one_way_to_4_lane_large(params, bridge
         {
             type = 'STREET',
             params = {
+                hasBus = hasBusLeft,
                 skipCollision = true,
                 type = 'lollo_medium_1_way_1_lane_country_road_narrow_sidewalk.lua',
                 tramTrackType = tramTrackType
@@ -2104,6 +2239,7 @@ local function updateFn_Motorway_4_1_lane_one_way_to_4_lane_large(params, bridge
         {
             type = 'STREET',
             params = {
+                hasBus = hasBusLeft,
                 skipCollision = true,
                 type = 'lollo_internal_1_way_1_lane_street_no_sidewalk.lua',
                 tramTrackType = tramTrackType
@@ -2117,6 +2253,7 @@ local function updateFn_Motorway_4_1_lane_one_way_to_4_lane_large(params, bridge
         {
             type = 'STREET',
             params = {
+                hasBus = false,
                 skipCollision = true,
                 type = 'lollo_internal_1_way_1_lane_street_no_sidewalk.lua',
                 tramTrackType = isTramTrackInEveryLane and tramTrackType or 'NO',
@@ -2130,6 +2267,7 @@ local function updateFn_Motorway_4_1_lane_one_way_to_4_lane_large(params, bridge
         {
             type = 'STREET',
             params = {
+                hasBus = false,
                 skipCollision = true,
                 type = 'lollo_internal_1_way_1_lane_street_no_sidewalk.lua',
                 tramTrackType = isTramTrackInEveryLane and tramTrackType or 'NO',
@@ -2143,6 +2281,7 @@ local function updateFn_Motorway_4_1_lane_one_way_to_4_lane_large(params, bridge
         {
             type = 'STREET',
             params = {
+                hasBus = hasBusLeft,
                 skipCollision = true,
                 type = 'lollo_internal_1_way_1_lane_street_no_sidewalk.lua',
                 tramTrackType = tramTrackType
@@ -2157,6 +2296,7 @@ local function updateFn_Motorway_4_1_lane_one_way_to_4_lane_large(params, bridge
         {
             type = 'STREET',
             params = {
+                hasBus = hasBusRight,
                 skipCollision = true,
                 type = tramTrackType == 'NO'
                     and 'standard/country_large_new.lua'
@@ -2208,10 +2348,13 @@ local function updateFn_Motorway_2_1_lane_narrow_sidewalk_to_2_lane(params, brid
 
     local isTramTrackInEveryLane = _getTramTrackInEveryLane(params)
     local tramTrackType = _getTramTrackType(params)
+    local hasBusLeft = _getHasBusLeft(params)
+    local hasBusRight = _getHasBusRight(params)
     result.edgeLists = {
         {
             type = 'STREET',
             params = {
+                hasBus = hasBusLeft,
                 skipCollision = true,
                 type = 'lollo_medium_1_way_1_lane_country_road_narrow_sidewalk.lua',
                 tramTrackType = tramTrackType
@@ -2225,6 +2368,7 @@ local function updateFn_Motorway_2_1_lane_narrow_sidewalk_to_2_lane(params, brid
         {
             type = 'STREET',
             params = {
+                hasBus = hasBusLeft,
                 skipCollision = true,
                 type = 'lollo_medium_1_way_1_lane_country_road_narrow_sidewalk.lua',
                 tramTrackType = tramTrackType
@@ -2239,6 +2383,7 @@ local function updateFn_Motorway_2_1_lane_narrow_sidewalk_to_2_lane(params, brid
         {
             type = 'STREET',
             params = {
+                hasBus = hasBusLeft,
                 skipCollision = true,
                 type = 'lollo_internal_1_way_1_lane_street_no_sidewalk.lua',
                 tramTrackType = tramTrackType
@@ -2252,6 +2397,7 @@ local function updateFn_Motorway_2_1_lane_narrow_sidewalk_to_2_lane(params, brid
         {
             type = 'STREET',
             params = {
+                hasBus = hasBusLeft,
                 skipCollision = true,
                 type = 'lollo_internal_1_way_1_lane_street_no_sidewalk.lua',
                 tramTrackType = tramTrackType
@@ -2266,6 +2412,7 @@ local function updateFn_Motorway_2_1_lane_narrow_sidewalk_to_2_lane(params, brid
         {
             type = 'STREET',
             params = {
+                hasBus = hasBusRight,
                 skipCollision = true,
                 type = 'standard/country_medium_new.lua',
                 tramTrackType = tramTrackType
@@ -2313,12 +2460,14 @@ local function updateFn_Motorway_3_1_lane_narrow_sidewalk_to_3_lane_one_way(para
 
     local isTramTrackInEveryLane = _getTramTrackInEveryLane(params)
     local tramTrackType = _getTramTrackType(params)
-    local hasBus = _getHasBus(params)
+    local hasBusLeft = _getHasBusLeft(params)
+    local hasBusRight = _getHasBusRight(params)
+    local hasBusInEveryLane = _getHasBusInEveryLane(params)
     result.edgeLists = {
         {
             type = 'STREET',
             params = {
-                hasBus = hasBus,
+                hasBus = hasBusLeft,
                 skipCollision = true,
                 type = 'lollo_medium_1_way_1_lane_country_road_narrow_sidewalk.lua',
                 tramTrackType = params.direction4Merge == 0 and tramTrackType or (isTramTrackInEveryLane and tramTrackType or 'NO')
@@ -2332,7 +2481,7 @@ local function updateFn_Motorway_3_1_lane_narrow_sidewalk_to_3_lane_one_way(para
         {
             type = 'STREET',
             params = {
-                hasBus = hasBus,
+                hasBus = hasBusLeft and hasBusInEveryLane,
                 skipCollision = true,
                 type = 'lollo_medium_1_way_1_lane_country_road_narrow_sidewalk.lua',
                 tramTrackType = isTramTrackInEveryLane and tramTrackType or 'NO'
@@ -2346,7 +2495,7 @@ local function updateFn_Motorway_3_1_lane_narrow_sidewalk_to_3_lane_one_way(para
         {
             type = 'STREET',
             params = {
-                hasBus = hasBus,
+                hasBus = hasBusLeft and hasBusInEveryLane,
                 skipCollision = true,
                 type = 'lollo_medium_1_way_1_lane_country_road_narrow_sidewalk.lua',
                 tramTrackType = params.direction4Merge == 1 and tramTrackType or (isTramTrackInEveryLane and tramTrackType or 'NO')
@@ -2361,7 +2510,7 @@ local function updateFn_Motorway_3_1_lane_narrow_sidewalk_to_3_lane_one_way(para
         {
             type = 'STREET',
             params = {
-                hasBus = hasBus,
+                hasBus = hasBusLeft,
                 skipCollision = true,
                 type = 'lollo_internal_1_way_1_lane_street_no_sidewalk.lua',
                 tramTrackType = params.direction4Merge == 0 and tramTrackType or (isTramTrackInEveryLane and tramTrackType or 'NO')
@@ -2375,7 +2524,7 @@ local function updateFn_Motorway_3_1_lane_narrow_sidewalk_to_3_lane_one_way(para
         {
             type = 'STREET',
             params = {
-                hasBus = hasBus,
+                hasBus = false,
                 skipCollision = true,
                 type = 'lollo_internal_1_way_1_lane_street_no_sidewalk.lua',
                 tramTrackType = isTramTrackInEveryLane and tramTrackType or 'NO'
@@ -2389,7 +2538,7 @@ local function updateFn_Motorway_3_1_lane_narrow_sidewalk_to_3_lane_one_way(para
         {
             type = 'STREET',
             params = {
-                hasBus = hasBus,
+                hasBus = false,
                 skipCollision = true,
                 type = 'lollo_internal_1_way_1_lane_street_no_sidewalk.lua',
                 tramTrackType = params.direction4Merge == 1 and tramTrackType or (isTramTrackInEveryLane and tramTrackType or 'NO')
@@ -2404,7 +2553,7 @@ local function updateFn_Motorway_3_1_lane_narrow_sidewalk_to_3_lane_one_way(para
         {
             type = 'STREET',
             params = {
-                hasBus = hasBus,
+                hasBus = hasBusRight,
                 skipCollision = true,
                 type = tramTrackType == 'NO'
                     and 'lollo_medium_1_way_3_lane_country_road.lua'
@@ -2454,12 +2603,14 @@ local function updateFn_Motorway_2_1_lane_narrow_sidewalk_to_2_lane_one_way(para
 
     local isTramTrackInEveryLane = _getTramTrackInEveryLane(params)
     local tramTrackType = _getTramTrackType(params)
-    local hasBus = _getHasBus(params)
+    local hasBusLeft = _getHasBusLeft(params)
+    local hasBusRight = _getHasBusRight(params)
+    local hasBusInEveryLane = _getHasBusInEveryLane(params)
     result.edgeLists = {
         {
             type = 'STREET',
             params = {
-                hasBus = hasBus,
+                hasBus = hasBusLeft,
                 skipCollision = true,
                 type = 'lollo_medium_1_way_1_lane_country_road_narrow_sidewalk.lua',
                 tramTrackType = params.direction4Merge == 0 and tramTrackType or (isTramTrackInEveryLane and tramTrackType or 'NO')
@@ -2473,7 +2624,7 @@ local function updateFn_Motorway_2_1_lane_narrow_sidewalk_to_2_lane_one_way(para
         {
             type = 'STREET',
             params = {
-                hasBus = hasBus,
+                hasBus = hasBusLeft and hasBusInEveryLane,
                 skipCollision = true,
                 type = 'lollo_medium_1_way_1_lane_country_road_narrow_sidewalk.lua',
                 tramTrackType = params.direction4Merge == 1 and tramTrackType or (isTramTrackInEveryLane and tramTrackType or 'NO')
@@ -2488,7 +2639,7 @@ local function updateFn_Motorway_2_1_lane_narrow_sidewalk_to_2_lane_one_way(para
         {
             type = 'STREET',
             params = {
-                hasBus = hasBus,
+                hasBus = hasBusLeft,
                 skipCollision = true,
                 type = 'lollo_internal_1_way_1_lane_street_no_sidewalk.lua',
                 tramTrackType = params.direction4Merge == 0 and tramTrackType or (isTramTrackInEveryLane and tramTrackType or 'NO')
@@ -2502,7 +2653,7 @@ local function updateFn_Motorway_2_1_lane_narrow_sidewalk_to_2_lane_one_way(para
         {
             type = 'STREET',
             params = {
-                hasBus = hasBus,
+                hasBus = false,
                 skipCollision = true,
                 type = 'lollo_internal_1_way_1_lane_street_no_sidewalk.lua',
                 tramTrackType = params.direction4Merge == 1 and tramTrackType or (isTramTrackInEveryLane and tramTrackType or 'NO')
@@ -2517,7 +2668,7 @@ local function updateFn_Motorway_2_1_lane_narrow_sidewalk_to_2_lane_one_way(para
         {
             type = 'STREET',
             params = {
-                hasBus = hasBus,
+                hasBus = hasBusRight,
                 skipCollision = true,
                 type = tramTrackType == 'NO'
                     and 'standard/country_medium_one_way_new.lua'

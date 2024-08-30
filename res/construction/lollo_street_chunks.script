@@ -33,6 +33,7 @@ function data()
             }
             -- LOLLO NOTE I cannot use KEEP here
             local tramTrackType = params.tramTrack_ and (({'NO', 'YES', 'ELECTRIC'})[params.tramTrack_ + 1]) or 'NO'
+            local hasBus = params.hasBus_ and (({false, true})[params.hasBus_ + 1]) or false
             -- LOLLO NOTE here, we have 2 half edges for every chunk of road. The inner nodes do not snap, the outer ones do.
             -- This is required if we want to make them snappable at all, to avoid crashes.
             -- We free all edges, so they can be freely converted to whatever one needs.
@@ -42,7 +43,8 @@ function data()
                 _pitchAngle,
                 two.globalStreetData[params.streetType4Chunks + 1],
                 two.globalBridgeData[params.bridgeType4Chunks + 1],
-                tramTrackType
+                tramTrackType,
+                hasBus
             )
             -- LOLLO NOTE this thing with the empty faces is required , otherwise the game will make its own alignments, with spikes and all on bridges or tunnels.
             result.terrainAlignmentLists = { { type = "EQUAL", optional = true, faces =  { } } }

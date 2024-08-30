@@ -93,6 +93,10 @@ function data()
 			["YellowBusLanesTooltip"] = "Change the looks of bus lanes so they have yellow stripes",
 			["MakeReservedLanes"] = "Make reserved lanes",
 			["MakeReservedLanesTooltip"] = "Make additional street types with reserved lanes for buses and lorries, buses and trams, buses only.",
+			["HasBus"] = "Bus Lane",
+			["HasBusInEveryLane"] = "Bus lanes wherever you can",
+			["HasBusLeft"] = "Bus Lane Left",
+			["HasBusRight"] = "Bus Lane Right",
 
 			-- flat foundation
 			["FlatFoundationName"] = "Flat Foundation",

@@ -206,6 +206,16 @@ return {
                 defaultIndex = 2
             },
             {
+                key = 'hasBus_',
+                name = _('HasBus'),
+                values = {
+                    -- must be in this sequence
+                    _('NO'),
+                    _('YES'),
+                },
+                defaultIndex = 0
+            },
+            {
                 key = 'lockLayoutCentre',
                 name = _('Lock chunks'),
                 tooltip = _('Lock chunks to keep their shape pretty and prevent other roads merging in. Unlock them to treat them like ordinary roads. You cannot relock an unlocked chunk.'),
@@ -265,7 +275,7 @@ return {
             }
         }
     end,
-    getStreetChunksSnapEdgeLists = function(params, pitchAngle, streetData, bridgeData, tramTrackType)
+    getStreetChunksSnapEdgeLists = function(params, pitchAngle, streetData, bridgeData, tramTrackType, hasBus)
         local streetHalfWidth = _getStreetHalfWidth(streetData)
         local streetFullWidth = _getStreetFullWidth(streetData)
 
@@ -288,6 +298,7 @@ return {
         local x2 = - x1
         local x3 = - x0
         local edgeParams = {
+            hasBus = hasBus,
             skipCollision = true,
             type = streetData.fileName,
             tramTrackType = tramTrackType

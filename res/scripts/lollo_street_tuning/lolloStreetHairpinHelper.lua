@@ -192,6 +192,16 @@ return {
                 defaultIndex = 2
             },
             {
+                key = 'hasBus_',
+                name = _('HasBus'),
+                values = {
+                    -- must be in this sequence
+                    _('NO'),
+                    _('YES'),
+                },
+                defaultIndex = 0
+            },
+            {
                 key = 'lockLayoutCentre',
                 name = _('Lock curve'),
                 tooltip = _('Lock a curve to keep its shape pretty and prevent other roads merging in. Unlock it to treat it like ordinary roads. You cannot relock an unlocked curve.'),
@@ -217,13 +227,14 @@ return {
             }
         }
     end,
-    getStreetHairpinSnapEdgeLists = function(params, extraRadius, pitchAngle, streetData, bridgeData, tramTrackType)
+    getStreetHairpinSnapEdgeLists = function(params, extraRadius, pitchAngle, streetData, bridgeData, tramTrackType, hasBus)
         local streetHalfWidth = _getStreetHalfWidth(streetData)
         local widthFactorBend = _getWidthFactor(streetHalfWidth)
         -- this is the fruit of trial and error, see the notes
         local xMax = math.max(9.0, streetHalfWidth + 1.0)
         -- local xMax = streetHalfWidth + 1.0 -- LOLLO TODO check this, it might need extending
         local edgeParams = {
+            hasBus = hasBus,
             skipCollision = true,
             type = streetData.fileName,
             tramTrackType = tramTrackType
