@@ -367,7 +367,7 @@ funcs.hideAllTramTracksStreets = function()
     -- print('_hideAllTramTracksStreets starting')
     local streetTypeFileNames = api.res.streetTypeRep.getAll()
     for streetTypeId, streetTypeFileName in pairs(streetTypeFileNames) do
-        if type(streetTypeId) == 'number' and streetTypeId > 0 then
+        if type(streetTypeId) == 'number' and streetTypeId > 0 and streetTypeFileName:starts("lollo") then
             local streetDataRecordFull = api.res.streetTypeRep.get(streetTypeId)
             -- print('working on streetID =', streetTypeId)
             if streetDataRecordFull ~= nil
