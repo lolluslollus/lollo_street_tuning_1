@@ -9,7 +9,7 @@ local streetUtils = require('lollo_street_tuning.streetUtils')
 function data()
     return {
         info = {
-            minorVersion = 66,
+            minorVersion = 67,
             severityAdd = 'NONE',
             severityRemove = 'WARNING',
             name = _('_NAME'),

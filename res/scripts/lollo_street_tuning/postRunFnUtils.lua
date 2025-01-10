@@ -1,6 +1,7 @@
 local arrayUtils = require('lollo_street_tuning.arrayUtils')
 local logger = require('lollo_street_tuning.logger')
 local streetUtils = require('lollo_street_tuning.streetUtils')
+local stringUtils = require('lollo_street_tuning.stringUtils')
 -- local debugger = require('debugger')
 
 -- LOLLO TODO
@@ -364,10 +365,13 @@ funcs.addStreetsWithReservedLanes = function()
 end
 
 funcs.hideAllTramTracksStreets = function()
-    -- print('_hideAllTramTracksStreets starting')
     local streetTypeFileNames = api.res.streetTypeRep.getAll()
     for streetTypeId, streetTypeFileName in pairs(streetTypeFileNames) do
-        if type(streetTypeId) == 'number' and streetTypeId > 0 then
+        if type(streetTypeId) == 'number'
+        and streetTypeId > 0
+        and type(streetTypeFileName) == 'string'
+        and stringUtils.stringStartsWith(streetTypeFileName, 'lollo') -- do not hide street types from other mods
+        then
             local streetDataRecordFull = api.res.streetTypeRep.get(streetTypeId)
             -- print('working on streetID =', streetTypeId)
             if streetDataRecordFull ~= nil
