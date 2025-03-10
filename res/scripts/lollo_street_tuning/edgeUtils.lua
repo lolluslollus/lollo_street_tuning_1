@@ -1248,7 +1248,7 @@ helper.track = {
                     myLogger.print('halfTrackWidth = ' .. tostring(halfTrackWidth))
                     -- local testPosition = transfUtils.transf2Position(transf, true)
                     local shifts = {}
-                    local howManySplitsM1 = 30.0 -- the higher, he better. Over 100 would be nonsense. 10 is not enough.
+                    local howManySplitsM1 = 32.0 -- the higher, the better. Over 100 would be nonsense. 18 is not enough.
                     for k = 0, howManySplitsM1, 1 do
                         shifts[#shifts+1] = k / howManySplitsM1
                     end
