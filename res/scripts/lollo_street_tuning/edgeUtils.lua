@@ -1135,6 +1135,7 @@ helper.track = {
         if type(transf) ~= 'table' then return nil end
 
         local _position = transfUtils.getVec123Transformed({0, 0, 0}, transf)
+         -- local testPosition = transfUtils.transf2Position(transf, true)
         -- print('position =') debugPrint(_position)
         local _searchRadius = 0.5
         local _box0 = api.type.Box3.new(
@@ -1165,7 +1166,7 @@ helper.track = {
             -- print('#baseEdgeIds == 1')
             -- return baseEdgeIds[1]
         else
-            myLogger.print('#baseEdgeIds == ' .. tostring(#baseEdgeIds))
+            myLogger.print('#baseEdgeIds == ' .. tostring(#baseEdgeIds) .. ', position = ') myLogger.debugPrint(_position)
             -- print('multiple base edges found')
             -- choose one edge and return its id
 
@@ -1219,7 +1220,7 @@ helper.track = {
             --         -- local node1 = api.engine.getComponent(baseEdge.node1, api.type.ComponentType.BASE_NODE)
             --         local trackTypeProperties = api.res.trackTypeRep.get(baseEdgeTrack.trackType)
             --         local halfTrackWidth = (trackTypeProperties.shapeWidth or 0) * 0.5
-            --         logger.print('halfTrackWidth = ' .. tostring(halfTrackWidth))
+            --         lmyLoggerogger.print('halfTrackWidth = ' .. tostring(halfTrackWidth))
             --         local testPosition = transfUtils.transf2Position(transf, true)
             --         local nodeBetween = helper.getNodeBetweenByPosition(baseEdgeIds[i], testPosition)
             --         if nodeBetween ~= nil and nodeBetween.length0 ~= 0 and nodeBetween.length1 ~= 0 and nodeBetween.position ~= nil then
@@ -1245,8 +1246,13 @@ helper.track = {
                     local trackTypeProperties = api.res.trackTypeRep.get(baseEdgeTrack.trackType)
                     local halfTrackWidth = (trackTypeProperties.shapeWidth or 0) * 0.5
                     myLogger.print('halfTrackWidth = ' .. tostring(halfTrackWidth))
-                    local testPosition = transfUtils.transf2Position(transf, true)
-                    local shifts = {0, 0.25, 0.5, 0.75, 1}
+                    -- local testPosition = transfUtils.transf2Position(transf, true)
+                    local shifts = {}
+                    local howManySplitsM1 = 30.0 -- the higher, he better. Over 100 would be nonsense. 10 is not enough.
+                    for k = 0, howManySplitsM1, 1 do
+                        shifts[#shifts+1] = k / howManySplitsM1
+                    end
+                    -- print('shifts =') debugPrint(shifts)
                     local nodesBetween = {}
                     for _, shift in pairs(shifts) do
                         local nodeBetween = helper.getNodeBetweenByPercentageShift(edgeId, shift)
@@ -1292,17 +1298,17 @@ local nodeBetween = {
                             nodesBetween[#nodesBetween+1] = nodeBetween
                         end
                     end
-                    myLogger.print('nodesBetween for edgeId ' .. tostring(edgeId) .. ' =') myLogger.debugPrint(nodesBetween)
+                    -- myLogger.print('nodesBetween for edgeId ' .. tostring(edgeId) .. ' =') myLogger.debugPrint(nodesBetween)
                     if #nodesBetween > 1 then
-                        local segmentPositions = {}
                         for k = 1, #nodesBetween - 1, 1 do
-                            segmentPositions[#segmentPositions+1] = {nodesBetween[k].position, nodesBetween[k+1].position}
-                        end
-                        for _, segmentPosition in pairs(segmentPositions) do
-                            local distance = transfUtils.getDistanceBetweenPointAndStraight(segmentPosition[1], segmentPosition[2], testPosition)
+                            -- local distance = transfUtils.getDistanceBetweenPointAndStraight(segmentPosition[1], segmentPosition[2], testPosition)
+                            local distance = transfUtils.getDistanceBetweenPointAndStraight(nodesBetween[k].position, nodesBetween[k+1].position, _position)
                             if type(distance) == 'number' and distance < minDistance_edgeId.distance and distance < halfTrackWidth then
+                                myLogger.print('new lower distance found for edge ' .. tostring(edgeId) .. ', it is ' .. tostring(distance))
                                 minDistance_edgeId.distance = distance
                                 minDistance_edgeId.edgeId = edgeId
+                            else
+                                myLogger.print('no lower distance found for edge ' .. tostring(edgeId) .. ', it would be ' .. tostring(distance))
                             end
                         end
                     end
