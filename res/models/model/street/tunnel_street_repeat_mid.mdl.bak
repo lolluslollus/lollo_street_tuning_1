@@ -1,0 +1,32 @@
+function data()
+return {
+	boundingInfo = {
+		bbMax = { 8, 2.5000076293945, 8.8625135421753, },
+		bbMin = { -1.5379548072815, -2.5000002384186, 5.8999991416931, },
+	},
+	collider = {
+		params = { },
+		transf = { 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, },
+		type = "MESH",
+	},
+	lods = {
+		{
+			node = {
+				children = {
+					{
+						materials = { "street/tunnel_street_repeat_wall.mtl", "tunnel_all_stone.mtl", },
+						mesh = "street/tunnel_street_repeat_mid/tunnel_street_repeat_mid_lod0.msh",
+						transf = { 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, },
+					},
+				},
+				transf = { 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, },
+			},
+			static = false,
+			visibleFrom = 0,
+			visibleTo = 4000,
+		},
+	},
+	metadata = { },
+	version = 1,
+}
+end
