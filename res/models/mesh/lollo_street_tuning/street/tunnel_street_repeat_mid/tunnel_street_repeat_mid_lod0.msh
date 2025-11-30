@@ -8,7 +8,7 @@ return {
 			indices = {
 				normal = {
 					count = 192,
-					offset = 2920,
+					offset = 2728,
 				},
 				position = {
 					count = 192,
@@ -20,7 +20,7 @@ return {
 				},
 				uv0 = {
 					count = 192,
-					offset = 2728,
+					offset = 2920,
 				},
 			},
 			materials = {
@@ -30,7 +30,7 @@ return {
 			indices = {
 				normal = {
 					count = 768,
-					offset = 4264,
+					offset = 3496,
 				},
 				position = {
 					count = 768,
@@ -42,7 +42,7 @@ return {
 				},
 				uv0 = {
 					count = 768,
-					offset = 3496,
+					offset = 4264,
 				},
 			},
 			materials = {
@@ -54,7 +54,7 @@ return {
 		normal = {
 			count = 612,
 			numComp = 3,
-			offset = 464,
+			offset = 0,
 		},
 		position = {
 			count = 756,
@@ -69,7 +69,7 @@ return {
 		uv0 = {
 			count = 464,
 			numComp = 2,
-			offset = 0,
+			offset = 612,
 		},
 	},
 }

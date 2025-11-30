@@ -14,9 +14,13 @@ function data()
 			{
 				node = {
 					children = {
+						-- {
+						-- 	materials = { "street/tunnel_street_repeat_wall.mtl", "tunnel_all_stone.mtl", },
+						-- 	mesh = "street/tunnel_street_repeat_mid/tunnel_street_repeat_mid_lod0.msh",
+						-- },
 						{
 							materials = { "street/tunnel_street_repeat_wall.mtl", "tunnel_all_stone.mtl", },
-							mesh = "street/tunnel_street_repeat_mid/tunnel_street_repeat_mid_lod0.msh",
+							mesh = "lollo_street_tuning/street/tunnel_street_repeat_mid/tunnel_street_repeat_mid_lod0.msh",
 						},
 						-- {
 						-- 	materials = { "street/tunnel_street_repeat_wall.mtl", "tunnel_all_stone.mtl", },
@@ -28,7 +32,7 @@ function data()
 						-- 	-- transf = {1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1}
 						-- },
 					},
-					transf = { 1, 0, 0, 0, 0, _fak, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, },
+					-- transf = { 1, 0, 0, 0, 0, _fak, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, },
 				},
 				static = false,
 				visibleFrom = 0,

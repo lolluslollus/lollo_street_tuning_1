@@ -1,5 +1,8 @@
 function data()
 return {
+	matConfigs = {
+		{ 0, 0, }, 
+	},
 	subMeshes = {
 		{
 			indices = {
@@ -20,6 +23,9 @@ return {
 					offset = 5324,
 				},
 			},
+			materials = {
+				"street/tunnel_street_repeat_mid/stone.mtl", 
+			},
 		},
 		{
 			indices = {
@@ -39,6 +45,9 @@ return {
 					count = 768,
 					offset = 6668,
 				},
+			},
+			materials = {
+				"station/train/passenger/rock.mtl", 
 			},
 		},
 	},
