@@ -23,10 +23,6 @@ function data()
 							mesh = "lollo_street_tuning/street/tunnel_street_repeat_mid/tunnel_street_repeat_mid_lod0.msh",
 						},
 						-- {
-						-- 	materials = { "street/tunnel_street_repeat_wall.mtl", "tunnel_all_stone.mtl", },
-						-- 	mesh = "lollo_street_tuning/street/tunnel_street_repeat_mid/tunnel_street_repeat_mid_lod0.msh",
-						-- },
-						-- {
 						-- 	materials = {'lollo_street_tuning/icon/yellow.mtl'},
 						-- 	mesh = 'lollo_street_tuning/icon/lod_0_icon_pointer.msh',
 						-- 	-- transf = {1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1}
